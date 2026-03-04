@@ -30,3 +30,9 @@ eggs/
 # OS
 .DS_Store
 Thumbs.db
+
+# Node / pnpm
+node_modules/
+apps/*/node_modules/
+pnpm-lock.yaml
+dist/

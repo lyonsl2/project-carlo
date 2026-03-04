@@ -1,4 +1,4 @@
-"""Bulletin sync pipeline: fetch, extract, AI parse, and persist."""
+"""Bulletin sync pipeline: fetch, process with AI, and persist."""
 
 from __future__ import annotations
 
@@ -26,20 +26,13 @@ from pdf_extract.storage import (
     insert_church,
     insert_event,
     list_churches,
-    list_bulletins_pending_parse,
-    list_bulletins_pending_text_extraction,
+    list_bulletins_pending_processing,
     list_existing_bulletin_urls,
     list_parish_ids,
     list_parish_sources,
-    mark_bulletin_parse_completed,
+    mark_bulletin_processed,
     migrate_db,
-    update_bulletin_text_extraction,
     update_church_address_if_missing,
-)
-from pdf_extract.text_extraction import (
-    extract_markdown_with_docling,
-    extract_text_by_page,
-    format_pages_with_boundaries,
 )
 
 ECATHOLIC_BULLETINS_PATH = "/bulletins"
@@ -350,10 +343,6 @@ def _parish_ids_for_run(conn, parish_name: str | None) -> list[int]:
     return list_parish_ids(conn)
 
 
-def _prepare_pages_for_storage(pages: list[str]) -> list[str]:
-    return [page.strip() for page in pages]
-
-
 def fetch_bulletins(*, parish_name: str | None = None, pdf_dir: Path = DEFAULT_PDF_DIR) -> dict[str, int]:
     LOGGER.info("Starting fetch stage (parish_name=%s)", parish_name or "*all*")
     migrate_db()
@@ -404,7 +393,6 @@ def fetch_bulletins(*, parish_name: str | None = None, pdf_dir: Path = DEFAULT_P
                 source_url=link.source_url,
                 pdf_path=str(pdf_path),
                 published_date=None,
-                text_pages_json=None,
                 content_hash=content_hash,
             )
             conn.commit()
@@ -417,15 +405,20 @@ def fetch_bulletins(*, parish_name: str | None = None, pdf_dir: Path = DEFAULT_P
         conn.close()
 
 
-def extract_bulletin_text(*, parish_name: str | None = None) -> dict[str, int]:
-    LOGGER.info("Starting extract stage (parish_name=%s)", parish_name or "*all*")
+def process_bulletins(
+    *,
+    parish_name: str | None = None,
+    model: str = "gemini-3-flash-preview",
+) -> dict[str, int]:
+    LOGGER.info("Starting process stage (parish_name=%s, model=%s)", parish_name or "*all*", model)
     migrate_db()
     conn = connect_db()
     try:
         parish_ids = _parish_ids_for_run(conn, parish_name)
-        extracted_count = 0
+        processed_count = 0
+        inserted_events = 0
         for parish_id in parish_ids:
-            rows = list_bulletins_pending_text_extraction(conn, parish_id=parish_id)
+            rows = list_bulletins_pending_processing(conn, parish_id=parish_id)
             for row in rows:
                 bulletin_id = int(row["id"])
                 pdf_path_raw = row["pdf_path"]
@@ -434,63 +427,24 @@ def extract_bulletin_text(*, parish_name: str | None = None) -> dict[str, int]:
                 pdf_path = Path(pdf_path_raw)
                 if not pdf_path.exists():
                     LOGGER.warning(
-                        "Skipping extraction for bulletin_id=%s: PDF file missing at %s",
+                        "Skipping process for bulletin_id=%s: PDF file missing at %s",
                         bulletin_id,
                         pdf_path,
                     )
                     continue
 
-                pages = extract_text_by_page(pdf_path)
-                markdown_text = extract_markdown_with_docling(pdf_path)
-                stored_pages = _prepare_pages_for_storage(pages)
-                update_bulletin_text_extraction(
-                    conn,
-                    bulletin_id=bulletin_id,
-                    text_pages_json=json.dumps(stored_pages),
-                    markdown_text=markdown_text,
-                )
-                conn.commit()
-                extracted_count += 1
-
-        result = {"extracted_bulletins": extracted_count}
-        LOGGER.info("Extract stage finished: %s", result)
-        return result
-    finally:
-        conn.close()
-
-
-def parse_bulletin_events(*, parish_name: str | None = None, model: str = "gpt-5-nano") -> dict[str, int]:
-    LOGGER.info("Starting parse stage (parish_name=%s, model=%s)", parish_name or "*all*", model)
-    migrate_db()
-    conn = connect_db()
-    try:
-        parish_ids = _parish_ids_for_run(conn, parish_name)
-        parsed_count = 0
-        inserted_events = 0
-        for parish_id in parish_ids:
-            rows = list_bulletins_pending_parse(conn, parish_id=parish_id)
-            for row in rows:
-                bulletin_id = int(row["id"])
-                text_pages_json = row["text_pages_json"]
-                if not isinstance(text_pages_json, str) or not text_pages_json:
-                    continue
                 try:
-                    pages = json.loads(text_pages_json)
-                except json.JSONDecodeError:
+                    pdf_bytes = pdf_path.read_bytes()
+                except OSError:
                     LOGGER.warning(
-                        "Skipping parse for bulletin_id=%s: invalid text_pages_json",
+                        "Skipping process for bulletin_id=%s: failed reading PDF at %s",
                         bulletin_id,
-                    )
-                    continue
-                if not isinstance(pages, list) or not all(isinstance(p, str) for p in pages):
-                    LOGGER.warning(
-                        "Skipping parse for bulletin_id=%s: unexpected text_pages_json shape",
-                        bulletin_id,
+                        pdf_path,
+                        exc_info=True,
                     )
                     continue
 
-                model_input = format_pages_with_boundaries(pages)
-                extracted = extract_events(model_input, model=model)
+                extracted = extract_events(pdf_bytes, model=model)
 
                 churches = extracted.get("churches", [])
                 church_map: dict[str, int] = {}
@@ -536,12 +490,12 @@ def parse_bulletin_events(*, parish_name: str | None = None, model: str = "gpt-5
                     insert_bulletin_event(conn, bulletin_id=bulletin_id, event_id=event_id)
                     inserted_events += 1
 
-                mark_bulletin_parse_completed(conn, bulletin_id=bulletin_id)
+                mark_bulletin_processed(conn, bulletin_id=bulletin_id)
                 conn.commit()
-                parsed_count += 1
+                processed_count += 1
 
-        result = {"parsed_bulletins": parsed_count, "inserted_events": inserted_events}
-        LOGGER.info("Parse stage finished: %s", result)
+        result = {"processed_bulletins": processed_count, "inserted_events": inserted_events}
+        LOGGER.info("Process stage finished: %s", result)
         return result
     finally:
         conn.close()
@@ -550,17 +504,15 @@ def parse_bulletin_events(*, parish_name: str | None = None, model: str = "gpt-5
 def sync_bulletins(
     *,
     parish_name: str | None = None,
-    model: str = "gpt-5-nano",
+    model: str = "gemini-3-flash-preview",
 ) -> dict[str, int]:
     LOGGER.info("Starting full sync run (parish_name=%s, model=%s)", parish_name or "*all*", model)
     fetch_result = fetch_bulletins(parish_name=parish_name)
-    extract_result = extract_bulletin_text(parish_name=parish_name)
-    parse_result = parse_bulletin_events(parish_name=parish_name, model=model)
+    process_result = process_bulletins(parish_name=parish_name, model=model)
     result = {
         "fetched_bulletins": fetch_result["fetched_bulletins"],
-        "extracted_bulletins": extract_result["extracted_bulletins"],
-        "parsed_bulletins": parse_result["parsed_bulletins"],
-        "inserted_events": parse_result["inserted_events"],
+        "processed_bulletins": process_result["processed_bulletins"],
+        "inserted_events": process_result["inserted_events"],
     }
     LOGGER.info("Full sync finished: %s", result)
     return result

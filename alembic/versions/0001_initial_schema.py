@@ -60,9 +60,7 @@ def upgrade() -> None:
             pdf_path TEXT,
             published_date TEXT,
             fetched_at TEXT NOT NULL,
-            text_pages_json TEXT,
-            text_extracted_at TEXT,
-            parse_completed_at TEXT,
+            processed_at TEXT,
             content_hash TEXT,
             UNIQUE(parish_id, source_url)
         )
@@ -70,14 +68,8 @@ def upgrade() -> None:
     )
     op.execute(
         """
-        CREATE INDEX idx_bulletin_parish_text_extracted
-        ON bulletin(parish_id, text_extracted_at)
-        """
-    )
-    op.execute(
-        """
-        CREATE INDEX idx_bulletin_parish_parse_completed
-        ON bulletin(parish_id, parse_completed_at)
+        CREATE INDEX idx_bulletin_parish_processed
+        ON bulletin(parish_id, processed_at)
         """
     )
     op.execute(

@@ -1,0 +1,14 @@
+{
+  "name": "project-carlo",
+  "private": true,
+  "version": "0.0.0",
+  "packageManager": "pnpm@10.12.1",
+  "scripts": {
+    "dev:api": "uv run uvicorn apps.api.main:app --reload",
+    "dev:web": "pnpm --filter web dev",
+    "build:web": "pnpm --filter web build",
+    "preview:web": "pnpm --filter web preview",
+    "lint:web": "pnpm --filter web lint",
+    "check:web": "pnpm --filter web check"
+  }
+}

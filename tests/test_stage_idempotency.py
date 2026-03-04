@@ -1,8 +1,7 @@
-import json
 from pathlib import Path
 
 from pdf_extract.storage import connect_db, get_parish_id, insert_bulletin, migrate_db
-from pdf_extract.sync import BulletinLink, extract_bulletin_text, fetch_bulletins, parse_bulletin_events
+from pdf_extract.sync import BulletinLink, fetch_bulletins, process_bulletins
 
 
 def _patch_sync_db(monkeypatch, db_path: Path) -> None:
@@ -39,7 +38,7 @@ def test_fetch_stage_is_idempotent(monkeypatch, tmp_path: Path) -> None:
     assert second["skipped_existing_urls"] == 1
 
 
-def test_extract_stage_is_idempotent(monkeypatch, tmp_path: Path) -> None:
+def test_process_stage_is_idempotent(monkeypatch, tmp_path: Path) -> None:
     db_path = tmp_path / "parish_events.db"
     migrate_db(db_path)
     _patch_sync_db(monkeypatch, db_path)
@@ -52,61 +51,10 @@ def test_extract_stage_is_idempotent(monkeypatch, tmp_path: Path) -> None:
         insert_bulletin(
             conn,
             parish_id=parish_id,
-            source_url="https://example.org/sample.pdf",
+            source_url="https://example.org/parsed.pdf",
             pdf_path=str(pdf_path),
             published_date="2026-02-22",
-            content_hash="abc",
-        )
-        conn.commit()
-    finally:
-        conn.close()
-
-    monkeypatch.setattr("pdf_extract.sync.extract_text_by_page", lambda _: ["Page One", "Page Two"])
-    monkeypatch.setattr(
-        "pdf_extract.sync.extract_markdown_with_docling",
-        lambda _: "# Bulletin\n\n- Item",
-    )
-
-    first = extract_bulletin_text(parish_name="Southeast Rochester Catholic Community")
-    second = extract_bulletin_text(parish_name="Southeast Rochester Catholic Community")
-
-    assert first["extracted_bulletins"] == 1
-    assert second["extracted_bulletins"] == 0
-
-    conn = connect_db(db_path)
-    try:
-        row = conn.execute(
-            "SELECT text_pages_json, markdown_text FROM bulletin WHERE source_url = ?",
-            ("https://example.org/sample.pdf",),
-        ).fetchone()
-    finally:
-        conn.close()
-
-    assert row is not None
-    assert row["text_pages_json"] == json.dumps(["Page One", "Page Two"])
-    assert row["markdown_text"] == "# Bulletin\n\n- Item"
-
-
-def test_parse_stage_is_idempotent(monkeypatch, tmp_path: Path) -> None:
-    db_path = tmp_path / "parish_events.db"
-    migrate_db(db_path)
-    _patch_sync_db(monkeypatch, db_path)
-
-    conn = connect_db(db_path)
-    try:
-        parish_id = get_parish_id(conn, "Southeast Rochester Catholic Community")
-        bulletin_id = insert_bulletin(
-            conn,
-            parish_id=parish_id,
-            source_url="https://example.org/parsed.pdf",
-            pdf_path=str(tmp_path / "parsed.pdf"),
-            published_date="2026-02-22",
-            text_pages_json=json.dumps(["Page One", "Page Two"]),
             content_hash="def",
-        )
-        conn.execute(
-            "UPDATE bulletin SET text_extracted_at = '2026-02-22T00:00:00Z' WHERE id = ?",
-            (bulletin_id,),
         )
         conn.commit()
     finally:
@@ -114,7 +62,7 @@ def test_parse_stage_is_idempotent(monkeypatch, tmp_path: Path) -> None:
 
     monkeypatch.setattr(
         "pdf_extract.sync.extract_events",
-        lambda text, model="gpt-5-nano": {
+        lambda pdf_bytes, model="gemini-3-flash-preview": {
             "churches": [{"id": "c1", "name": "St. Mary", "address": "123 Main"}],
             "events": [
                 {
@@ -131,10 +79,22 @@ def test_parse_stage_is_idempotent(monkeypatch, tmp_path: Path) -> None:
         },
     )
 
-    first = parse_bulletin_events(parish_name="Southeast Rochester Catholic Community")
-    second = parse_bulletin_events(parish_name="Southeast Rochester Catholic Community")
+    first = process_bulletins(parish_name="Southeast Rochester Catholic Community")
+    second = process_bulletins(parish_name="Southeast Rochester Catholic Community")
 
-    assert first["parsed_bulletins"] == 1
+    assert first["processed_bulletins"] == 1
     assert first["inserted_events"] == 1
-    assert second["parsed_bulletins"] == 0
+    assert second["processed_bulletins"] == 0
     assert second["inserted_events"] == 0
+
+    conn = connect_db(db_path)
+    try:
+        row = conn.execute(
+            "SELECT processed_at FROM bulletin WHERE source_url = ?",
+            ("https://example.org/parsed.pdf",),
+        ).fetchone()
+    finally:
+        conn.close()
+
+    assert row is not None
+    assert row["processed_at"] is not None

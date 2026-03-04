@@ -101,8 +101,6 @@ def insert_bulletin(
     source_url: str,
     pdf_path: str | None = None,
     published_date: str | None = None,
-    text_pages_json: str | None = None,
-    markdown_text: str | None = None,
     content_hash: str | None,
 ) -> int:
     now = utc_now_iso()
@@ -114,11 +112,9 @@ def insert_bulletin(
             pdf_path,
             published_date,
             fetched_at,
-            text_pages_json,
-            markdown_text,
             content_hash
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?)
         """,
         (
             parish_id,
@@ -126,15 +122,13 @@ def insert_bulletin(
             pdf_path,
             published_date,
             now,
-            text_pages_json,
-            markdown_text,
             content_hash,
         ),
     )
     return int(cur.lastrowid)
 
 
-def list_bulletins_pending_text_extraction(
+def list_bulletins_pending_processing(
     conn: sqlite3.Connection,
     *,
     parish_id: int | None = None,
@@ -145,7 +139,7 @@ def list_bulletins_pending_text_extraction(
             SELECT id, parish_id, pdf_path
             FROM bulletin
             WHERE pdf_path IS NOT NULL
-              AND text_extracted_at IS NULL
+              AND processed_at IS NULL
             ORDER BY id
             """
         ).fetchall()
@@ -155,65 +149,18 @@ def list_bulletins_pending_text_extraction(
         FROM bulletin
         WHERE parish_id = ?
           AND pdf_path IS NOT NULL
-          AND text_extracted_at IS NULL
+          AND processed_at IS NULL
         ORDER BY id
         """,
         (parish_id,),
     ).fetchall()
 
 
-def update_bulletin_text_extraction(
-    conn: sqlite3.Connection,
-    *,
-    bulletin_id: int,
-    text_pages_json: str,
-    markdown_text: str,
-) -> None:
+def mark_bulletin_processed(conn: sqlite3.Connection, *, bulletin_id: int) -> None:
     conn.execute(
         """
         UPDATE bulletin
-        SET text_pages_json = ?,
-            markdown_text = ?,
-            text_extracted_at = ?
-        WHERE id = ?
-        """,
-        (text_pages_json, markdown_text, utc_now_iso(), bulletin_id),
-    )
-
-
-def list_bulletins_pending_parse(
-    conn: sqlite3.Connection,
-    *,
-    parish_id: int | None = None,
-) -> list[sqlite3.Row]:
-    if parish_id is None:
-        return conn.execute(
-            """
-            SELECT id, parish_id, text_pages_json
-            FROM bulletin
-            WHERE text_extracted_at IS NOT NULL
-              AND parse_completed_at IS NULL
-            ORDER BY id
-            """
-        ).fetchall()
-    return conn.execute(
-        """
-        SELECT id, parish_id, text_pages_json
-        FROM bulletin
-        WHERE parish_id = ?
-          AND text_extracted_at IS NOT NULL
-          AND parse_completed_at IS NULL
-        ORDER BY id
-        """,
-        (parish_id,),
-    ).fetchall()
-
-
-def mark_bulletin_parse_completed(conn: sqlite3.Connection, *, bulletin_id: int) -> None:
-    conn.execute(
-        """
-        UPDATE bulletin
-        SET parse_completed_at = ?
+        SET processed_at = ?
         WHERE id = ?
         """,
         (utc_now_iso(), bulletin_id),

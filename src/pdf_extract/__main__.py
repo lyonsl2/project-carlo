@@ -6,7 +6,7 @@ import logging
 import sys
 
 from pdf_extract.storage import DEFAULT_DB_PATH, delete_db, downgrade_db, migrate_db
-from pdf_extract.sync import extract_bulletin_text, fetch_bulletins, parse_bulletin_events, sync_bulletins
+from pdf_extract.sync import fetch_bulletins, process_bulletins, sync_bulletins
 
 LOGGER = logging.getLogger(__name__)
 
@@ -22,7 +22,7 @@ def _configure_logging(level_name: str) -> None:
 def _run_sync_mode(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(
         prog="python -m pdf_extract",
-        description="Fetch bulletin PDFs, extract text, and parse events into SQLite.",
+        description="Fetch bulletin PDFs and process schedule events into SQLite.",
     )
     parser.add_argument(
         "--parish",
@@ -30,8 +30,8 @@ def _run_sync_mode(argv: list[str]) -> int:
     )
     parser.add_argument(
         "--model",
-        default="gpt-5-nano",
-        help="OpenAI model for parse command/full sync (default: gpt-5-nano)",
+        default="gemini-3-flash-preview",
+        help="Gemini model for process command/full sync (default: gemini-3-flash-preview)",
     )
     parser.add_argument(
         "--log-level",
@@ -58,8 +58,7 @@ def _run_sync_mode(argv: list[str]) -> int:
     )
     subparsers = parser.add_subparsers(dest="command")
     subparsers.add_parser("fetch", help="Fetch latest PDFs and save to disk/db")
-    subparsers.add_parser("extract", help="Extract text from fetched PDFs")
-    subparsers.add_parser("parse", help="Parse extracted text with OpenAI and save events")
+    subparsers.add_parser("process", help="Process fetched PDFs with Gemini and save events")
     args = parser.parse_args(argv)
     _configure_logging(args.log_level)
 
@@ -92,10 +91,8 @@ def _run_sync_mode(argv: list[str]) -> int:
 
         if args.command == "fetch":
             result = fetch_bulletins(parish_name=args.parish)
-        elif args.command == "extract":
-            result = extract_bulletin_text(parish_name=args.parish)
-        elif args.command == "parse":
-            result = parse_bulletin_events(parish_name=args.parish, model=args.model)
+        elif args.command == "process":
+            result = process_bulletins(parish_name=args.parish, model=args.model)
         else:
             result = sync_bulletins(
                 parish_name=args.parish,

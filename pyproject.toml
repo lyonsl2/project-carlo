@@ -5,17 +5,17 @@ build-backend = "hatchling.build"
 [project]
 name = "pdf-extract"
 version = "0.1.0"
-description = "Extract text from PDFs using Python."
+description = "Fetch parish bulletins and process schedules with Gemini."
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "alembic>=1.17.1",
-    "pymupdf>=1.27.1",
-    "openai>=2.21.0",
+    "fastapi>=0.121.1",
     "pydantic>=2.12.5",
     "playwright>=1.55.0",
     "sqlalchemy>=2.0.44",
-    "docling>=2.75.0",
+    "google-genai>=1.65.0",
+    "uvicorn>=0.38.0",
 ]
 
 [tool.hatch.build.targets.wheel]
@@ -23,6 +23,7 @@ packages = ["src/pdf_extract"]
 
 [dependency-groups]
 dev = [
+    "httpx>=0.28.1",
     "pytest>=9.0.2",
     "ruff>=0.15.2",
 ]

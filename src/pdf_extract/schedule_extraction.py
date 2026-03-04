@@ -1,10 +1,10 @@
-"""Extract structured schedule data from document text using the OpenAI API."""
+"""Extract structured schedule data from bulletin PDFs using Gemini."""
 
 import json
-import os
 from typing import Any, Literal
 
-from openai import OpenAI
+from google import genai
+from google.genai import types
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -73,64 +73,43 @@ Rules:
 Return output that matches the provided JSON schema exactly."""
 
 
-EVENTS_JSON_SCHEMA: dict[str, Any] = {
-    "type": "json_schema",
-    "name": "church_schedule",
-    "strict": True,
-    "schema": SchedulePayload.model_json_schema(),
-}
-
-
 def extract_events(
-    text: str,
+    pdf_bytes: bytes,
     *,
-    api_key: str | None = None,
-    model: str = "gpt-5-nano",
+    model: str = "gemini-3-flash-preview",
 ) -> dict[str, Any]:
-    """Use the OpenAI API to extract Mass, Confession, and Adoration schedule from document text.
+    """Use Gemini to extract Mass, Confession, and Adoration schedule from a PDF.
 
     Args:
-        text: Raw text (e.g. from a PDF) to analyze.
-        api_key: OpenAI API key. If not set, uses the OPENAI_API_KEY environment variable.
-        model: OpenAI model to use (e.g. gpt-5-nano, gpt-4o).
+        pdf_bytes: Raw PDF bytes to analyze.
+        model: Gemini model to use.
 
     Returns:
         Dict with:
         - "churches": list of church objects (id, name, address)
         - "events": list of events that reference churches by church_id
 
-    Raises:
-        ValueError: If no API key is provided or set in OPENAI_API_KEY.
-        openai.APIError: On API errors.
     """
-    key = api_key or os.environ.get("OPENAI_API_KEY")
-    if not key:
-        raise ValueError(
-            "OpenAI API key required. Set OPENAI_API_KEY or pass api_key=..."
-        )
+    if not pdf_bytes:
+        return _normalize_payload({})
 
-    client = OpenAI(api_key=key)
-    response = client.responses.create(
+    client = genai.Client()
+    response = client.models.generate_content(
         model=model,
-        input=[
-            {
-                "role": "system",
-                "content": [{"type": "input_text", "text": EVENTS_SYSTEM_PROMPT}],
-            },
-            {
-                "role": "user",
-                "content": [{"type": "input_text", "text": text}],
-            },
-            {
-                "role": "system",
-                "content": [{"type": "input_text", "text": EVENTS_SYSTEM_PROMPT}],
-            },
+        contents=[
+            EVENTS_SYSTEM_PROMPT,
+            types.Part.from_bytes(data=pdf_bytes, mime_type="application/pdf"),
         ],
-        reasoning={"effort": "medium"},
-        text={"format": EVENTS_JSON_SCHEMA},
+        config=types.GenerateContentConfig(
+            response_mime_type="application/json",
+            response_json_schema=SchedulePayload.model_json_schema(),
+        ),
     )
-    content = response.output_text or "{}"
-    data = json.loads(content)
+    content = response.text or "{}"
+    try:
+        data = json.loads(content)
+    except json.JSONDecodeError:
+        data = {}
     if not isinstance(data, dict):
         data = {}
     return _normalize_payload(data)
