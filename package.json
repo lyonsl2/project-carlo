@@ -7,7 +7,7 @@
     "dev:api": "uv run uvicorn apps.api.main:app --reload",
     "dev:web": "pnpm --filter web dev",
     "extract:web": "uv run python apps/web/scripts/extract_frontend_db.py",
-    "build:web": "pnpm run extract:web && pnpm --filter web build",
+    "build:web": "pnpm --filter web build",
     "preview:web": "pnpm --filter web preview",
     "lint:web": "pnpm --filter web lint",
     "check:web": "pnpm --filter web check"
