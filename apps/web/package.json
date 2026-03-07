@@ -7,9 +7,10 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "preview": "vite preview",
+    "preview": "pnpm run build && wrangler dev",
     "lint": "eslint .",
-    "check": "tsc --noEmit"
+    "check": "tsc --noEmit",
+    "deploy": "pnpm run build && wrangler deploy"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.90.3",
@@ -18,10 +19,10 @@
     "react-dom": "^19.1.1",
     "react-leaflet": "^5.0.0",
     "react-router-dom": "^7.9.4",
-    "sql.js": "^1.14.1",
-    "wrangler": "^4.71.0"
+    "sql.js": "^1.14.1"
   },
   "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.26.1",
     "@eslint/js": "^9.38.0",
     "@types/leaflet": "^1.9.21",
     "@types/node": "^24.7.2",
@@ -35,6 +36,7 @@
     "globals": "^16.4.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.46.2",
-    "vite": "^7.1.11"
+    "vite": "^7.1.11",
+    "wrangler": "^4.71.0"
   }
 }

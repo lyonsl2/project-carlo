@@ -4,6 +4,8 @@ import { copyFileSync, existsSync, mkdirSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
 import type { Plugin } from "vite";
 
+import { cloudflare } from "@cloudflare/vite-plugin";
+
 function copySqlWasm(): Plugin {
   return {
     name: "copy-sql-wasm",
@@ -21,7 +23,7 @@ function copySqlWasm(): Plugin {
 }
 
 export default defineConfig({
-  plugins: [react(), copySqlWasm()],
+  plugins: [react(), copySqlWasm(), cloudflare()],
   server: {
     host: true,
     port: 5173,

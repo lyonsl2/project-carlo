@@ -25,21 +25,19 @@ uv sync --group dev
 pnpm install
 ```
 
-## Run the apps
+## Run the web app
 
-Start API server:
+Refresh the frontend SQLite snapshot:
 
 ```bash
-uv run uvicorn apps.api.main:app --reload
+pnpm extract:web
 ```
 
-Start web app:
+Start the web app:
 
 ```bash
 pnpm dev:web
 ```
-
-The web app expects API at `http://localhost:8000` by default.
 
 ## Usage
 
@@ -105,8 +103,8 @@ uv run alembic revision -m "describe change"
 Backfill church coordinates from address data (OpenStreetMap Nominatim):
 
 ```bash
-uv run python -m apps.api.scripts.geocode_churches --dry-run
-uv run python -m apps.api.scripts.geocode_churches --email "you@example.com"
+uv run python scripts/geocode_churches.py --dry-run
+uv run python scripts/geocode_churches.py --email "you@example.com"
 ```
 
 ## Project layout
@@ -115,7 +113,8 @@ uv run python -m apps.api.scripts.geocode_churches --email "you@example.com"
 - `package.json` and `pnpm-workspace.yaml` - JS workspace for frontend
 - `uv.lock` - locked dependency versions
 - `apps/web` - React + TypeScript + Vite frontend
-- `apps/api/main.py` - FastAPI read API for map and church pages
+- `apps/web/scripts/extract_frontend_db.py` - builds the frontend SQLite snapshot
+- `scripts/geocode_churches.py` - optional coordinate backfill helper
 - `src/pdf_extract/schedule_extraction.py` - Gemini schedule extraction implementation
 - `src/pdf_extract/sync.py` - fetch/process orchestration
 - `src/pdf_extract/storage.py` - SQLite helpers and migration runner
