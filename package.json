@@ -5,11 +5,12 @@
   "packageManager": "pnpm@10.12.1",
   "scripts": {
     "dev:api": "uv run uvicorn apps.api.main:app --reload",
-    "dev:web": "pnpm --filter web dev",
+    "install:web": "pnpm --dir apps/web install",
+    "dev:web": "pnpm --dir apps/web dev",
     "extract:web": "uv run python apps/web/scripts/extract_frontend_db.py",
-    "build:web": "pnpm --filter web build",
-    "preview:web": "pnpm --filter web preview",
-    "lint:web": "pnpm --filter web lint",
-    "check:web": "pnpm --filter web check"
+    "build:web": "pnpm --dir apps/web build",
+    "preview:web": "pnpm --dir apps/web preview",
+    "lint:web": "pnpm --dir apps/web lint",
+    "check:web": "pnpm --dir apps/web check"
   }
 }
