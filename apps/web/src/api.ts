@@ -1,47 +1,283 @@
-import type { ChurchDetail, ChurchMapItem, EventSummary, EventType } from "./types";
+import type { Database, SqlValue } from "sql.js";
+import { getDb } from "./db";
+import type {
+  ChurchDetail,
+  ChurchMapItem,
+  EventSummary,
+  EventType,
+} from "./types";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
+const ALL_TYPES: EventType[] = ["mass", "confession", "adoration"];
 
-function buildTypesParam(types: EventType[]): string | null {
-  if (types.length === 0) {
-    return null;
-  }
-  return types.join(",");
+const DAY_TO_INDEX: Record<string, number> = {
+  monday: 0,
+  tuesday: 1,
+  wednesday: 2,
+  thursday: 3,
+  friday: 4,
+  saturday: 5,
+  sunday: 6,
+};
+
+interface RawEvent {
+  id: number;
+  church_id: number;
+  event_type: EventType;
+  event_kind: "weekly" | "specific_date";
+  day_of_week: string | null;
+  date: string | null;
+  start_time: string;
+  end_time: string | null;
+  cancelled: boolean;
+  occurrence: string | null;
 }
 
-export async function fetchChurches(types: EventType[]): Promise<ChurchMapItem[]> {
-  const url = new URL("/churches", API_BASE);
-  const typeValue = buildTypesParam(types);
-  if (typeValue) {
-    url.searchParams.set("types", typeValue);
+function parseTime(value: string): { hours: number; minutes: number } | null {
+  const raw = value.trim();
+  const patterns: [RegExp, (m: RegExpMatchArray) => { hours: number; minutes: number }][] = [
+    // 12:30 PM / 12:30PM
+    [/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i, (m) => {
+      let h = parseInt(m[1]);
+      const min = parseInt(m[2]);
+      const ampm = m[3].toUpperCase();
+      if (ampm === "PM" && h !== 12) h += 12;
+      if (ampm === "AM" && h === 12) h = 0;
+      return { hours: h, minutes: min };
+    }],
+    // 8 AM / 8AM
+    [/^(\d{1,2})\s*(AM|PM)$/i, (m) => {
+      let h = parseInt(m[1]);
+      const ampm = m[2].toUpperCase();
+      if (ampm === "PM" && h !== 12) h += 12;
+      if (ampm === "AM" && h === 12) h = 0;
+      return { hours: h, minutes: 0 };
+    }],
+    // 14:30
+    [/^(\d{1,2}):(\d{2})$/, (m) => ({
+      hours: parseInt(m[1]),
+      minutes: parseInt(m[2]),
+    })],
+    // 1430
+    [/^(\d{2})(\d{2})$/, (m) => ({
+      hours: parseInt(m[1]),
+      minutes: parseInt(m[2]),
+    })],
+  ];
+  for (const [re, extract] of patterns) {
+    const match = raw.match(re);
+    if (match) return extract(match);
   }
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error("Failed loading churches");
+  return null;
+}
+
+function todayDate(): Date {
+  const now = new Date();
+  return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+}
+
+function nextForWeekly(
+  dayOfWeek: string,
+  startTime: string,
+  today: Date,
+): Date | null {
+  const dayIdx = DAY_TO_INDEX[dayOfWeek.toLowerCase()];
+  if (dayIdx === undefined) return null;
+  const parsed = parseTime(startTime);
+  if (!parsed) return null;
+  const jsDay = (dayIdx + 1) % 7; // Python: Monday=0; JS: Sunday=0
+  const currentDay = today.getDay();
+  const daysAhead = (jsDay - currentDay + 7) % 7;
+  const target = new Date(today);
+  target.setDate(target.getDate() + daysAhead);
+  target.setHours(parsed.hours, parsed.minutes, 0, 0);
+  return target;
+}
+
+function nextForSpecific(eventDate: string, startTime: string): Date | null {
+  const parsed = parseTime(startTime);
+  if (!parsed) return null;
+  const parts = eventDate.split("-");
+  if (parts.length !== 3) return null;
+  const d = new Date(
+    parseInt(parts[0]),
+    parseInt(parts[1]) - 1,
+    parseInt(parts[2]),
+    parsed.hours,
+    parsed.minutes,
+  );
+  if (isNaN(d.getTime())) return null;
+  return d;
+}
+
+function computeOccurrence(event: {
+  cancelled: boolean;
+  event_kind: string;
+  day_of_week: string | null;
+  start_time: string;
+  date: string | null;
+}): string | null {
+  if (event.cancelled) return null;
+  const today = todayDate();
+  let occ: Date | null = null;
+  if (event.event_kind === "weekly" && event.day_of_week) {
+    occ = nextForWeekly(event.day_of_week, event.start_time, today);
+  } else if (event.event_kind === "specific_date" && event.date) {
+    occ = nextForSpecific(event.date, event.start_time);
   }
-  return (await response.json()) as ChurchMapItem[];
+  return occ ? occ.toISOString() : null;
+}
+
+function str(v: SqlValue): string | null {
+  return typeof v === "string" ? v : null;
+}
+
+function num(v: SqlValue): number | null {
+  return typeof v === "number" ? v : null;
+}
+
+function queryEvents(
+  db: Database,
+  churchIds: number[],
+  types: EventType[],
+): RawEvent[] {
+  if (churchIds.length === 0) return [];
+  const effectiveTypes = types.length === 0 ? ALL_TYPES : types;
+  const churchPh = churchIds.map(() => "?").join(",");
+  const typePh = effectiveTypes.map(() => "?").join(",");
+  const stmt = db.prepare(
+    `SELECT id, church_id, event_type, event_kind,
+            day_of_week, date, start_time, end_time, cancelled
+     FROM event
+     WHERE church_id IN (${churchPh})
+       AND event_type IN (${typePh})`,
+  );
+  stmt.bind([...churchIds, ...effectiveTypes]);
+
+  const results: RawEvent[] = [];
+  while (stmt.step()) {
+    const row = stmt.getAsObject();
+    const ev: RawEvent = {
+      id: row["id"] as number,
+      church_id: row["church_id"] as number,
+      event_type: row["event_type"] as EventType,
+      event_kind: row["event_kind"] as "weekly" | "specific_date",
+      day_of_week: str(row["day_of_week"]),
+      date: str(row["date"]),
+      start_time: row["start_time"] as string,
+      end_time: str(row["end_time"]),
+      cancelled: Boolean(row["cancelled"]),
+      occurrence: null,
+    };
+    ev.occurrence = computeOccurrence(ev);
+    results.push(ev);
+  }
+  stmt.free();
+  return results;
+}
+
+function toEventSummary(ev: RawEvent): EventSummary {
+  return {
+    id: ev.id,
+    type: ev.event_type,
+    kind: ev.event_kind,
+    day_of_week: ev.day_of_week,
+    date: ev.date,
+    start_time: ev.start_time,
+    end_time: ev.end_time,
+    cancelled: ev.cancelled,
+    next_occurrence: ev.occurrence,
+  };
+}
+
+export async function fetchChurches(
+  types: EventType[],
+): Promise<ChurchMapItem[]> {
+  const db = await getDb();
+
+  const stmt = db.prepare(
+    "SELECT id, parish_id, name, address, latitude, longitude FROM church ORDER BY name",
+  );
+  const churches: { id: number; parish_id: number; name: string | null; address: string | null; latitude: number | null; longitude: number | null }[] = [];
+  while (stmt.step()) {
+    const row = stmt.getAsObject();
+    churches.push({
+      id: row["id"] as number,
+      parish_id: row["parish_id"] as number,
+      name: str(row["name"]),
+      address: str(row["address"]),
+      latitude: num(row["latitude"]),
+      longitude: num(row["longitude"]),
+    });
+  }
+  stmt.free();
+
+  const churchIds = churches.map((c) => c.id);
+  const events = queryEvents(db, churchIds, types);
+
+  const grouped = new Map<number, RawEvent[]>();
+  for (const ev of events) {
+    let list = grouped.get(ev.church_id);
+    if (!list) {
+      list = [];
+      grouped.set(ev.church_id, list);
+    }
+    list.push(ev);
+  }
+
+  const UPCOMING_LIMIT = 3;
+  return churches.map((c) => {
+    const churchEvents = grouped.get(c.id) ?? [];
+    const upcomingSorted = churchEvents
+      .filter((e) => e.occurrence !== null)
+      .sort((a, b) => a.occurrence!.localeCompare(b.occurrence!))
+      .slice(0, UPCOMING_LIMIT);
+    const eventTypes = [
+      ...new Set(churchEvents.map((e) => e.event_type)),
+    ].sort() as EventType[];
+    return {
+      ...c,
+      event_types: eventTypes,
+      upcoming_events: upcomingSorted.map(toEventSummary),
+    };
+  });
 }
 
 export async function fetchChurch(churchId: number): Promise<ChurchDetail> {
-  const response = await fetch(new URL(`/churches/${churchId}`, API_BASE));
-  if (!response.ok) {
-    throw new Error("Failed loading church");
+  const db = await getDb();
+  const stmt = db.prepare(
+    "SELECT id, parish_id, name, address, latitude, longitude FROM church WHERE id = ?",
+  );
+  stmt.bind([churchId]);
+  if (!stmt.step()) {
+    stmt.free();
+    throw new Error("Church not found");
   }
-  return (await response.json()) as ChurchDetail;
+  const row = stmt.getAsObject();
+  stmt.free();
+  return {
+    id: row["id"] as number,
+    parish_id: row["parish_id"] as number,
+    name: str(row["name"]),
+    address: str(row["address"]),
+    latitude: num(row["latitude"]),
+    longitude: num(row["longitude"]),
+  };
 }
 
 export async function fetchChurchEvents(
   churchId: number,
   types: EventType[],
 ): Promise<EventSummary[]> {
-  const url = new URL(`/churches/${churchId}/events`, API_BASE);
-  const typeValue = buildTypesParam(types);
-  if (typeValue) {
-    url.searchParams.set("types", typeValue);
+  const db = await getDb();
+
+  const check = db.exec("SELECT 1 FROM church WHERE id = ?", [churchId]);
+  if (check.length === 0 || check[0].values.length === 0) {
+    throw new Error("Church not found");
   }
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error("Failed loading church events");
-  }
-  return (await response.json()) as EventSummary[];
+
+  const events = queryEvents(db, [churchId], types);
+  return events
+    .filter((e) => e.occurrence !== null)
+    .sort((a, b) => a.occurrence!.localeCompare(b.occurrence!))
+    .map(toEventSummary);
 }
