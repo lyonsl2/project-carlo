@@ -253,22 +253,15 @@ def test_resolve_church_id_similarity(tmp_path: Path) -> None:
         conn.close()
 
 
-def test_build_links_for_parish_falls_back_to_parishes_online(monkeypatch, tmp_path: Path) -> None:
+def test_build_links_for_parish_parishes_online(monkeypatch, tmp_path: Path) -> None:
     db_path = tmp_path / "parish_events.db"
     migrate_db(db_path)
     conn = connect_db(db_path)
     try:
         parish_id = get_parish_id(conn, "Southeast Rochester Catholic Community")
         conn.execute(
-            "DELETE FROM parish_source WHERE parish_id = ? AND type = ?",
-            (parish_id, "ecatholic"),
-        )
-        conn.execute(
-            """
-            INSERT INTO parish_source(parish_id, type, provider_id, created_at)
-            VALUES (?, ?, ?, '2026-01-01T00:00:00Z')
-            """,
-            (parish_id, PARISHES_ONLINE_TYPE, "123"),
+            "UPDATE parish SET source_type = ?, source_provider_id = ? WHERE id = ?",
+            (PARISHES_ONLINE_TYPE, "123", parish_id),
         )
         conn.commit()
 

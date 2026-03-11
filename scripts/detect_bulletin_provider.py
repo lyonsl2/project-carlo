@@ -21,6 +21,8 @@ PROVIDER_KEYWORDS: list[tuple[str, str]] = [
 
 
 CF_CHALLENGE_TIMEOUT_MS = 15_000
+_PARISHES_ONLINE_WIDGET_FRAME_TIMEOUT_MS = 15_000
+_PARISHES_ONLINE_WIDGET_SELECTOR_TIMEOUT_MS = 15_000
 
 
 def _wait_for_cloudflare(page) -> None:  # type: ignore[no-untyped-def]
@@ -32,9 +34,30 @@ def _wait_for_cloudflare(page) -> None:  # type: ignore[no-untyped-def]
                 "document.title !== 'Just a moment...'",
                 timeout=CF_CHALLENGE_TIMEOUT_MS,
             )
-            page.wait_for_load_state("networkidle")
+            page.wait_for_load_state("domcontentloaded")
         except Exception:
             LOGGER.warning("Cloudflare challenge did not resolve in time")
+
+
+def _wait_for_parishes_online_widget(page) -> None:  # type: ignore[no-untyped-def]
+    """Wait for Parishes Online widget iframe and its content using Playwright APIs."""
+    for _ in range(_PARISHES_ONLINE_WIDGET_FRAME_TIMEOUT_MS // 500):
+        parishes_frame = next(
+            (f for f in page.frames if "parishesonline" in (f.url or "").lower()),
+            None,
+        )
+        if parishes_frame is None:
+            page.wait_for_timeout(500)
+            continue
+        try:
+            parishes_frame.wait_for_selector(
+                'a[href*="publication-page"]',
+                timeout=_PARISHES_ONLINE_WIDGET_SELECTOR_TIMEOUT_MS,
+            )
+        except Exception:
+            pass
+        return
+    return
 
 
 _PARISHES_ONLINE_ID_PATTERNS: list[re.Pattern[str]] = [
@@ -60,6 +83,79 @@ def detect_provider(page_html: str) -> tuple[str, str | None]:
             if provider == "parishes_online":
                 provider_id = _extract_parishes_online_id(page_html)
             return provider, provider_id
+    return "other", None
+
+
+_FRAME_CONTENT_TIMEOUT_MS = 5_000
+
+
+def _collect_page_html(page, *, include_frames: bool = True) -> str:  # type: ignore[no-untyped-def]
+    """Collect HTML from main frame and optionally all iframes.
+
+    Per Playwright docs: skip detached frames (frame.is_detached), wait for load
+    state before content() (frame.wait_for_load_state), and use a short default
+    timeout so frame.content() does not hang indefinitely.
+    """
+    parts = [page.content()]
+    if not include_frames:
+        return "\n".join(parts)
+    try:
+        page.set_default_timeout(_FRAME_CONTENT_TIMEOUT_MS)
+        for frame in page.frames:
+            if frame == page.main_frame:
+                continue
+            if frame.is_detached():
+                continue
+            try:
+                frame.wait_for_load_state("domcontentloaded", timeout=_FRAME_CONTENT_TIMEOUT_MS)
+                parts.append(frame.content())
+            except Exception:
+                LOGGER.debug("Skipping frame %s (timeout or error)", frame.url)
+    finally:
+        page.set_default_timeout(30_000)
+    return "\n".join(parts)
+
+
+_BULLETIN_LINK_RE = re.compile(r"bulletin", re.IGNORECASE)
+
+
+def _find_bulletin_hrefs(page) -> list[str]:  # type: ignore[no-untyped-def]
+    """Return deduplicated absolute URLs from anchors whose href contains 'bulletin'."""
+    anchors = page.query_selector_all("a[href]")
+    seen: set[str] = set()
+    result: list[str] = []
+    base_url = page.url
+    for anchor in anchors:
+        href = anchor.get_attribute("href")
+        if not href or not _BULLETIN_LINK_RE.search(href):
+            continue
+        if href.startswith("/"):
+            from urllib.parse import urljoin
+            href = urljoin(base_url, href)
+        if not href.startswith("http"):
+            continue
+        if href not in seen:
+            seen.add(href)
+            result.append(href)
+    return result
+
+
+def _detect_from_bulletin_links(page) -> tuple[str, str | None]:  # type: ignore[no-untyped-def]
+    """Follow links containing 'bulletin' and run detection on each."""
+    hrefs = _find_bulletin_hrefs(page)
+    LOGGER.info("Found %d bulletin link(s) to check", len(hrefs))
+    for href in hrefs:
+        try:
+            LOGGER.info("  Following bulletin link: %s", href)
+            page.goto(href, wait_until="domcontentloaded", timeout=30000)
+            _wait_for_cloudflare(page)
+            _wait_for_parishes_online_widget(page)
+            html = _collect_page_html(page, include_frames=True)
+            provider, provider_id = detect_provider(html)
+            if provider != "other":
+                return provider, provider_id
+        except Exception:
+            LOGGER.exception("  Failed to load bulletin link %s", href)
     return "other", None
 
 
@@ -103,16 +199,14 @@ def run_detection(
                     url = str(row["homepage_url"])
                     try:
                         LOGGER.info("Loading %s", url)
-                        page.goto(url, wait_until="networkidle", timeout=30000)
+                        page.goto(url, wait_until="domcontentloaded", timeout=30000)
                         _wait_for_cloudflare(page)
-                        all_html_parts = [page.content()]
-                        for frame in page.frames:
-                            try:
-                                all_html_parts.append(frame.content())
-                            except Exception:
-                                pass
-                        html = "\n".join(all_html_parts)
+                        _wait_for_parishes_online_widget(page)
+                        html = _collect_page_html(page)
                         provider, provider_id = detect_provider(html)
+                        if provider == "other":
+                            LOGGER.info("No provider on homepage, checking bulletin links for %s", url)
+                            provider, provider_id = _detect_from_bulletin_links(page)
                         LOGGER.info("Detected provider=%s provider_id=%s for %s", provider, provider_id, url)
                     except Exception:
                         LOGGER.exception("Failed to load %s", url)

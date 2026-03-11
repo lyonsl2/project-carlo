@@ -29,7 +29,7 @@ from pdf_extract.storage import (
     list_bulletins_pending_processing,
     list_existing_bulletin_urls,
     list_parish_ids,
-    list_parish_sources,
+    get_parish_source,
     mark_bulletin_processed,
     migrate_db,
     update_church_address_if_missing,
@@ -231,28 +231,23 @@ def _extract_parishes_online_pdf_url_from_href(
 
 
 def _build_latest_bulletin_links_for_parish(*, conn, parish_id: int) -> BulletinLink:
-    for source in list_parish_sources(conn, parish_id):
-        source_type = str(source["type"])
-        provider_id_raw = source["provider_id"]
-        if provider_id_raw is None:
-            continue
-        provider_id = str(provider_id_raw)
-        if source_type == "ecatholic":
-            LOGGER.info(
-                "Selected source for parish_id=%s: type=%s provider_id=%s",
-                parish_id,
-                source_type,
-                provider_id,
-            )
-            return build_latest_ecatholic_bulletin_links(provider_id=provider_id)
-        if source_type == PARISHES_ONLINE_TYPE:
-            LOGGER.info(
-                "Selected source for parish_id=%s: type=%s provider_id=%s",
-                parish_id,
-                source_type,
-                provider_id,
-            )
-            return build_latest_parishes_online_bulletin_links(provider_id=provider_id)
+    row = get_parish_source(conn, parish_id)
+    if row is None:
+        raise ValueError(f"No parish found for parish_id={parish_id}")
+    source_type = row["source_type"]
+    provider_id = row["source_provider_id"]
+    if not source_type or not provider_id:
+        raise ValueError(f"No supported source configured for parish_id={parish_id}")
+    LOGGER.info(
+        "Selected source for parish_id=%s: type=%s provider_id=%s",
+        parish_id,
+        source_type,
+        provider_id,
+    )
+    if source_type == "ecatholic":
+        return build_latest_ecatholic_bulletin_links(provider_id=provider_id)
+    if source_type == PARISHES_ONLINE_TYPE:
+        return build_latest_parishes_online_bulletin_links(provider_id=provider_id)
     raise ValueError(f"No supported source configured for parish_id={parish_id}")
 
 

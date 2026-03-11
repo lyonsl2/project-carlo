@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(claude config:*)",
+      "Bash(sqlite3:*)",
+      "Bash(uv run:*)",
+      "Bash(git add:*)"
+    ]
+  }
+}

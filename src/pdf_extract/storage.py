@@ -77,16 +77,11 @@ def get_parish_id(conn: sqlite3.Connection, parish_name: str) -> int:
     return int(row["id"])
 
 
-def list_parish_sources(conn: sqlite3.Connection, parish_id: int) -> list[sqlite3.Row]:
+def get_parish_source(conn: sqlite3.Connection, parish_id: int) -> sqlite3.Row | None:
     return conn.execute(
-        """
-        SELECT type, provider_id
-        FROM parish_source
-        WHERE parish_id = ?
-        ORDER BY id
-        """,
+        "SELECT source_type, source_provider_id FROM parish WHERE id = ?",
         (parish_id,),
-    ).fetchall()
+    ).fetchone()
 
 
 def list_existing_bulletin_urls(conn: sqlite3.Connection, parish_id: int) -> set[str]:
