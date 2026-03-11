@@ -95,7 +95,7 @@ pnpm db:drop     # delete the SQLite file
 - `data/schema.sql` - SQLite schema (source of truth)
 - `data/` - CSV, JSON data files and downloaded bulletin PDFs
 - `apps/web/` - React + TypeScript + Vite frontend
-- `apps/web/scripts/extract_frontend_db.py` - builds the frontend SQLite snapshot
+- `src/pdf_extract/extract_frontend_db.py` - builds the frontend SQLite snapshot
 - `src/pdf_extract/` - Python CLI package
   - `__main__.py` - CLI entry point
   - `sync.py` - fetch/process orchestration

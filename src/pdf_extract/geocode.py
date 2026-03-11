@@ -83,11 +83,9 @@ def run_backfill(
         if not dry_run:
             c["latitude"] = coords[0]
             c["longitude"] = coords[1]
+            save_json_list(CHURCHES_PATH, churches)
         updated += 1
         if pause_seconds > 0:
             time.sleep(pause_seconds)
-
-    if not dry_run:
-        save_json_list(CHURCHES_PATH, churches)
 
     return {"checked": len(pending), "updated": updated, "failed": failed}

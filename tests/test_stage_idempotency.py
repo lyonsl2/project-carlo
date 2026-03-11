@@ -33,12 +33,16 @@ def test_fetch_stage_is_idempotent(monkeypatch, tmp_path: Path) -> None:
 
     monkeypatch.setattr(
         "pdf_extract.sync._build_bulletin_link",
-        lambda source_type, source_provider_id: BulletinLink(
+        lambda source_type, source_provider_id, *, page=None: BulletinLink(
             source_url="https://example.org/bulletin.pdf",
             fetch_url="https://example.org/bulletin.pdf",
         ),
     )
     monkeypatch.setattr("pdf_extract.sync._download_pdf", lambda **kwargs: b"%PDF-1.4 fake")
+    monkeypatch.setattr(
+        "pdf_extract.sync._launch_browser",
+        lambda: (type("PW", (), {"stop": lambda self: None})(), type("B", (), {"close": lambda self: None})(), None),
+    )
 
     pdf_dir = tmp_path / "bulletins"
     first = fetch_bulletins(parish_name="Test Parish", pdf_dir=pdf_dir)

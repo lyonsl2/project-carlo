@@ -11,7 +11,6 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import date, timedelta
 from difflib import SequenceMatcher
-from html.parser import HTMLParser
 from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.parse import parse_qs, unquote, urljoin, urlparse
@@ -77,63 +76,32 @@ def _next_sunday_after(d: date) -> date:
 # ── eCatholic bulletin resolution ───────────────────────────────────────────
 
 def build_latest_ecatholic_bulletin_links(
-    *, provider_id: str, reference_date: date | None = None
+    *, provider_id: str, reference_date: date | None = None, page: object | None = None,
 ) -> BulletinLink:
     _ = reference_date
-    source_url, fetch_url = _resolve_ecatholic_latest_link(provider_id=provider_id)
+    source_url, fetch_url = _resolve_ecatholic_latest_link(provider_id=provider_id, page=page)
     return BulletinLink(source_url=source_url, fetch_url=fetch_url)
 
 
-def _resolve_ecatholic_latest_link(*, provider_id: str) -> tuple[str, str]:
+def _resolve_ecatholic_latest_link(
+    *, provider_id: str, page: object | None = None,
+) -> tuple[str, str]:
     bulletins_url = urljoin(provider_id.rstrip("/") + "/", ECATHOLIC_BULLETINS_PATH.lstrip("/"))
-    return _resolve_latest_anchor_link_from_html_fetch(
+    return _resolve_latest_anchor_link_with_playwright(
         page_url=bulletins_url,
+        anchor_selector="a[href*='files.ecatholic.com']",
         source_label=f"ecatholic provider_id={provider_id}",
-        href_filter=lambda href: "files.ecatholic.com" in href and "bulletins" in href,
         href_to_urls=lambda href: _extract_ecatholic_pdf_url_from_href(
             href=href,
             base_url=bulletins_url,
         ),
+        page=page,
     )
 
 
-class _AnchorHrefParser(HTMLParser):
-    def __init__(self) -> None:
-        super().__init__()
-        self.hrefs: list[str] = []
-
-    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
-        if tag.lower() != "a":
-            return
-        for key, value in attrs:
-            if key.lower() == "href" and isinstance(value, str):
-                self.hrefs.append(value)
-                return
-
-
-def _resolve_latest_anchor_link_from_html_fetch(
-    *,
-    page_url: str,
-    source_label: str,
-    href_filter: Callable[[str], bool],
-    href_to_urls: Callable[[str], tuple[str, str] | None],
+def _resolve_parishes_online_latest_link(
+    *, provider_id: str, page: object | None = None,
 ) -> tuple[str, str]:
-    LOGGER.info("Resolving latest anchor link from HTML (%s)", source_label)
-    html_bytes = _http_get_bytes(page_url, timeout=30)
-    parser = _AnchorHrefParser()
-    parser.feed(html_bytes.decode("utf-8", errors="replace"))
-    for href in parser.hrefs:
-        if not href_filter(href):
-            continue
-        urls = href_to_urls(href)
-        if urls is None:
-            continue
-        LOGGER.info("Resolved latest anchor link from HTML (%s)", source_label)
-        return urls
-    raise ValueError(f"No matching anchor link found for {source_label} at {page_url}")
-
-
-def _resolve_parishes_online_latest_link(*, provider_id: str) -> tuple[str, str]:
     org_url = PARISHES_ONLINE_ORG_URL_TEMPLATE.format(provider_id=provider_id)
     return _resolve_latest_anchor_link_with_playwright(
         page_url=org_url,
@@ -144,7 +112,23 @@ def _resolve_parishes_online_latest_link(*, provider_id: str) -> tuple[str, str]
             provider_id=provider_id,
             base_url=org_url,
         ),
+        page=page,
     )
+
+
+def _launch_browser() -> tuple[object, object, object]:
+    """Launch a Playwright browser with stealth. Returns (playwright, browser, page)."""
+    playwright_module = importlib.import_module("playwright.sync_api")
+    sync_playwright = getattr(playwright_module, "sync_playwright")
+    stealth_cls = getattr(importlib.import_module("playwright_stealth"), "Stealth")
+    stealth = stealth_cls()
+
+    pw = sync_playwright().start()
+    browser = pw.chromium.launch(headless=False, channel="chrome")
+    context = browser.new_context()
+    stealth.apply_stealth_sync(context)
+    page = context.new_page()
+    return pw, browser, page
 
 
 def _resolve_latest_anchor_link_with_playwright(
@@ -153,30 +137,35 @@ def _resolve_latest_anchor_link_with_playwright(
     anchor_selector: str,
     source_label: str,
     href_to_urls: Callable[[str], tuple[str, str] | None],
+    page: object | None = None,
 ) -> tuple[str, str]:
-    playwright_module = importlib.import_module("playwright.sync_api")
-    sync_playwright = getattr(playwright_module, "sync_playwright")
+    owns_browser = page is None
+    pw = None
+    browser = None
+    if owns_browser:
+        pw, browser, page = _launch_browser()
 
-    LOGGER.info("Resolving latest anchor link (%s)", source_label)
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
-        try:
-            page = browser.new_page()
-            LOGGER.info("Visiting page URL: %s", page_url)
-            page.goto(page_url, wait_until="domcontentloaded")
-            page.wait_for_selector(anchor_selector, timeout=15000)
-            anchors = page.query_selector_all(anchor_selector)
-            for anchor in anchors:
-                href = anchor.get_attribute("href")
-                if not isinstance(href, str):
-                    continue
-                urls = href_to_urls(href)
-                if urls is None:
-                    continue
-                LOGGER.info("Resolved latest anchor link (%s)", source_label)
-                return urls
-        finally:
-            browser.close()
+    try:
+        LOGGER.info("Resolving latest anchor link (%s)", source_label)
+        LOGGER.info("Visiting page URL: %s", page_url)
+        page.goto(page_url, wait_until="domcontentloaded")  # type: ignore[union-attr]
+        page.wait_for_selector(anchor_selector, timeout=15000)  # type: ignore[union-attr]
+        anchors = page.query_selector_all(anchor_selector)  # type: ignore[union-attr]
+        for anchor in anchors:
+            href = anchor.get_attribute("href")
+            if not isinstance(href, str):
+                continue
+            urls = href_to_urls(href)
+            if urls is None:
+                continue
+            LOGGER.info("Resolved latest anchor link (%s)", source_label)
+            return urls
+    finally:
+        if owns_browser:
+            if browser is not None:
+                browser.close()
+            if pw is not None:
+                pw.stop()
 
     raise ValueError(f"No matching anchor link found for {source_label} at {page_url}")
 
@@ -196,9 +185,9 @@ def _extract_ecatholic_pdf_url_from_href(*, href: str, base_url: str) -> tuple[s
 
 
 def build_latest_parishes_online_bulletin_links(
-    *, provider_id: str, reference_date: date | None = None
+    *, provider_id: str, reference_date: date | None = None, page: object | None = None,
 ) -> BulletinLink:
-    source_url, fetch_url = _resolve_parishes_online_latest_link(provider_id=provider_id)
+    source_url, fetch_url = _resolve_parishes_online_latest_link(provider_id=provider_id, page=page)
     _ = reference_date
     return BulletinLink(source_url=source_url, fetch_url=fetch_url)
 
@@ -226,11 +215,13 @@ def _extract_parishes_online_pdf_url_from_href(
 
 # ── Bulletin link resolution ────────────────────────────────────────────────
 
-def _build_bulletin_link(source_type: str, source_provider_id: str) -> BulletinLink:
+def _build_bulletin_link(
+    source_type: str, source_provider_id: str, *, page: object | None = None,
+) -> BulletinLink:
     if source_type == "ecatholic":
-        return build_latest_ecatholic_bulletin_links(provider_id=source_provider_id)
+        return build_latest_ecatholic_bulletin_links(provider_id=source_provider_id, page=page)
     if source_type == PARISHES_ONLINE_TYPE:
-        return build_latest_parishes_online_bulletin_links(provider_id=source_provider_id)
+        return build_latest_parishes_online_bulletin_links(provider_id=source_provider_id, page=page)
     raise ValueError(f"Unsupported source_type: {source_type}")
 
 
@@ -325,50 +316,54 @@ def fetch_bulletins(
     fetched = 0
     skipped_existing = 0
 
-    for parish in parishes:
-        slug = parish["slug"]
-        source_type = parish["source_type"]
-        source_provider_id = parish["source_provider_id"]
+    pw, browser, page = _launch_browser()
+    try:
+        for parish in parishes:
+            slug = parish["slug"]
+            source_type = parish["source_type"]
+            source_provider_id = parish["source_provider_id"]
 
-        if not source_type or not source_provider_id:
-            continue
+            if not source_type or not source_provider_id:
+                continue
 
-        try:
-            link = _build_bulletin_link(source_type, source_provider_id)
-        except ValueError:
-            LOGGER.warning("Skipping parish %s: no supported source", slug)
-            continue
+            try:
+                link = _build_bulletin_link(source_type, source_provider_id, page=page)
+            except ValueError:
+                LOGGER.warning("Skipping parish %s: no supported source", slug)
+                continue
 
-        if link.source_url in existing_urls:
-            skipped_existing += 1
-            continue
+            if link.source_url in existing_urls:
+                skipped_existing += 1
+                continue
 
-        try:
-            pdf_bytes = _download_pdf(fetch_url=link.fetch_url, source_url=link.source_url)
-        except Exception:
-            LOGGER.warning("Failed downloading bulletin for %s", slug, exc_info=True)
-            continue
+            try:
+                pdf_bytes = _download_pdf(fetch_url=link.fetch_url, source_url=link.source_url)
+            except Exception:
+                LOGGER.warning("Failed downloading bulletin for %s", slug, exc_info=True)
+                continue
 
-        content_hash = hashlib.sha256(pdf_bytes).hexdigest()
-        parish_dir = pdf_dir / slug
-        parish_dir.mkdir(parents=True, exist_ok=True)
-        pdf_path = parish_dir / f"{content_hash}.pdf"
-        if not pdf_path.exists():
-            pdf_path.write_bytes(pdf_bytes)
+            content_hash = hashlib.sha256(pdf_bytes).hexdigest()
+            parish_dir = pdf_dir / slug
+            parish_dir.mkdir(parents=True, exist_ok=True)
+            pdf_path = parish_dir / f"{content_hash}.pdf"
+            if not pdf_path.exists():
+                pdf_path.write_bytes(pdf_bytes)
 
-        metadata.append({
-            "parish_slug": slug,
-            "source_url": link.source_url,
-            "pdf_path": str(pdf_path),
-            "content_hash": content_hash,
-            "fetched_at": utc_now_iso(),
-            "processed_at": None,
-            "published_date": None,
-        })
-        existing_urls.add(link.source_url)
-        fetched += 1
-
-    save_json_list(BULLETINS_METADATA_PATH, metadata)
+            metadata.append({
+                "parish_slug": slug,
+                "source_url": link.source_url,
+                "pdf_path": str(pdf_path),
+                "content_hash": content_hash,
+                "fetched_at": utc_now_iso(),
+                "processed_at": None,
+                "published_date": None,
+            })
+            existing_urls.add(link.source_url)
+            fetched += 1
+            save_json_list(BULLETINS_METADATA_PATH, metadata)
+    finally:
+        browser.close()
+        pw.stop()
 
     result = {"fetched_bulletins": fetched, "skipped_existing_urls": skipped_existing}
     LOGGER.info("Fetch stage finished: %s", result)
@@ -476,10 +471,9 @@ def process_bulletins(
 
         entry["processed_at"] = utc_now_iso()
         processed_count += 1
-
-    save_json_list(BULLETINS_METADATA_PATH, metadata)
-    save_json_list(CHURCHES_PATH, churches)
-    save_json_list(EVENTS_PATH, events)
+        save_json_list(BULLETINS_METADATA_PATH, metadata)
+        save_json_list(CHURCHES_PATH, churches)
+        save_json_list(EVENTS_PATH, events)
 
     result = {"processed_bulletins": processed_count, "inserted_events": inserted_events}
     LOGGER.info("Process stage finished: %s", result)

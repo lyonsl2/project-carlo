@@ -3,7 +3,7 @@ from pathlib import Path
 from pdf_extract.storage import SCHEMA_PATH, connect_db
 
 
-def test_event_belongs_to_church_and_maps_to_bulletin(tmp_path: Path) -> None:
+def test_event_belongs_to_church_and_bulletin(tmp_path: Path) -> None:
     db_path = tmp_path / "parish_events.db"
     conn = connect_db(db_path)
     schema_sql = SCHEMA_PATH.read_text(encoding="utf-8")
@@ -29,15 +29,10 @@ def test_event_belongs_to_church_and_maps_to_bulletin(tmp_path: Path) -> None:
     bulletin_id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
 
     conn.execute(
-        "INSERT INTO event(church_id, event_type, event_kind, day_of_week, start_time, cancelled, raw_json) VALUES (?, ?, ?, ?, ?, ?, ?)",
-        (church_id, "mass", "weekly", "Sunday", "9:30am", 0, "{}"),
+        "INSERT INTO event(church_id, bulletin_id, event_type, event_kind, day_of_week, start_time, cancelled, raw_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        (church_id, bulletin_id, "mass", "weekly", "Sunday", "9:30am", 0, "{}"),
     )
     event_id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
-
-    conn.execute(
-        "INSERT INTO bulletin_event(bulletin_id, event_id) VALUES (?, ?)",
-        (bulletin_id, event_id),
-    )
     conn.commit()
 
     row = conn.execute(
@@ -45,8 +40,7 @@ def test_event_belongs_to_church_and_maps_to_bulletin(tmp_path: Path) -> None:
         SELECT e.id as event_id, c.id as church_id, b.id as bulletin_id
         FROM event e
         JOIN church c ON c.id = e.church_id
-        JOIN bulletin_event be ON be.event_id = e.id
-        JOIN bulletin b ON b.id = be.bulletin_id
+        JOIN bulletin b ON b.id = e.bulletin_id
         WHERE e.id = ?
         """,
         (event_id,),

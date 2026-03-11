@@ -53,7 +53,7 @@ def create_db(db_path: Path = DEFAULT_DB_PATH) -> dict[str, int]:
         # 5. Load churches.json → church table
         stats["churches"] = _load_churches(conn)
 
-        # 6. Load events.json → event + bulletin_event tables
+        # 6. Load events.json → event table
         stats["events"] = _load_events(conn)
 
         conn.commit()
@@ -208,11 +208,21 @@ def _load_events(conn) -> int:
         if not church_row:
             continue
 
-        cur = conn.execute(
-            """INSERT INTO event(church_id, event_type, event_kind, day_of_week, date, start_time, end_time, cancelled, raw_json)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+        # Resolve bulletin_id if we can find it
+        bulletin_id = None
+        bulletin_row = conn.execute(
+            "SELECT id FROM bulletin WHERE parish_id = ? AND source_url = ?",
+            (parish_row["id"], entry.get("bulletin_source_url")),
+        ).fetchone()
+        if bulletin_row:
+            bulletin_id = bulletin_row["id"]
+
+        conn.execute(
+            """INSERT INTO event(church_id, bulletin_id, event_type, event_kind, day_of_week, date, start_time, end_time, cancelled, raw_json)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
             (
                 church_row["id"],
+                bulletin_id,
                 entry.get("event_type", ""),
                 entry.get("event_kind", ""),
                 entry.get("day_of_week"),
@@ -223,17 +233,6 @@ def _load_events(conn) -> int:
                 entry.get("raw_json"),
             ),
         )
-
-        # Link to bulletin if we can find it
-        bulletin_row = conn.execute(
-            "SELECT id FROM bulletin WHERE parish_id = ? AND source_url = ?",
-            (parish_row["id"], entry.get("bulletin_source_url")),
-        ).fetchone()
-        if bulletin_row:
-            conn.execute(
-                "INSERT OR IGNORE INTO bulletin_event(bulletin_id, event_id) VALUES (?, ?)",
-                (bulletin_row["id"], cur.lastrowid),
-            )
 
         count += 1
 

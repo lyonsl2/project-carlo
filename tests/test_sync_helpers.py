@@ -14,7 +14,6 @@ from pdf_extract.sync import (
     _extract_parishes_online_pdf_url_from_href,
     _find_matching_church,
     _next_sunday_after,
-    _resolve_latest_anchor_link_from_html_fetch,
     _resolve_latest_anchor_link_with_playwright,
     build_latest_ecatholic_bulletin_links,
     build_latest_parishes_online_bulletin_links,
@@ -36,7 +35,7 @@ def _create_test_db(db_path: Path) -> None:
 
 
 def test_build_latest_ecatholic_bulletin_links(monkeypatch) -> None:
-    def fake_resolve(*, provider_id: str) -> tuple[str, str]:
+    def fake_resolve(*, provider_id: str, page=None) -> tuple[str, str]:
         assert provider_id == "https://southeastrochestercatholics.org"
         return (
             "https://files.ecatholic.com/19887/bulletins/20260222.pdf",
@@ -63,45 +62,8 @@ def test_extract_ecatholic_pdf_url_from_href() -> None:
     )
 
 
-def test_resolve_latest_anchor_link_from_html_fetch_uses_first_valid_anchor(monkeypatch) -> None:
-    html = b"""
-    <html>
-      <body>
-        <a href="/ignore-this">Ignore</a>
-        <a href="/good.pdf">Good</a>
-        <a href="/later.pdf">Later</a>
-      </body>
-    </html>
-    """
-
-    def fake_http_get_bytes(url: str, *, referer=None, timeout=60) -> bytes:
-        assert url == "https://example.org/bulletins"
-        assert timeout == 30
-        return html
-
-    monkeypatch.setattr("pdf_extract.sync._http_get_bytes", fake_http_get_bytes)
-
-    seen_hrefs: list[str] = []
-
-    def href_to_urls(href: str):
-        seen_hrefs.append(href)
-        if href == "/good.pdf":
-            return ("https://example.org/source", "https://example.org/good.pdf")
-        return None
-
-    source_url, fetch_url = _resolve_latest_anchor_link_from_html_fetch(
-        page_url="https://example.org/bulletins",
-        source_label="test-provider",
-        href_filter=lambda href: "pdf" in href,
-        href_to_urls=href_to_urls,
-    )
-    assert seen_hrefs == ["/good.pdf"]
-    assert source_url == "https://example.org/source"
-    assert fetch_url == "https://example.org/good.pdf"
-
-
 def test_build_latest_parishes_online_bulletin_links(monkeypatch) -> None:
-    def fake_resolve(*, provider_id: str) -> tuple[str, str]:
+    def fake_resolve(*, provider_id: str, page=None) -> tuple[str, str]:
         assert provider_id == "123"
         return (
             "https://parishesonline.com/publication-page/123?selectedPublication=https://container.parishesonline.com/path/latest.pdf",
@@ -150,7 +112,7 @@ def test_extract_parishes_online_pdf_url_from_relative_href() -> None:
     )
 
 
-def test_resolve_latest_anchor_link_with_playwright_uses_first_valid_anchor(monkeypatch) -> None:
+def test_resolve_latest_anchor_link_with_playwright_uses_first_valid_anchor() -> None:
     class FakeAnchor:
         def __init__(self, href):
             self._href = href
@@ -178,38 +140,7 @@ def test_resolve_latest_anchor_link_with_playwright_uses_first_valid_anchor(monk
                 FakeAnchor("/later.pdf"),
             ]
 
-    class FakeBrowser:
-        def new_page(self) -> FakePage:
-            return FakePage()
-
-        def close(self) -> None:
-            return
-
-    class FakeChromium:
-        def launch(self, headless: bool) -> FakeBrowser:
-            assert headless is True
-            return FakeBrowser()
-
-    class FakePlaywright:
-        chromium = FakeChromium()
-
-    class FakePlaywrightContext:
-        def __enter__(self) -> FakePlaywright:
-            return FakePlaywright()
-
-        def __exit__(self, exc_type, exc, tb) -> None:
-            return
-
-    class FakePlaywrightModule:
-        @staticmethod
-        def sync_playwright() -> FakePlaywrightContext:
-            return FakePlaywrightContext()
-
-    monkeypatch.setattr(
-        "pdf_extract.sync.importlib.import_module",
-        lambda name: FakePlaywrightModule(),
-    )
-
+    fake_page = FakePage()
     seen_hrefs: list[str] = []
 
     def href_to_urls(href: str):
@@ -223,6 +154,7 @@ def test_resolve_latest_anchor_link_with_playwright_uses_first_valid_anchor(monk
         anchor_selector="a[href*='bulletins']",
         source_label="test-provider",
         href_to_urls=href_to_urls,
+        page=fake_page,
     )
     assert seen_hrefs == ["/ignore-this", "/good.pdf"]
     assert source_url == "https://example.org/source"
@@ -305,7 +237,7 @@ def test_find_matching_church_wrong_parish() -> None:
 
 
 def test_build_bulletin_link_ecatholic(monkeypatch) -> None:
-    def fake_build(*, provider_id, reference_date=None):
+    def fake_build(*, provider_id, reference_date=None, page=None):
         return BulletinLink(source_url="https://ecatholic.com/b.pdf", fetch_url="https://ecatholic.com/b.pdf")
 
     monkeypatch.setattr("pdf_extract.sync.build_latest_ecatholic_bulletin_links", fake_build)
@@ -314,7 +246,7 @@ def test_build_bulletin_link_ecatholic(monkeypatch) -> None:
 
 
 def test_build_bulletin_link_parishes_online(monkeypatch) -> None:
-    def fake_build(*, provider_id, reference_date=None):
+    def fake_build(*, provider_id, reference_date=None, page=None):
         return BulletinLink(source_url="https://po.com/source", fetch_url="https://po.com/fetch.pdf")
 
     monkeypatch.setattr("pdf_extract.sync.build_latest_parishes_online_bulletin_links", fake_build)

@@ -54,6 +54,7 @@ CREATE INDEX IF NOT EXISTS idx_bulletin_parish_processed ON bulletin(parish_id, 
 CREATE TABLE IF NOT EXISTS event (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     church_id INTEGER NOT NULL REFERENCES church(id) ON DELETE RESTRICT,
+    bulletin_id INTEGER REFERENCES bulletin(id) ON DELETE SET NULL,
     event_type TEXT NOT NULL,
     event_kind TEXT NOT NULL,
     day_of_week TEXT,
@@ -64,8 +65,4 @@ CREATE TABLE IF NOT EXISTS event (
     raw_json TEXT
 );
 
-CREATE TABLE IF NOT EXISTS bulletin_event (
-    bulletin_id INTEGER NOT NULL REFERENCES bulletin(id) ON DELETE CASCADE,
-    event_id INTEGER NOT NULL REFERENCES event(id) ON DELETE CASCADE,
-    PRIMARY KEY (bulletin_id, event_id)
-);
+CREATE INDEX IF NOT EXISTS idx_event_bulletin ON event(bulletin_id);

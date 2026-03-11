@@ -9,14 +9,16 @@ Project Carlo is a Catholic parish bulletin data pipeline and web viewer. It scr
 ## Commands
 
 ### Setup
+
 ```bash
 uv sync --group dev    # Python dependencies
 pnpm install           # Node dependencies (includes web app)
 ```
 
 ### Pipeline (via pnpm scripts)
+
 ```bash
-pnpm fetch             # Download bulletins from provider URLs
+pnpm run fetch             # Download bulletins from provider URLs
 pnpm process           # Extract schedules via Gemini
 pnpm detect            # Detect bulletin providers (Playwright)
 pnpm geocode           # Backfill church coordinates (Nominatim)
@@ -25,6 +27,7 @@ pnpm db:drop           # Delete database
 ```
 
 ### Testing & Linting
+
 ```bash
 pnpm test                       # Run all Python tests
 pnpm test -- tests/test_foo.py  # Run single test file
@@ -35,6 +38,7 @@ pnpm lint:web                   # ESLint
 ```
 
 ### Web App
+
 ```bash
 pnpm dev:web       # Dev server on localhost:5173
 pnpm build:web     # Production build
@@ -58,10 +62,11 @@ parishes.csv → [detect.py] Playwright → detect_results.json
                                             ↓
                        [db.py] create_db() → parish_events.db
                                             ↓
-                       extract_frontend_db.py → frontend.db (minimal subset)
+                       [extract_frontend_db.py] → frontend.db (minimal subset)
 ```
 
 Key modules:
+
 - **sync.py** — Core pipeline: bulletin link resolution (eCatholic HTML, ParishesOnline Playwright), PDF download, church matching (address then fuzzy name), fetch/process orchestration
 - **schedule_extraction.py** — Pydantic models + Gemini prompt for structured extraction from PDFs
 - **storage.py** — Data paths, SQLite helpers, JSON file I/O
@@ -70,12 +75,14 @@ Key modules:
 - **geocode.py** — Nominatim geocoding for church addresses
 
 ### Database
+
 - Schema source of truth: `data/schema.sql`
 - Main DB: `data/parish_events.db`
 - Frontend DB: `apps/web/public/frontend.db` (subset for browser WASM SQLite)
-- Tables: website, parish, church, bulletin, event, bulletin_event
+- Tables: website, parish, church, bulletin, event
 
 ### Web Frontend (`apps/web/`)
+
 - React 19 + TypeScript + Vite
 - sql.js for in-browser SQLite (loads frontend.db via WASM)
 - Leaflet/react-leaflet for map rendering
@@ -83,9 +90,11 @@ Key modules:
 - Deploys to Cloudflare Workers
 
 ## Environment Variables
+
 - `GEMINI_API_KEY` — Required for `process` subcommand (Gemini AI extraction)
 
 ## Tech Stack
+
 - **Python >=3.13**, managed with **uv**, build system **Hatchling**
 - **pnpm** workspace for Node.js
 - **Ruff** for Python linting (line-length=100, target py313)

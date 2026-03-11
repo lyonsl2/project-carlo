@@ -10,7 +10,7 @@ from __future__ import annotations
 import sqlite3
 from pathlib import Path
 
-ROOT = Path(__file__).resolve().parents[3]
+ROOT = Path(__file__).resolve().parents[2]
 SOURCE_DB = ROOT / "data" / "parish_events.db"
 DEST_DB = ROOT / "apps" / "web" / "public" / "frontend.db"
 
