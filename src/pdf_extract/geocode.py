@@ -4,11 +4,15 @@ from __future__ import annotations
 
 import json
 import logging
-import sqlite3
 import time
-from pathlib import Path
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
+
+from pdf_extract.storage import (
+    CHURCHES_PATH,
+    load_json_list,
+    save_json_list,
+)
 
 LOGGER = logging.getLogger(__name__)
 
@@ -43,60 +47,47 @@ def geocode_address(address: str, *, email: str | None = None) -> tuple[float, f
 
 def run_backfill(
     *,
-    db_path: Path,
     dry_run: bool,
     limit: int | None,
     pause_seconds: float,
     email: str | None,
 ) -> dict[str, int]:
-    conn = sqlite3.connect(db_path)
-    conn.row_factory = sqlite3.Row
-    try:
-        rows = conn.execute(
-            """
-            SELECT id, address
-            FROM church
-            WHERE address IS NOT NULL
-              AND TRIM(address) != ''
-              AND (latitude IS NULL OR longitude IS NULL)
-            ORDER BY id
-            """
-        ).fetchall()
-        if limit is not None:
-            rows = rows[:limit]
+    churches = load_json_list(CHURCHES_PATH)
 
-        updated = 0
-        failed = 0
-        for row in rows:
-            try:
-                church_id = int(row["id"])
-                address = str(row["address"])
-                try:
-                    coordinates = geocode_address(address, email=email)
-                except Exception:
-                    failed += 1
-                    continue
-                if coordinates is None:
-                    failed += 1
-                    continue
+    pending = [
+        c for c in churches
+        if (c.get("latitude") is None or c.get("longitude") is None)
+        and c.get("address")
+        and str(c["address"]).strip()
+    ]
+    if limit is not None:
+        pending = pending[:limit]
 
-                lat, lng = coordinates
-                if not dry_run:
-                    conn.execute(
-                        """
-                        UPDATE church
-                        SET latitude = ?, longitude = ?
-                        WHERE id = ?
-                        """,
-                        (lat, lng, church_id),
-                    )
-                updated += 1
-            finally:
-                if pause_seconds > 0:
-                    time.sleep(pause_seconds)
+    updated = 0
+    failed = 0
+    for c in pending:
+        try:
+            coords = geocode_address(str(c["address"]), email=email)
+        except Exception:
+            LOGGER.warning("Geocode failed for %s", c.get("address"), exc_info=True)
+            failed += 1
+            if pause_seconds > 0:
+                time.sleep(pause_seconds)
+            continue
+        if coords is None:
+            failed += 1
+            if pause_seconds > 0:
+                time.sleep(pause_seconds)
+            continue
 
         if not dry_run:
-            conn.commit()
-        return {"checked": len(rows), "updated": updated, "failed": failed}
-    finally:
-        conn.close()
+            c["latitude"] = coords[0]
+            c["longitude"] = coords[1]
+        updated += 1
+        if pause_seconds > 0:
+            time.sleep(pause_seconds)
+
+    if not dry_run:
+        save_json_list(CHURCHES_PATH, churches)
+
+    return {"checked": len(pending), "updated": updated, "failed": failed}

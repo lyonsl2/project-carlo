@@ -1,0 +1,307 @@
+{
+  "all-saints-corning": {
+    "bulletin_provider": "parishes_online",
+    "provider_id": "all-saints-parish",
+    "bulletin_page": null
+  },
+  "net-catholic": {
+    "bulletin_provider": "ecatholic",
+    "provider_id": null,
+    "bulletin_page": null
+  },
+  "southeast-rochester-catholic-community": {
+    "bulletin_provider": "ecatholic",
+    "provider_id": null,
+    "bulletin_page": null
+  },
+  "blessed-trinity-st-patrick": {
+    "bulletin_provider": "other",
+    "provider_id": null,
+    "bulletin_page": null
+  },
+  "catholic-parishes-eastern-wayne-county": {
+    "bulletin_provider": "parishes_online",
+    "provider_id": "st-michael-s-church-st-joseph-the-worker-and-blessed-trinity-catholic-church",
+    "bulletin_page": null
+  },
+  "saint-jerome": {
+    "bulletin_provider": "ecatholic",
+    "provider_id": null,
+    "bulletin_page": null
+  },
+  "assumption-resurrection": {
+    "bulletin_provider": "ecatholic",
+    "provider_id": null,
+    "bulletin_page": null
+  },
+  "holy-spirit-st-josephs": {
+    "bulletin_provider": "ecatholic",
+    "provider_id": null,
+    "bulletin_page": null
+  },
+  "nativity-seas": {
+    "bulletin_provider": "parishes_online",
+    "provider_id": "church-of-the-nativity-of-the-blessed-virgin-mary-and-st-elizabeth-ann-seton",
+    "bulletin_page": null
+  },
+  "transfiguration-st-catherine-mendon": {
+    "bulletin_provider": "parishes_online",
+    "provider_id": "church-of-the-transfiguration-and-st-catherine-of-siena-church",
+    "bulletin_page": null
+  },
+  "st-monica-emmanuel": {
+    "bulletin_provider": "other",
+    "provider_id": null,
+    "bulletin_page": null
+  },
+  "good-shepherd-catholic-community": {
+    "bulletin_provider": "parishes_online",
+    "provider_id": "good-shepherd-catholic-community",
+    "bulletin_page": null
+  },
+  "holy-apostles": {
+    "bulletin_provider": "other",
+    "provider_id": null,
+    "bulletin_page": null
+  },
+  "our-mother-of-sorrows-holy-cross": {
+    "bulletin_provider": "parishes_online",
+    "provider_id": "our-mother-of-sorrows-church",
+    "bulletin_page": null
+  },
+  "holy-family-catholic-community": {
+    "bulletin_provider": "parishes_online",
+    "provider_id": "holy-family-catholic-community-14572",
+    "bulletin_page": null
+  },
+  "holy-trinity-webster": {
+    "bulletin_provider": "other",
+    "provider_id": null,
+    "bulletin_page": null
+  },
+  "immaculate-conception-ithaca": {
+    "bulletin_provider": "other",
+    "provider_id": null,
+    "bulletin_page": null
+  },
+  "immaculate-conception-st-bridgets": {
+    "bulletin_provider": "other",
+    "provider_id": null,
+    "bulletin_page": null
+  },
+  "mary-mother-of-mercy": {
+    "bulletin_provider": "other",
+    "provider_id": null,
+    "bulletin_page": null
+  },
+  "our-lady-of-lourdes-st-anne": {
+    "bulletin_provider": "parishes_online",
+    "provider_id": "our-lady-of-lourdes-saint-anne-church",
+    "bulletin_page": null
+  },
+  "our-lady-of-peace-geneva": {
+    "bulletin_provider": "parishes_online",
+    "provider_id": "our-lady-of-peace-parish-14456",
+    "bulletin_page": null
+  },
+  "our-lady-of-the-lakes": {
+    "bulletin_provider": "parishes_online",
+    "provider_id": "our-lady-of-the-lakes-catholic-community",
+    "bulletin_page": null
+  },
+  "our-lady-of-the-valley": {
+    "bulletin_provider": "other",
+    "provider_id": null,
+    "bulletin_page": null
+  },
+  "our-lady-of-victory-st-joseph": {
+    "bulletin_provider": "parishes_online",
+    "provider_id": "our-lady-of-victory-st-joseph-church",
+    "bulletin_page": null
+  },
+  "our-lady-queen-of-peace-st-thomas-more": {
+    "bulletin_provider": "ecatholic",
+    "provider_id": null,
+    "bulletin_page": null
+  },
+  "parish-of-the-holy-family": {
+    "bulletin_provider": "ecatholic",
+    "provider_id": null,
+    "bulletin_page": null
+  },
+  "most-holy-name-of-jesus": {
+    "bulletin_provider": "other",
+    "provider_id": null,
+    "bulletin_page": null
+  },
+  "peace-of-christ": {
+    "bulletin_provider": "discover_mass",
+    "provider_id": null,
+    "bulletin_page": null
+  },
+  "sacred-heart-auburn-cluster": {
+    "bulletin_provider": "other",
+    "provider_id": null,
+    "bulletin_page": null
+  },
+  "sacred-heart-cathedral": {
+    "bulletin_provider": "parishes_online",
+    "provider_id": null,
+    "bulletin_page": null
+  },
+  "saint-rita-webster": {
+    "bulletin_provider": "other",
+    "provider_id": null,
+    "bulletin_page": null
+  },
+  "ss-isidore-maria-torribia": {
+    "bulletin_provider": "parishes_online",
+    "provider_id": "sts-isidore-maria-torribia-parish",
+    "bulletin_page": null
+  },
+  "our-lady-of-the-snow-saints-mary-and-martha": {
+    "bulletin_provider": "parishes_online",
+    "provider_id": "st-marys-church-13021",
+    "bulletin_page": null
+  },
+  "st-agnes-paul-rose": {
+    "bulletin_provider": "parishes_online",
+    "provider_id": "st-agnes-church-st-paul-of-the-cross-and-st-rose-church",
+    "bulletin_page": null
+  },
+  "st-benedict-parish": {
+    "bulletin_provider": "ecatholic",
+    "provider_id": null,
+    "bulletin_page": null
+  },
+  "st-benedicts-st-marys-lake": {
+    "bulletin_provider": "parishes_online",
+    "provider_id": "st-marys-on-the-lake-st-benedicts",
+    "bulletin_page": null
+  },
+  "st-catherine-of-siena-ithaca": {
+    "bulletin_provider": "ecatholic",
+    "provider_id": null,
+    "bulletin_page": null
+  },
+  "st-christopher": {
+    "bulletin_provider": "other",
+    "provider_id": null,
+    "bulletin_page": null
+  },
+  "st-frances-xavier-cabrini": {
+    "bulletin_provider": "ecatholic",
+    "provider_id": null,
+    "bulletin_page": null
+  },
+  "st-francis-and-st-clare": {
+    "bulletin_provider": "other",
+    "provider_id": null,
+    "bulletin_page": null
+  },
+  "st-john-of-rochester": {
+    "bulletin_provider": "ecatholic",
+    "provider_id": null,
+    "bulletin_page": null
+  },
+  "st-john-greece": {
+    "bulletin_provider": "other",
+    "provider_id": null,
+    "bulletin_page": null
+  },
+  "st-john-spencerport": {
+    "bulletin_provider": "ecatholic",
+    "provider_id": null,
+    "bulletin_page": null
+  },
+  "st-john-vianney": {
+    "bulletin_provider": "other",
+    "provider_id": null,
+    "bulletin_page": null
+  },
+  "st-kateri-tekakwitha": {
+    "bulletin_provider": "parishes_online",
+    "provider_id": "st-kateri-tekakwitha-parish-14617",
+    "bulletin_page": null
+  },
+  "st-katharine-drexel-st-maximilian-kolbe": {
+    "bulletin_provider": "parishes_online",
+    "provider_id": "st-maximillian-kolbe-parish",
+    "bulletin_page": null
+  },
+  "st-lawrence": {
+    "bulletin_provider": "other",
+    "provider_id": null,
+    "bulletin_page": null
+  },
+  "st-leo-the-great": {
+    "bulletin_provider": "ecatholic",
+    "provider_id": null,
+    "bulletin_page": null
+  },
+  "st-louis-pittsford": {
+    "bulletin_provider": "ecatholic",
+    "provider_id": null,
+    "bulletin_page": null
+  },
+  "st-luke-the-evangelist": {
+    "bulletin_provider": "parishes_online",
+    "provider_id": "st-luke-the-evangelist",
+    "bulletin_page": null
+  },
+  "st-marianne-cope": {
+    "bulletin_provider": "parishes_online",
+    "provider_id": "st-marianne-cope-roman-catholic-parish",
+    "bulletin_page": null
+  },
+  "st-marks-greece": {
+    "bulletin_provider": "parishes_online",
+    "provider_id": "st-marks-church-14612",
+    "bulletin_page": null
+  },
+  "st-martin-de-porres": {
+    "bulletin_provider": "parishes_online",
+    "provider_id": "st-martin-de-porres-parish-at-st-mary-of-the-assumption-church",
+    "bulletin_page": null
+  },
+  "st-mary-our-mother": {
+    "bulletin_provider": "other",
+    "provider_id": null,
+    "bulletin_page": null
+  },
+  "st-marys-st-matthew": {
+    "bulletin_provider": "other",
+    "provider_id": null,
+    "bulletin_page": null
+  },
+  "st-patricks-victor": {
+    "bulletin_provider": "discover_mass",
+    "provider_id": null,
+    "bulletin_page": null
+  },
+  "st-pauls-webster": {
+    "bulletin_provider": "other",
+    "provider_id": null,
+    "bulletin_page": null
+  },
+  "st-peters-ontario-county": {
+    "bulletin_provider": "other",
+    "provider_id": null,
+    "bulletin_page": null
+  },
+  "st-pius-x-chili": {
+    "bulletin_provider": "parishes_online",
+    "provider_id": "st-pius-x-church-14624",
+    "bulletin_page": null
+  },
+  "st-stanislaus-kostka": {
+    "bulletin_provider": "parishes_online",
+    "provider_id": "st-stanislaus-kostka-church",
+    "bulletin_page": null
+  },
+  "st-theodores-gates": {
+    "bulletin_provider": "ecatholic",
+    "provider_id": null,
+    "bulletin_page": null
+  }
+}

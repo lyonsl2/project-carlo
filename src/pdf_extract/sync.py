@@ -1,4 +1,4 @@
-"""Bulletin sync pipeline: fetch, process with AI, and persist."""
+"""Bulletin sync pipeline: fetch, process with AI, and persist to data files."""
 
 from __future__ import annotations
 
@@ -19,20 +19,16 @@ from urllib.request import Request, urlopen
 
 from pdf_extract.schedule_extraction import extract_events
 from pdf_extract.storage import (
+    BULLETINS_DIR,
+    BULLETINS_METADATA_PATH,
+    CHURCHES_PATH,
+    EVENTS_PATH,
     connect_db,
-    get_parish_id,
-    insert_bulletin,
-    insert_bulletin_event,
-    insert_church,
-    insert_event,
-    list_churches,
-    list_bulletins_pending_processing,
-    list_existing_bulletin_urls,
-    list_parish_ids,
-    get_parish_source,
-    mark_bulletin_processed,
-    migrate_db,
-    update_church_address_if_missing,
+    get_parish_by_name,
+    list_parishes,
+    load_json_list,
+    save_json_list,
+    utc_now_iso,
 )
 
 ECATHOLIC_BULLETINS_PATH = "/bulletins"
@@ -42,7 +38,6 @@ PARISHES_ONLINE_PUBLICATION_URL_PREFIX = (
     "https://parishesonline.com/publication-page/{provider_id}?selectedPublication="
 )
 LOGGER = logging.getLogger(__name__)
-DEFAULT_PDF_DIR = Path("data/bulletins")
 
 
 @dataclass(frozen=True)
@@ -72,19 +67,19 @@ def _normalize_address(address: str | None) -> str:
 
 
 def _first_sunday_on_or_after(d: date) -> date:
-    # Monday=0 .. Sunday=6
     return d + timedelta(days=(6 - d.weekday()) % 7)
 
 
 def _next_sunday_after(d: date) -> date:
-    # Return the next Sunday strictly after the given date.
     return _first_sunday_on_or_after(d + timedelta(days=1))
 
+
+# ── eCatholic bulletin resolution ───────────────────────────────────────────
 
 def build_latest_ecatholic_bulletin_links(
     *, provider_id: str, reference_date: date | None = None
 ) -> BulletinLink:
-    _ = reference_date  # unused; kept for call-site compatibility
+    _ = reference_date
     source_url, fetch_url = _resolve_ecatholic_latest_link(provider_id=provider_id)
     return BulletinLink(source_url=source_url, fetch_url=fetch_url)
 
@@ -204,7 +199,7 @@ def build_latest_parishes_online_bulletin_links(
     *, provider_id: str, reference_date: date | None = None
 ) -> BulletinLink:
     source_url, fetch_url = _resolve_parishes_online_latest_link(provider_id=provider_id)
-    _ = reference_date  # unused; kept for call-site compatibility
+    _ = reference_date
     return BulletinLink(source_url=source_url, fetch_url=fetch_url)
 
 
@@ -220,7 +215,6 @@ def _extract_parishes_online_pdf_url_from_href(
     if not selected_values:
         return None
     selected = selected_values[0]
-    # Some pages double-encode this query parameter.
     for _ in range(2):
         selected = unquote(selected)
     if not selected.lower().startswith("https://container.parishesonline.com/"):
@@ -230,26 +224,17 @@ def _extract_parishes_online_pdf_url_from_href(
     return absolute_href, selected
 
 
-def _build_latest_bulletin_links_for_parish(*, conn, parish_id: int) -> BulletinLink:
-    row = get_parish_source(conn, parish_id)
-    if row is None:
-        raise ValueError(f"No parish found for parish_id={parish_id}")
-    source_type = row["source_type"]
-    provider_id = row["source_provider_id"]
-    if not source_type or not provider_id:
-        raise ValueError(f"No supported source configured for parish_id={parish_id}")
-    LOGGER.info(
-        "Selected source for parish_id=%s: type=%s provider_id=%s",
-        parish_id,
-        source_type,
-        provider_id,
-    )
-    if source_type == "ecatholic":
-        return build_latest_ecatholic_bulletin_links(provider_id=provider_id)
-    if source_type == PARISHES_ONLINE_TYPE:
-        return build_latest_parishes_online_bulletin_links(provider_id=provider_id)
-    raise ValueError(f"No supported source configured for parish_id={parish_id}")
+# ── Bulletin link resolution ────────────────────────────────────────────────
 
+def _build_bulletin_link(source_type: str, source_provider_id: str) -> BulletinLink:
+    if source_type == "ecatholic":
+        return build_latest_ecatholic_bulletin_links(provider_id=source_provider_id)
+    if source_type == PARISHES_ONLINE_TYPE:
+        return build_latest_parishes_online_bulletin_links(provider_id=source_provider_id)
+    raise ValueError(f"Unsupported source_type: {source_type}")
+
+
+# ── HTTP helpers ────────────────────────────────────────────────────────────
 
 def _http_get_bytes(url: str, *, referer: str | None = None, timeout: int = 60) -> bytes:
     headers = {
@@ -274,7 +259,6 @@ def _http_get_bytes(url: str, *, referer: str | None = None, timeout: int = 60) 
 
 
 def _download_pdf(*, fetch_url: str, source_url: str) -> bytes:
-    # Kept dual URL arguments to preserve call-site flexibility.
     referer = source_url
     try:
         LOGGER.info("Attempting primary fetch URL: %s", fetch_url)
@@ -284,121 +268,114 @@ def _download_pdf(*, fetch_url: str, source_url: str) -> bytes:
         return _http_get_bytes(source_url, referer=referer, timeout=60)
 
 
-def _resolve_church_id(
-    *,
-    conn,
-    parish_id: int,
-    church_name: str | None,
-    church_address: str | None,
+# ── Church matching (in-memory against churches list) ───────────────────────
+
+def _find_matching_church(
+    churches: list[dict],
+    parish_slug: str,
+    name_normalized: str,
+    address: str | None,
     threshold: float = 0.90,
-) -> int:
-    desired_norm = normalize_church_name(church_name)
-    desired_address_norm = _normalize_address(church_address)
-    existing = list_churches(conn, parish_id)
+) -> dict | None:
+    """Find a matching church in the list by address or name similarity."""
+    candidates = [c for c in churches if c["parish_slug"] == parish_slug]
+    address_norm = _normalize_address(address)
 
-    if desired_address_norm:
-        for row in existing:
-            row_address_norm = _normalize_address(row["address"] if isinstance(row["address"], str) else None)
-            if row_address_norm and row_address_norm == desired_address_norm:
-                matched_id = int(row["id"])
-                update_church_address_if_missing(
-                    conn, church_id=matched_id, new_address=church_address
-                )
-                return matched_id
+    # Try exact address match first
+    if address_norm:
+        for c in candidates:
+            if _normalize_address(c.get("address")) == address_norm:
+                return c
 
-    best_id: int | None = None
+    # Then fuzzy name match
+    best: dict | None = None
     best_score = 0.0
-    for row in existing:
-        row_norm = str(row["name_normalized"] or "")
-        if desired_norm and row_norm and desired_norm == row_norm:
-            best_id = int(row["id"])
-            best_score = 1.0
-            break
-        score = SequenceMatcher(None, desired_norm, row_norm).ratio() if desired_norm and row_norm else 0.0
-        if score > best_score:
-            best_score = score
-            best_id = int(row["id"])
+    for c in candidates:
+        c_norm = c.get("name_normalized", "")
+        if name_normalized and c_norm:
+            if name_normalized == c_norm:
+                return c
+            score = SequenceMatcher(None, name_normalized, c_norm).ratio()
+            if score > best_score:
+                best_score = score
+                best = c
 
-    if best_id is not None and best_score >= threshold:
-        update_church_address_if_missing(conn, church_id=best_id, new_address=church_address)
-        return best_id
-
-    return insert_church(
-        conn,
-        parish_id=parish_id,
-        name=church_name,
-        address=church_address,
-        name_normalized=desired_norm or None,
-    )
+    if best is not None and best_score >= threshold:
+        return best
+    return None
 
 
-def _parish_ids_for_run(conn, parish_name: str | None) -> list[int]:
-    if parish_name:
-        return [get_parish_id(conn, parish_name)]
-    return list_parish_ids(conn)
+# ── Pipeline: fetch ─────────────────────────────────────────────────────────
 
-
-def fetch_bulletins(*, parish_name: str | None = None, pdf_dir: Path = DEFAULT_PDF_DIR) -> dict[str, int]:
+def fetch_bulletins(
+    *,
+    parish_name: str | None = None,
+    pdf_dir: Path = BULLETINS_DIR,
+) -> dict[str, int]:
     LOGGER.info("Starting fetch stage (parish_name=%s)", parish_name or "*all*")
-    migrate_db()
+    metadata = load_json_list(BULLETINS_METADATA_PATH)
+    existing_urls = {e["source_url"] for e in metadata}
+
     conn = connect_db()
     try:
-        parish_ids = _parish_ids_for_run(conn, parish_name)
-        fetched = 0
-        skipped_existing = 0
-        for parish_id in parish_ids:
-            LOGGER.info("Fetching latest bulletin for parish_id=%s", parish_id)
-            try:
-                link = _build_latest_bulletin_links_for_parish(conn=conn, parish_id=parish_id)
-            except ValueError:
-                LOGGER.warning("Skipping parish_id=%s: no supported source configuration", parish_id)
-                continue
-
-            existing_urls = list_existing_bulletin_urls(conn, parish_id)
-            if link.source_url in existing_urls:
-                skipped_existing += 1
-                LOGGER.debug(
-                    "Skipping existing bulletin URL for parish_id=%s: %s",
-                    parish_id,
-                    link.source_url,
-                )
-                continue
-
-            try:
-                pdf_bytes = _download_pdf(fetch_url=link.fetch_url, source_url=link.source_url)
-            except Exception:
-                LOGGER.warning(
-                    "Failed downloading bulletin for parish_id=%s (source_url=%s)",
-                    parish_id,
-                    link.source_url,
-                    exc_info=True,
-                )
-                continue
-
-            content_hash = hashlib.sha256(pdf_bytes).hexdigest()
-            parish_dir = pdf_dir / str(parish_id)
-            parish_dir.mkdir(parents=True, exist_ok=True)
-            pdf_path = parish_dir / f"{content_hash}.pdf"
-            if not pdf_path.exists():
-                pdf_path.write_bytes(pdf_bytes)
-
-            insert_bulletin(
-                conn,
-                parish_id=parish_id,
-                source_url=link.source_url,
-                pdf_path=str(pdf_path),
-                published_date=None,
-                content_hash=content_hash,
-            )
-            conn.commit()
-            fetched += 1
-
-        result = {"fetched_bulletins": fetched, "skipped_existing_urls": skipped_existing}
-        LOGGER.info("Fetch stage finished: %s", result)
-        return result
+        parishes = _parishes_for_run(conn, parish_name)
     finally:
         conn.close()
 
+    fetched = 0
+    skipped_existing = 0
+
+    for parish in parishes:
+        slug = parish["slug"]
+        source_type = parish["source_type"]
+        source_provider_id = parish["source_provider_id"]
+
+        if not source_type or not source_provider_id:
+            continue
+
+        try:
+            link = _build_bulletin_link(source_type, source_provider_id)
+        except ValueError:
+            LOGGER.warning("Skipping parish %s: no supported source", slug)
+            continue
+
+        if link.source_url in existing_urls:
+            skipped_existing += 1
+            continue
+
+        try:
+            pdf_bytes = _download_pdf(fetch_url=link.fetch_url, source_url=link.source_url)
+        except Exception:
+            LOGGER.warning("Failed downloading bulletin for %s", slug, exc_info=True)
+            continue
+
+        content_hash = hashlib.sha256(pdf_bytes).hexdigest()
+        parish_dir = pdf_dir / slug
+        parish_dir.mkdir(parents=True, exist_ok=True)
+        pdf_path = parish_dir / f"{content_hash}.pdf"
+        if not pdf_path.exists():
+            pdf_path.write_bytes(pdf_bytes)
+
+        metadata.append({
+            "parish_slug": slug,
+            "source_url": link.source_url,
+            "pdf_path": str(pdf_path),
+            "content_hash": content_hash,
+            "fetched_at": utc_now_iso(),
+            "processed_at": None,
+            "published_date": None,
+        })
+        existing_urls.add(link.source_url)
+        fetched += 1
+
+    save_json_list(BULLETINS_METADATA_PATH, metadata)
+
+    result = {"fetched_bulletins": fetched, "skipped_existing_urls": skipped_existing}
+    LOGGER.info("Fetch stage finished: %s", result)
+    return result
+
+
+# ── Pipeline: process ───────────────────────────────────────────────────────
 
 def process_bulletins(
     *,
@@ -406,108 +383,115 @@ def process_bulletins(
     model: str = "gemini-3-flash-preview",
 ) -> dict[str, int]:
     LOGGER.info("Starting process stage (parish_name=%s, model=%s)", parish_name or "*all*", model)
-    migrate_db()
-    conn = connect_db()
-    try:
-        parish_ids = _parish_ids_for_run(conn, parish_name)
-        processed_count = 0
-        inserted_events = 0
-        for parish_id in parish_ids:
-            rows = list_bulletins_pending_processing(conn, parish_id=parish_id)
-            for row in rows:
-                bulletin_id = int(row["id"])
-                pdf_path_raw = row["pdf_path"]
-                if not isinstance(pdf_path_raw, str) or not pdf_path_raw:
-                    continue
-                pdf_path = Path(pdf_path_raw)
-                if not pdf_path.exists():
-                    LOGGER.warning(
-                        "Skipping process for bulletin_id=%s: PDF file missing at %s",
-                        bulletin_id,
-                        pdf_path,
-                    )
-                    continue
+    metadata = load_json_list(BULLETINS_METADATA_PATH)
+    churches = load_json_list(CHURCHES_PATH)
+    events = load_json_list(EVENTS_PATH)
 
-                try:
-                    pdf_bytes = pdf_path.read_bytes()
-                except OSError:
-                    LOGGER.warning(
-                        "Skipping process for bulletin_id=%s: failed reading PDF at %s",
-                        bulletin_id,
-                        pdf_path,
-                        exc_info=True,
-                    )
-                    continue
+    # Filter to pending bulletins (not yet processed, have a PDF)
+    pending = [m for m in metadata if m.get("processed_at") is None and m.get("pdf_path")]
 
-                extracted = extract_events(pdf_bytes, model=model)
+    if parish_name:
+        conn = connect_db()
+        try:
+            parish_row = get_parish_by_name(conn, parish_name)
+        finally:
+            conn.close()
+        if parish_row:
+            target_slug = parish_row["slug"]
+            pending = [m for m in pending if m["parish_slug"] == target_slug]
 
-                churches = extracted.get("churches", [])
-                church_map: dict[str, int] = {}
-                for ch in churches:
-                    if not isinstance(ch, dict):
-                        continue
-                    extracted_id = ch.get("id")
-                    if not isinstance(extracted_id, str) or not extracted_id:
-                        continue
-                    church_db_id = _resolve_church_id(
-                        conn=conn,
-                        parish_id=parish_id,
-                        church_name=ch.get("name") if isinstance(ch.get("name"), str) else None,
-                        church_address=ch.get("address") if isinstance(ch.get("address"), str) else None,
-                    )
-                    church_map[extracted_id] = church_db_id
+    processed_count = 0
+    inserted_events = 0
 
-                events = extracted.get("events", [])
-                for ev in events:
-                    if not isinstance(ev, dict):
-                        continue
-                    extracted_church_id = ev.get("church_id")
-                    if not isinstance(extracted_church_id, str):
-                        continue
-                    church_id = church_map.get(extracted_church_id)
-                    if church_id is None:
-                        continue
+    for entry in pending:
+        pdf_path = Path(entry["pdf_path"])
+        if not pdf_path.exists():
+            LOGGER.warning("Skipping: PDF missing at %s", pdf_path)
+            continue
 
-                    event_id = insert_event(
-                        conn,
-                        church_id=church_id,
-                        event_type=str(ev.get("type", "")),
-                        event_kind=str(ev.get("kind", "")),
-                        day_of_week=ev.get("day_of_week")
-                        if isinstance(ev.get("day_of_week"), str)
-                        else None,
-                        date=ev.get("date") if isinstance(ev.get("date"), str) else None,
-                        start_time=str(ev.get("start_time", "")),
-                        end_time=ev.get("end_time") if isinstance(ev.get("end_time"), str) else None,
-                        cancelled=bool(ev.get("cancelled", False)),
-                        raw_json=json.dumps(ev, sort_keys=True),
-                    )
-                    insert_bulletin_event(conn, bulletin_id=bulletin_id, event_id=event_id)
-                    inserted_events += 1
+        try:
+            pdf_bytes = pdf_path.read_bytes()
+        except OSError:
+            LOGGER.warning("Skipping: failed reading PDF at %s", pdf_path, exc_info=True)
+            continue
 
-                mark_bulletin_processed(conn, bulletin_id=bulletin_id)
-                conn.commit()
-                processed_count += 1
+        extracted = extract_events(pdf_bytes, model=model)
+        parish_slug = entry["parish_slug"]
 
-        result = {"processed_bulletins": processed_count, "inserted_events": inserted_events}
-        LOGGER.info("Process stage finished: %s", result)
-        return result
-    finally:
-        conn.close()
+        # Build mapping: extracted church id → name_normalized
+        church_map: dict[str, str] = {}
+        for ch in extracted.get("churches", []):
+            if not isinstance(ch, dict):
+                continue
+            extracted_id = ch.get("id")
+            if not isinstance(extracted_id, str) or not extracted_id:
+                continue
 
+            ch_name = ch.get("name") if isinstance(ch.get("name"), str) else None
+            ch_address = ch.get("address") if isinstance(ch.get("address"), str) else None
+            name_normalized = normalize_church_name(ch_name)
 
-def sync_bulletins(
-    *,
-    parish_name: str | None = None,
-    model: str = "gemini-3-flash-preview",
-) -> dict[str, int]:
-    LOGGER.info("Starting full sync run (parish_name=%s, model=%s)", parish_name or "*all*", model)
-    fetch_result = fetch_bulletins(parish_name=parish_name)
-    process_result = process_bulletins(parish_name=parish_name, model=model)
-    result = {
-        "fetched_bulletins": fetch_result["fetched_bulletins"],
-        "processed_bulletins": process_result["processed_bulletins"],
-        "inserted_events": process_result["inserted_events"],
-    }
-    LOGGER.info("Full sync finished: %s", result)
+            existing = _find_matching_church(churches, parish_slug, name_normalized, ch_address)
+            if existing is not None:
+                # Update address if missing
+                if ch_address and not existing.get("address"):
+                    existing["address"] = ch_address
+                church_map[extracted_id] = existing["name_normalized"]
+            else:
+                churches.append({
+                    "parish_slug": parish_slug,
+                    "name": ch_name,
+                    "address": ch_address,
+                    "name_normalized": name_normalized or None,
+                    "latitude": None,
+                    "longitude": None,
+                })
+                church_map[extracted_id] = name_normalized
+
+        # Process events
+        for ev in extracted.get("events", []):
+            if not isinstance(ev, dict):
+                continue
+            extracted_church_id = ev.get("church_id")
+            if not isinstance(extracted_church_id, str):
+                continue
+            church_name_norm = church_map.get(extracted_church_id)
+            if not church_name_norm:
+                continue
+
+            events.append({
+                "parish_slug": parish_slug,
+                "church_name_normalized": church_name_norm,
+                "bulletin_source_url": entry["source_url"],
+                "event_type": str(ev.get("type", "")),
+                "event_kind": str(ev.get("kind", "")),
+                "day_of_week": ev.get("day_of_week") if isinstance(ev.get("day_of_week"), str) else None,
+                "date": ev.get("date") if isinstance(ev.get("date"), str) else None,
+                "start_time": str(ev.get("start_time", "")),
+                "end_time": ev.get("end_time") if isinstance(ev.get("end_time"), str) else None,
+                "cancelled": bool(ev.get("cancelled", False)),
+                "raw_json": json.dumps(ev, sort_keys=True),
+            })
+            inserted_events += 1
+
+        entry["processed_at"] = utc_now_iso()
+        processed_count += 1
+
+    save_json_list(BULLETINS_METADATA_PATH, metadata)
+    save_json_list(CHURCHES_PATH, churches)
+    save_json_list(EVENTS_PATH, events)
+
+    result = {"processed_bulletins": processed_count, "inserted_events": inserted_events}
+    LOGGER.info("Process stage finished: %s", result)
     return result
+
+
+# ── Helpers ─────────────────────────────────────────────────────────────────
+
+def _parishes_for_run(conn, parish_name: str | None) -> list:
+    if parish_name:
+        row = get_parish_by_name(conn, parish_name)
+        if row is None:
+            raise ValueError(f"Parish not found: {parish_name}")
+        return [row]
+    return list(list_parishes(conn))

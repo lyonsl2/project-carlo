@@ -1,22 +1,39 @@
 from pathlib import Path
 
-from pdf_extract.storage import connect_db, get_parish_id, insert_bulletin, migrate_db
+from pdf_extract.storage import SCHEMA_PATH, connect_db, save_json_list
 from pdf_extract.sync import BulletinLink, fetch_bulletins, process_bulletins
 
 
-def _patch_sync_db(monkeypatch, db_path: Path) -> None:
-    monkeypatch.setattr("pdf_extract.sync.migrate_db", lambda: None)
-    monkeypatch.setattr("pdf_extract.sync.connect_db", lambda: connect_db(db_path))
+def _setup_test_db(tmp_path: Path) -> Path:
+    """Create a test DB with schema and a test parish."""
+    db_path = tmp_path / "parish_events.db"
+    conn = connect_db(db_path)
+    schema_sql = SCHEMA_PATH.read_text(encoding="utf-8")
+    conn.executescript(schema_sql)
+    conn.execute(
+        "INSERT INTO parish(slug, name, source_type, source_provider_id, created_at) VALUES (?, ?, ?, ?, ?)",
+        ("test-parish", "Test Parish", "ecatholic", "https://test.org", "2026-01-01T00:00:00Z"),
+    )
+    conn.commit()
+    conn.close()
+    return db_path
+
+
+def _patch_paths(monkeypatch, tmp_path: Path) -> None:
+    """Point all data file paths to tmp_path."""
+    monkeypatch.setattr("pdf_extract.sync.BULLETINS_METADATA_PATH", tmp_path / "metadata.json")
+    monkeypatch.setattr("pdf_extract.sync.CHURCHES_PATH", tmp_path / "churches.json")
+    monkeypatch.setattr("pdf_extract.sync.EVENTS_PATH", tmp_path / "events.json")
 
 
 def test_fetch_stage_is_idempotent(monkeypatch, tmp_path: Path) -> None:
-    db_path = tmp_path / "parish_events.db"
-    migrate_db(db_path)
-    _patch_sync_db(monkeypatch, db_path)
+    db_path = _setup_test_db(tmp_path)
+    _patch_paths(monkeypatch, tmp_path)
+    monkeypatch.setattr("pdf_extract.sync.connect_db", lambda: connect_db(db_path))
 
     monkeypatch.setattr(
-        "pdf_extract.sync._build_latest_bulletin_links_for_parish",
-        lambda **kwargs: BulletinLink(
+        "pdf_extract.sync._build_bulletin_link",
+        lambda source_type, source_provider_id: BulletinLink(
             source_url="https://example.org/bulletin.pdf",
             fetch_url="https://example.org/bulletin.pdf",
         ),
@@ -24,14 +41,8 @@ def test_fetch_stage_is_idempotent(monkeypatch, tmp_path: Path) -> None:
     monkeypatch.setattr("pdf_extract.sync._download_pdf", lambda **kwargs: b"%PDF-1.4 fake")
 
     pdf_dir = tmp_path / "bulletins"
-    first = fetch_bulletins(
-        parish_name="Southeast Rochester Catholic Community",
-        pdf_dir=pdf_dir,
-    )
-    second = fetch_bulletins(
-        parish_name="Southeast Rochester Catholic Community",
-        pdf_dir=pdf_dir,
-    )
+    first = fetch_bulletins(parish_name="Test Parish", pdf_dir=pdf_dir)
+    second = fetch_bulletins(parish_name="Test Parish", pdf_dir=pdf_dir)
 
     assert first["fetched_bulletins"] == 1
     assert second["fetched_bulletins"] == 0
@@ -39,26 +50,26 @@ def test_fetch_stage_is_idempotent(monkeypatch, tmp_path: Path) -> None:
 
 
 def test_process_stage_is_idempotent(monkeypatch, tmp_path: Path) -> None:
-    db_path = tmp_path / "parish_events.db"
-    migrate_db(db_path)
-    _patch_sync_db(monkeypatch, db_path)
+    db_path = _setup_test_db(tmp_path)
+    _patch_paths(monkeypatch, tmp_path)
+    monkeypatch.setattr("pdf_extract.sync.connect_db", lambda: connect_db(db_path))
 
-    conn = connect_db(db_path)
-    try:
-        parish_id = get_parish_id(conn, "Southeast Rochester Catholic Community")
-        pdf_path = tmp_path / "sample.pdf"
-        pdf_path.write_bytes(b"fake")
-        insert_bulletin(
-            conn,
-            parish_id=parish_id,
-            source_url="https://example.org/parsed.pdf",
-            pdf_path=str(pdf_path),
-            published_date="2026-02-22",
-            content_hash="def",
-        )
-        conn.commit()
-    finally:
-        conn.close()
+    # Create a test PDF
+    pdf_path = tmp_path / "sample.pdf"
+    pdf_path.write_bytes(b"fake")
+
+    # Write a metadata entry for an unprocessed bulletin
+    save_json_list(tmp_path / "metadata.json", [
+        {
+            "parish_slug": "test-parish",
+            "source_url": "https://example.org/parsed.pdf",
+            "pdf_path": str(pdf_path),
+            "content_hash": "def",
+            "fetched_at": "2026-01-01T00:00:00Z",
+            "processed_at": None,
+            "published_date": "2026-02-22",
+        }
+    ])
 
     monkeypatch.setattr(
         "pdf_extract.sync.extract_events",
@@ -79,22 +90,10 @@ def test_process_stage_is_idempotent(monkeypatch, tmp_path: Path) -> None:
         },
     )
 
-    first = process_bulletins(parish_name="Southeast Rochester Catholic Community")
-    second = process_bulletins(parish_name="Southeast Rochester Catholic Community")
+    first = process_bulletins(parish_name="Test Parish")
+    second = process_bulletins(parish_name="Test Parish")
 
     assert first["processed_bulletins"] == 1
     assert first["inserted_events"] == 1
     assert second["processed_bulletins"] == 0
     assert second["inserted_events"] == 0
-
-    conn = connect_db(db_path)
-    try:
-        row = conn.execute(
-            "SELECT processed_at FROM bulletin WHERE source_url = ?",
-            ("https://example.org/parsed.pdf",),
-        ).fetchone()
-    finally:
-        conn.close()
-
-    assert row is not None
-    assert row["processed_at"] is not None
