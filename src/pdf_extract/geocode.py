@@ -1,14 +1,17 @@
+"""Backfill church latitude/longitude from address using Nominatim."""
+
 from __future__ import annotations
 
-import argparse
 import json
+import logging
 import sqlite3
 import time
 from pathlib import Path
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
-DEFAULT_DB_PATH = Path("data/parish_events.db")
+LOGGER = logging.getLogger(__name__)
+
 NOMINATIM_URL = "https://nominatim.openstreetmap.org/search"
 
 
@@ -97,26 +100,3 @@ def run_backfill(
         return {"checked": len(rows), "updated": updated, "failed": failed}
     finally:
         conn.close()
-
-
-def main() -> None:
-    parser = argparse.ArgumentParser(description="Backfill church latitude/longitude from address.")
-    parser.add_argument("--db-path", type=Path, default=DEFAULT_DB_PATH)
-    parser.add_argument("--dry-run", action="store_true")
-    parser.add_argument("--limit", type=int, default=None)
-    parser.add_argument("--pause-seconds", type=float, default=1.0)
-    parser.add_argument("--email", type=str, default=None)
-    args = parser.parse_args()
-
-    result = run_backfill(
-        db_path=args.db_path,
-        dry_run=args.dry_run,
-        limit=args.limit,
-        pause_seconds=args.pause_seconds,
-        email=args.email,
-    )
-    print(json.dumps(result, indent=2))
-
-
-if __name__ == "__main__":
-    main()

@@ -1,15 +1,12 @@
-"""Copy ecatholic and parishes-online rows from website into parish table."""
+"""Seed parish table from website rows with known bulletin providers."""
 
 from __future__ import annotations
 
-import argparse
-import json
 import logging
 import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
 
-DEFAULT_DB_PATH = Path("data/parish_events.db")
 LOGGER = logging.getLogger(__name__)
 
 
@@ -75,29 +72,3 @@ def seed_parishes(*, db_path: Path, dry_run: bool) -> dict[str, int]:
         return {"inserted": inserted, "skipped": skipped}
     finally:
         conn.close()
-
-
-def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Seed parish table from website rows with ecatholic or parishes-online providers.",
-    )
-    parser.add_argument("--db-path", type=Path, default=DEFAULT_DB_PATH)
-    parser.add_argument("--dry-run", action="store_true")
-    parser.add_argument(
-        "--log-level",
-        default="INFO",
-        choices=["DEBUG", "INFO", "WARNING", "ERROR"],
-    )
-    args = parser.parse_args()
-
-    logging.basicConfig(
-        level=getattr(logging, args.log_level),
-        format="%(asctime)s %(levelname)s %(name)s - %(message)s",
-    )
-
-    result = seed_parishes(db_path=args.db_path, dry_run=args.dry_run)
-    print(json.dumps(result, indent=2))
-
-
-if __name__ == "__main__":
-    main()

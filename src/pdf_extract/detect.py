@@ -1,8 +1,8 @@
+"""Detect bulletin provider for parish websites using Playwright."""
+
 from __future__ import annotations
 
-import argparse
 import importlib
-import json
 import logging
 import re
 import sqlite3
@@ -10,7 +10,6 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-DEFAULT_DB_PATH = Path("data/parish_events.db")
 LOGGER = logging.getLogger(__name__)
 
 PROVIDER_KEYWORDS: list[tuple[str, str]] = [
@@ -234,36 +233,3 @@ def run_detection(
         return {"checked": len(rows), "updated": updated, "failed": failed}
     finally:
         conn.close()
-
-
-def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Detect bulletin provider for unprocessed websites.",
-    )
-    parser.add_argument("--db-path", type=Path, default=DEFAULT_DB_PATH)
-    parser.add_argument("--dry-run", action="store_true")
-    parser.add_argument("--limit", type=int, default=None)
-    parser.add_argument("--pause-seconds", type=float, default=0.5)
-    parser.add_argument(
-        "--log-level",
-        default="INFO",
-        choices=["DEBUG", "INFO", "WARNING", "ERROR"],
-    )
-    args = parser.parse_args()
-
-    logging.basicConfig(
-        level=getattr(logging, args.log_level),
-        format="%(asctime)s %(levelname)s %(name)s - %(message)s",
-    )
-
-    result = run_detection(
-        db_path=args.db_path,
-        dry_run=args.dry_run,
-        limit=args.limit,
-        pause_seconds=args.pause_seconds,
-    )
-    print(json.dumps(result, indent=2))
-
-
-if __name__ == "__main__":
-    main()
