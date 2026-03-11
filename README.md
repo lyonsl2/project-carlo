@@ -98,7 +98,8 @@ pnpm db:drop     # delete the SQLite file
 - `src/pdf_extract/extract_frontend_db.py` - builds the frontend SQLite snapshot
 - `src/pdf_extract/` - Python CLI package
   - `__main__.py` - CLI entry point
-  - `sync.py` - fetch/process orchestration
+  - `fetch.py` - bulletin fetching and provider link resolution
+  - `process.py` - bulletin processing with Gemini AI
   - `schedule_extraction.py` - Gemini schedule extraction
   - `storage.py` - SQLite helpers and data paths
   - `db.py` - database creation from data files

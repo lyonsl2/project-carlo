@@ -1,7 +1,8 @@
 from pathlib import Path
 
+from pdf_extract.fetch import BulletinLink, fetch_bulletins
+from pdf_extract.process import process_bulletins
 from pdf_extract.storage import SCHEMA_PATH, connect_db, save_json_list
-from pdf_extract.sync import BulletinLink, fetch_bulletins, process_bulletins
 
 
 def _setup_test_db(tmp_path: Path) -> Path:
@@ -19,28 +20,33 @@ def _setup_test_db(tmp_path: Path) -> Path:
     return db_path
 
 
-def _patch_paths(monkeypatch, tmp_path: Path) -> None:
-    """Point all data file paths to tmp_path."""
-    monkeypatch.setattr("pdf_extract.sync.BULLETINS_METADATA_PATH", tmp_path / "metadata.json")
-    monkeypatch.setattr("pdf_extract.sync.CHURCHES_PATH", tmp_path / "churches.json")
-    monkeypatch.setattr("pdf_extract.sync.EVENTS_PATH", tmp_path / "events.json")
+def _patch_fetch_paths(monkeypatch, tmp_path: Path) -> None:
+    """Point fetch data file paths to tmp_path."""
+    monkeypatch.setattr("pdf_extract.fetch.BULLETINS_METADATA_PATH", tmp_path / "metadata.json")
+
+
+def _patch_process_paths(monkeypatch, tmp_path: Path) -> None:
+    """Point process data file paths to tmp_path."""
+    monkeypatch.setattr("pdf_extract.process.BULLETINS_METADATA_PATH", tmp_path / "metadata.json")
+    monkeypatch.setattr("pdf_extract.process.CHURCHES_PATH", tmp_path / "churches.json")
+    monkeypatch.setattr("pdf_extract.process.EVENTS_PATH", tmp_path / "events.json")
 
 
 def test_fetch_stage_is_idempotent(monkeypatch, tmp_path: Path) -> None:
     db_path = _setup_test_db(tmp_path)
-    _patch_paths(monkeypatch, tmp_path)
-    monkeypatch.setattr("pdf_extract.sync.connect_db", lambda: connect_db(db_path))
+    _patch_fetch_paths(monkeypatch, tmp_path)
+    monkeypatch.setattr("pdf_extract.fetch.connect_db", lambda: connect_db(db_path))
 
     monkeypatch.setattr(
-        "pdf_extract.sync._build_bulletin_link",
+        "pdf_extract.fetch._build_bulletin_link",
         lambda source_type, source_provider_id, *, page=None: BulletinLink(
             source_url="https://example.org/bulletin.pdf",
             fetch_url="https://example.org/bulletin.pdf",
         ),
     )
-    monkeypatch.setattr("pdf_extract.sync._download_pdf", lambda **kwargs: b"%PDF-1.4 fake")
+    monkeypatch.setattr("pdf_extract.fetch._download_pdf", lambda **kwargs: b"%PDF-1.4 fake")
     monkeypatch.setattr(
-        "pdf_extract.sync._launch_browser",
+        "pdf_extract.fetch._launch_browser",
         lambda: (type("PW", (), {"stop": lambda self: None})(), type("B", (), {"close": lambda self: None})(), None),
     )
 
@@ -55,8 +61,8 @@ def test_fetch_stage_is_idempotent(monkeypatch, tmp_path: Path) -> None:
 
 def test_process_stage_is_idempotent(monkeypatch, tmp_path: Path) -> None:
     db_path = _setup_test_db(tmp_path)
-    _patch_paths(monkeypatch, tmp_path)
-    monkeypatch.setattr("pdf_extract.sync.connect_db", lambda: connect_db(db_path))
+    _patch_process_paths(monkeypatch, tmp_path)
+    monkeypatch.setattr("pdf_extract.process.connect_db", lambda: connect_db(db_path))
 
     # Create a test PDF
     pdf_path = tmp_path / "sample.pdf"
@@ -76,7 +82,7 @@ def test_process_stage_is_idempotent(monkeypatch, tmp_path: Path) -> None:
     ])
 
     monkeypatch.setattr(
-        "pdf_extract.sync.extract_events",
+        "pdf_extract.process.extract_events",
         lambda pdf_bytes, model="gemini-3-flash-preview": {
             "churches": [{"id": "c1", "name": "St. Mary", "address": "123 Main"}],
             "events": [

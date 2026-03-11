@@ -6,17 +6,19 @@ from pdf_extract.storage import (
     connect_db,
     list_churches,
 )
-from pdf_extract.sync import (
+from pdf_extract.fetch import (
     BulletinLink,
     PARISHES_ONLINE_TYPE,
     _build_bulletin_link,
     _extract_ecatholic_pdf_url_from_href,
     _extract_parishes_online_pdf_url_from_href,
-    _find_matching_church,
     _next_sunday_after,
     _resolve_latest_anchor_link_with_playwright,
     build_latest_ecatholic_bulletin_links,
     build_latest_parishes_online_bulletin_links,
+)
+from pdf_extract.process import (
+    _find_matching_church,
     normalize_church_name,
 )
 
@@ -42,7 +44,7 @@ def test_build_latest_ecatholic_bulletin_links(monkeypatch) -> None:
             "https://files.ecatholic.com/19887/bulletins/20260222.pdf",
         )
 
-    monkeypatch.setattr("pdf_extract.sync._resolve_ecatholic_latest_link", fake_resolve)
+    monkeypatch.setattr("pdf_extract.fetch._resolve_ecatholic_latest_link", fake_resolve)
     link = build_latest_ecatholic_bulletin_links(
         provider_id="https://southeastrochestercatholics.org",
         reference_date=date(2026, 2, 19),  # should be ignored
@@ -70,7 +72,7 @@ def test_build_latest_parishes_online_bulletin_links(monkeypatch) -> None:
             "https://container.parishesonline.com/path/latest.pdf",
         )
 
-    monkeypatch.setattr("pdf_extract.sync._resolve_parishes_online_latest_link", fake_resolve)
+    monkeypatch.setattr("pdf_extract.fetch._resolve_parishes_online_latest_link", fake_resolve)
     link = build_latest_parishes_online_bulletin_links(
         provider_id="123",
         reference_date=date(2026, 2, 19),
@@ -240,7 +242,7 @@ def test_build_bulletin_link_ecatholic(monkeypatch) -> None:
     def fake_build(*, provider_id, reference_date=None, page=None):
         return BulletinLink(source_url="https://ecatholic.com/b.pdf", fetch_url="https://ecatholic.com/b.pdf")
 
-    monkeypatch.setattr("pdf_extract.sync.build_latest_ecatholic_bulletin_links", fake_build)
+    monkeypatch.setattr("pdf_extract.fetch.build_latest_ecatholic_bulletin_links", fake_build)
     link = _build_bulletin_link("ecatholic", "https://test.org")
     assert link.source_url == "https://ecatholic.com/b.pdf"
 
@@ -249,6 +251,6 @@ def test_build_bulletin_link_parishes_online(monkeypatch) -> None:
     def fake_build(*, provider_id, reference_date=None, page=None):
         return BulletinLink(source_url="https://po.com/source", fetch_url="https://po.com/fetch.pdf")
 
-    monkeypatch.setattr("pdf_extract.sync.build_latest_parishes_online_bulletin_links", fake_build)
+    monkeypatch.setattr("pdf_extract.fetch.build_latest_parishes_online_bulletin_links", fake_build)
     link = _build_bulletin_link(PARISHES_ONLINE_TYPE, "123")
     assert link.fetch_url == "https://po.com/fetch.pdf"

@@ -93,12 +93,12 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if args.command == "fetch":
             _ensure_db()
-            from pdf_extract.sync import fetch_bulletins
+            from pdf_extract.fetch import fetch_bulletins
             result = fetch_bulletins(parish_name=args.parish)
 
         elif args.command == "process":
             _ensure_db()
-            from pdf_extract.sync import process_bulletins
+            from pdf_extract.process import process_bulletins
             result = process_bulletins(parish_name=args.parish, model=args.model)
 
         elif args.command == "detect":

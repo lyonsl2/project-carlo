@@ -54,9 +54,9 @@ parishes.csv → [detect.py] Playwright → detect_results.json
                                             ↓
                               [db.py] create DB from schema.sql + data files
                                             ↓
-                       [sync.py] fetch_bulletins() → download PDFs → bulletins/metadata.json
+                       [fetch.py] fetch_bulletins() → download PDFs → bulletins/metadata.json
                                             ↓
-                       [sync.py] process_bulletins() → [schedule_extraction.py] Gemini AI
+                       [process.py] process_bulletins() → [schedule_extraction.py] Gemini AI
                                             ↓
                                    churches.json, events.json
                                             ↓
@@ -67,7 +67,8 @@ parishes.csv → [detect.py] Playwright → detect_results.json
 
 Key modules:
 
-- **sync.py** — Core pipeline: bulletin link resolution (eCatholic HTML, ParishesOnline Playwright), PDF download, church matching (address then fuzzy name), fetch/process orchestration
+- **fetch.py** — Bulletin fetching: provider link resolution (eCatholic, ParishesOnline via Playwright), PDF download, browser management
+- **process.py** — Bulletin processing: Gemini AI extraction, church matching (address then fuzzy name), event persistence
 - **schedule_extraction.py** — Pydantic models + Gemini prompt for structured extraction from PDFs
 - **storage.py** — Data paths, SQLite helpers, JSON file I/O
 - **db.py** — Database creation: loads schema.sql then populates from CSV/JSON data files
