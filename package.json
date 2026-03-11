@@ -10,6 +10,8 @@
     "fetch": "uv run python -m pdf_extract fetch",
     "process": "uv run python -m pdf_extract process",
     "geocode": "uv run python -m pdf_extract geocode",
+    "test": "uv run pytest",
+    "lint": "uv run ruff check .",
     "extract:web": "uv run python apps/web/scripts/extract_frontend_db.py",
     "install:web": "pnpm --dir apps/web install",
     "dev:web": "pnpm --dir apps/web dev",

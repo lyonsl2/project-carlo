@@ -1,6 +1,6 @@
 # Bulletin Processing Pipeline
 
-Fetch parish bulletin PDFs and process schedule events (Mass, Confession, Adoration)
+Fetch parish bulletin PDFs and extract schedule events (Mass, Confession, Adoration)
 with Gemini into SQLite.
 
 ## Prerequisites
@@ -43,27 +43,18 @@ pnpm dev:web
 
 ### Command line
 
-Run the full pipeline (`fetch -> process`):
-
-```bash
-uv run python -m pdf_extract
-```
-
-Optional flags:
-
-- `--parish "Southeast Rochester Catholic Community"` (if omitted, runs all parishes in DB)
-- `--model gemini-3-flash-preview` (used by `process` and full pipeline)
-- `--log-level DEBUG|INFO|WARNING|ERROR` (default: `INFO`)
-- `--migrate` (run `alembic upgrade head` and exit)
-- `--delete-db` (delete the DB file and exit)
-- `--downgrade` or `--downgrade <revision>` (default is one step back, `-1`)
-
 Run each stage independently:
 
 ```bash
-uv run python -m pdf_extract fetch [--parish "..."]
-uv run python -m pdf_extract process [--parish "..."] [--model gemini-3-flash-preview]
+pnpm fetch [-- --parish "..."]
+pnpm process [-- --parish "..." --model gemini-3-flash-preview]
+pnpm detect [-- --dry-run --limit N --pause-seconds 0.5]
+pnpm geocode [-- --dry-run --limit N --email "you@example.com"]
+pnpm db:create
+pnpm db:drop
 ```
+
+All commands accept `-- --log-level DEBUG|INFO|WARNING|ERROR` (default: `INFO`).
 
 Stage idempotency:
 
@@ -73,59 +64,52 @@ Stage idempotency:
 ### From Python
 
 ```python
-from pdf_extract import fetch_bulletins, process_bulletins, sync_bulletins
+from pdf_extract import extract_events, fetch_bulletins, process_bulletins
 
 fetch_result = fetch_bulletins(parish_name="Southeast Rochester Catholic Community")
 process_result = process_bulletins(parish_name="Southeast Rochester Catholic Community")
-full_result = sync_bulletins(parish_name="Southeast Rochester Catholic Community")
 ```
 
 ## Environment Variables
 
 - `GEMINI_API_KEY`: automatically picked up by the Gemini client.
-- `GOOGLE_API_KEY`: also supported by the SDK as an alternative environment variable.
+- `GOOGLE_API_KEY`: also supported by the SDK as an alternative.
 
 ## Database workflow
 
-Database changes are migration-first, with SQL in Alembic revisions:
-
-- `alembic/versions/*.py` is the source of truth for schema history.
-- Use SQL in `upgrade()`/`downgrade()` via `op.execute(...)`.
-- Run migrations at process startup or deploy time.
-
-Useful commands:
+The database is rebuilt from flat files (`data/schema.sql`, CSVs, and JSONs):
 
 ```bash
-uv run alembic upgrade head
-uv run alembic revision -m "describe change"
+pnpm db:create   # drop and recreate from schema + data files
+pnpm db:drop     # delete the SQLite file
 ```
 
-Backfill church coordinates from address data (OpenStreetMap Nominatim):
-
-```bash
-uv run python scripts/geocode_churches.py --dry-run
-uv run python scripts/geocode_churches.py --email "you@example.com"
-```
+`schema.sql` is the source of truth for the database schema. Pipeline commands
+(`fetch`, `process`) automatically rebuild the DB before running.
 
 ## Project layout
 
 - `pyproject.toml` - project metadata and dependencies
 - `package.json` and `pnpm-workspace.yaml` - JS workspace for frontend
 - `uv.lock` - locked dependency versions
-- `apps/web` - React + TypeScript + Vite frontend
+- `data/schema.sql` - SQLite schema (source of truth)
+- `data/` - CSV, JSON data files and downloaded bulletin PDFs
+- `apps/web/` - React + TypeScript + Vite frontend
 - `apps/web/scripts/extract_frontend_db.py` - builds the frontend SQLite snapshot
-- `scripts/geocode_churches.py` - optional coordinate backfill helper
-- `src/pdf_extract/schedule_extraction.py` - Gemini schedule extraction implementation
-- `src/pdf_extract/sync.py` - fetch/process orchestration
-- `src/pdf_extract/storage.py` - SQLite helpers and migration runner
-- `src/pdf_extract/__main__.py` - CLI entry point
-- `alembic/` - migration environment and revisions
+- `src/pdf_extract/` - Python CLI package
+  - `__main__.py` - CLI entry point
+  - `sync.py` - fetch/process orchestration
+  - `schedule_extraction.py` - Gemini schedule extraction
+  - `storage.py` - SQLite helpers and data paths
+  - `db.py` - database creation from data files
+  - `detect.py` - bulletin provider detection (Playwright)
+  - `geocode.py` - address geocoding (Nominatim)
 
 ## Dependencies
 
 - [google-genai](https://github.com/googleapis/python-genai) - Gemini API client for PDF processing and structured JSON output.
-- [playwright](https://playwright.dev/python/) - provider site link resolution where needed.
-- [alembic](https://alembic.sqlalchemy.org/) and [sqlalchemy](https://www.sqlalchemy.org/) - migration workflow.
+- [playwright](https://playwright.dev/python/) - bulletin provider detection and link resolution.
+- [pydantic](https://docs.pydantic.dev/) - data validation and Gemini response parsing.
 
 To add more dependencies:
 
@@ -138,11 +122,11 @@ uv add package-name
 Run linting:
 
 ```bash
-uv run ruff check .
+pnpm lint
 ```
 
 Run tests:
 
 ```bash
-uv run pytest
+pnpm test
 ```

@@ -15,6 +15,8 @@ dist/
 build/
 eggs/
 .eggs/
+.ruff_cache/
+.pytest_cache/
 
 # Environment and logs
 .env
@@ -36,6 +38,13 @@ node_modules/
 apps/*/node_modules/
 dist/
 
+# Data
+data/bulletins/**/*.pdf
+data/*.db
+
 # Generated frontend assets
 # apps/web/public/frontend.db
 apps/web/public/*.wasm
+
+# Claude Code
+.claude/
