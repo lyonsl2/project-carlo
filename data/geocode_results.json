@@ -1,0 +1,512 @@
+[
+  {
+    "parish_slug": "all-saints-corning",
+    "church_name": "St. Mary's Catholic Church",
+    "latitude": 42.1422899,
+    "longitude": -77.0609656
+  },
+  {
+    "parish_slug": "net-catholic",
+    "church_name": "All Saints Church",
+    "latitude": 42.5424254,
+    "longitude": -76.5388303
+  },
+  {
+    "parish_slug": "net-catholic",
+    "church_name": "Holy Cross Church",
+    "latitude": 42.5110535,
+    "longitude": -76.335304
+  },
+  {
+    "parish_slug": "net-catholic",
+    "church_name": "Saint Anthony's Church",
+    "latitude": 42.6039734,
+    "longitude": -76.3725574
+  },
+  {
+    "parish_slug": "southeast-rochester-catholic-community",
+    "church_name": "Blessed Sacrament Church",
+    "latitude": 43.1448098,
+    "longitude": -77.5884847
+  },
+  {
+    "parish_slug": "southeast-rochester-catholic-community",
+    "church_name": "St. Boniface Church",
+    "latitude": 43.1427736,
+    "longitude": -77.6027498
+  },
+  {
+    "parish_slug": "southeast-rochester-catholic-community",
+    "church_name": "St. Mary's Church",
+    "latitude": 43.1532543,
+    "longitude": -77.6060634
+  },
+  {
+    "parish_slug": "catholic-parishes-eastern-wayne-county",
+    "church_name": "St. Mary Magdalene",
+    "latitude": 43.2197692,
+    "longitude": -76.8162833
+  },
+  {
+    "parish_slug": "catholic-parishes-eastern-wayne-county",
+    "church_name": "St. Thomas Church",
+    "latitude": 43.250928,
+    "longitude": -76.7221072
+  },
+  {
+    "parish_slug": "catholic-parishes-eastern-wayne-county",
+    "church_name": "St. Jude Church",
+    "latitude": 43.316239,
+    "longitude": -76.7019125
+  },
+  {
+    "parish_slug": "saint-jerome",
+    "church_name": "Church of St. Jerome",
+    "latitude": 43.1140815,
+    "longitude": -77.4878701
+  },
+  {
+    "parish_slug": "assumption-resurrection",
+    "church_name": "Church of the Assumption",
+    "latitude": 43.1051388,
+    "longitude": -77.4403658
+  },
+  {
+    "parish_slug": "assumption-resurrection",
+    "church_name": "Church of the Resurrection",
+    "latitude": 43.0776551,
+    "longitude": -77.4106996
+  },
+  {
+    "parish_slug": "holy-spirit-st-josephs",
+    "church_name": "Holy Spirit Church",
+    "latitude": 43.1829688,
+    "longitude": -77.4854109
+  },
+  {
+    "parish_slug": "holy-spirit-st-josephs",
+    "church_name": "St. Joseph's Church",
+    "latitude": 43.1357481,
+    "longitude": -77.4778718
+  },
+  {
+    "parish_slug": "nativity-seas",
+    "church_name": "Church of the Nativity of the Blessed Virgin Mary",
+    "latitude": 43.2128494,
+    "longitude": -77.9399647
+  },
+  {
+    "parish_slug": "nativity-seas",
+    "church_name": "Saint Elizabeth Ann Seton Church",
+    "latitude": 43.31289,
+    "longitude": -77.9227876
+  },
+  {
+    "parish_slug": "transfiguration-st-catherine-mendon",
+    "church_name": "Church of the Transfiguration",
+    "latitude": 43.0575106,
+    "longitude": -77.5212237
+  },
+  {
+    "parish_slug": "transfiguration-st-catherine-mendon",
+    "church_name": "St. Catherine of Siena Church",
+    "latitude": 42.996167,
+    "longitude": -77.5042105
+  },
+  {
+    "parish_slug": "good-shepherd-catholic-community",
+    "church_name": "St. Patrick's Church",
+    "latitude": 42.7094458,
+    "longitude": -76.424062
+  },
+  {
+    "parish_slug": "good-shepherd-catholic-community",
+    "church_name": "St. Michael's Church",
+    "latitude": 42.842092,
+    "longitude": -76.691891
+  },
+  {
+    "parish_slug": "our-mother-of-sorrows-holy-cross",
+    "church_name": "Our Mother of Sorrows",
+    "latitude": 43.2516358,
+    "longitude": -77.6590211
+  },
+  {
+    "parish_slug": "our-mother-of-sorrows-holy-cross",
+    "church_name": "Holy Cross Church",
+    "latitude": 43.2528157,
+    "longitude": -77.6120689
+  },
+  {
+    "parish_slug": "holy-family-catholic-community",
+    "church_name": "St. Joseph Church",
+    "latitude": 42.5686758,
+    "longitude": -77.5951581
+  },
+  {
+    "parish_slug": "holy-family-catholic-community",
+    "church_name": "St. Mary Church",
+    "latitude": 42.5603868,
+    "longitude": -77.6928581
+  },
+  {
+    "parish_slug": "holy-family-catholic-community",
+    "church_name": "St. Pius V Church",
+    "latitude": 42.5008445,
+    "longitude": -77.496703
+  },
+  {
+    "parish_slug": "our-lady-of-lourdes-st-anne",
+    "church_name": "Our Lady of Lourdes Church",
+    "latitude": 43.1323508,
+    "longitude": -77.564642
+  },
+  {
+    "parish_slug": "our-lady-of-lourdes-st-anne",
+    "church_name": "Saint Anne Church",
+    "latitude": 43.1185396,
+    "longitude": -77.6196083
+  },
+  {
+    "parish_slug": "our-lady-of-peace-geneva",
+    "church_name": "St. Francis deSales Church",
+    "latitude": 42.8734405,
+    "longitude": -76.9796252
+  },
+  {
+    "parish_slug": "our-lady-of-peace-geneva",
+    "church_name": "St. Stephen Church",
+    "latitude": 42.8675775,
+    "longitude": -76.9884883
+  },
+  {
+    "parish_slug": "our-lady-of-peace-geneva",
+    "church_name": "St. John's Chapel",
+    "latitude": 42.859155,
+    "longitude": -76.9826513
+  },
+  {
+    "parish_slug": "our-lady-of-the-lakes",
+    "church_name": "Saint Michael's Church",
+    "latitude": 42.6611295,
+    "longitude": -77.0571805
+  },
+  {
+    "parish_slug": "our-lady-of-the-lakes",
+    "church_name": "Saint Januarius' Church",
+    "latitude": 42.623984,
+    "longitude": -77.396913
+  },
+  {
+    "parish_slug": "our-lady-of-the-lakes",
+    "church_name": "Saint Patrick's Church",
+    "latitude": 42.527322,
+    "longitude": -77.2869487
+  },
+  {
+    "parish_slug": "our-lady-of-the-snow-saints-mary-and-martha",
+    "church_name": "St. Joseph Church",
+    "latitude": 43.044883,
+    "longitude": -76.5640385
+  },
+  {
+    "parish_slug": "our-lady-of-the-snow-saints-mary-and-martha",
+    "church_name": "St. Patrick Church",
+    "latitude": 43.170008,
+    "longitude": -76.5692612
+  },
+  {
+    "parish_slug": "our-lady-of-victory-st-joseph",
+    "church_name": "Our Lady of Victory / St. Joseph",
+    "latitude": 43.1589381,
+    "longitude": -77.6089455
+  },
+  {
+    "parish_slug": "our-lady-queen-of-peace-st-thomas-more",
+    "church_name": "Our Lady Queen of Peace",
+    "latitude": 43.1073079,
+    "longitude": -77.5643953
+  },
+  {
+    "parish_slug": "our-lady-queen-of-peace-st-thomas-more",
+    "church_name": "St. Thomas More",
+    "latitude": 43.1333922,
+    "longitude": -77.5385498
+  },
+  {
+    "parish_slug": "parish-of-the-holy-family",
+    "church_name": "The Parish of the Holy Family",
+    "latitude": 43.1661799,
+    "longitude": -77.7382788
+  },
+  {
+    "parish_slug": "ss-isidore-maria-torribia",
+    "church_name": "St. Catherine of Siena",
+    "latitude": 42.110317,
+    "longitude": -77.2260116
+  },
+  {
+    "parish_slug": "ss-isidore-maria-torribia",
+    "church_name": "St. Stanislaus Bishop & Martyr",
+    "latitude": 42.371739,
+    "longitude": -77.1092941
+  },
+  {
+    "parish_slug": "ss-isidore-maria-torribia",
+    "church_name": "St. Joseph the Carpenter",
+    "latitude": 42.231852,
+    "longitude": -77.1957491
+  },
+  {
+    "parish_slug": "our-lady-of-the-snow-saints-mary-and-martha",
+    "church_name": "St. Francis of Assisi Church",
+    "latitude": 42.932652,
+    "longitude": -76.5872628
+  },
+  {
+    "parish_slug": "our-lady-of-the-snow-saints-mary-and-martha",
+    "church_name": "St. Hyacinth Church",
+    "latitude": 42.9413431,
+    "longitude": -76.576642
+  },
+  {
+    "parish_slug": "st-agnes-paul-rose",
+    "church_name": "St. Agnes Church",
+    "latitude": 42.9134936,
+    "longitude": -77.7454914
+  },
+  {
+    "parish_slug": "st-agnes-paul-rose",
+    "church_name": "St. Paul of the Cross",
+    "latitude": 42.954789,
+    "longitude": -77.5932223
+  },
+  {
+    "parish_slug": "st-agnes-paul-rose",
+    "church_name": "St. Rose Church",
+    "latitude": 42.9018893,
+    "longitude": -77.6114996
+  },
+  {
+    "parish_slug": "st-benedict-parish",
+    "church_name": "St. Bridget's Church",
+    "latitude": 42.8999745,
+    "longitude": -77.4328218
+  },
+  {
+    "parish_slug": "st-benedict-parish",
+    "church_name": "St. Mary's Church",
+    "latitude": 42.8910195,
+    "longitude": -77.2828984
+  },
+  {
+    "parish_slug": "st-benedicts-st-marys-lake",
+    "church_name": "St. Benedict's Church",
+    "latitude": 42.332669,
+    "longitude": -76.7925424
+  },
+  {
+    "parish_slug": "st-benedicts-st-marys-lake",
+    "church_name": "St. Mary's of the Lake",
+    "latitude": 42.3773209,
+    "longitude": -76.8697424
+  },
+  {
+    "parish_slug": "st-catherine-of-siena-ithaca",
+    "church_name": "St. Catherine of Siena Church",
+    "latitude": 42.4690119,
+    "longitude": -76.4706896
+  },
+  {
+    "parish_slug": "st-frances-xavier-cabrini",
+    "church_name": "Annunciation",
+    "latitude": 43.1879387,
+    "longitude": -77.5746931
+  },
+  {
+    "parish_slug": "st-frances-xavier-cabrini",
+    "church_name": "Corpus Christi",
+    "latitude": 43.160979,
+    "longitude": -77.589501
+  },
+  {
+    "parish_slug": "st-frances-xavier-cabrini",
+    "church_name": "Saint Michael",
+    "latitude": 43.1744135,
+    "longitude": -77.6130002
+  },
+  {
+    "parish_slug": "st-john-of-rochester",
+    "church_name": "St. John of Rochester",
+    "latitude": 43.0758604,
+    "longitude": -77.4758017
+  },
+  {
+    "parish_slug": "st-john-spencerport",
+    "church_name": "St. John the Evangelist",
+    "latitude": 43.1938664,
+    "longitude": -77.8039002
+  },
+  {
+    "parish_slug": "catholic-parishes-eastern-wayne-county",
+    "church_name": "St. John the Evangelist",
+    "latitude": 43.0866606,
+    "longitude": -76.8703443
+  },
+  {
+    "parish_slug": "catholic-parishes-eastern-wayne-county",
+    "church_name": "St. Michael",
+    "latitude": 43.0674625,
+    "longitude": -76.9882325
+  },
+  {
+    "parish_slug": "st-kateri-tekakwitha",
+    "church_name": "Christ the King",
+    "latitude": 43.2081515,
+    "longitude": -77.5806942
+  },
+  {
+    "parish_slug": "st-kateri-tekakwitha",
+    "church_name": "St. Margaret Mary",
+    "latitude": 43.2060719,
+    "longitude": -77.6059001
+  },
+  {
+    "parish_slug": "st-kateri-tekakwitha",
+    "church_name": "St. Cecilia",
+    "latitude": 43.1980411,
+    "longitude": -77.561019
+  },
+  {
+    "parish_slug": "st-kateri-tekakwitha",
+    "church_name": "St. Thomas the Apostle",
+    "latitude": 43.239244,
+    "longitude": -77.5984958
+  },
+  {
+    "parish_slug": "st-katharine-drexel-st-maximilian-kolbe",
+    "church_name": "St. Patrick's Church",
+    "latitude": 43.0681442,
+    "longitude": -77.3029822
+  },
+  {
+    "parish_slug": "st-katharine-drexel-st-maximilian-kolbe",
+    "church_name": "St. Anne's Church",
+    "latitude": 43.0645845,
+    "longitude": -77.2332892
+  },
+  {
+    "parish_slug": "st-katharine-drexel-st-maximilian-kolbe",
+    "church_name": "St. Mary's of the Lake Church",
+    "latitude": 43.211121,
+    "longitude": -77.2818265
+  },
+  {
+    "parish_slug": "st-katharine-drexel-st-maximilian-kolbe",
+    "church_name": "Church of the Epiphany",
+    "latitude": 43.2359575,
+    "longitude": -77.0705842
+  },
+  {
+    "parish_slug": "st-katharine-drexel-st-maximilian-kolbe",
+    "church_name": "St. Mary Star of the Sea",
+    "latitude": 43.27011,
+    "longitude": -76.988706
+  },
+  {
+    "parish_slug": "st-leo-the-great",
+    "church_name": "St. Leo the Great Catholic Parish",
+    "latitude": 43.2918531,
+    "longitude": -77.7957304
+  },
+  {
+    "parish_slug": "st-louis-pittsford",
+    "church_name": "St. Louis Church",
+    "latitude": 43.0877672,
+    "longitude": -77.5162028
+  },
+  {
+    "parish_slug": "st-luke-the-evangelist",
+    "church_name": "St. Mary",
+    "latitude": 42.8001888,
+    "longitude": -77.8148369
+  },
+  {
+    "parish_slug": "st-luke-the-evangelist",
+    "church_name": "St. Patrick",
+    "latitude": 42.7237235,
+    "longitude": -77.8764829
+  },
+  {
+    "parish_slug": "st-luke-the-evangelist",
+    "church_name": "Holy Angels",
+    "latitude": 42.584579,
+    "longitude": -77.9396076
+  },
+  {
+    "parish_slug": "st-luke-the-evangelist",
+    "church_name": "St. Lucy",
+    "latitude": 42.8324115,
+    "longitude": -77.8811016
+  },
+  {
+    "parish_slug": "st-luke-the-evangelist",
+    "church_name": "St. Juan Diego Community",
+    "latitude": 42.772758,
+    "longitude": -77.8952936
+  },
+  {
+    "parish_slug": "st-marianne-cope",
+    "church_name": "Guardian Angels Church",
+    "latitude": 43.0781567,
+    "longitude": -77.6081735
+  },
+  {
+    "parish_slug": "st-marks-greece",
+    "church_name": "St. Mark's Roman Catholic Church",
+    "latitude": 43.2798074,
+    "longitude": -77.7014974
+  },
+  {
+    "parish_slug": "st-martin-de-porres",
+    "church_name": "St. Columba",
+    "latitude": 42.9766165,
+    "longitude": -77.855098
+  },
+  {
+    "parish_slug": "st-martin-de-porres",
+    "church_name": "St. Mary of the Assumption",
+    "latitude": 43.0193618,
+    "longitude": -77.7581847
+  },
+  {
+    "parish_slug": "st-martin-de-porres",
+    "church_name": "St. Vincent de Paul",
+    "latitude": 43.1052604,
+    "longitude": -77.8851595
+  },
+  {
+    "parish_slug": "catholic-parishes-eastern-wayne-county",
+    "church_name": "St. Michael Church",
+    "latitude": 43.042727,
+    "longitude": -77.095884
+  },
+  {
+    "parish_slug": "st-pius-x-chili",
+    "church_name": "St. Pius X Church",
+    "latitude": 43.1141813,
+    "longitude": -77.7347367
+  },
+  {
+    "parish_slug": "st-stanislaus-kostka",
+    "church_name": "St. Stanislaus Kostka Church",
+    "latitude": 43.1862465,
+    "longitude": -77.5985159
+  },
+  {
+    "parish_slug": "st-theodores-gates",
+    "church_name": "St. Theodore's Catholic Church",
+    "latitude": 43.1684008,
+    "longitude": -77.6952206
+  }
+]

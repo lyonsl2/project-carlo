@@ -25,16 +25,17 @@ CREATE TABLE IF NOT EXISTS parish (
 CREATE TABLE IF NOT EXISTS church (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     parish_id INTEGER NOT NULL REFERENCES parish(id) ON DELETE CASCADE,
-    name TEXT,
+    name TEXT NOT NULL,
     address TEXT,
-    name_normalized TEXT,
     latitude REAL,
     longitude REAL,
+    name_verified INTEGER NOT NULL DEFAULT 0,
+    address_verified INTEGER NOT NULL DEFAULT 0,
     created_at TEXT,
-    UNIQUE(parish_id, name_normalized)
+    UNIQUE(parish_id, name)
 );
 
-CREATE INDEX IF NOT EXISTS idx_church_parish_name_normalized ON church(parish_id, name_normalized);
+CREATE INDEX IF NOT EXISTS idx_church_parish_name ON church(parish_id, name);
 CREATE INDEX IF NOT EXISTS idx_church_lat_lng ON church(latitude, longitude);
 
 CREATE TABLE IF NOT EXISTS bulletin (

@@ -21,6 +21,7 @@ pnpm install           # Node dependencies (includes web app)
 pnpm run fetch             # Download bulletins from provider URLs
 pnpm process           # Extract schedules via Gemini
 pnpm detect            # Detect bulletin providers (Playwright)
+pnpm verify            # Verify church data via Gemini
 pnpm geocode           # Backfill church coordinates (Nominatim)
 pnpm db:create         # Recreate DB from schema + data files
 pnpm db:drop           # Delete database
@@ -53,12 +54,16 @@ pnpm extract:web   # Build frontend.db snapshot from main DB
 parishes.csv → [detect.py] Playwright → detect_results.json
                                             ↓
                               [db.py] create DB from schema.sql + data files
+                                      (churches.csv, verify_results.json, geocode_results.json)
                                             ↓
                        [fetch.py] fetch_bulletins() → download PDFs → bulletins/metadata.json
                                             ↓
                        [process.py] process_bulletins() → [schedule_extraction.py] Gemini AI
                                             ↓
-                                   churches.json, events.json
+                                        events.json
+                                            ↓
+                       [verify.py] verify_churches() → verify_results.json
+                       [geocode.py] run_backfill() → geocode_results.json
                                             ↓
                        [db.py] create_db() → parish_events.db
                                             ↓
@@ -68,12 +73,13 @@ parishes.csv → [detect.py] Playwright → detect_results.json
 Key modules:
 
 - **fetch.py** — Bulletin fetching: provider link resolution (eCatholic, ParishesOnline via Playwright), PDF download, browser management
-- **process.py** — Bulletin processing: Gemini AI extraction, church matching (address then fuzzy name), event persistence
-- **schedule_extraction.py** — Pydantic models + Gemini prompt for structured extraction from PDFs
+- **process.py** — Bulletin processing: Gemini AI extraction, maps events to known churches from DB
+- **verify.py** — Church verification: validates church names/addresses against bulletin PDFs via Gemini
+- **schedule_extraction.py** — Pydantic models + Gemini prompts for extraction and verification
 - **storage.py** — Data paths, SQLite helpers, JSON file I/O
 - **db.py** — Database creation: loads schema.sql then populates from CSV/JSON data files
 - **detect.py** — Playwright-based provider detection (ecatholic, parishes_online, discover_mass)
-- **geocode.py** — Nominatim geocoding for church addresses
+- **geocode.py** — Nominatim geocoding, writes results to geocode_results.json
 
 ### Database
 

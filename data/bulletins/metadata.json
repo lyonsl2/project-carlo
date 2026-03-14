@@ -5,7 +5,7 @@
     "pdf_path": "data\\bulletins\\all-saints-corning\\09acbaef716ea1f48a6b255baf68bcc2119c5c1f7e56718ef058a171f576622a.pdf",
     "content_hash": "09acbaef716ea1f48a6b255baf68bcc2119c5c1f7e56718ef058a171f576622a",
     "fetched_at": "2026-03-11T04:00:35Z",
-    "processed_at": "2026-03-11T04:06:12Z",
+    "processed_at": "2026-03-14T04:12:49Z",
     "published_date": null
   },
   {
@@ -14,7 +14,7 @@
     "pdf_path": "data\\bulletins\\net-catholic\\9199888649d35abe149d40d4c5a41f046c4c21ca232c5488f975ce5f9a776ece.pdf",
     "content_hash": "9199888649d35abe149d40d4c5a41f046c4c21ca232c5488f975ce5f9a776ece",
     "fetched_at": "2026-03-11T04:00:37Z",
-    "processed_at": "2026-03-11T04:06:36Z",
+    "processed_at": "2026-03-14T04:13:09Z",
     "published_date": null
   },
   {
@@ -23,7 +23,7 @@
     "pdf_path": "data\\bulletins\\southeast-rochester-catholic-community\\c4b4e1e2628d5effdb21f9c730a712414754d2a3f3f2a4097acbe8bbf625e2f0.pdf",
     "content_hash": "c4b4e1e2628d5effdb21f9c730a712414754d2a3f3f2a4097acbe8bbf625e2f0",
     "fetched_at": "2026-03-11T04:00:40Z",
-    "processed_at": "2026-03-11T04:07:52Z",
+    "processed_at": "2026-03-14T04:13:41Z",
     "published_date": null
   },
   {
@@ -32,7 +32,7 @@
     "pdf_path": "data\\bulletins\\catholic-parishes-eastern-wayne-county\\5bf2a3af899351c08453df91a0e16451de591f6201aa177a3df953fd195413b5.pdf",
     "content_hash": "5bf2a3af899351c08453df91a0e16451de591f6201aa177a3df953fd195413b5",
     "fetched_at": "2026-03-11T04:00:43Z",
-    "processed_at": "2026-03-11T04:08:56Z",
+    "processed_at": "2026-03-14T04:14:45Z",
     "published_date": null
   },
   {
@@ -41,7 +41,7 @@
     "pdf_path": "data\\bulletins\\saint-jerome\\bfb426a8e8acb739c9c501e436aa0e16b3f5505bac64f16c0e3d9bac43a2125f.pdf",
     "content_hash": "bfb426a8e8acb739c9c501e436aa0e16b3f5505bac64f16c0e3d9bac43a2125f",
     "fetched_at": "2026-03-11T04:00:45Z",
-    "processed_at": "2026-03-11T04:09:22Z",
+    "processed_at": "2026-03-14T04:15:16Z",
     "published_date": null
   },
   {
@@ -50,7 +50,7 @@
     "pdf_path": "data\\bulletins\\assumption-resurrection\\ddaa9b4ed177cb0ba98e007c3830c073f27ad0bfb077c8a7140b08391138ded5.pdf",
     "content_hash": "ddaa9b4ed177cb0ba98e007c3830c073f27ad0bfb077c8a7140b08391138ded5",
     "fetched_at": "2026-03-11T04:00:46Z",
-    "processed_at": "2026-03-11T04:10:18Z",
+    "processed_at": "2026-03-14T04:15:55Z",
     "published_date": null
   },
   {
@@ -59,7 +59,7 @@
     "pdf_path": "data\\bulletins\\all-saints-corning\\fc510f82fe133fbd567437c106c8899ad5c57a1412cf0f9f827c885278d31137.pdf",
     "content_hash": "fc510f82fe133fbd567437c106c8899ad5c57a1412cf0f9f827c885278d31137",
     "fetched_at": "2026-03-12T21:28:58Z",
-    "processed_at": null,
+    "processed_at": "2026-03-14T04:09:48Z",
     "published_date": null
   },
   {
@@ -68,7 +68,7 @@
     "pdf_path": "data\\bulletins\\southeast-rochester-catholic-community\\17c2df0caead3669a489c601ca22e57e000957de5057d27d191b06908c0983b5.pdf",
     "content_hash": "17c2df0caead3669a489c601ca22e57e000957de5057d27d191b06908c0983b5",
     "fetched_at": "2026-03-12T21:29:02Z",
-    "processed_at": null,
+    "processed_at": "2026-03-14T04:10:47Z",
     "published_date": null
   }
 ]

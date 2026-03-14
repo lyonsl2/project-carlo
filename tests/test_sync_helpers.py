@@ -4,7 +4,6 @@ from pathlib import Path
 from pdf_extract.storage import (
     SCHEMA_PATH,
     connect_db,
-    list_churches,
 )
 from pdf_extract.fetch import (
     BulletinLink,
@@ -16,10 +15,6 @@ from pdf_extract.fetch import (
     _resolve_latest_anchor_link_with_playwright,
     build_latest_ecatholic_bulletin_links,
     build_latest_parishes_online_bulletin_links,
-)
-from pdf_extract.process import (
-    _find_matching_church,
-    normalize_church_name,
 )
 
 
@@ -166,76 +161,6 @@ def test_resolve_latest_anchor_link_with_playwright_uses_first_valid_anchor() ->
 def test_next_sunday_after() -> None:
     assert _next_sunday_after(date(2026, 2, 19)) == date(2026, 2, 22)  # Thursday -> same-week Sunday
     assert _next_sunday_after(date(2026, 2, 22)) == date(2026, 3, 1)   # Sunday -> next Sunday
-
-
-def test_normalize_church_name() -> None:
-    assert normalize_church_name("St Mary's") == "saint mary s"
-    assert normalize_church_name("st mary") == "saint mary"
-    assert normalize_church_name("Blessed Sacrament Church") == "blessed sacrament"
-
-
-def test_find_matching_church_by_name_similarity() -> None:
-    churches = [
-        {
-            "parish_slug": "test-parish",
-            "name": "St Mary's",
-            "address": "15 St Mary's Place",
-            "name_normalized": "saint mary s",
-            "latitude": None,
-            "longitude": None,
-        }
-    ]
-    # Similar name should match
-    match = _find_matching_church(churches, "test-parish", "saint mary", None)
-    assert match is not None
-    assert match["name_normalized"] == "saint mary s"
-
-
-def test_find_matching_church_by_address() -> None:
-    churches = [
-        {
-            "parish_slug": "test-parish",
-            "name": "Blessed Sacrament Church",
-            "address": "534 Oxford St., Rochester, NY 14607",
-            "name_normalized": "blessed sacrament",
-            "latitude": None,
-            "longitude": None,
-        }
-    ]
-    # Same address (different punctuation) should match
-    match = _find_matching_church(churches, "test-parish", "blessed sacrament", "534 Oxford St Rochester NY 14607")
-    assert match is not None
-    assert match["name"] == "Blessed Sacrament Church"
-
-
-def test_find_matching_church_no_match() -> None:
-    churches = [
-        {
-            "parish_slug": "test-parish",
-            "name": "St Mary's",
-            "address": None,
-            "name_normalized": "saint mary s",
-            "latitude": None,
-            "longitude": None,
-        }
-    ]
-    match = _find_matching_church(churches, "test-parish", "holy cross", None)
-    assert match is None
-
-
-def test_find_matching_church_wrong_parish() -> None:
-    churches = [
-        {
-            "parish_slug": "other-parish",
-            "name": "St Mary's",
-            "address": None,
-            "name_normalized": "saint mary s",
-            "latitude": None,
-            "longitude": None,
-        }
-    ]
-    match = _find_matching_church(churches, "test-parish", "saint mary s", None)
-    assert match is None
 
 
 def test_build_bulletin_link_ecatholic(monkeypatch) -> None:

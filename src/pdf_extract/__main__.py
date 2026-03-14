@@ -58,6 +58,12 @@ def _build_parser() -> argparse.ArgumentParser:
     detect_parser.add_argument("--pause-seconds", type=float, default=0.5)
     _add_common_args(detect_parser)
 
+    # -- verify --
+    verify_parser = subparsers.add_parser("verify", help="Verify church data against latest bulletin")
+    verify_parser.add_argument("--parish", help="Parish name (omit for all)")
+    verify_parser.add_argument("--model", default="gemini-3-flash-preview", help="Gemini model (default: gemini-3-flash-preview)")
+    _add_common_args(verify_parser)
+
     # -- geocode --
     geocode_parser = subparsers.add_parser("geocode", help="Backfill church lat/lng from address")
     geocode_parser.add_argument("--dry-run", action="store_true")
@@ -111,7 +117,13 @@ def main(argv: list[str] | None = None) -> int:
                 pause_seconds=args.pause_seconds,
             )
 
+        elif args.command == "verify":
+            _ensure_db()
+            from pdf_extract.verify import verify_churches
+            result = verify_churches(parish_name=args.parish, model=args.model)
+
         elif args.command == "geocode":
+            _ensure_db()
             from pdf_extract.geocode import run_backfill
             result = run_backfill(
                 dry_run=args.dry_run,

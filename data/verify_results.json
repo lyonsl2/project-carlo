@@ -1,0 +1,157 @@
+{
+  "all-saints-corning": {
+    "verified_at": "2026-03-14T03:57:31Z",
+    "existing_churches": [
+      {
+        "church_name": "St. Mary's Catholic Church",
+        "name_status": "verified",
+        "address_status": "incorrect",
+        "corrected_name": null,
+        "corrected_address": "158 State Street, Corning, NY 14830"
+      }
+    ],
+    "new_churches": []
+  },
+  "net-catholic": {
+    "verified_at": "2026-03-14T03:58:04Z",
+    "existing_churches": [
+      {
+        "church_name": "All Saints Church",
+        "name_status": "verified",
+        "address_status": "verified",
+        "corrected_name": null,
+        "corrected_address": null
+      },
+      {
+        "church_name": "Holy Cross Church",
+        "name_status": "verified",
+        "address_status": "verified",
+        "corrected_name": null,
+        "corrected_address": null
+      },
+      {
+        "church_name": "Saint Anthony's Church",
+        "name_status": "verified",
+        "address_status": "verified",
+        "corrected_name": null,
+        "corrected_address": null
+      }
+    ],
+    "new_churches": []
+  },
+  "southeast-rochester-catholic-community": {
+    "verified_at": "2026-03-14T03:58:39Z",
+    "existing_churches": [
+      {
+        "church_name": "Blessed Sacrament Church",
+        "name_status": "verified",
+        "address_status": "incorrect",
+        "corrected_name": null,
+        "corrected_address": "534 Oxford St., Rochester, NY 14607"
+      },
+      {
+        "church_name": "St. Boniface Church",
+        "name_status": "verified",
+        "address_status": "verified",
+        "corrected_name": null,
+        "corrected_address": null
+      },
+      {
+        "church_name": "St. Mary's Church",
+        "name_status": "verified",
+        "address_status": "verified",
+        "corrected_name": null,
+        "corrected_address": null
+      }
+    ],
+    "new_churches": []
+  },
+  "catholic-parishes-eastern-wayne-county": {
+    "verified_at": "2026-03-14T03:59:15Z",
+    "existing_churches": [
+      {
+        "church_name": "St. Mary Magdalene",
+        "name_status": "verified",
+        "address_status": "unverifiable",
+        "corrected_name": null,
+        "corrected_address": null
+      },
+      {
+        "church_name": "St. Thomas Church",
+        "name_status": "verified",
+        "address_status": "unverifiable",
+        "corrected_name": null,
+        "corrected_address": null
+      },
+      {
+        "church_name": "St. Jude Church",
+        "name_status": "verified",
+        "address_status": "unverifiable",
+        "corrected_name": null,
+        "corrected_address": null
+      },
+      {
+        "church_name": "St. John the Evangelist",
+        "name_status": "verified",
+        "address_status": "unverifiable",
+        "corrected_name": null,
+        "corrected_address": null
+      },
+      {
+        "church_name": "St. Michael",
+        "name_status": "verified",
+        "address_status": "unverifiable",
+        "corrected_name": null,
+        "corrected_address": null
+      },
+      {
+        "church_name": "St. Patrick",
+        "name_status": "unverifiable",
+        "address_status": "unverifiable",
+        "corrected_name": null,
+        "corrected_address": null
+      },
+      {
+        "church_name": "St. Michael Church",
+        "name_status": "verified",
+        "address_status": "verified",
+        "corrected_name": null,
+        "corrected_address": null
+      }
+    ],
+    "new_churches": []
+  },
+  "saint-jerome": {
+    "verified_at": "2026-03-14T03:59:26Z",
+    "existing_churches": [
+      {
+        "church_name": "Saint Jerome's Church",
+        "name_status": "incorrect",
+        "address_status": "incorrect",
+        "corrected_name": "Church of St. Jerome",
+        "corrected_address": "207 Garfield Street, East Rochester, NY 14445"
+      }
+    ],
+    "new_churches": []
+  },
+  "assumption-resurrection": {
+    "verified_at": "2026-03-14T03:59:34Z",
+    "existing_churches": [
+      {
+        "church_name": "Church of the Assumption",
+        "name_status": "verified",
+        "address_status": "verified",
+        "corrected_name": null,
+        "corrected_address": null
+      },
+      {
+        "church_name": "Church of the Resurrection",
+        "name_status": "verified",
+        "address_status": "verified",
+        "corrected_name": null,
+        "corrected_address": null
+      }
+    ],
+    "new_churches": []
+  }
+}

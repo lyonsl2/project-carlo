@@ -3,18 +3,18 @@
 from __future__ import annotations
 
 import csv
-import json
 import logging
 from pathlib import Path
 
 from pdf_extract.storage import (
     BULLETINS_METADATA_PATH,
-    CHURCHES_PATH,
+    CHURCHES_CSV_PATH,
     DEFAULT_DB_PATH,
     DETECT_RESULTS_PATH,
     EVENTS_PATH,
-    PARISHES_CSV_PATH,
+    GEOCODE_RESULTS_PATH,
     SCHEMA_PATH,
+    VERIFY_RESULTS_PATH,
     connect_db,
     delete_db,
     load_json_dict,
@@ -50,7 +50,7 @@ def create_db(db_path: Path = DEFAULT_DB_PATH) -> dict[str, int]:
         # 4. Load bulletins/metadata.json → bulletin table
         stats["bulletins"] = _load_bulletins(conn)
 
-        # 5. Load churches.json → church table
+        # 5. Load churches from CSV + verify_results.json + geocode_results.json
         stats["churches"] = _load_churches(conn)
 
         # 6. Load events.json → event table
@@ -64,6 +64,8 @@ def create_db(db_path: Path = DEFAULT_DB_PATH) -> dict[str, int]:
 
 
 def _load_websites(conn) -> int:
+    from pdf_extract.storage import PARISHES_CSV_PATH
+
     if not PARISHES_CSV_PATH.exists():
         LOGGER.info("No parishes.csv found, skipping website load")
         return 0
@@ -159,33 +161,106 @@ def _load_bulletins(conn) -> int:
 
 
 def _load_churches(conn) -> int:
-    entries = load_json_list(CHURCHES_PATH)
-    if not entries:
-        LOGGER.info("No churches.json found, skipping")
-        return 0
-
-    count = 0
+    """Load churches from CSV, then apply verify and geocode results."""
     now = utc_now_iso()
-    for entry in entries:
-        parish_row = conn.execute("SELECT id FROM parish WHERE slug = ?", (entry["parish_slug"],)).fetchone()
+    count = 0
+
+    # Step A: Load from churches.csv
+    if CHURCHES_CSV_PATH.exists():
+        with open(CHURCHES_CSV_PATH, encoding="utf-8") as f:
+            for row in csv.DictReader(f):
+                parish_row = conn.execute(
+                    "SELECT id FROM parish WHERE slug = ?", (row["parish_id"],)
+                ).fetchone()
+                if not parish_row:
+                    continue
+                conn.execute(
+                    "INSERT OR IGNORE INTO church(parish_id, name, address, created_at) VALUES (?, ?, ?, ?)",
+                    (parish_row["id"], row["name"], row.get("address"), now),
+                )
+                count += 1
+        LOGGER.info("Loaded %d churches from churches.csv", count)
+    else:
+        LOGGER.info("No churches.csv found, skipping")
+
+    # Step B: Apply verify_results.json
+    verify_results = load_json_dict(VERIFY_RESULTS_PATH)
+    verified_count = 0
+    for parish_slug, result in verify_results.items():
+        parish_row = conn.execute(
+            "SELECT id FROM parish WHERE slug = ?", (parish_slug,)
+        ).fetchone()
+        if not parish_row:
+            continue
+
+        # Process existing church verifications
+        for church_v in result.get("existing_churches", []):
+            church_name = church_v.get("church_name")
+            if not church_name:
+                continue
+
+            name_verified = 1 if church_v.get("name_status") == "verified" else 0
+            address_verified = 1 if church_v.get("address_status") == "verified" else 0
+
+            # If incorrect and correction provided, update the name/address
+            if church_v.get("name_status") == "incorrect" and church_v.get("corrected_name"):
+                conn.execute(
+                    "UPDATE church SET name = ?, name_verified = 1 WHERE parish_id = ? AND name = ?",
+                    (church_v["corrected_name"], parish_row["id"], church_name),
+                )
+            else:
+                conn.execute(
+                    "UPDATE church SET name_verified = ? WHERE parish_id = ? AND name = ?",
+                    (name_verified, parish_row["id"], church_name),
+                )
+
+            if church_v.get("address_status") == "incorrect" and church_v.get("corrected_address"):
+                # Use the potentially-corrected name for lookup
+                lookup_name = church_v.get("corrected_name") or church_name
+                conn.execute(
+                    "UPDATE church SET address = ?, address_verified = 1 WHERE parish_id = ? AND name = ?",
+                    (church_v["corrected_address"], parish_row["id"], lookup_name),
+                )
+            else:
+                lookup_name = church_v.get("corrected_name") or church_name
+                conn.execute(
+                    "UPDATE church SET address_verified = ? WHERE parish_id = ? AND name = ?",
+                    (address_verified, parish_row["id"], lookup_name),
+                )
+
+            verified_count += 1
+
+        # Insert new churches discovered by verify
+        for new_church in result.get("new_churches", []):
+            if not new_church.get("name"):
+                continue
+            conn.execute(
+                "INSERT OR IGNORE INTO church(parish_id, name, address, created_at) VALUES (?, ?, ?, ?)",
+                (parish_row["id"], new_church["name"], new_church.get("address"), now),
+            )
+            count += 1
+
+    if verified_count:
+        LOGGER.info("Applied %d church verifications from verify_results.json", verified_count)
+
+    # Step C: Apply geocode_results.json
+    geocode_results = load_json_list(GEOCODE_RESULTS_PATH)
+    geocoded_count = 0
+    for geo in geocode_results:
+        parish_row = conn.execute(
+            "SELECT id FROM parish WHERE slug = ?", (geo["parish_slug"],)
+        ).fetchone()
         if not parish_row:
             continue
         conn.execute(
-            """INSERT OR IGNORE INTO church(parish_id, name, address, name_normalized, latitude, longitude, created_at)
-               VALUES (?, ?, ?, ?, ?, ?, ?)""",
-            (
-                parish_row["id"],
-                entry.get("name"),
-                entry.get("address"),
-                entry.get("name_normalized"),
-                entry.get("latitude"),
-                entry.get("longitude"),
-                now,
-            ),
+            "UPDATE church SET latitude = ?, longitude = ? WHERE parish_id = ? AND name = ?",
+            (geo["latitude"], geo["longitude"], parish_row["id"], geo["church_name"]),
         )
-        count += 1
+        geocoded_count += 1
 
-    LOGGER.info("Loaded %d churches from churches.json", count)
+    if geocoded_count:
+        LOGGER.info("Applied %d geocode results from geocode_results.json", geocoded_count)
+
     return count
 
 
@@ -197,13 +272,12 @@ def _load_events(conn) -> int:
 
     count = 0
     for entry in entries:
-        # Resolve church_id via parish_slug + church_name_normalized
         parish_row = conn.execute("SELECT id FROM parish WHERE slug = ?", (entry["parish_slug"],)).fetchone()
         if not parish_row:
             continue
         church_row = conn.execute(
-            "SELECT id FROM church WHERE parish_id = ? AND name_normalized = ?",
-            (parish_row["id"], entry["church_name_normalized"]),
+            "SELECT id FROM church WHERE parish_id = ? AND name = ?",
+            (parish_row["id"], entry["church_name"]),
         ).fetchone()
         if not church_row:
             continue

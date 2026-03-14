@@ -9,7 +9,8 @@ from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
 from pdf_extract.storage import (
-    CHURCHES_PATH,
+    GEOCODE_RESULTS_PATH,
+    connect_db,
     load_json_list,
     save_json_list,
 )
@@ -52,24 +53,40 @@ def run_backfill(
     pause_seconds: float,
     email: str | None,
 ) -> dict[str, int]:
-    churches = load_json_list(CHURCHES_PATH)
+    # Load existing geocode results for dedup
+    geocode_results = load_json_list(GEOCODE_RESULTS_PATH)
+    already_geocoded = {
+        (r["parish_slug"], r["church_name"])
+        for r in geocode_results
+    }
+
+    # Query churches with NULL lat/lng and non-null address from DB
+    conn = connect_db()
+    try:
+        rows = conn.execute(
+            """SELECT c.name, c.address, p.slug as parish_slug
+               FROM church c
+               JOIN parish p ON p.id = c.parish_id
+               WHERE (c.latitude IS NULL OR c.longitude IS NULL)
+                 AND c.address IS NOT NULL AND c.address != ''"""
+        ).fetchall()
+    finally:
+        conn.close()
 
     pending = [
-        c for c in churches
-        if (c.get("latitude") is None or c.get("longitude") is None)
-        and c.get("address")
-        and str(c["address"]).strip()
+        r for r in rows
+        if (r["parish_slug"], r["name"]) not in already_geocoded
     ]
     if limit is not None:
         pending = pending[:limit]
 
     updated = 0
     failed = 0
-    for c in pending:
+    for r in pending:
         try:
-            coords = geocode_address(str(c["address"]), email=email)
+            coords = geocode_address(str(r["address"]), email=email)
         except Exception:
-            LOGGER.warning("Geocode failed for %s", c.get("address"), exc_info=True)
+            LOGGER.warning("Geocode failed for %s", r["address"], exc_info=True)
             failed += 1
             if pause_seconds > 0:
                 time.sleep(pause_seconds)
@@ -81,9 +98,13 @@ def run_backfill(
             continue
 
         if not dry_run:
-            c["latitude"] = coords[0]
-            c["longitude"] = coords[1]
-            save_json_list(CHURCHES_PATH, churches)
+            geocode_results.append({
+                "parish_slug": r["parish_slug"],
+                "church_name": r["name"],
+                "latitude": coords[0],
+                "longitude": coords[1],
+            })
+            save_json_list(GEOCODE_RESULTS_PATH, geocode_results)
         updated += 1
         if pause_seconds > 0:
             time.sleep(pause_seconds)

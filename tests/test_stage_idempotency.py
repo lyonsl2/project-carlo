@@ -6,7 +6,7 @@ from pdf_extract.storage import SCHEMA_PATH, connect_db, save_json_list
 
 
 def _setup_test_db(tmp_path: Path) -> Path:
-    """Create a test DB with schema and a test parish."""
+    """Create a test DB with schema, a test parish, and seed churches."""
     db_path = tmp_path / "parish_events.db"
     conn = connect_db(db_path)
     schema_sql = SCHEMA_PATH.read_text(encoding="utf-8")
@@ -14,6 +14,11 @@ def _setup_test_db(tmp_path: Path) -> Path:
     conn.execute(
         "INSERT INTO parish(slug, name, source_type, source_provider_id, created_at) VALUES (?, ?, ?, ?, ?)",
         ("test-parish", "Test Parish", "ecatholic", "https://test.org", "2026-01-01T00:00:00Z"),
+    )
+    parish_id = conn.execute("SELECT id FROM parish WHERE slug = 'test-parish'").fetchone()["id"]
+    conn.execute(
+        "INSERT INTO church(parish_id, name, address, created_at) VALUES (?, ?, ?, ?)",
+        (parish_id, "St. Mary", "123 Main", "2026-01-01T00:00:00Z"),
     )
     conn.commit()
     conn.close()
@@ -28,7 +33,6 @@ def _patch_fetch_paths(monkeypatch, tmp_path: Path) -> None:
 def _patch_process_paths(monkeypatch, tmp_path: Path) -> None:
     """Point process data file paths to tmp_path."""
     monkeypatch.setattr("pdf_extract.process.BULLETINS_METADATA_PATH", tmp_path / "metadata.json")
-    monkeypatch.setattr("pdf_extract.process.CHURCHES_PATH", tmp_path / "churches.json")
     monkeypatch.setattr("pdf_extract.process.EVENTS_PATH", tmp_path / "events.json")
 
 
@@ -83,11 +87,10 @@ def test_process_stage_is_idempotent(monkeypatch, tmp_path: Path) -> None:
 
     monkeypatch.setattr(
         "pdf_extract.process.extract_events",
-        lambda pdf_bytes, model="gemini-3-flash-preview": {
-            "churches": [{"id": "c1", "name": "St. Mary", "address": "123 Main"}],
+        lambda pdf_bytes, *, churches, model="gemini-3-flash-preview": {
             "events": [
                 {
-                    "church_id": "c1",
+                    "church_name": "St. Mary",
                     "type": "mass",
                     "kind": "weekly",
                     "day_of_week": "Sunday",
@@ -97,6 +100,7 @@ def test_process_stage_is_idempotent(monkeypatch, tmp_path: Path) -> None:
                     "cancelled": False,
                 }
             ],
+            "church_list_needs_review": False,
         },
     )
 

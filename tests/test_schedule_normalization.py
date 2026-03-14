@@ -3,10 +3,9 @@ from pdf_extract.schedule_extraction import _normalize_payload
 
 def test_normalize_new_shape() -> None:
     data = {
-        "churches": [{"id": "c1", "name": "St. Mary", "address": "123 Main"}],
         "events": [
             {
-                "church_id": "c1",
+                "church_name": "St. Mary",
                 "type": "mass",
                 "kind": "weekly",
                 "day_of_week": "Sunday",
@@ -16,24 +15,18 @@ def test_normalize_new_shape() -> None:
                 "cancelled": False,
             }
         ],
+        "church_list_needs_review": False,
     }
     result = _normalize_payload(data)
-    assert result["churches"][0]["id"] == "c1"
-    assert result["events"][0]["church_id"] == "c1"
+    assert result["events"][0]["church_name"] == "St. Mary"
+    assert result["church_list_needs_review"] is False
 
 
-def test_normalize_rejects_unknown_church_id() -> None:
+def test_normalize_filters_invalid_events() -> None:
     data = {
-        "churches": [
-            {
-                "id": "c1",
-                "name": "St. John",
-                "address": "456 Oak",
-            }
-        ],
         "events": [
             {
-                "church_id": "c999",
+                "church_name": "",
                 "type": "mass",
                 "kind": "weekly",
                 "day_of_week": "Saturday",
@@ -41,10 +34,35 @@ def test_normalize_rejects_unknown_church_id() -> None:
                 "start_time": "5:00 PM",
                 "end_time": None,
                 "cancelled": False,
-            }
+            },
+            {
+                "church_name": "St. John",
+                "type": "mass",
+                "kind": "weekly",
+                "day_of_week": "Sunday",
+                "date": None,
+                "start_time": "10:00 AM",
+                "end_time": None,
+                "cancelled": False,
+            },
         ],
+        "church_list_needs_review": False,
     }
     result = _normalize_payload(data)
-    assert result["churches"][0]["id"] == "c1"
-    assert result["churches"][0]["name"] == "St. John"
+    assert len(result["events"]) == 1
+    assert result["events"][0]["church_name"] == "St. John"
+
+
+def test_normalize_church_list_needs_review() -> None:
+    data = {
+        "events": [],
+        "church_list_needs_review": True,
+    }
+    result = _normalize_payload(data)
+    assert result["church_list_needs_review"] is True
+
+
+def test_normalize_empty_payload() -> None:
+    result = _normalize_payload({})
     assert result["events"] == []
+    assert result["church_list_needs_review"] is False

@@ -5,7 +5,6 @@ from __future__ import annotations
 import hashlib
 import importlib
 import logging
-import re
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import date, timedelta
