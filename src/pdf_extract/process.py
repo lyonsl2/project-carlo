@@ -89,14 +89,9 @@ def process_bulletins(
                 church_slug = ev.get("church_slug")
                 if not isinstance(church_slug, str):
                     continue
-                church_name = ev.get("church_name")
-                if not isinstance(church_name, str):
-                    continue
 
                 events.append({
-                    "parish_slug": parish_slug,
                     "church_slug": church_slug,
-                    "church_name": church_name,
                     "bulletin_source_url": entry["source_url"],
                     "event_type": str(ev.get("type", "")),
                     "event_kind": str(ev.get("kind", "")),

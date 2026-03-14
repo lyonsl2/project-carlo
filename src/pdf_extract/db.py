@@ -248,8 +248,8 @@ def _apply_verify_results(conn) -> int:
 
             if church_v.get("slug_needs_review"):
                 LOGGER.warning(
-                    "Church slug may need review: %s (parish: %s, name: %s)",
-                    church_slug, parish_slug, church_v.get("church_name"),
+                    "Church slug may need review: %s (parish: %s)",
+                    church_slug, parish_slug,
                 )
 
             name_verified = 1 if church_v.get("name_status") == "verified" else 0

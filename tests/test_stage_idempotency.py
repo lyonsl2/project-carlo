@@ -93,7 +93,6 @@ def test_process_stage_is_idempotent(monkeypatch, tmp_path: Path) -> None:
             "events": [
                 {
                     "church_slug": "st-mary-anytown",
-                    "church_name": "St. Mary",
                     "type": "mass",
                     "kind": "weekly",
                     "day_of_week": "Sunday",

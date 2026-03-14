@@ -15,7 +15,6 @@ class Event(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     church_slug: str = Field(min_length=1)
-    church_name: str = Field(min_length=1)
     type: Literal["mass", "confession", "adoration"]
     kind: Literal["weekly", "specific_date"]
     day_of_week: str | None
@@ -49,7 +48,6 @@ class ChurchVerification(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     church_slug: str
-    church_name: str
     name_status: Literal["verified", "incorrect", "unverifiable"]
     address_status: Literal["verified", "incorrect", "unverifiable"]
     corrected_name: str | None = None
@@ -89,8 +87,7 @@ Each church in the list has a "slug" (stable identifier), "name", and "address".
 Structure your response as follows:
 
 events: An array of schedule entries. Each entry has:
-   - church_slug: the slug of the matching church from the provided list
-   - church_name: the name of the matching church from the provided list
+   - church_slug: the slug of the matching church from the provided list (required)
    - type: one of "mass", "confession", "adoration"
    - kind: "weekly" or "specific_date"
    - start_time: time when it starts
@@ -102,7 +99,7 @@ events: An array of schedule entries. Each entry has:
 church_list_needs_review: boolean flag
 
 Rules:
-- Every event must use a church_slug and church_name that exactly match one of the provided churches.
+- Every event must use a church_slug that exactly matches one of the provided churches.
 - For Mass: always include start_time; end_time is usually null/omitted unless explicitly provided.
 - For Confession and Adoration: include end_time when the document provides it.
 - Use kind="weekly" for recurring weekly schedule entries.
@@ -130,7 +127,7 @@ def extract_events(
 
     Returns:
         Dict with:
-        - "events": list of events with church_name
+        - "events": list of events keyed by church_slug
         - "church_list_needs_review": bool
 
     """
@@ -174,9 +171,6 @@ def _normalize_payload(data: dict[str, Any]) -> dict[str, Any]:
             church_slug = e.get("church_slug")
             if not isinstance(church_slug, str) or not church_slug.strip():
                 continue
-            church_name = e.get("church_name")
-            if not isinstance(church_name, str) or not church_name.strip():
-                continue
             event_type = e.get("type")
             if event_type not in {"mass", "confession", "adoration"}:
                 continue
@@ -195,7 +189,6 @@ def _normalize_payload(data: dict[str, Any]) -> dict[str, Any]:
             events.append(
                 {
                     "church_slug": church_slug,
-                    "church_name": church_name,
                     "type": event_type,
                     "kind": event_kind,
                     "day_of_week": day_of_week if isinstance(day_of_week, str) else None,
@@ -227,7 +220,7 @@ You are given:
 Each church in the list has a "slug" (stable URL identifier), "name", and "address".
 
 For each church in the provided list:
-- Echo back the church_slug exactly as provided.
+- Echo back the church_slug exactly as provided (this is the only church identifier needed).
 - Check if the church name can be verified from the bulletin. Report name_status as:
   - "verified" if the name matches what's in the bulletin
   - "incorrect" if the bulletin shows a different name — provide corrected_name
@@ -298,9 +291,6 @@ def _normalize_verification(data: dict[str, Any]) -> dict[str, Any]:
         church_slug = c.get("church_slug")
         if not isinstance(church_slug, str) or not church_slug.strip():
             continue
-        church_name = c.get("church_name")
-        if not isinstance(church_name, str) or not church_name.strip():
-            continue
         name_status = c.get("name_status")
         if name_status not in {"verified", "incorrect", "unverifiable"}:
             name_status = "unverifiable"
@@ -309,7 +299,6 @@ def _normalize_verification(data: dict[str, Any]) -> dict[str, Any]:
             address_status = "unverifiable"
         entry: dict[str, Any] = {
             "church_slug": church_slug,
-            "church_name": church_name,
             "name_status": name_status,
             "address_status": address_status,
             "slug_needs_review": bool(c.get("slug_needs_review", False)),

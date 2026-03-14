@@ -6,7 +6,6 @@ def test_normalize_new_shape() -> None:
         "events": [
             {
                 "church_slug": "st-mary",
-                "church_name": "St. Mary",
                 "type": "mass",
                 "kind": "weekly",
                 "day_of_week": "Sunday",
@@ -20,7 +19,7 @@ def test_normalize_new_shape() -> None:
     }
     result = _normalize_payload(data)
     assert result["events"][0]["church_slug"] == "st-mary"
-    assert result["events"][0]["church_name"] == "St. Mary"
+    assert "church_name" not in result["events"][0]
     assert result["church_list_needs_review"] is False
 
 
@@ -28,8 +27,7 @@ def test_normalize_filters_invalid_events() -> None:
     data = {
         "events": [
             {
-                "church_slug": "empty-name",
-                "church_name": "",
+                "church_slug": "",
                 "type": "mass",
                 "kind": "weekly",
                 "day_of_week": "Saturday",
@@ -40,7 +38,6 @@ def test_normalize_filters_invalid_events() -> None:
             },
             {
                 "church_slug": "st-john",
-                "church_name": "St. John",
                 "type": "mass",
                 "kind": "weekly",
                 "day_of_week": "Sunday",

@@ -3,7 +3,6 @@
     "verified_at": "2026-03-14T03:57:31Z",
     "existing_churches": [
       {
-        "church_name": "St. Mary's Catholic Church",
         "name_status": "verified",
         "address_status": "incorrect",
         "corrected_name": null,
@@ -23,7 +22,6 @@
     "verified_at": "2026-03-14T03:58:04Z",
     "existing_churches": [
       {
-        "church_name": "All Saints Church",
         "name_status": "verified",
         "address_status": "verified",
         "corrected_name": null,
@@ -31,7 +29,6 @@
         "church_slug": "all-saints"
       },
       {
-        "church_name": "Holy Cross Church",
         "name_status": "verified",
         "address_status": "verified",
         "corrected_name": null,
@@ -39,7 +36,6 @@
         "church_slug": "holy-cross-freeville"
       },
       {
-        "church_name": "Saint Anthony's Church",
         "name_status": "verified",
         "address_status": "verified",
         "corrected_name": null,
@@ -53,7 +49,6 @@
     "verified_at": "2026-03-14T03:58:39Z",
     "existing_churches": [
       {
-        "church_name": "Blessed Sacrament Church",
         "name_status": "verified",
         "address_status": "incorrect",
         "corrected_name": null,
@@ -67,7 +62,6 @@
         "church_slug": "blessed-sacrament"
       },
       {
-        "church_name": "St. Boniface Church",
         "name_status": "verified",
         "address_status": "verified",
         "corrected_name": null,
@@ -75,7 +69,6 @@
         "church_slug": "st-boniface"
       },
       {
-        "church_name": "St. Mary's Church",
         "name_status": "verified",
         "address_status": "verified",
         "corrected_name": null,
@@ -89,7 +82,6 @@
     "verified_at": "2026-03-14T03:59:15Z",
     "existing_churches": [
       {
-        "church_name": "St. Mary Magdalene",
         "name_status": "verified",
         "address_status": "unverifiable",
         "corrected_name": null,
@@ -97,7 +89,6 @@
         "church_slug": "st-mary-magdalene"
       },
       {
-        "church_name": "St. Thomas Church",
         "name_status": "verified",
         "address_status": "unverifiable",
         "corrected_name": null,
@@ -105,7 +96,6 @@
         "church_slug": "st-thomas"
       },
       {
-        "church_name": "St. Jude Church",
         "name_status": "verified",
         "address_status": "unverifiable",
         "corrected_name": null,
@@ -113,7 +103,6 @@
         "church_slug": "st-jude"
       },
       {
-        "church_name": "St. John the Evangelist",
         "name_status": "verified",
         "address_status": "unverifiable",
         "corrected_name": null,
@@ -121,7 +110,6 @@
         "church_slug": "st-john-evangelist-clyde"
       },
       {
-        "church_name": "St. Michael",
         "name_status": "verified",
         "address_status": "unverifiable",
         "corrected_name": null,
@@ -129,7 +117,6 @@
         "church_slug": "st-michael-lyons"
       },
       {
-        "church_name": "St. Patrick",
         "name_status": "unverifiable",
         "address_status": "unverifiable",
         "corrected_name": null,
@@ -137,7 +124,6 @@
         "church_slug": "st-patrick-savannah"
       },
       {
-        "church_name": "St. Michael Church",
         "name_status": "verified",
         "address_status": "verified",
         "corrected_name": null,
@@ -151,7 +137,6 @@
     "verified_at": "2026-03-14T03:59:26Z",
     "existing_churches": [
       {
-        "church_name": "Saint Jerome's Church",
         "name_status": "incorrect",
         "address_status": "incorrect",
         "corrected_name": "Church of St. Jerome",
@@ -171,7 +156,6 @@
     "verified_at": "2026-03-14T03:59:34Z",
     "existing_churches": [
       {
-        "church_name": "Church of the Assumption",
         "name_status": "verified",
         "address_status": "verified",
         "corrected_name": null,
@@ -179,7 +163,6 @@
         "church_slug": "assumption"
       },
       {
-        "church_name": "Church of the Resurrection",
         "name_status": "verified",
         "address_status": "verified",
         "corrected_name": null,
