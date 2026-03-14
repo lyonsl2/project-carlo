@@ -87,7 +87,7 @@ def list_existing_bulletin_urls(conn: sqlite3.Connection, parish_id: int) -> set
 
 def list_churches(conn: sqlite3.Connection, parish_id: int) -> list[sqlite3.Row]:
     return conn.execute(
-        "SELECT id, parish_id, name, address_line1, address_line2, city, state, postal_code"
+        "SELECT id, parish_id, slug, name, address_line1, address_line2, city, state, postal_code"
         " FROM church WHERE parish_id = ? ORDER BY id",
         (parish_id,),
     ).fetchall()

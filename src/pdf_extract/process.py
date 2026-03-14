@@ -70,6 +70,7 @@ def process_bulletins(
             church_rows = list_churches(conn, parish_row["id"])
             church_list = [
                 {
+                    "slug": r["slug"],
                     "name": r["name"],
                     "address": format_address(
                         r["address_line1"], r["address_line2"],
@@ -85,12 +86,16 @@ def process_bulletins(
             for ev in extracted.get("events", []):
                 if not isinstance(ev, dict):
                     continue
+                church_slug = ev.get("church_slug")
+                if not isinstance(church_slug, str):
+                    continue
                 church_name = ev.get("church_name")
                 if not isinstance(church_name, str):
                     continue
 
                 events.append({
                     "parish_slug": parish_slug,
+                    "church_slug": church_slug,
                     "church_name": church_name,
                     "bulletin_source_url": entry["source_url"],
                     "event_type": str(ev.get("type", "")),

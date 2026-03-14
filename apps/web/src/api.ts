@@ -198,7 +198,7 @@ export async function fetchChurches(
   const db = await getDb();
 
   const stmt = db.prepare(
-    `SELECT id, parish_id, name, address_line1, address_line2, city, state, postal_code,
+    `SELECT id, parish_id, slug, name, address_line1, address_line2, city, state, postal_code,
             latitude, longitude FROM church ORDER BY name`,
   );
   const churches: ChurchDetail[] = [];
@@ -208,6 +208,7 @@ export async function fetchChurches(
       churches.push({
         id: row["id"] as number,
         parish_id: row["parish_id"] as number,
+        slug: row["slug"] as string,
         name: str(row["name"]),
         address_line1: str(row["address_line1"]),
         address_line2: str(row["address_line2"]),
@@ -253,14 +254,14 @@ export async function fetchChurches(
   });
 }
 
-export async function fetchChurch(churchId: number): Promise<ChurchDetail> {
+export async function fetchChurch(slug: string): Promise<ChurchDetail> {
   const db = await getDb();
   const stmt = db.prepare(
-    `SELECT id, parish_id, name, address_line1, address_line2, city, state, postal_code,
-            latitude, longitude FROM church WHERE id = ?`,
+    `SELECT id, parish_id, slug, name, address_line1, address_line2, city, state, postal_code,
+            latitude, longitude FROM church WHERE slug = ?`,
   );
   try {
-    stmt.bind([churchId]);
+    stmt.bind([slug]);
     if (!stmt.step()) {
       throw new Error("Church not found");
     }
@@ -268,6 +269,7 @@ export async function fetchChurch(churchId: number): Promise<ChurchDetail> {
     return {
       id: row["id"] as number,
       parish_id: row["parish_id"] as number,
+      slug: row["slug"] as string,
       name: str(row["name"]),
       address_line1: str(row["address_line1"]),
       address_line2: str(row["address_line2"]),
@@ -283,15 +285,16 @@ export async function fetchChurch(churchId: number): Promise<ChurchDetail> {
 }
 
 export async function fetchChurchEvents(
-  churchId: number,
+  slug: string,
   types: EventType[],
 ): Promise<EventSummary[]> {
   const db = await getDb();
 
-  const check = db.exec("SELECT 1 FROM church WHERE id = ?", [churchId]);
-  if (check.length === 0 || check[0].values.length === 0) {
+  const idResult = db.exec("SELECT id FROM church WHERE slug = ?", [slug]);
+  if (idResult.length === 0 || idResult[0].values.length === 0) {
     throw new Error("Church not found");
   }
+  const churchId = idResult[0].values[0][0] as number;
 
   const events = queryEvents(db, [churchId], types);
   return events

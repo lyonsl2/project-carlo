@@ -17,9 +17,9 @@ def test_event_belongs_to_church_and_bulletin(tmp_path: Path) -> None:
     parish_id = conn.execute("SELECT id FROM parish WHERE slug = 'test-parish'").fetchone()["id"]
 
     conn.execute(
-        "INSERT INTO church(parish_id, name, address_line1, city, state, postal_code, created_at)"
-        " VALUES (?, ?, ?, ?, ?, ?, ?)",
-        (parish_id, "Blessed Sacrament", "534 Oxford St.", "Rochester", "NY", "14607",
+        "INSERT INTO church(parish_id, slug, name, address_line1, city, state, postal_code, created_at)"
+        " VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        (parish_id, "blessed-sacrament", "Blessed Sacrament", "534 Oxford St.", "Rochester", "NY", "14607",
          "2026-01-01T00:00:00Z"),
     )
     church_id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]

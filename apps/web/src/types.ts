@@ -15,6 +15,7 @@ export interface EventSummary {
 export interface ChurchMapItem {
   id: number;
   parish_id: number;
+  slug: string;
   name: string | null;
   address_line1: string | null;
   address_line2: string | null;
@@ -30,6 +31,7 @@ export interface ChurchMapItem {
 export interface ChurchDetail {
   id: number;
   parish_id: number;
+  slug: string;
   name: string | null;
   address_line1: string | null;
   address_line2: string | null;

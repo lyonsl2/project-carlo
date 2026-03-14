@@ -192,7 +192,8 @@ def _load_churches_from_csv(conn) -> int:
     with open(CHURCHES_CSV_PATH, encoding="utf-8") as f:
         reader = csv.DictReader(f)
         _validate_csv_headers(
-            reader.fieldnames, {"parish_id", "name", "line1", "city", "state", "postal_code"},
+            reader.fieldnames,
+            {"parish_id", "slug", "name", "line1", "city", "state", "postal_code"},
             "churches.csv",
         )
         for row in reader:
@@ -203,11 +204,12 @@ def _load_churches_from_csv(conn) -> int:
                 continue
             conn.execute(
                 """INSERT OR IGNORE INTO church(
-                    parish_id, name, address_line1, address_line2, city, state, postal_code,
+                    parish_id, slug, name, address_line1, address_line2, city, state, postal_code,
                     created_at
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                 (
                     parish_row["id"],
+                    row["slug"],
                     row["name"],
                     row.get("line1") or None,
                     row.get("line2") or None,
@@ -240,48 +242,52 @@ def _apply_verify_results(conn) -> int:
             continue
 
         for church_v in result.get("existing_churches", []):
-            church_name = church_v.get("church_name")
-            if not church_name:
+            church_slug = church_v.get("church_slug")
+            if not church_slug:
                 continue
+
+            if church_v.get("slug_needs_review"):
+                LOGGER.warning(
+                    "Church slug may need review: %s (parish: %s, name: %s)",
+                    church_slug, parish_slug, church_v.get("church_name"),
+                )
 
             name_verified = 1 if church_v.get("name_status") == "verified" else 0
             address_verified = 1 if church_v.get("address_status") == "verified" else 0
 
             if church_v.get("name_status") == "incorrect" and church_v.get("corrected_name"):
                 conn.execute(
-                    "UPDATE church SET name = ?, name_verified = 1 WHERE parish_id = ? AND name = ?",
-                    (church_v["corrected_name"], parish_row["id"], church_name),
+                    "UPDATE church SET name = ?, name_verified = 1 WHERE slug = ?",
+                    (church_v["corrected_name"], church_slug),
                 )
             else:
                 conn.execute(
-                    "UPDATE church SET name_verified = ? WHERE parish_id = ? AND name = ?",
-                    (name_verified, parish_row["id"], church_name),
+                    "UPDATE church SET name_verified = ? WHERE slug = ?",
+                    (name_verified, church_slug),
                 )
 
             if church_v.get("address_status") == "incorrect" and church_v.get("corrected_address"):
-                lookup_name = church_v.get("corrected_name") or church_name
                 addr = church_v["corrected_address"]
                 if isinstance(addr, dict):
                     conn.execute(
                         """UPDATE church SET address_line1 = ?, address_line2 = ?,
                            city = ?, state = ?, postal_code = ?, address_verified = 1
-                           WHERE parish_id = ? AND name = ?""",
+                           WHERE slug = ?""",
                         (
                             addr.get("line1"), addr.get("line2"),
                             addr.get("city"), addr.get("state"), addr.get("postal_code"),
-                            parish_row["id"], lookup_name,
+                            church_slug,
                         ),
                     )
                 else:
                     conn.execute(
-                        "UPDATE church SET address_verified = 1 WHERE parish_id = ? AND name = ?",
-                        (parish_row["id"], lookup_name),
+                        "UPDATE church SET address_verified = 1 WHERE slug = ?",
+                        (church_slug,),
                     )
             else:
-                lookup_name = church_v.get("corrected_name") or church_name
                 conn.execute(
-                    "UPDATE church SET address_verified = ? WHERE parish_id = ? AND name = ?",
-                    (address_verified, parish_row["id"], lookup_name),
+                    "UPDATE church SET address_verified = ? WHERE slug = ?",
+                    (address_verified, church_slug),
                 )
 
             verified_count += 1
@@ -289,15 +295,23 @@ def _apply_verify_results(conn) -> int:
         for new_church in result.get("new_churches", []):
             if not new_church.get("name"):
                 continue
+            new_slug = new_church.get("slug")
+            if not new_slug:
+                LOGGER.warning(
+                    "Skipping new church without slug: %s (parish: %s)",
+                    new_church.get("name"), parish_slug,
+                )
+                continue
             addr = new_church.get("address")
             if isinstance(addr, dict):
                 conn.execute(
                     """INSERT OR IGNORE INTO church(
-                        parish_id, name, address_line1, address_line2, city, state, postal_code,
+                        parish_id, slug, name,
+                        address_line1, address_line2, city, state, postal_code,
                         created_at
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                     (
-                        parish_row["id"], new_church["name"],
+                        parish_row["id"], new_slug, new_church["name"],
                         addr.get("line1"), addr.get("line2"),
                         addr.get("city"), addr.get("state"), addr.get("postal_code"),
                         now,
@@ -305,9 +319,9 @@ def _apply_verify_results(conn) -> int:
                 )
             else:
                 conn.execute(
-                    """INSERT OR IGNORE INTO church(parish_id, name, created_at)
-                       VALUES (?, ?, ?)""",
-                    (parish_row["id"], new_church["name"], now),
+                    """INSERT OR IGNORE INTO church(parish_id, slug, name, created_at)
+                       VALUES (?, ?, ?, ?)""",
+                    (parish_row["id"], new_slug, new_church["name"], now),
                 )
             new_count += 1
 
@@ -379,12 +393,11 @@ def _load_events(conn) -> int:
 
     count = 0
     for entry in entries:
-        parish_row = conn.execute("SELECT id FROM parish WHERE slug = ?", (entry["parish_slug"],)).fetchone()
-        if not parish_row:
+        church_slug = entry.get("church_slug")
+        if not church_slug:
             continue
         church_row = conn.execute(
-            "SELECT id FROM church WHERE parish_id = ? AND name = ?",
-            (parish_row["id"], entry["church_name"]),
+            "SELECT id, parish_id FROM church WHERE slug = ?", (church_slug,)
         ).fetchone()
         if not church_row:
             continue
@@ -393,7 +406,7 @@ def _load_events(conn) -> int:
         bulletin_id = None
         bulletin_row = conn.execute(
             "SELECT id FROM bulletin WHERE parish_id = ? AND source_url = ?",
-            (parish_row["id"], entry.get("bulletin_source_url")),
+            (church_row["parish_id"], entry.get("bulletin_source_url")),
         ).fetchone()
         if bulletin_row:
             bulletin_id = bulletin_row["id"]

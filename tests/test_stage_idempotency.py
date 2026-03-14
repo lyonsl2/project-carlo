@@ -17,9 +17,9 @@ def _setup_test_db(tmp_path: Path) -> Path:
     )
     parish_id = conn.execute("SELECT id FROM parish WHERE slug = 'test-parish'").fetchone()["id"]
     conn.execute(
-        "INSERT INTO church(parish_id, name, address_line1, city, state, postal_code, created_at)"
-        " VALUES (?, ?, ?, ?, ?, ?, ?)",
-        (parish_id, "St. Mary", "123 Main St", "Anytown", "NY", "14000",
+        "INSERT INTO church(parish_id, slug, name, address_line1, city, state, postal_code, created_at)"
+        " VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        (parish_id, "st-mary-anytown", "St. Mary", "123 Main St", "Anytown", "NY", "14000",
          "2026-01-01T00:00:00Z"),
     )
     conn.commit()
@@ -92,6 +92,7 @@ def test_process_stage_is_idempotent(monkeypatch, tmp_path: Path) -> None:
         lambda pdf_bytes, *, churches, model="gemini-3-flash-preview": {
             "events": [
                 {
+                    "church_slug": "st-mary-anytown",
                     "church_name": "St. Mary",
                     "type": "mass",
                     "kind": "weekly",

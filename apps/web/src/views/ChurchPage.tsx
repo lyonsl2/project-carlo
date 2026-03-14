@@ -12,18 +12,17 @@ function eventLine(event: EventSummary): string {
 }
 
 export function ChurchPage() {
-  const { churchId } = useParams();
-  const id = Number(churchId);
-  const enabled = Number.isFinite(id);
+  const { churchSlug } = useParams();
+  const enabled = typeof churchSlug === "string" && churchSlug.length > 0;
 
   const churchQuery = useQuery({
-    queryKey: ["church", id],
-    queryFn: () => fetchChurch(id),
+    queryKey: ["church", churchSlug],
+    queryFn: () => fetchChurch(churchSlug!),
     enabled,
   });
   const eventsQuery = useQuery({
-    queryKey: ["church-events", id],
-    queryFn: () => fetchChurchEvents(id, ["mass", "confession", "adoration"]),
+    queryKey: ["church-events", churchSlug],
+    queryFn: () => fetchChurchEvents(churchSlug!, ["mass", "confession", "adoration"]),
     enabled,
   });
 

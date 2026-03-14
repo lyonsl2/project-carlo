@@ -14,6 +14,7 @@ from pydantic import BaseModel, ConfigDict, Field
 class Event(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
+    church_slug: str = Field(min_length=1)
     church_name: str = Field(min_length=1)
     type: Literal["mass", "confession", "adoration"]
     kind: Literal["weekly", "specific_date"]
@@ -47,17 +48,20 @@ class Address(BaseModel):
 class ChurchVerification(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
+    church_slug: str
     church_name: str
     name_status: Literal["verified", "incorrect", "unverifiable"]
     address_status: Literal["verified", "incorrect", "unverifiable"]
     corrected_name: str | None = None
     corrected_address: Address | None = None
+    slug_needs_review: bool = False
 
 
 class NewChurch(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     name: str
+    slug: str | None = None
     address: Address | None = None
 
 
@@ -80,12 +84,13 @@ You are given:
 1) A parish bulletin PDF
 2) Known churches for this parish: {churches_json}
 
-Map each event to one of the known church names EXACTLY as provided in the list above.
+Each church in the list has a "slug" (stable identifier), "name", and "address". Map each event to one of the known churches.
 
 Structure your response as follows:
 
 events: An array of schedule entries. Each entry has:
-   - church_name: must exactly match one of the provided church names
+   - church_slug: the slug of the matching church from the provided list
+   - church_name: the name of the matching church from the provided list
    - type: one of "mass", "confession", "adoration"
    - kind: "weekly" or "specific_date"
    - start_time: time when it starts
@@ -97,7 +102,7 @@ events: An array of schedule entries. Each entry has:
 church_list_needs_review: boolean flag
 
 Rules:
-- Every event must use a church_name that exactly matches one of the provided church names.
+- Every event must use a church_slug and church_name that exactly match one of the provided churches.
 - For Mass: always include start_time; end_time is usually null/omitted unless explicitly provided.
 - For Confession and Adoration: include end_time when the document provides it.
 - Use kind="weekly" for recurring weekly schedule entries.
@@ -166,6 +171,9 @@ def _normalize_payload(data: dict[str, Any]) -> dict[str, Any]:
         for e in raw_events:
             if not isinstance(e, dict):
                 continue
+            church_slug = e.get("church_slug")
+            if not isinstance(church_slug, str) or not church_slug.strip():
+                continue
             church_name = e.get("church_name")
             if not isinstance(church_name, str) or not church_name.strip():
                 continue
@@ -186,6 +194,7 @@ def _normalize_payload(data: dict[str, Any]) -> dict[str, Any]:
                 continue
             events.append(
                 {
+                    "church_slug": church_slug,
                     "church_name": church_name,
                     "type": event_type,
                     "kind": event_kind,
@@ -215,7 +224,10 @@ You are given:
 1) A parish bulletin PDF
 2) A list of known churches for this parish: {churches_json}
 
+Each church in the list has a "slug" (stable URL identifier), "name", and "address".
+
 For each church in the provided list:
+- Echo back the church_slug exactly as provided.
 - Check if the church name can be verified from the bulletin. Report name_status as:
   - "verified" if the name matches what's in the bulletin
   - "incorrect" if the bulletin shows a different name — provide corrected_name
@@ -224,8 +236,9 @@ For each church in the provided list:
   - "verified" if the address matches what's in the bulletin
   - "incorrect" if the bulletin shows a different address — provide corrected_address as a structured object with fields: line1, line2 (or null), city, state, postal_code
   - "unverifiable" if the bulletin doesn't show an address for this church
+- Set slug_needs_review to true ONLY if the slug is clearly a poor match for this church (e.g. slug says one city but the church is obviously in a different city, or slug refers to a completely different saint). Otherwise false.
 
-For any churches that are clearly part of this parish (not guest/visiting churches) and are NOT in the provided list, add them to new_churches with name and address (as a structured object with line1, line2, city, state, postal_code).
+For any churches that are clearly part of this parish (not guest/visiting churches) and are NOT in the provided list, add them to new_churches with name, slug (a short URL-friendly identifier based on the church name and city, like "st-marys-corning"), and address (as a structured object with line1, line2, city, state, postal_code).
 
 Return output that matches the provided JSON schema exactly."""
 
@@ -282,6 +295,9 @@ def _normalize_verification(data: dict[str, Any]) -> dict[str, Any]:
     for c in data.get("existing_churches", []):
         if not isinstance(c, dict):
             continue
+        church_slug = c.get("church_slug")
+        if not isinstance(church_slug, str) or not church_slug.strip():
+            continue
         church_name = c.get("church_name")
         if not isinstance(church_name, str) or not church_name.strip():
             continue
@@ -292,9 +308,11 @@ def _normalize_verification(data: dict[str, Any]) -> dict[str, Any]:
         if address_status not in {"verified", "incorrect", "unverifiable"}:
             address_status = "unverifiable"
         entry: dict[str, Any] = {
+            "church_slug": church_slug,
             "church_name": church_name,
             "name_status": name_status,
             "address_status": address_status,
+            "slug_needs_review": bool(c.get("slug_needs_review", False)),
         }
         if name_status == "incorrect":
             corrected = c.get("corrected_name")
@@ -314,8 +332,10 @@ def _normalize_verification(data: dict[str, Any]) -> dict[str, Any]:
         name = c.get("name")
         if not isinstance(name, str) or not name.strip():
             continue
+        slug = c.get("slug")
         new_churches.append({
             "name": name,
+            "slug": slug if isinstance(slug, str) else None,
             "address": c.get("address") if isinstance(c.get("address"), dict) else None,
         })
 

@@ -13,7 +13,8 @@
           "city": "Corning",
           "state": "NY",
           "postal_code": "14830"
-        }
+        },
+        "church_slug": "st-marys-corning"
       }
     ],
     "new_churches": []
@@ -26,21 +27,24 @@
         "name_status": "verified",
         "address_status": "verified",
         "corrected_name": null,
-        "corrected_address": null
+        "corrected_address": null,
+        "church_slug": "all-saints"
       },
       {
         "church_name": "Holy Cross Church",
         "name_status": "verified",
         "address_status": "verified",
         "corrected_name": null,
-        "corrected_address": null
+        "corrected_address": null,
+        "church_slug": "holy-cross-freeville"
       },
       {
         "church_name": "Saint Anthony's Church",
         "name_status": "verified",
         "address_status": "verified",
         "corrected_name": null,
-        "corrected_address": null
+        "corrected_address": null,
+        "church_slug": "saint-anthonys"
       }
     ],
     "new_churches": []
@@ -59,21 +63,24 @@
           "city": "Rochester",
           "state": "NY",
           "postal_code": "14607"
-        }
+        },
+        "church_slug": "blessed-sacrament"
       },
       {
         "church_name": "St. Boniface Church",
         "name_status": "verified",
         "address_status": "verified",
         "corrected_name": null,
-        "corrected_address": null
+        "corrected_address": null,
+        "church_slug": "st-boniface"
       },
       {
         "church_name": "St. Mary's Church",
         "name_status": "verified",
         "address_status": "verified",
         "corrected_name": null,
-        "corrected_address": null
+        "corrected_address": null,
+        "church_slug": "st-marys-rochester"
       }
     ],
     "new_churches": []
@@ -86,49 +93,56 @@
         "name_status": "verified",
         "address_status": "unverifiable",
         "corrected_name": null,
-        "corrected_address": null
+        "corrected_address": null,
+        "church_slug": "st-mary-magdalene"
       },
       {
         "church_name": "St. Thomas Church",
         "name_status": "verified",
         "address_status": "unverifiable",
         "corrected_name": null,
-        "corrected_address": null
+        "corrected_address": null,
+        "church_slug": "st-thomas"
       },
       {
         "church_name": "St. Jude Church",
         "name_status": "verified",
         "address_status": "unverifiable",
         "corrected_name": null,
-        "corrected_address": null
+        "corrected_address": null,
+        "church_slug": "st-jude"
       },
       {
         "church_name": "St. John the Evangelist",
         "name_status": "verified",
         "address_status": "unverifiable",
         "corrected_name": null,
-        "corrected_address": null
+        "corrected_address": null,
+        "church_slug": "st-john-evangelist-clyde"
       },
       {
         "church_name": "St. Michael",
         "name_status": "verified",
         "address_status": "unverifiable",
         "corrected_name": null,
-        "corrected_address": null
+        "corrected_address": null,
+        "church_slug": "st-michael-lyons"
       },
       {
         "church_name": "St. Patrick",
         "name_status": "unverifiable",
         "address_status": "unverifiable",
         "corrected_name": null,
-        "corrected_address": null
+        "corrected_address": null,
+        "church_slug": "st-patrick-savannah"
       },
       {
         "church_name": "St. Michael Church",
         "name_status": "verified",
         "address_status": "verified",
         "corrected_name": null,
-        "corrected_address": null
+        "corrected_address": null,
+        "church_slug": "st-michael-newark"
       }
     ],
     "new_churches": []
@@ -147,7 +161,8 @@
           "city": "East Rochester",
           "state": "NY",
           "postal_code": "14445"
-        }
+        },
+        "church_slug": "saint-jeromes"
       }
     ],
     "new_churches": []
@@ -160,14 +175,16 @@
         "name_status": "verified",
         "address_status": "verified",
         "corrected_name": null,
-        "corrected_address": null
+        "corrected_address": null,
+        "church_slug": "assumption"
       },
       {
         "church_name": "Church of the Resurrection",
         "name_status": "verified",
         "address_status": "verified",
         "corrected_name": null,
-        "corrected_address": null
+        "corrected_address": null,
+        "church_slug": "resurrection"
       }
     ],
     "new_churches": []

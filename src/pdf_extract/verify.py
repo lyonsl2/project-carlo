@@ -73,6 +73,7 @@ def verify_churches(
             church_rows = list_churches(conn, parish_id)
             church_list = [
                 {
+                    "slug": r["slug"],
                     "name": r["name"],
                     "address": format_address(
                         r["address_line1"], r["address_line2"],

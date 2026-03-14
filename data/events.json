@@ -10,7 +10,8 @@
     "start_time": "5:00pm",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Saturday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"5:00pm\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Saturday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"5:00pm\", \"type\": \"mass\"}",
+    "church_slug": "st-marys-corning"
   },
   {
     "parish_slug": "all-saints-corning",
@@ -23,7 +24,8 @@
     "start_time": "8:00am",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:00am\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:00am\", \"type\": \"mass\"}",
+    "church_slug": "st-marys-corning"
   },
   {
     "parish_slug": "all-saints-corning",
@@ -36,7 +38,8 @@
     "start_time": "10:30am",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"10:30am\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"10:30am\", \"type\": \"mass\"}",
+    "church_slug": "st-marys-corning"
   },
   {
     "parish_slug": "all-saints-corning",
@@ -49,7 +52,8 @@
     "start_time": "8:00am",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Monday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:00am\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Monday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:00am\", \"type\": \"mass\"}",
+    "church_slug": "st-marys-corning"
   },
   {
     "parish_slug": "all-saints-corning",
@@ -62,7 +66,8 @@
     "start_time": "12:15pm",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Wednesday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"12:15pm\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Wednesday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"12:15pm\", \"type\": \"mass\"}",
+    "church_slug": "st-marys-corning"
   },
   {
     "parish_slug": "all-saints-corning",
@@ -75,7 +80,8 @@
     "start_time": "5:30pm",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Thursday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"5:30pm\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Thursday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"5:30pm\", \"type\": \"mass\"}",
+    "church_slug": "st-marys-corning"
   },
   {
     "parish_slug": "all-saints-corning",
@@ -88,7 +94,8 @@
     "start_time": "12:15pm",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Friday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"12:15pm\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Friday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"12:15pm\", \"type\": \"mass\"}",
+    "church_slug": "st-marys-corning"
   },
   {
     "parish_slug": "all-saints-corning",
@@ -101,7 +108,8 @@
     "start_time": "11:40am",
     "end_time": "12:10pm",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Wednesday\", \"end_time\": \"12:10pm\", \"kind\": \"weekly\", \"start_time\": \"11:40am\", \"type\": \"confession\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Wednesday\", \"end_time\": \"12:10pm\", \"kind\": \"weekly\", \"start_time\": \"11:40am\", \"type\": \"confession\"}",
+    "church_slug": "st-marys-corning"
   },
   {
     "parish_slug": "all-saints-corning",
@@ -114,7 +122,8 @@
     "start_time": "6:10pm",
     "end_time": "7:30pm",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Thursday\", \"end_time\": \"7:30pm\", \"kind\": \"weekly\", \"start_time\": \"6:10pm\", \"type\": \"confession\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Thursday\", \"end_time\": \"7:30pm\", \"kind\": \"weekly\", \"start_time\": \"6:10pm\", \"type\": \"confession\"}",
+    "church_slug": "st-marys-corning"
   },
   {
     "parish_slug": "all-saints-corning",
@@ -127,7 +136,8 @@
     "start_time": "11:40am",
     "end_time": "12:10pm",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Friday\", \"end_time\": \"12:10pm\", \"kind\": \"weekly\", \"start_time\": \"11:40am\", \"type\": \"confession\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Friday\", \"end_time\": \"12:10pm\", \"kind\": \"weekly\", \"start_time\": \"11:40am\", \"type\": \"confession\"}",
+    "church_slug": "st-marys-corning"
   },
   {
     "parish_slug": "all-saints-corning",
@@ -140,7 +150,8 @@
     "start_time": "3:00pm",
     "end_time": "4:30pm",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Saturday\", \"end_time\": \"4:30pm\", \"kind\": \"weekly\", \"start_time\": \"3:00pm\", \"type\": \"confession\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Saturday\", \"end_time\": \"4:30pm\", \"kind\": \"weekly\", \"start_time\": \"3:00pm\", \"type\": \"confession\"}",
+    "church_slug": "st-marys-corning"
   },
   {
     "parish_slug": "all-saints-corning",
@@ -153,7 +164,8 @@
     "start_time": "6:10pm",
     "end_time": "7:30pm",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Thursday\", \"end_time\": \"7:30pm\", \"kind\": \"weekly\", \"start_time\": \"6:10pm\", \"type\": \"adoration\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Thursday\", \"end_time\": \"7:30pm\", \"kind\": \"weekly\", \"start_time\": \"6:10pm\", \"type\": \"adoration\"}",
+    "church_slug": "st-marys-corning"
   },
   {
     "parish_slug": "all-saints-corning",
@@ -166,7 +178,8 @@
     "start_time": "1:00pm",
     "end_time": "12:00am",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Friday\", \"end_time\": \"12:00am\", \"kind\": \"weekly\", \"start_time\": \"1:00pm\", \"type\": \"adoration\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Friday\", \"end_time\": \"12:00am\", \"kind\": \"weekly\", \"start_time\": \"1:00pm\", \"type\": \"adoration\"}",
+    "church_slug": "st-marys-corning"
   },
   {
     "parish_slug": "all-saints-corning",
@@ -179,7 +192,8 @@
     "start_time": "5:30pm",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": \"2026-03-16\", \"day_of_week\": \"Monday\", \"end_time\": null, \"kind\": \"specific_date\", \"start_time\": \"5:30pm\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": \"2026-03-16\", \"day_of_week\": \"Monday\", \"end_time\": null, \"kind\": \"specific_date\", \"start_time\": \"5:30pm\", \"type\": \"mass\"}",
+    "church_slug": "st-marys-corning"
   },
   {
     "parish_slug": "all-saints-corning",
@@ -192,7 +206,8 @@
     "start_time": "8:00am",
     "end_time": null,
     "cancelled": true,
-    "raw_json": "{\"cancelled\": true, \"church_name\": \"St. Mary's Catholic Church\", \"date\": \"2026-03-16\", \"day_of_week\": \"Monday\", \"end_time\": null, \"kind\": \"specific_date\", \"start_time\": \"8:00am\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": true, \"church_name\": \"St. Mary's Catholic Church\", \"date\": \"2026-03-16\", \"day_of_week\": \"Monday\", \"end_time\": null, \"kind\": \"specific_date\", \"start_time\": \"8:00am\", \"type\": \"mass\"}",
+    "church_slug": "st-marys-corning"
   },
   {
     "parish_slug": "all-saints-corning",
@@ -205,7 +220,8 @@
     "start_time": "5:30pm",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": \"2026-03-17\", \"day_of_week\": \"Tuesday\", \"end_time\": null, \"kind\": \"specific_date\", \"start_time\": \"5:30pm\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": \"2026-03-17\", \"day_of_week\": \"Tuesday\", \"end_time\": null, \"kind\": \"specific_date\", \"start_time\": \"5:30pm\", \"type\": \"mass\"}",
+    "church_slug": "st-marys-corning"
   },
   {
     "parish_slug": "all-saints-corning",
@@ -218,7 +234,8 @@
     "start_time": "12:15pm",
     "end_time": null,
     "cancelled": true,
-    "raw_json": "{\"cancelled\": true, \"church_name\": \"St. Mary's Catholic Church\", \"date\": \"2026-03-18\", \"day_of_week\": \"Wednesday\", \"end_time\": null, \"kind\": \"specific_date\", \"start_time\": \"12:15pm\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": true, \"church_name\": \"St. Mary's Catholic Church\", \"date\": \"2026-03-18\", \"day_of_week\": \"Wednesday\", \"end_time\": null, \"kind\": \"specific_date\", \"start_time\": \"12:15pm\", \"type\": \"mass\"}",
+    "church_slug": "st-marys-corning"
   },
   {
     "parish_slug": "all-saints-corning",
@@ -231,7 +248,8 @@
     "start_time": "11:40am",
     "end_time": "12:10pm",
     "cancelled": true,
-    "raw_json": "{\"cancelled\": true, \"church_name\": \"St. Mary's Catholic Church\", \"date\": \"2026-03-18\", \"day_of_week\": \"Wednesday\", \"end_time\": \"12:10pm\", \"kind\": \"specific_date\", \"start_time\": \"11:40am\", \"type\": \"confession\"}"
+    "raw_json": "{\"cancelled\": true, \"church_name\": \"St. Mary's Catholic Church\", \"date\": \"2026-03-18\", \"day_of_week\": \"Wednesday\", \"end_time\": \"12:10pm\", \"kind\": \"specific_date\", \"start_time\": \"11:40am\", \"type\": \"confession\"}",
+    "church_slug": "st-marys-corning"
   },
   {
     "parish_slug": "all-saints-corning",
@@ -244,7 +262,8 @@
     "start_time": "7:00pm",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": \"2026-03-19\", \"day_of_week\": \"Thursday\", \"end_time\": null, \"kind\": \"specific_date\", \"start_time\": \"7:00pm\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": \"2026-03-19\", \"day_of_week\": \"Thursday\", \"end_time\": null, \"kind\": \"specific_date\", \"start_time\": \"7:00pm\", \"type\": \"mass\"}",
+    "church_slug": "st-marys-corning"
   },
   {
     "parish_slug": "all-saints-corning",
@@ -257,7 +276,8 @@
     "start_time": "5:30pm",
     "end_time": null,
     "cancelled": true,
-    "raw_json": "{\"cancelled\": true, \"church_name\": \"St. Mary's Catholic Church\", \"date\": \"2026-03-19\", \"day_of_week\": \"Thursday\", \"end_time\": null, \"kind\": \"specific_date\", \"start_time\": \"5:30pm\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": true, \"church_name\": \"St. Mary's Catholic Church\", \"date\": \"2026-03-19\", \"day_of_week\": \"Thursday\", \"end_time\": null, \"kind\": \"specific_date\", \"start_time\": \"5:30pm\", \"type\": \"mass\"}",
+    "church_slug": "st-marys-corning"
   },
   {
     "parish_slug": "all-saints-corning",
@@ -270,7 +290,8 @@
     "start_time": "6:10pm",
     "end_time": "7:30pm",
     "cancelled": true,
-    "raw_json": "{\"cancelled\": true, \"church_name\": \"St. Mary's Catholic Church\", \"date\": \"2026-03-19\", \"day_of_week\": \"Thursday\", \"end_time\": \"7:30pm\", \"kind\": \"specific_date\", \"start_time\": \"6:10pm\", \"type\": \"confession\"}"
+    "raw_json": "{\"cancelled\": true, \"church_name\": \"St. Mary's Catholic Church\", \"date\": \"2026-03-19\", \"day_of_week\": \"Thursday\", \"end_time\": \"7:30pm\", \"kind\": \"specific_date\", \"start_time\": \"6:10pm\", \"type\": \"confession\"}",
+    "church_slug": "st-marys-corning"
   },
   {
     "parish_slug": "all-saints-corning",
@@ -283,7 +304,8 @@
     "start_time": "6:10pm",
     "end_time": "7:30pm",
     "cancelled": true,
-    "raw_json": "{\"cancelled\": true, \"church_name\": \"St. Mary's Catholic Church\", \"date\": \"2026-03-19\", \"day_of_week\": \"Thursday\", \"end_time\": \"7:30pm\", \"kind\": \"specific_date\", \"start_time\": \"6:10pm\", \"type\": \"adoration\"}"
+    "raw_json": "{\"cancelled\": true, \"church_name\": \"St. Mary's Catholic Church\", \"date\": \"2026-03-19\", \"day_of_week\": \"Thursday\", \"end_time\": \"7:30pm\", \"kind\": \"specific_date\", \"start_time\": \"6:10pm\", \"type\": \"adoration\"}",
+    "church_slug": "st-marys-corning"
   },
   {
     "parish_slug": "southeast-rochester-catholic-community",
@@ -296,7 +318,8 @@
     "start_time": "4:30pm",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Boniface Church\", \"date\": null, \"day_of_week\": \"Saturday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"4:30pm\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Boniface Church\", \"date\": null, \"day_of_week\": \"Saturday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"4:30pm\", \"type\": \"mass\"}",
+    "church_slug": "st-boniface"
   },
   {
     "parish_slug": "southeast-rochester-catholic-community",
@@ -309,7 +332,8 @@
     "start_time": "8:00am",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Boniface Church\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:00am\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Boniface Church\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:00am\", \"type\": \"mass\"}",
+    "church_slug": "st-boniface"
   },
   {
     "parish_slug": "southeast-rochester-catholic-community",
@@ -322,7 +346,8 @@
     "start_time": "9:30am",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Blessed Sacrament Church\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"9:30am\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Blessed Sacrament Church\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"9:30am\", \"type\": \"mass\"}",
+    "church_slug": "blessed-sacrament"
   },
   {
     "parish_slug": "southeast-rochester-catholic-community",
@@ -335,7 +360,8 @@
     "start_time": "11:15am",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Church\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"11:15am\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Church\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"11:15am\", \"type\": \"mass\"}",
+    "church_slug": "st-marys-rochester"
   },
   {
     "parish_slug": "southeast-rochester-catholic-community",
@@ -348,7 +374,8 @@
     "start_time": "3:30pm",
     "end_time": "4:15pm",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Boniface Church\", \"date\": null, \"day_of_week\": \"Saturday\", \"end_time\": \"4:15pm\", \"kind\": \"weekly\", \"start_time\": \"3:30pm\", \"type\": \"confession\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Boniface Church\", \"date\": null, \"day_of_week\": \"Saturday\", \"end_time\": \"4:15pm\", \"kind\": \"weekly\", \"start_time\": \"3:30pm\", \"type\": \"confession\"}",
+    "church_slug": "st-boniface"
   },
   {
     "parish_slug": "southeast-rochester-catholic-community",
@@ -361,7 +388,8 @@
     "start_time": "8:00am",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Blessed Sacrament Church\", \"date\": null, \"day_of_week\": \"Monday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:00am\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Blessed Sacrament Church\", \"date\": null, \"day_of_week\": \"Monday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:00am\", \"type\": \"mass\"}",
+    "church_slug": "blessed-sacrament"
   },
   {
     "parish_slug": "southeast-rochester-catholic-community",
@@ -374,7 +402,8 @@
     "start_time": "12:10pm",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Church\", \"date\": null, \"day_of_week\": \"Monday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"12:10pm\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Church\", \"date\": null, \"day_of_week\": \"Monday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"12:10pm\", \"type\": \"mass\"}",
+    "church_slug": "st-marys-rochester"
   },
   {
     "parish_slug": "southeast-rochester-catholic-community",
@@ -387,7 +416,8 @@
     "start_time": "8:00am",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Boniface Church\", \"date\": null, \"day_of_week\": \"Tuesday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:00am\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Boniface Church\", \"date\": null, \"day_of_week\": \"Tuesday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:00am\", \"type\": \"mass\"}",
+    "church_slug": "st-boniface"
   },
   {
     "parish_slug": "southeast-rochester-catholic-community",
@@ -400,7 +430,8 @@
     "start_time": "8:00am",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Blessed Sacrament Church\", \"date\": null, \"day_of_week\": \"Wednesday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:00am\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Blessed Sacrament Church\", \"date\": null, \"day_of_week\": \"Wednesday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:00am\", \"type\": \"mass\"}",
+    "church_slug": "blessed-sacrament"
   },
   {
     "parish_slug": "southeast-rochester-catholic-community",
@@ -413,7 +444,8 @@
     "start_time": "8:00am",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Boniface Church\", \"date\": null, \"day_of_week\": \"Thursday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:00am\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Boniface Church\", \"date\": null, \"day_of_week\": \"Thursday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:00am\", \"type\": \"mass\"}",
+    "church_slug": "st-boniface"
   },
   {
     "parish_slug": "southeast-rochester-catholic-community",
@@ -426,7 +458,8 @@
     "start_time": "12:10pm",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Church\", \"date\": null, \"day_of_week\": \"Friday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"12:10pm\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Church\", \"date\": null, \"day_of_week\": \"Friday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"12:10pm\", \"type\": \"mass\"}",
+    "church_slug": "st-marys-rochester"
   },
   {
     "parish_slug": "southeast-rochester-catholic-community",
@@ -439,7 +472,8 @@
     "start_time": "9:00am",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Church\", \"date\": \"2026-03-14\", \"day_of_week\": \"Saturday\", \"end_time\": null, \"kind\": \"specific_date\", \"start_time\": \"9:00am\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Church\", \"date\": \"2026-03-14\", \"day_of_week\": \"Saturday\", \"end_time\": null, \"kind\": \"specific_date\", \"start_time\": \"9:00am\", \"type\": \"mass\"}",
+    "church_slug": "st-marys-rochester"
   },
   {
     "parish_slug": "southeast-rochester-catholic-community",
@@ -452,7 +486,8 @@
     "start_time": "7:00pm",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Boniface Church\", \"date\": \"2026-03-17\", \"day_of_week\": \"Tuesday\", \"end_time\": null, \"kind\": \"specific_date\", \"start_time\": \"7:00pm\", \"type\": \"adoration\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Boniface Church\", \"date\": \"2026-03-17\", \"day_of_week\": \"Tuesday\", \"end_time\": null, \"kind\": \"specific_date\", \"start_time\": \"7:00pm\", \"type\": \"adoration\"}",
+    "church_slug": "st-boniface"
   },
   {
     "parish_slug": "southeast-rochester-catholic-community",
@@ -465,7 +500,8 @@
     "start_time": "11:30am",
     "end_time": "1:00pm",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Church\", \"date\": \"2026-03-24\", \"day_of_week\": \"Tuesday\", \"end_time\": \"1:00pm\", \"kind\": \"specific_date\", \"start_time\": \"11:30am\", \"type\": \"confession\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Church\", \"date\": \"2026-03-24\", \"day_of_week\": \"Tuesday\", \"end_time\": \"1:00pm\", \"kind\": \"specific_date\", \"start_time\": \"11:30am\", \"type\": \"confession\"}",
+    "church_slug": "st-marys-rochester"
   },
   {
     "parish_slug": "southeast-rochester-catholic-community",
@@ -478,7 +514,8 @@
     "start_time": "2:00pm",
     "end_time": "3:30pm",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Blessed Sacrament Church\", \"date\": \"2026-03-24\", \"day_of_week\": \"Tuesday\", \"end_time\": \"3:30pm\", \"kind\": \"specific_date\", \"start_time\": \"2:00pm\", \"type\": \"confession\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Blessed Sacrament Church\", \"date\": \"2026-03-24\", \"day_of_week\": \"Tuesday\", \"end_time\": \"3:30pm\", \"kind\": \"specific_date\", \"start_time\": \"2:00pm\", \"type\": \"confession\"}",
+    "church_slug": "blessed-sacrament"
   },
   {
     "parish_slug": "southeast-rochester-catholic-community",
@@ -491,7 +528,8 @@
     "start_time": "6:30pm",
     "end_time": "8:00pm",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Boniface Church\", \"date\": \"2026-03-24\", \"day_of_week\": \"Tuesday\", \"end_time\": \"8:00pm\", \"kind\": \"specific_date\", \"start_time\": \"6:30pm\", \"type\": \"confession\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Boniface Church\", \"date\": \"2026-03-24\", \"day_of_week\": \"Tuesday\", \"end_time\": \"8:00pm\", \"kind\": \"specific_date\", \"start_time\": \"6:30pm\", \"type\": \"confession\"}",
+    "church_slug": "st-boniface"
   },
   {
     "parish_slug": "southeast-rochester-catholic-community",
@@ -504,7 +542,8 @@
     "start_time": "6:30pm",
     "end_time": "8:00pm",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Boniface Church\", \"date\": \"2026-03-24\", \"day_of_week\": \"Tuesday\", \"end_time\": \"8:00pm\", \"kind\": \"specific_date\", \"start_time\": \"6:30pm\", \"type\": \"adoration\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Boniface Church\", \"date\": \"2026-03-24\", \"day_of_week\": \"Tuesday\", \"end_time\": \"8:00pm\", \"kind\": \"specific_date\", \"start_time\": \"6:30pm\", \"type\": \"adoration\"}",
+    "church_slug": "st-boniface"
   },
   {
     "parish_slug": "all-saints-corning",
@@ -517,7 +556,8 @@
     "start_time": "8:00am",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:00am\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:00am\", \"type\": \"mass\"}",
+    "church_slug": "st-marys-corning"
   },
   {
     "parish_slug": "all-saints-corning",
@@ -530,7 +570,8 @@
     "start_time": "10:30am",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"10:30am\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"10:30am\", \"type\": \"mass\"}",
+    "church_slug": "st-marys-corning"
   },
   {
     "parish_slug": "all-saints-corning",
@@ -543,7 +584,8 @@
     "start_time": "5:00pm",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Saturday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"5:00pm\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Saturday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"5:00pm\", \"type\": \"mass\"}",
+    "church_slug": "st-marys-corning"
   },
   {
     "parish_slug": "all-saints-corning",
@@ -556,7 +598,8 @@
     "start_time": "8:00am",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Monday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:00am\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Monday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:00am\", \"type\": \"mass\"}",
+    "church_slug": "st-marys-corning"
   },
   {
     "parish_slug": "all-saints-corning",
@@ -569,7 +612,8 @@
     "start_time": "12:15pm",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Wednesday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"12:15pm\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Wednesday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"12:15pm\", \"type\": \"mass\"}",
+    "church_slug": "st-marys-corning"
   },
   {
     "parish_slug": "all-saints-corning",
@@ -582,7 +626,8 @@
     "start_time": "5:30pm",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Thursday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"5:30pm\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Thursday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"5:30pm\", \"type\": \"mass\"}",
+    "church_slug": "st-marys-corning"
   },
   {
     "parish_slug": "all-saints-corning",
@@ -595,7 +640,8 @@
     "start_time": "12:15pm",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Friday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"12:15pm\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Friday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"12:15pm\", \"type\": \"mass\"}",
+    "church_slug": "st-marys-corning"
   },
   {
     "parish_slug": "all-saints-corning",
@@ -608,7 +654,8 @@
     "start_time": "11:40am",
     "end_time": "12:10pm",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Wednesday\", \"end_time\": \"12:10pm\", \"kind\": \"weekly\", \"start_time\": \"11:40am\", \"type\": \"confession\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Wednesday\", \"end_time\": \"12:10pm\", \"kind\": \"weekly\", \"start_time\": \"11:40am\", \"type\": \"confession\"}",
+    "church_slug": "st-marys-corning"
   },
   {
     "parish_slug": "all-saints-corning",
@@ -621,7 +668,8 @@
     "start_time": "11:40am",
     "end_time": "12:10pm",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Friday\", \"end_time\": \"12:10pm\", \"kind\": \"weekly\", \"start_time\": \"11:40am\", \"type\": \"confession\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Friday\", \"end_time\": \"12:10pm\", \"kind\": \"weekly\", \"start_time\": \"11:40am\", \"type\": \"confession\"}",
+    "church_slug": "st-marys-corning"
   },
   {
     "parish_slug": "all-saints-corning",
@@ -634,7 +682,8 @@
     "start_time": "6:10pm",
     "end_time": "7:30pm",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Thursday\", \"end_time\": \"7:30pm\", \"kind\": \"weekly\", \"start_time\": \"6:10pm\", \"type\": \"confession\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Thursday\", \"end_time\": \"7:30pm\", \"kind\": \"weekly\", \"start_time\": \"6:10pm\", \"type\": \"confession\"}",
+    "church_slug": "st-marys-corning"
   },
   {
     "parish_slug": "all-saints-corning",
@@ -647,7 +696,8 @@
     "start_time": "3:00pm",
     "end_time": "4:30pm",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Saturday\", \"end_time\": \"4:30pm\", \"kind\": \"weekly\", \"start_time\": \"3:00pm\", \"type\": \"confession\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Saturday\", \"end_time\": \"4:30pm\", \"kind\": \"weekly\", \"start_time\": \"3:00pm\", \"type\": \"confession\"}",
+    "church_slug": "st-marys-corning"
   },
   {
     "parish_slug": "all-saints-corning",
@@ -660,7 +710,8 @@
     "start_time": "6:10pm",
     "end_time": "7:30pm",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Thursday\", \"end_time\": \"7:30pm\", \"kind\": \"weekly\", \"start_time\": \"6:10pm\", \"type\": \"adoration\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Thursday\", \"end_time\": \"7:30pm\", \"kind\": \"weekly\", \"start_time\": \"6:10pm\", \"type\": \"adoration\"}",
+    "church_slug": "st-marys-corning"
   },
   {
     "parish_slug": "all-saints-corning",
@@ -673,7 +724,8 @@
     "start_time": "1:00pm",
     "end_time": "12:00am",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Friday\", \"end_time\": \"12:00am\", \"kind\": \"weekly\", \"start_time\": \"1:00pm\", \"type\": \"adoration\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Catholic Church\", \"date\": null, \"day_of_week\": \"Friday\", \"end_time\": \"12:00am\", \"kind\": \"weekly\", \"start_time\": \"1:00pm\", \"type\": \"adoration\"}",
+    "church_slug": "st-marys-corning"
   },
   {
     "parish_slug": "net-catholic",
@@ -686,7 +738,8 @@
     "start_time": "4:30pm",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Saint Anthony's Church\", \"date\": null, \"day_of_week\": \"Saturday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"4:30pm\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Saint Anthony's Church\", \"date\": null, \"day_of_week\": \"Saturday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"4:30pm\", \"type\": \"mass\"}",
+    "church_slug": "saint-anthonys"
   },
   {
     "parish_slug": "net-catholic",
@@ -699,7 +752,8 @@
     "start_time": "8:30am",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Holy Cross Church\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:30am\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Holy Cross Church\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:30am\", \"type\": \"mass\"}",
+    "church_slug": "holy-cross-freeville"
   },
   {
     "parish_slug": "net-catholic",
@@ -712,7 +766,8 @@
     "start_time": "10:30am",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"All Saints Church\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"10:30am\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"All Saints Church\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"10:30am\", \"type\": \"mass\"}",
+    "church_slug": "all-saints"
   },
   {
     "parish_slug": "net-catholic",
@@ -725,7 +780,8 @@
     "start_time": "9:00am",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"All Saints Church\", \"date\": null, \"day_of_week\": \"Monday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"9:00am\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"All Saints Church\", \"date\": null, \"day_of_week\": \"Monday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"9:00am\", \"type\": \"mass\"}",
+    "church_slug": "all-saints"
   },
   {
     "parish_slug": "net-catholic",
@@ -738,7 +794,8 @@
     "start_time": "9:00am",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Saint Anthony's Church\", \"date\": null, \"day_of_week\": \"Tuesday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"9:00am\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Saint Anthony's Church\", \"date\": null, \"day_of_week\": \"Tuesday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"9:00am\", \"type\": \"mass\"}",
+    "church_slug": "saint-anthonys"
   },
   {
     "parish_slug": "net-catholic",
@@ -751,7 +808,8 @@
     "start_time": "9:00am",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Holy Cross Church\", \"date\": null, \"day_of_week\": \"Wednesday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"9:00am\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Holy Cross Church\", \"date\": null, \"day_of_week\": \"Wednesday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"9:00am\", \"type\": \"mass\"}",
+    "church_slug": "holy-cross-freeville"
   },
   {
     "parish_slug": "net-catholic",
@@ -764,7 +822,8 @@
     "start_time": "9:00am",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Saint Anthony's Church\", \"date\": null, \"day_of_week\": \"Thursday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"9:00am\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Saint Anthony's Church\", \"date\": null, \"day_of_week\": \"Thursday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"9:00am\", \"type\": \"mass\"}",
+    "church_slug": "saint-anthonys"
   },
   {
     "parish_slug": "net-catholic",
@@ -777,7 +836,8 @@
     "start_time": "7:00pm",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Holy Cross Church\", \"date\": null, \"day_of_week\": \"Friday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"7:00pm\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Holy Cross Church\", \"date\": null, \"day_of_week\": \"Friday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"7:00pm\", \"type\": \"mass\"}",
+    "church_slug": "holy-cross-freeville"
   },
   {
     "parish_slug": "net-catholic",
@@ -790,7 +850,8 @@
     "start_time": "8:15am",
     "end_time": "8:45am",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"All Saints Church\", \"date\": null, \"day_of_week\": \"Monday\", \"end_time\": \"8:45am\", \"kind\": \"weekly\", \"start_time\": \"8:15am\", \"type\": \"confession\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"All Saints Church\", \"date\": null, \"day_of_week\": \"Monday\", \"end_time\": \"8:45am\", \"kind\": \"weekly\", \"start_time\": \"8:15am\", \"type\": \"confession\"}",
+    "church_slug": "all-saints"
   },
   {
     "parish_slug": "net-catholic",
@@ -803,7 +864,8 @@
     "start_time": "7:00pm",
     "end_time": "8:00pm",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Holy Cross Church\", \"date\": null, \"day_of_week\": \"Tuesday\", \"end_time\": \"8:00pm\", \"kind\": \"weekly\", \"start_time\": \"7:00pm\", \"type\": \"confession\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Holy Cross Church\", \"date\": null, \"day_of_week\": \"Tuesday\", \"end_time\": \"8:00pm\", \"kind\": \"weekly\", \"start_time\": \"7:00pm\", \"type\": \"confession\"}",
+    "church_slug": "holy-cross-freeville"
   },
   {
     "parish_slug": "net-catholic",
@@ -816,7 +878,8 @@
     "start_time": "7:00pm",
     "end_time": "8:00pm",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Holy Cross Church\", \"date\": null, \"day_of_week\": \"Tuesday\", \"end_time\": \"8:00pm\", \"kind\": \"weekly\", \"start_time\": \"7:00pm\", \"type\": \"adoration\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Holy Cross Church\", \"date\": null, \"day_of_week\": \"Tuesday\", \"end_time\": \"8:00pm\", \"kind\": \"weekly\", \"start_time\": \"7:00pm\", \"type\": \"adoration\"}",
+    "church_slug": "holy-cross-freeville"
   },
   {
     "parish_slug": "net-catholic",
@@ -829,7 +892,8 @@
     "start_time": "3:00pm",
     "end_time": "4:00pm",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Saint Anthony's Church\", \"date\": null, \"day_of_week\": \"Saturday\", \"end_time\": \"4:00pm\", \"kind\": \"weekly\", \"start_time\": \"3:00pm\", \"type\": \"confession\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Saint Anthony's Church\", \"date\": null, \"day_of_week\": \"Saturday\", \"end_time\": \"4:00pm\", \"kind\": \"weekly\", \"start_time\": \"3:00pm\", \"type\": \"confession\"}",
+    "church_slug": "saint-anthonys"
   },
   {
     "parish_slug": "southeast-rochester-catholic-community",
@@ -842,7 +906,8 @@
     "start_time": "4:30pm",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Boniface Church\", \"date\": null, \"day_of_week\": \"Saturday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"4:30pm\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Boniface Church\", \"date\": null, \"day_of_week\": \"Saturday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"4:30pm\", \"type\": \"mass\"}",
+    "church_slug": "st-boniface"
   },
   {
     "parish_slug": "southeast-rochester-catholic-community",
@@ -855,7 +920,8 @@
     "start_time": "8:00am",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Boniface Church\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:00am\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Boniface Church\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:00am\", \"type\": \"mass\"}",
+    "church_slug": "st-boniface"
   },
   {
     "parish_slug": "southeast-rochester-catholic-community",
@@ -868,7 +934,8 @@
     "start_time": "9:30am",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Blessed Sacrament Church\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"9:30am\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Blessed Sacrament Church\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"9:30am\", \"type\": \"mass\"}",
+    "church_slug": "blessed-sacrament"
   },
   {
     "parish_slug": "southeast-rochester-catholic-community",
@@ -881,7 +948,8 @@
     "start_time": "11:15am",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Church\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"11:15am\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Church\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"11:15am\", \"type\": \"mass\"}",
+    "church_slug": "st-marys-rochester"
   },
   {
     "parish_slug": "southeast-rochester-catholic-community",
@@ -894,7 +962,8 @@
     "start_time": "8:00am",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Blessed Sacrament Church\", \"date\": null, \"day_of_week\": \"Monday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:00am\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Blessed Sacrament Church\", \"date\": null, \"day_of_week\": \"Monday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:00am\", \"type\": \"mass\"}",
+    "church_slug": "blessed-sacrament"
   },
   {
     "parish_slug": "southeast-rochester-catholic-community",
@@ -907,7 +976,8 @@
     "start_time": "12:10pm",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Church\", \"date\": null, \"day_of_week\": \"Monday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"12:10pm\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Church\", \"date\": null, \"day_of_week\": \"Monday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"12:10pm\", \"type\": \"mass\"}",
+    "church_slug": "st-marys-rochester"
   },
   {
     "parish_slug": "southeast-rochester-catholic-community",
@@ -920,7 +990,8 @@
     "start_time": "8:00am",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Boniface Church\", \"date\": null, \"day_of_week\": \"Tuesday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:00am\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Boniface Church\", \"date\": null, \"day_of_week\": \"Tuesday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:00am\", \"type\": \"mass\"}",
+    "church_slug": "st-boniface"
   },
   {
     "parish_slug": "southeast-rochester-catholic-community",
@@ -933,7 +1004,8 @@
     "start_time": "8:00am",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Blessed Sacrament Church\", \"date\": null, \"day_of_week\": \"Wednesday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:00am\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Blessed Sacrament Church\", \"date\": null, \"day_of_week\": \"Wednesday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:00am\", \"type\": \"mass\"}",
+    "church_slug": "blessed-sacrament"
   },
   {
     "parish_slug": "southeast-rochester-catholic-community",
@@ -946,7 +1018,8 @@
     "start_time": "8:00am",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Boniface Church\", \"date\": null, \"day_of_week\": \"Thursday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:00am\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Boniface Church\", \"date\": null, \"day_of_week\": \"Thursday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:00am\", \"type\": \"mass\"}",
+    "church_slug": "st-boniface"
   },
   {
     "parish_slug": "southeast-rochester-catholic-community",
@@ -959,7 +1032,8 @@
     "start_time": "12:10pm",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Church\", \"date\": null, \"day_of_week\": \"Friday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"12:10pm\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Church\", \"date\": null, \"day_of_week\": \"Friday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"12:10pm\", \"type\": \"mass\"}",
+    "church_slug": "st-marys-rochester"
   },
   {
     "parish_slug": "southeast-rochester-catholic-community",
@@ -972,7 +1046,8 @@
     "start_time": "3:30pm",
     "end_time": "4:15pm",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Boniface Church\", \"date\": null, \"day_of_week\": \"Saturday\", \"end_time\": \"4:15pm\", \"kind\": \"weekly\", \"start_time\": \"3:30pm\", \"type\": \"confession\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Boniface Church\", \"date\": null, \"day_of_week\": \"Saturday\", \"end_time\": \"4:15pm\", \"kind\": \"weekly\", \"start_time\": \"3:30pm\", \"type\": \"confession\"}",
+    "church_slug": "st-boniface"
   },
   {
     "parish_slug": "southeast-rochester-catholic-community",
@@ -985,7 +1060,8 @@
     "start_time": "11:30am",
     "end_time": "1:00pm",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Church\", \"date\": \"2026-03-24\", \"day_of_week\": null, \"end_time\": \"1:00pm\", \"kind\": \"specific_date\", \"start_time\": \"11:30am\", \"type\": \"confession\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Church\", \"date\": \"2026-03-24\", \"day_of_week\": null, \"end_time\": \"1:00pm\", \"kind\": \"specific_date\", \"start_time\": \"11:30am\", \"type\": \"confession\"}",
+    "church_slug": "st-marys-rochester"
   },
   {
     "parish_slug": "southeast-rochester-catholic-community",
@@ -998,7 +1074,8 @@
     "start_time": "2:00pm",
     "end_time": "3:30pm",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Blessed Sacrament Church\", \"date\": \"2026-03-24\", \"day_of_week\": null, \"end_time\": \"3:30pm\", \"kind\": \"specific_date\", \"start_time\": \"2:00pm\", \"type\": \"confession\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Blessed Sacrament Church\", \"date\": \"2026-03-24\", \"day_of_week\": null, \"end_time\": \"3:30pm\", \"kind\": \"specific_date\", \"start_time\": \"2:00pm\", \"type\": \"confession\"}",
+    "church_slug": "blessed-sacrament"
   },
   {
     "parish_slug": "southeast-rochester-catholic-community",
@@ -1011,7 +1088,8 @@
     "start_time": "6:30pm",
     "end_time": "8:00pm",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Boniface Church\", \"date\": \"2026-03-24\", \"day_of_week\": null, \"end_time\": \"8:00pm\", \"kind\": \"specific_date\", \"start_time\": \"6:30pm\", \"type\": \"confession\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Boniface Church\", \"date\": \"2026-03-24\", \"day_of_week\": null, \"end_time\": \"8:00pm\", \"kind\": \"specific_date\", \"start_time\": \"6:30pm\", \"type\": \"confession\"}",
+    "church_slug": "st-boniface"
   },
   {
     "parish_slug": "southeast-rochester-catholic-community",
@@ -1024,7 +1102,8 @@
     "start_time": "7:00pm",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Boniface Church\", \"date\": \"2026-03-10\", \"day_of_week\": null, \"end_time\": null, \"kind\": \"specific_date\", \"start_time\": \"7:00pm\", \"type\": \"adoration\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Boniface Church\", \"date\": \"2026-03-10\", \"day_of_week\": null, \"end_time\": null, \"kind\": \"specific_date\", \"start_time\": \"7:00pm\", \"type\": \"adoration\"}",
+    "church_slug": "st-boniface"
   },
   {
     "parish_slug": "southeast-rochester-catholic-community",
@@ -1037,7 +1116,8 @@
     "start_time": "6:30pm",
     "end_time": "8:00pm",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Boniface Church\", \"date\": \"2026-03-24\", \"day_of_week\": null, \"end_time\": \"8:00pm\", \"kind\": \"specific_date\", \"start_time\": \"6:30pm\", \"type\": \"adoration\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Boniface Church\", \"date\": \"2026-03-24\", \"day_of_week\": null, \"end_time\": \"8:00pm\", \"kind\": \"specific_date\", \"start_time\": \"6:30pm\", \"type\": \"adoration\"}",
+    "church_slug": "st-boniface"
   },
   {
     "parish_slug": "southeast-rochester-catholic-community",
@@ -1050,7 +1130,8 @@
     "start_time": "9:00am",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Church\", \"date\": \"2026-03-14\", \"day_of_week\": null, \"end_time\": null, \"kind\": \"specific_date\", \"start_time\": \"9:00am\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary's Church\", \"date\": \"2026-03-14\", \"day_of_week\": null, \"end_time\": null, \"kind\": \"specific_date\", \"start_time\": \"9:00am\", \"type\": \"mass\"}",
+    "church_slug": "st-marys-rochester"
   },
   {
     "parish_slug": "catholic-parishes-eastern-wayne-county",
@@ -1063,7 +1144,8 @@
     "start_time": "8:15 am",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Michael Church\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:15 am\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Michael Church\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:15 am\", \"type\": \"mass\"}",
+    "church_slug": "st-michael-newark"
   },
   {
     "parish_slug": "catholic-parishes-eastern-wayne-county",
@@ -1076,7 +1158,8 @@
     "start_time": "10:30 am",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Michael Church\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"10:30 am\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Michael Church\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"10:30 am\", \"type\": \"mass\"}",
+    "church_slug": "st-michael-newark"
   },
   {
     "parish_slug": "catholic-parishes-eastern-wayne-county",
@@ -1089,7 +1172,8 @@
     "start_time": "8:00 am",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Michael Church\", \"date\": null, \"day_of_week\": \"Tuesday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:00 am\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Michael Church\", \"date\": null, \"day_of_week\": \"Tuesday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:00 am\", \"type\": \"mass\"}",
+    "church_slug": "st-michael-newark"
   },
   {
     "parish_slug": "catholic-parishes-eastern-wayne-county",
@@ -1102,7 +1186,8 @@
     "start_time": "6:00 pm",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Michael Church\", \"date\": null, \"day_of_week\": \"Wednesday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"6:00 pm\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Michael Church\", \"date\": null, \"day_of_week\": \"Wednesday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"6:00 pm\", \"type\": \"mass\"}",
+    "church_slug": "st-michael-newark"
   },
   {
     "parish_slug": "catholic-parishes-eastern-wayne-county",
@@ -1115,7 +1200,8 @@
     "start_time": "9:45 am",
     "end_time": "10:15 am",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Michael Church\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": \"10:15 am\", \"kind\": \"weekly\", \"start_time\": \"9:45 am\", \"type\": \"confession\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Michael Church\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": \"10:15 am\", \"kind\": \"weekly\", \"start_time\": \"9:45 am\", \"type\": \"confession\"}",
+    "church_slug": "st-michael-newark"
   },
   {
     "parish_slug": "catholic-parishes-eastern-wayne-county",
@@ -1128,7 +1214,8 @@
     "start_time": "6:45 pm",
     "end_time": "7:15 pm",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Michael Church\", \"date\": null, \"day_of_week\": \"Wednesday\", \"end_time\": \"7:15 pm\", \"kind\": \"weekly\", \"start_time\": \"6:45 pm\", \"type\": \"confession\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Michael Church\", \"date\": null, \"day_of_week\": \"Wednesday\", \"end_time\": \"7:15 pm\", \"kind\": \"weekly\", \"start_time\": \"6:45 pm\", \"type\": \"confession\"}",
+    "church_slug": "st-michael-newark"
   },
   {
     "parish_slug": "catholic-parishes-eastern-wayne-county",
@@ -1141,7 +1228,8 @@
     "start_time": "6:30 pm",
     "end_time": "7:30 pm",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Michael Church\", \"date\": null, \"day_of_week\": \"Wednesday\", \"end_time\": \"7:30 pm\", \"kind\": \"weekly\", \"start_time\": \"6:30 pm\", \"type\": \"adoration\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Michael Church\", \"date\": null, \"day_of_week\": \"Wednesday\", \"end_time\": \"7:30 pm\", \"kind\": \"weekly\", \"start_time\": \"6:30 pm\", \"type\": \"adoration\"}",
+    "church_slug": "st-michael-newark"
   },
   {
     "parish_slug": "catholic-parishes-eastern-wayne-county",
@@ -1154,7 +1242,8 @@
     "start_time": "10:30 am",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. John the Evangelist\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"10:30 am\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. John the Evangelist\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"10:30 am\", \"type\": \"mass\"}",
+    "church_slug": "st-john-evangelist-clyde"
   },
   {
     "parish_slug": "catholic-parishes-eastern-wayne-county",
@@ -1167,7 +1256,8 @@
     "start_time": "6:00 pm",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. John the Evangelist\", \"date\": null, \"day_of_week\": \"Wednesday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"6:00 pm\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. John the Evangelist\", \"date\": null, \"day_of_week\": \"Wednesday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"6:00 pm\", \"type\": \"mass\"}",
+    "church_slug": "st-john-evangelist-clyde"
   },
   {
     "parish_slug": "catholic-parishes-eastern-wayne-county",
@@ -1180,7 +1270,8 @@
     "start_time": "8:30 am",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. John the Evangelist\", \"date\": null, \"day_of_week\": \"Thursday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:30 am\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. John the Evangelist\", \"date\": null, \"day_of_week\": \"Thursday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:30 am\", \"type\": \"mass\"}",
+    "church_slug": "st-john-evangelist-clyde"
   },
   {
     "parish_slug": "catholic-parishes-eastern-wayne-county",
@@ -1193,7 +1284,8 @@
     "start_time": "5:20 pm",
     "end_time": "5:50 pm",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. John the Evangelist\", \"date\": null, \"day_of_week\": \"Wednesday\", \"end_time\": \"5:50 pm\", \"kind\": \"weekly\", \"start_time\": \"5:20 pm\", \"type\": \"confession\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. John the Evangelist\", \"date\": null, \"day_of_week\": \"Wednesday\", \"end_time\": \"5:50 pm\", \"kind\": \"weekly\", \"start_time\": \"5:20 pm\", \"type\": \"confession\"}",
+    "church_slug": "st-john-evangelist-clyde"
   },
   {
     "parish_slug": "catholic-parishes-eastern-wayne-county",
@@ -1206,7 +1298,8 @@
     "start_time": "8:30 am",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Michael\", \"date\": null, \"day_of_week\": \"Friday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:30 am\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Michael\", \"date\": null, \"day_of_week\": \"Friday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:30 am\", \"type\": \"mass\"}",
+    "church_slug": "st-michael-lyons"
   },
   {
     "parish_slug": "catholic-parishes-eastern-wayne-county",
@@ -1219,7 +1312,8 @@
     "start_time": "4:00 pm",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Michael\", \"date\": null, \"day_of_week\": \"Saturday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"4:00 pm\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Michael\", \"date\": null, \"day_of_week\": \"Saturday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"4:00 pm\", \"type\": \"mass\"}",
+    "church_slug": "st-michael-lyons"
   },
   {
     "parish_slug": "catholic-parishes-eastern-wayne-county",
@@ -1232,7 +1326,8 @@
     "start_time": "3:15 pm",
     "end_time": "3:45 pm",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Michael\", \"date\": null, \"day_of_week\": \"Saturday\", \"end_time\": \"3:45 pm\", \"kind\": \"weekly\", \"start_time\": \"3:15 pm\", \"type\": \"confession\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Michael\", \"date\": null, \"day_of_week\": \"Saturday\", \"end_time\": \"3:45 pm\", \"kind\": \"weekly\", \"start_time\": \"3:15 pm\", \"type\": \"confession\"}",
+    "church_slug": "st-michael-lyons"
   },
   {
     "parish_slug": "catholic-parishes-eastern-wayne-county",
@@ -1245,7 +1340,8 @@
     "start_time": "10:30 am",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Michael\", \"date\": \"2026-03-15\", \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"specific_date\", \"start_time\": \"10:30 am\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Michael\", \"date\": \"2026-03-15\", \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"specific_date\", \"start_time\": \"10:30 am\", \"type\": \"mass\"}",
+    "church_slug": "st-michael-lyons"
   },
   {
     "parish_slug": "catholic-parishes-eastern-wayne-county",
@@ -1258,7 +1354,8 @@
     "start_time": "10:30 am",
     "end_time": null,
     "cancelled": true,
-    "raw_json": "{\"cancelled\": true, \"church_name\": \"St. John the Evangelist\", \"date\": \"2026-03-15\", \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"specific_date\", \"start_time\": \"10:30 am\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": true, \"church_name\": \"St. John the Evangelist\", \"date\": \"2026-03-15\", \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"specific_date\", \"start_time\": \"10:30 am\", \"type\": \"mass\"}",
+    "church_slug": "st-john-evangelist-clyde"
   },
   {
     "parish_slug": "catholic-parishes-eastern-wayne-county",
@@ -1271,7 +1368,8 @@
     "start_time": "8:30 am",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary Magdalene\", \"date\": null, \"day_of_week\": \"Monday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:30 am\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary Magdalene\", \"date\": null, \"day_of_week\": \"Monday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:30 am\", \"type\": \"mass\"}",
+    "church_slug": "st-mary-magdalene"
   },
   {
     "parish_slug": "catholic-parishes-eastern-wayne-county",
@@ -1284,7 +1382,8 @@
     "start_time": "8:30 am",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary Magdalene\", \"date\": null, \"day_of_week\": \"Friday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:30 am\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary Magdalene\", \"date\": null, \"day_of_week\": \"Friday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:30 am\", \"type\": \"mass\"}",
+    "church_slug": "st-mary-magdalene"
   },
   {
     "parish_slug": "catholic-parishes-eastern-wayne-county",
@@ -1297,7 +1396,8 @@
     "start_time": "4:30 pm",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary Magdalene\", \"date\": null, \"day_of_week\": \"Saturday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"4:30 pm\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary Magdalene\", \"date\": null, \"day_of_week\": \"Saturday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"4:30 pm\", \"type\": \"mass\"}",
+    "church_slug": "st-mary-magdalene"
   },
   {
     "parish_slug": "catholic-parishes-eastern-wayne-county",
@@ -1310,7 +1410,8 @@
     "start_time": "3:30 pm",
     "end_time": "4:15 pm",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary Magdalene\", \"date\": null, \"day_of_week\": \"Saturday\", \"end_time\": \"4:15 pm\", \"kind\": \"weekly\", \"start_time\": \"3:30 pm\", \"type\": \"confession\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary Magdalene\", \"date\": null, \"day_of_week\": \"Saturday\", \"end_time\": \"4:15 pm\", \"kind\": \"weekly\", \"start_time\": \"3:30 pm\", \"type\": \"confession\"}",
+    "church_slug": "st-mary-magdalene"
   },
   {
     "parish_slug": "catholic-parishes-eastern-wayne-county",
@@ -1323,7 +1424,8 @@
     "start_time": "9:15 am",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary Magdalene\", \"date\": null, \"day_of_week\": \"Monday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"9:15 am\", \"type\": \"adoration\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Mary Magdalene\", \"date\": null, \"day_of_week\": \"Monday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"9:15 am\", \"type\": \"adoration\"}",
+    "church_slug": "st-mary-magdalene"
   },
   {
     "parish_slug": "catholic-parishes-eastern-wayne-county",
@@ -1336,7 +1438,8 @@
     "start_time": "8:00 am",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Thomas Church\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:00 am\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Thomas Church\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:00 am\", \"type\": \"mass\"}",
+    "church_slug": "st-thomas"
   },
   {
     "parish_slug": "catholic-parishes-eastern-wayne-county",
@@ -1349,7 +1452,8 @@
     "start_time": "7:20 am",
     "end_time": "7:50 am",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Thomas Church\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": \"7:50 am\", \"kind\": \"weekly\", \"start_time\": \"7:20 am\", \"type\": \"confession\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"St. Thomas Church\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": \"7:50 am\", \"kind\": \"weekly\", \"start_time\": \"7:20 am\", \"type\": \"confession\"}",
+    "church_slug": "st-thomas"
   },
   {
     "parish_slug": "saint-jerome",
@@ -1362,7 +1466,8 @@
     "start_time": "4:30 p.m.",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of St. Jerome\", \"date\": null, \"day_of_week\": \"Saturday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"4:30 p.m.\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of St. Jerome\", \"date\": null, \"day_of_week\": \"Saturday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"4:30 p.m.\", \"type\": \"mass\"}",
+    "church_slug": "saint-jeromes"
   },
   {
     "parish_slug": "saint-jerome",
@@ -1375,7 +1480,8 @@
     "start_time": "8:00 a.m.",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of St. Jerome\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:00 a.m.\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of St. Jerome\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:00 a.m.\", \"type\": \"mass\"}",
+    "church_slug": "saint-jeromes"
   },
   {
     "parish_slug": "saint-jerome",
@@ -1388,7 +1494,8 @@
     "start_time": "10:00 a.m.",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of St. Jerome\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"10:00 a.m.\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of St. Jerome\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"10:00 a.m.\", \"type\": \"mass\"}",
+    "church_slug": "saint-jeromes"
   },
   {
     "parish_slug": "saint-jerome",
@@ -1401,7 +1508,8 @@
     "start_time": "7:30 a.m.",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of St. Jerome\", \"date\": null, \"day_of_week\": \"Monday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"7:30 a.m.\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of St. Jerome\", \"date\": null, \"day_of_week\": \"Monday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"7:30 a.m.\", \"type\": \"mass\"}",
+    "church_slug": "saint-jeromes"
   },
   {
     "parish_slug": "saint-jerome",
@@ -1414,7 +1522,8 @@
     "start_time": "7:30 a.m.",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of St. Jerome\", \"date\": null, \"day_of_week\": \"Tuesday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"7:30 a.m.\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of St. Jerome\", \"date\": null, \"day_of_week\": \"Tuesday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"7:30 a.m.\", \"type\": \"mass\"}",
+    "church_slug": "saint-jeromes"
   },
   {
     "parish_slug": "saint-jerome",
@@ -1427,7 +1536,8 @@
     "start_time": "7:30 a.m.",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of St. Jerome\", \"date\": null, \"day_of_week\": \"Wednesday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"7:30 a.m.\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of St. Jerome\", \"date\": null, \"day_of_week\": \"Wednesday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"7:30 a.m.\", \"type\": \"mass\"}",
+    "church_slug": "saint-jeromes"
   },
   {
     "parish_slug": "saint-jerome",
@@ -1440,7 +1550,8 @@
     "start_time": "7:30 a.m.",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of St. Jerome\", \"date\": null, \"day_of_week\": \"Thursday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"7:30 a.m.\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of St. Jerome\", \"date\": null, \"day_of_week\": \"Thursday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"7:30 a.m.\", \"type\": \"mass\"}",
+    "church_slug": "saint-jeromes"
   },
   {
     "parish_slug": "saint-jerome",
@@ -1453,7 +1564,8 @@
     "start_time": "7:30 a.m.",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of St. Jerome\", \"date\": null, \"day_of_week\": \"Friday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"7:30 a.m.\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of St. Jerome\", \"date\": null, \"day_of_week\": \"Friday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"7:30 a.m.\", \"type\": \"mass\"}",
+    "church_slug": "saint-jeromes"
   },
   {
     "parish_slug": "saint-jerome",
@@ -1466,7 +1578,8 @@
     "start_time": "7:00 a.m.",
     "end_time": "7:25 a.m.",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of St. Jerome\", \"date\": null, \"day_of_week\": \"Monday\", \"end_time\": \"7:25 a.m.\", \"kind\": \"weekly\", \"start_time\": \"7:00 a.m.\", \"type\": \"confession\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of St. Jerome\", \"date\": null, \"day_of_week\": \"Monday\", \"end_time\": \"7:25 a.m.\", \"kind\": \"weekly\", \"start_time\": \"7:00 a.m.\", \"type\": \"confession\"}",
+    "church_slug": "saint-jeromes"
   },
   {
     "parish_slug": "saint-jerome",
@@ -1479,7 +1592,8 @@
     "start_time": "7:00 a.m.",
     "end_time": "7:25 a.m.",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of St. Jerome\", \"date\": null, \"day_of_week\": \"Tuesday\", \"end_time\": \"7:25 a.m.\", \"kind\": \"weekly\", \"start_time\": \"7:00 a.m.\", \"type\": \"confession\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of St. Jerome\", \"date\": null, \"day_of_week\": \"Tuesday\", \"end_time\": \"7:25 a.m.\", \"kind\": \"weekly\", \"start_time\": \"7:00 a.m.\", \"type\": \"confession\"}",
+    "church_slug": "saint-jeromes"
   },
   {
     "parish_slug": "saint-jerome",
@@ -1492,7 +1606,8 @@
     "start_time": "7:00 a.m.",
     "end_time": "7:25 a.m.",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of St. Jerome\", \"date\": null, \"day_of_week\": \"Wednesday\", \"end_time\": \"7:25 a.m.\", \"kind\": \"weekly\", \"start_time\": \"7:00 a.m.\", \"type\": \"confession\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of St. Jerome\", \"date\": null, \"day_of_week\": \"Wednesday\", \"end_time\": \"7:25 a.m.\", \"kind\": \"weekly\", \"start_time\": \"7:00 a.m.\", \"type\": \"confession\"}",
+    "church_slug": "saint-jeromes"
   },
   {
     "parish_slug": "saint-jerome",
@@ -1505,7 +1620,8 @@
     "start_time": "7:00 a.m.",
     "end_time": "7:25 a.m.",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of St. Jerome\", \"date\": null, \"day_of_week\": \"Thursday\", \"end_time\": \"7:25 a.m.\", \"kind\": \"weekly\", \"start_time\": \"7:00 a.m.\", \"type\": \"confession\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of St. Jerome\", \"date\": null, \"day_of_week\": \"Thursday\", \"end_time\": \"7:25 a.m.\", \"kind\": \"weekly\", \"start_time\": \"7:00 a.m.\", \"type\": \"confession\"}",
+    "church_slug": "saint-jeromes"
   },
   {
     "parish_slug": "saint-jerome",
@@ -1518,7 +1634,8 @@
     "start_time": "7:00 a.m.",
     "end_time": "7:25 a.m.",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of St. Jerome\", \"date\": null, \"day_of_week\": \"Friday\", \"end_time\": \"7:25 a.m.\", \"kind\": \"weekly\", \"start_time\": \"7:00 a.m.\", \"type\": \"confession\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of St. Jerome\", \"date\": null, \"day_of_week\": \"Friday\", \"end_time\": \"7:25 a.m.\", \"kind\": \"weekly\", \"start_time\": \"7:00 a.m.\", \"type\": \"confession\"}",
+    "church_slug": "saint-jeromes"
   },
   {
     "parish_slug": "saint-jerome",
@@ -1531,7 +1648,8 @@
     "start_time": "3:00 p.m.",
     "end_time": "4:00 p.m.",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of St. Jerome\", \"date\": null, \"day_of_week\": \"Saturday\", \"end_time\": \"4:00 p.m.\", \"kind\": \"weekly\", \"start_time\": \"3:00 p.m.\", \"type\": \"confession\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of St. Jerome\", \"date\": null, \"day_of_week\": \"Saturday\", \"end_time\": \"4:00 p.m.\", \"kind\": \"weekly\", \"start_time\": \"3:00 p.m.\", \"type\": \"confession\"}",
+    "church_slug": "saint-jeromes"
   },
   {
     "parish_slug": "saint-jerome",
@@ -1544,7 +1662,8 @@
     "start_time": "8:00 a.m.",
     "end_time": "5:00 p.m.",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of St. Jerome\", \"date\": null, \"day_of_week\": \"Tuesday\", \"end_time\": \"5:00 p.m.\", \"kind\": \"weekly\", \"start_time\": \"8:00 a.m.\", \"type\": \"adoration\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of St. Jerome\", \"date\": null, \"day_of_week\": \"Tuesday\", \"end_time\": \"5:00 p.m.\", \"kind\": \"weekly\", \"start_time\": \"8:00 a.m.\", \"type\": \"adoration\"}",
+    "church_slug": "saint-jeromes"
   },
   {
     "parish_slug": "saint-jerome",
@@ -1557,7 +1676,8 @@
     "start_time": "12:00 p.m.",
     "end_time": "1:00 p.m.",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of St. Jerome\", \"date\": \"2026-03-24\", \"day_of_week\": null, \"end_time\": \"1:00 p.m.\", \"kind\": \"specific_date\", \"start_time\": \"12:00 p.m.\", \"type\": \"confession\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of St. Jerome\", \"date\": \"2026-03-24\", \"day_of_week\": null, \"end_time\": \"1:00 p.m.\", \"kind\": \"specific_date\", \"start_time\": \"12:00 p.m.\", \"type\": \"confession\"}",
+    "church_slug": "saint-jeromes"
   },
   {
     "parish_slug": "saint-jerome",
@@ -1570,7 +1690,8 @@
     "start_time": "5:00 p.m.",
     "end_time": "6:00 p.m.",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of St. Jerome\", \"date\": \"2026-03-24\", \"day_of_week\": null, \"end_time\": \"6:00 p.m.\", \"kind\": \"specific_date\", \"start_time\": \"5:00 p.m.\", \"type\": \"confession\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of St. Jerome\", \"date\": \"2026-03-24\", \"day_of_week\": null, \"end_time\": \"6:00 p.m.\", \"kind\": \"specific_date\", \"start_time\": \"5:00 p.m.\", \"type\": \"confession\"}",
+    "church_slug": "saint-jeromes"
   },
   {
     "parish_slug": "assumption-resurrection",
@@ -1583,7 +1704,8 @@
     "start_time": "4:00 PM",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of the Assumption\", \"date\": null, \"day_of_week\": \"Saturday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"4:00 PM\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of the Assumption\", \"date\": null, \"day_of_week\": \"Saturday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"4:00 PM\", \"type\": \"mass\"}",
+    "church_slug": "assumption"
   },
   {
     "parish_slug": "assumption-resurrection",
@@ -1596,7 +1718,8 @@
     "start_time": "8:00 AM",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of the Assumption\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:00 AM\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of the Assumption\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:00 AM\", \"type\": \"mass\"}",
+    "church_slug": "assumption"
   },
   {
     "parish_slug": "assumption-resurrection",
@@ -1609,7 +1732,8 @@
     "start_time": "11:30 AM",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of the Assumption\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"11:30 AM\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of the Assumption\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"11:30 AM\", \"type\": \"mass\"}",
+    "church_slug": "assumption"
   },
   {
     "parish_slug": "assumption-resurrection",
@@ -1622,7 +1746,8 @@
     "start_time": "11:15 AM",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of the Assumption\", \"date\": null, \"day_of_week\": \"Monday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"11:15 AM\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of the Assumption\", \"date\": null, \"day_of_week\": \"Monday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"11:15 AM\", \"type\": \"mass\"}",
+    "church_slug": "assumption"
   },
   {
     "parish_slug": "assumption-resurrection",
@@ -1635,7 +1760,8 @@
     "start_time": "7:30 AM",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of the Assumption\", \"date\": null, \"day_of_week\": \"Tuesday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"7:30 AM\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of the Assumption\", \"date\": null, \"day_of_week\": \"Tuesday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"7:30 AM\", \"type\": \"mass\"}",
+    "church_slug": "assumption"
   },
   {
     "parish_slug": "assumption-resurrection",
@@ -1648,7 +1774,8 @@
     "start_time": "7:30 AM",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of the Assumption\", \"date\": null, \"day_of_week\": \"Wednesday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"7:30 AM\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of the Assumption\", \"date\": null, \"day_of_week\": \"Wednesday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"7:30 AM\", \"type\": \"mass\"}",
+    "church_slug": "assumption"
   },
   {
     "parish_slug": "assumption-resurrection",
@@ -1661,7 +1788,8 @@
     "start_time": "11:15 AM",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of the Assumption\", \"date\": null, \"day_of_week\": \"Wednesday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"11:15 AM\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of the Assumption\", \"date\": null, \"day_of_week\": \"Wednesday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"11:15 AM\", \"type\": \"mass\"}",
+    "church_slug": "assumption"
   },
   {
     "parish_slug": "assumption-resurrection",
@@ -1674,7 +1802,8 @@
     "start_time": "7:30 AM",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of the Assumption\", \"date\": null, \"day_of_week\": \"Thursday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"7:30 AM\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of the Assumption\", \"date\": null, \"day_of_week\": \"Thursday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"7:30 AM\", \"type\": \"mass\"}",
+    "church_slug": "assumption"
   },
   {
     "parish_slug": "assumption-resurrection",
@@ -1687,7 +1816,8 @@
     "start_time": "11:15 AM",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of the Assumption\", \"date\": null, \"day_of_week\": \"Friday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"11:15 AM\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of the Assumption\", \"date\": null, \"day_of_week\": \"Friday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"11:15 AM\", \"type\": \"mass\"}",
+    "church_slug": "assumption"
   },
   {
     "parish_slug": "assumption-resurrection",
@@ -1700,7 +1830,8 @@
     "start_time": "9:45 AM",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of the Resurrection\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"9:45 AM\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of the Resurrection\", \"date\": null, \"day_of_week\": \"Sunday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"9:45 AM\", \"type\": \"mass\"}",
+    "church_slug": "resurrection"
   },
   {
     "parish_slug": "assumption-resurrection",
@@ -1713,7 +1844,8 @@
     "start_time": "8:30 AM",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of the Resurrection\", \"date\": null, \"day_of_week\": \"Monday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:30 AM\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of the Resurrection\", \"date\": null, \"day_of_week\": \"Monday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:30 AM\", \"type\": \"mass\"}",
+    "church_slug": "resurrection"
   },
   {
     "parish_slug": "assumption-resurrection",
@@ -1726,7 +1858,8 @@
     "start_time": "8:30 AM",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of the Resurrection\", \"date\": null, \"day_of_week\": \"Tuesday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:30 AM\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of the Resurrection\", \"date\": null, \"day_of_week\": \"Tuesday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:30 AM\", \"type\": \"mass\"}",
+    "church_slug": "resurrection"
   },
   {
     "parish_slug": "assumption-resurrection",
@@ -1739,7 +1872,8 @@
     "start_time": "8:30 AM",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of the Resurrection\", \"date\": null, \"day_of_week\": \"Thursday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:30 AM\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of the Resurrection\", \"date\": null, \"day_of_week\": \"Thursday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:30 AM\", \"type\": \"mass\"}",
+    "church_slug": "resurrection"
   },
   {
     "parish_slug": "assumption-resurrection",
@@ -1752,7 +1886,8 @@
     "start_time": "8:30 AM",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of the Resurrection\", \"date\": null, \"day_of_week\": \"Friday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:30 AM\", \"type\": \"mass\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of the Resurrection\", \"date\": null, \"day_of_week\": \"Friday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"8:30 AM\", \"type\": \"mass\"}",
+    "church_slug": "resurrection"
   },
   {
     "parish_slug": "assumption-resurrection",
@@ -1765,7 +1900,8 @@
     "start_time": "12:00 PM",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of the Assumption\", \"date\": null, \"day_of_week\": \"Wednesday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"12:00 PM\", \"type\": \"confession\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of the Assumption\", \"date\": null, \"day_of_week\": \"Wednesday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"12:00 PM\", \"type\": \"confession\"}",
+    "church_slug": "assumption"
   },
   {
     "parish_slug": "assumption-resurrection",
@@ -1778,7 +1914,8 @@
     "start_time": "5:00 PM",
     "end_time": null,
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of the Assumption\", \"date\": null, \"day_of_week\": \"Saturday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"5:00 PM\", \"type\": \"confession\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of the Assumption\", \"date\": null, \"day_of_week\": \"Saturday\", \"end_time\": null, \"kind\": \"weekly\", \"start_time\": \"5:00 PM\", \"type\": \"confession\"}",
+    "church_slug": "assumption"
   },
   {
     "parish_slug": "assumption-resurrection",
@@ -1791,7 +1928,8 @@
     "start_time": "4:00 PM",
     "end_time": "7:00 PM",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of the Resurrection\", \"date\": \"2026-03-10\", \"day_of_week\": null, \"end_time\": \"7:00 PM\", \"kind\": \"specific_date\", \"start_time\": \"4:00 PM\", \"type\": \"confession\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of the Resurrection\", \"date\": \"2026-03-10\", \"day_of_week\": null, \"end_time\": \"7:00 PM\", \"kind\": \"specific_date\", \"start_time\": \"4:00 PM\", \"type\": \"confession\"}",
+    "church_slug": "resurrection"
   },
   {
     "parish_slug": "assumption-resurrection",
@@ -1804,7 +1942,8 @@
     "start_time": "4:00 PM",
     "end_time": "7:00 PM",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of the Assumption\", \"date\": \"2026-03-16\", \"day_of_week\": null, \"end_time\": \"7:00 PM\", \"kind\": \"specific_date\", \"start_time\": \"4:00 PM\", \"type\": \"confession\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of the Assumption\", \"date\": \"2026-03-16\", \"day_of_week\": null, \"end_time\": \"7:00 PM\", \"kind\": \"specific_date\", \"start_time\": \"4:00 PM\", \"type\": \"confession\"}",
+    "church_slug": "assumption"
   },
   {
     "parish_slug": "assumption-resurrection",
@@ -1817,6 +1956,7 @@
     "start_time": "6:30 PM",
     "end_time": "7:30 PM",
     "cancelled": false,
-    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of the Resurrection\", \"date\": \"2026-03-16\", \"day_of_week\": null, \"end_time\": \"7:30 PM\", \"kind\": \"specific_date\", \"start_time\": \"6:30 PM\", \"type\": \"adoration\"}"
+    "raw_json": "{\"cancelled\": false, \"church_name\": \"Church of the Resurrection\", \"date\": \"2026-03-16\", \"day_of_week\": null, \"end_time\": \"7:30 PM\", \"kind\": \"specific_date\", \"start_time\": \"6:30 PM\", \"type\": \"adoration\"}",
+    "church_slug": "resurrection"
   }
 ]

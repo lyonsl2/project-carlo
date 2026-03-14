@@ -57,7 +57,7 @@ export function ChurchMap({ churches }: ChurchMapProps) {
                 <li>No upcoming events found</li>
               )}
             </ul>
-            <Link to={`/churches/${church.id}`}>View church page</Link>
+            <Link to={`/churches/${church.slug}`}>View church page</Link>
           </Popup>
         </Marker>
       ))}
