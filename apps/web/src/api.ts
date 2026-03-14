@@ -198,7 +198,8 @@ export async function fetchChurches(
   const db = await getDb();
 
   const stmt = db.prepare(
-    "SELECT id, parish_id, name, address, latitude, longitude FROM church ORDER BY name",
+    `SELECT id, parish_id, name, address_line1, address_line2, city, state, postal_code,
+            latitude, longitude FROM church ORDER BY name`,
   );
   const churches: ChurchDetail[] = [];
   try {
@@ -208,7 +209,11 @@ export async function fetchChurches(
         id: row["id"] as number,
         parish_id: row["parish_id"] as number,
         name: str(row["name"]),
-        address: str(row["address"]),
+        address_line1: str(row["address_line1"]),
+        address_line2: str(row["address_line2"]),
+        city: str(row["city"]),
+        state: str(row["state"]),
+        postal_code: str(row["postal_code"]),
         latitude: num(row["latitude"]),
         longitude: num(row["longitude"]),
       });
@@ -251,7 +256,8 @@ export async function fetchChurches(
 export async function fetchChurch(churchId: number): Promise<ChurchDetail> {
   const db = await getDb();
   const stmt = db.prepare(
-    "SELECT id, parish_id, name, address, latitude, longitude FROM church WHERE id = ?",
+    `SELECT id, parish_id, name, address_line1, address_line2, city, state, postal_code,
+            latitude, longitude FROM church WHERE id = ?`,
   );
   try {
     stmt.bind([churchId]);
@@ -263,7 +269,11 @@ export async function fetchChurch(churchId: number): Promise<ChurchDetail> {
       id: row["id"] as number,
       parish_id: row["parish_id"] as number,
       name: str(row["name"]),
-      address: str(row["address"]),
+      address_line1: str(row["address_line1"]),
+      address_line2: str(row["address_line2"]),
+      city: str(row["city"]),
+      state: str(row["state"]),
+      postal_code: str(row["postal_code"]),
       latitude: num(row["latitude"]),
       longitude: num(row["longitude"]),
     };

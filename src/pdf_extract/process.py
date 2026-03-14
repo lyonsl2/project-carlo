@@ -6,6 +6,7 @@ import json
 import logging
 from pathlib import Path
 
+from pdf_extract.address import format_address
 from pdf_extract.schedule_extraction import extract_events
 from pdf_extract.storage import (
     BULLETINS_METADATA_PATH,
@@ -68,7 +69,13 @@ def process_bulletins(
 
             church_rows = list_churches(conn, parish_row["id"])
             church_list = [
-                {"name": r["name"], "address": r["address"]}
+                {
+                    "name": r["name"],
+                    "address": format_address(
+                        r["address_line1"], r["address_line2"],
+                        r["city"], r["state"], r["postal_code"],
+                    ),
+                }
                 for r in church_rows
             ]
 

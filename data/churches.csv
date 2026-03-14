@@ -1,130 +1,130 @@
-parish_id,name,address
-all-saints-corning,"St. Mary's Catholic Church","155 State Street, Corning, NY 14830"
-net-catholic,"All Saints Church","347 Ridge Road, Lansing, NY 14882"
-net-catholic,"Holy Cross Church","375 George Road, Freeville, NY 13068"
-net-catholic,"Saint Anthony's Church","312 Locke Road, Groton, NY 13073"
-southeast-rochester-catholic-community,"Blessed Sacrament Church","259 Rutgers Street, Rochester, NY 14607"
-southeast-rochester-catholic-community,"St. Boniface Church","330 Gregory Street, Rochester, NY 14620"
-southeast-rochester-catholic-community,"St. Mary's Church","15 St. Mary's Place, Rochester, NY 14607"
-blessed-trinity-st-patrick,"St. James Church","503 Clark Street, Waverly, NY 14892"
-blessed-trinity-st-patrick,"St. John the Evangelist Church","28 Rock Street, Newark Valley, NY 13811"
-blessed-trinity-st-patrick,"St. Margaret Mary Church","1110 Pennsylvania Avenue, Apalachin, NY 13732"
-blessed-trinity-st-patrick,"St. Patrick Church","300 Main Street, Owego, NY 13827"
-catholic-parishes-eastern-wayne-county,"St. Mary Magdalene","15 Northup Avenue, Wolcott, NY 14590"
-catholic-parishes-eastern-wayne-county,"St. Thomas Church","6927 Main Street, Red Creek, NY 13143"
-catholic-parishes-eastern-wayne-county,"St. Jude Church","580 Main Street, Fair Haven, NY 13064"
-saint-jerome,"Saint Jerome's Church","207 South Garfield Street, East Rochester, NY 14445"
-assumption-resurrection,"Church of the Assumption","20 East Avenue, Fairport, NY 14450"
-assumption-resurrection,"Church of the Resurrection","63 Mason Road, Fairport, NY 14450"
-holy-spirit-st-josephs,"Holy Spirit Church","1355 Hatch Road, Penfield, NY 14580"
-holy-spirit-st-josephs,"St. Joseph's Church","43 Gebhardt Road, Penfield, NY 14526"
-nativity-seas,"Church of the Nativity of the Blessed Virgin Mary","152 Main Street, Brockport, NY 14420"
-nativity-seas,"Saint Elizabeth Ann Seton Church","3747 Brick Schoolhouse Road, Hamlin, NY 14464"
-transfiguration-st-catherine-mendon,"Church of the Transfiguration","50 West Bloomfield Road, Pittsford, NY 14534"
-transfiguration-st-catherine-mendon,"St. Catherine of Siena Church","26 Mendon-Ionia Road, Mendon, NY 14506"
-st-monica-emmanuel,"St. Monica Church","34 Monica Street, Rochester, NY 14619"
-good-shepherd-catholic-community,"St. Patrick's Church","51 Grove Street, Moravia, NY 13118"
-good-shepherd-catholic-community,"St. Patrick's Church","303 Main Street, Aurora, NY 13026"
-good-shepherd-catholic-community,"Our Lady of the Lake","8695 State Route 90, King Ferry, NY 13081"
-good-shepherd-catholic-community,"St. Michael's Church","162 Cayuga Street, Union Springs, NY 13160"
-holy-apostles,"Holy Apostles Church","530 Lyell Avenue, Rochester, NY 14606"
-our-mother-of-sorrows-holy-cross,"Our Mother of Sorrows","5000 Mount Read Boulevard, Rochester, NY 14612"
-our-mother-of-sorrows-holy-cross,"Holy Cross Church","4492 Lake Avenue, Rochester, NY 14612"
-holy-family-catholic-community,"St. Joseph Church","208 Fremont Street, Wayland, NY 14572"
-holy-family-catholic-community,"St. Mary Church","38 Elizabeth Street, Dansville, NY 14437"
-holy-family-catholic-community,"Sacred Heart of Jesus Church","11114 Chapel Street, Perkinsville, NY 14529"
-holy-family-catholic-community,"St. Pius V Church","35 Maple Avenue, Cohocton, NY 14826"
-holy-trinity-webster,"Holy Trinity Church","1460 Ridge Road, Webster, NY 14580"
-immaculate-conception-ithaca,"Immaculate Conception Church","113 North Geneva Street, Ithaca, NY 14850"
-immaculate-conception-st-bridgets,"Immaculate Conception/St. Bridget's Church","445 Frederick Douglass Street, Rochester, NY 14608"
-mary-mother-of-mercy,"Holy Cross Church","7231 Main Street, Ovid, NY 14521"
-mary-mother-of-mercy,"St. Francis Solanus Church","3660 Orchard Street, Interlaken, NY 14847"
-mary-mother-of-mercy,"St. James the Apostle","17 Whig Street, Trumansburg, NY 14886"
-our-lady-of-lourdes-st-anne,"Our Lady of Lourdes Church","150 Varinna Drive, Rochester, NY 14618"
-our-lady-of-lourdes-st-anne,"Saint Anne Church","1600 Mount Hope Avenue, Rochester, NY 14620"
-our-lady-of-peace-geneva,"St. Francis deSales Church","130 Exchange Street, Geneva, NY 14456"
-our-lady-of-peace-geneva,"St. Stephen Church","48 Pulteney Street, Geneva, NY 14456"
-our-lady-of-peace-geneva,"St. John's Chapel","630 South Main Street, Geneva, NY 14456"
-our-lady-of-the-lakes,"Saint Michael's Church","312 Liberty Street, Penn Yan, NY 14527"
-our-lady-of-the-lakes,"Saint Januarius' Church","180 North Main Street, Naples, NY 14512"
-our-lady-of-the-lakes,"Saint Patrick's Church","47 North Main Street, Prattsburgh, NY 14873"
-our-lady-of-the-snow-saints-mary-and-martha,"St. Joseph Church","8831 South Seneca Street, Weedsport, NY 13166"
-our-lady-of-the-snow-saints-mary-and-martha,"St. Patrick Church","2576 East Mechanic Street, Cato, NY 13033"
-our-lady-of-the-valley,"St. Ann's Church","27 Erie Avenue, Hornell, NY 14843"
-our-lady-of-the-valley,"St. Mary's Church","Church Street, Rexville, NY 14877"
-our-lady-of-victory-st-joseph,"Our Lady of Victory / St. Joseph","210 Pleasant Street, Rochester, NY 14604"
-our-lady-queen-of-peace-st-thomas-more,"Our Lady Queen of Peace","601 Edgewood Avenue, Brighton, NY 14618"
-our-lady-queen-of-peace-st-thomas-more,"St. Thomas More","2617 East Avenue, Brighton, NY 14610"
-parish-of-the-holy-family,"The Parish of the Holy Family","4100 Lyell Road, Rochester, NY 14606"
-most-holy-name-of-jesus,"St. Mary's Church","224 Franklin Street, Elmira, NY 14904"
-most-holy-name-of-jesus,"St. Patrick's Church","604 Park Place, Elmira, NY 14901"
-peace-of-christ,"St. Ambrose Church","25 Empire Boulevard, Rochester, NY 14609"
-peace-of-christ,"St. James Church","130 Brett Road, Rochester, NY 14609"
-peace-of-christ,"St. John the Evangelist Church","553 Humboldt Street, Rochester, NY 14610"
-sacred-heart-auburn-cluster,"Sacred Heart","90 Melrose Road, Auburn, NY 13021"
-sacred-heart-auburn-cluster,"St. Alphonsus","85 East Genesee Street, Auburn, NY 13021"
-sacred-heart-auburn-cluster,"St. Ann","4890 Twelve Corners Road, Auburn, NY 13021"
-sacred-heart-cathedral,"Sacred Heart Cathedral","296 Flower City Park, Rochester, NY 14615"
-saint-rita-webster,"St. Rita Roman Catholic Church","1008 Maple Drive, Webster, NY 14580"
-ss-isidore-maria-torribia,"St. Catherine of Siena","51 Maple Street, Addison, NY 14801"
-ss-isidore-maria-torribia,"St. Stanislaus Bishop & Martyr","7646 Whitehead Hill Road, Bradford, NY 14815"
-ss-isidore-maria-torribia,"St. Joseph the Carpenter","8508 Main Street, Campbell, NY 14821"
-our-lady-of-the-snow-saints-mary-and-martha,"St. Francis of Assisi Church","303 Clark Street, Auburn, NY 13021"
-our-lady-of-the-snow-saints-mary-and-martha,"St. Hyacinth Church","63 Pulaski Street, Auburn, NY 13021"
-st-agnes-paul-rose,"St. Agnes Church","96 Prospect Street, Avon, NY 14414"
-st-agnes-paul-rose,"St. Paul of the Cross","31 Monroe Street, Honeoye Falls, NY 14472"
-st-agnes-paul-rose,"St. Rose Church","1985 Lake Avenue, Lima, NY 14485"
-st-benedict-parish,"St. Bridget's Church","15 Church Street, Bloomfield, NY 14469"
-st-benedict-parish,"St. Mary's Church","95 North Main Street, Canandaigua, NY 14424"
-st-benedicts-st-marys-lake,"St. Benedict's Church","304 Speedway Road, Odessa, NY 14869"
-st-benedicts-st-marys-lake,"St. Mary's of the Lake","905 North Decatur Street, Watkins Glen, NY 14891"
-st-catherine-of-siena-ithaca,"St. Catherine of Siena Church","309 Siena Drive, Ithaca, NY 14850"
-st-charles-borromeo,"St. Charles Borromeo","3003 Dewey Avenue, Rochester, NY 14616"
-st-christopher,"St. Christopher's Church","3350 Union Street, North Chili, NY 14514"
-st-frances-xavier-cabrini,"Annunciation","1760 Norton Street, Rochester, NY 14609"
-st-frances-xavier-cabrini,"Corpus Christi","864 East Main Street, Rochester, NY 14605"
-st-frances-xavier-cabrini,"Saint Michael","869 North Clinton Avenue, Rochester, NY 14605"
-st-francis-and-st-clare,"St. Mary's Church","35 Center Street, Waterloo, NY 13165"
-st-francis-and-st-clare,"St. Patrick's Church","97 West Bayard Street, Seneca Falls, NY 13148"
-st-john-of-rochester,"St. John of Rochester","8 Wickford Way, Fairport, NY 14450"
-st-john-greece,"St. John the Evangelist","2400 West Ridge Road, Rochester, NY 14626"
-st-john-spencerport,"St. John the Evangelist","55 Martha Street, Spencerport, NY 14559"
-st-john-vianney,"St. Mary's Church","32 East Morris Street, Bath, NY 14810"
-st-john-vianney,"St. Gabriel's Church","78 Shethar Street, Hammondsport, NY 14840"
-catholic-parishes-eastern-wayne-county,"St. John the Evangelist","114 Sodus Street, Clyde, NY 14433"
-catholic-parishes-eastern-wayne-county,"St. Michael","3 Holley Street, Lyons, NY 14489"
-catholic-parishes-eastern-wayne-county,"St. Patrick","52 Clyde Street, Savannah, NY 13146"
-st-kateri-tekakwitha,"Christ the King","445 Kings Highway South, Rochester, NY 14617"
-st-kateri-tekakwitha,"St. Margaret Mary","401 Rogers Parkway, Rochester, NY 14617"
-st-kateri-tekakwitha,"St. Cecilia","2732 Culver Road, Rochester, NY 14622"
-st-kateri-tekakwitha,"St. Thomas the Apostle","4536 Saint Paul Boulevard, Rochester, NY 14617"
-st-katharine-drexel-st-maximilian-kolbe,"St. Patrick's Church","52 Main Street, Macedon, NY 14502"
-st-katharine-drexel-st-maximilian-kolbe,"St. Anne's Church","136 Church Street, Palmyra, NY 14522"
-st-katharine-drexel-st-maximilian-kolbe,"St. Mary's of the Lake Church","5823 Walworth Road, Ontario, NY 14519"
-st-katharine-drexel-st-maximilian-kolbe,"Church of the Epiphany","105 West Main Street, Sodus, NY 14551"
-st-katharine-drexel-st-maximilian-kolbe,"St. Mary Star of the Sea","7502 South Fitzhugh Street, Sodus Point, NY 14555"
-st-lawrence,"St. Lawrence Church","1000 North Greece Road, Rochester, NY 14626"
-st-leo-the-great,"St. Leo the Great Catholic Parish","110 Old Hojack Lane, Hilton, NY 14468"
-st-louis-pittsford,"St. Louis Church","64 South Main Street, Pittsford, NY 14534"
-st-luke-the-evangelist,"St. Mary","13 North Street, Geneseo, NY 14454"
-st-luke-the-evangelist,"St. Patrick","46 Stanley Street, Mount Morris, NY 14510"
-st-luke-the-evangelist,"Holy Angels","45 North Church Street, Nunda, NY 14517"
-st-luke-the-evangelist,"St. Lucy","2770 Retsof Avenue, Piffard, NY 14533"
-st-luke-the-evangelist,"St. Juan Diego Community","175 Main Street, Leicester, NY 14481"
-st-marianne-cope,"Guardian Angels Church","2061 East Henrietta Road, Rochester, NY 14623"
-st-marks-greece,"St. Mark's Roman Catholic Church","54 Kuhn Road, Rochester, NY 14612"
-st-martin-de-porres,"St. Columba","198 North Street, Caledonia, NY 14423"
-st-martin-de-porres,"St. Mary of the Assumption","99 Main Street, Scottsville, NY 14546"
-st-martin-de-porres,"St. Vincent de Paul","11 North Main Street, Churchville, NY 14428"
-st-mary-our-mother,"St. Mary Our Mother","816 West Broad Street, Horseheads, NY 14845"
-st-marys-st-matthew,"St. Mary's","8961 West Main Street, Honeoye, NY 14471"
-st-marys-st-matthew,"St. Matthew","6591 Richmond Mills Road, Livonia, NY 14487"
-catholic-parishes-eastern-wayne-county,"St. Michael Church","401 South Main Street, Newark, NY 14513"
-st-patricks-victor,"St. Patrick's Church","115 Maple Avenue, Victor, NY 14564"
-st-pauls-webster,"St. Paul's Roman Catholic Church","783 Hard Road, Webster, NY 14580"
-st-peters-ontario-county,"St. Dominic","97 West Main Street, Shortsville, NY 14548"
-st-peters-ontario-county,"St. Felix","12 Hibbard Avenue, Clifton Springs, NY 14432"
-st-peters-ontario-county,"St. Francis","12 Church Street, Phelps, NY 14532"
-st-pius-x-chili,"St. Pius X Church","3010 Chili Avenue, Rochester, NY 14624"
-st-stanislaus-kostka,"St. Stanislaus Kostka Church","34 St. Stanislaus Street, Rochester, NY 14621"
-st-theodores-gates,"St. Theodore's Catholic Church","168 Spencerport Road, Rochester, NY 14606"
+parish_id,name,line1,line2,city,state,postal_code
+all-saints-corning,St. Mary's Catholic Church,155 State Street,,Corning,NY,14830
+net-catholic,All Saints Church,347 Ridge Road,,Lansing,NY,14882
+net-catholic,Holy Cross Church,375 George Road,,Freeville,NY,13068
+net-catholic,Saint Anthony's Church,312 Locke Road,,Groton,NY,13073
+southeast-rochester-catholic-community,Blessed Sacrament Church,259 Rutgers Street,,Rochester,NY,14607
+southeast-rochester-catholic-community,St. Boniface Church,330 Gregory Street,,Rochester,NY,14620
+southeast-rochester-catholic-community,St. Mary's Church,15 St. Mary's Place,,Rochester,NY,14607
+blessed-trinity-st-patrick,St. James Church,503 Clark Street,,Waverly,NY,14892
+blessed-trinity-st-patrick,St. John the Evangelist Church,28 Rock Street,,Newark Valley,NY,13811
+blessed-trinity-st-patrick,St. Margaret Mary Church,1110 Pennsylvania Avenue,,Apalachin,NY,13732
+blessed-trinity-st-patrick,St. Patrick Church,300 Main Street,,Owego,NY,13827
+catholic-parishes-eastern-wayne-county,St. Mary Magdalene,15 Northup Avenue,,Wolcott,NY,14590
+catholic-parishes-eastern-wayne-county,St. Thomas Church,6927 Main Street,,Red Creek,NY,13143
+catholic-parishes-eastern-wayne-county,St. Jude Church,580 Main Street,,Fair Haven,NY,13064
+saint-jerome,Saint Jerome's Church,207 South Garfield Street,,East Rochester,NY,14445
+assumption-resurrection,Church of the Assumption,20 East Avenue,,Fairport,NY,14450
+assumption-resurrection,Church of the Resurrection,63 Mason Road,,Fairport,NY,14450
+holy-spirit-st-josephs,Holy Spirit Church,1355 Hatch Road,,Penfield,NY,14580
+holy-spirit-st-josephs,St. Joseph's Church,43 Gebhardt Road,,Penfield,NY,14526
+nativity-seas,Church of the Nativity of the Blessed Virgin Mary,152 Main Street,,Brockport,NY,14420
+nativity-seas,Saint Elizabeth Ann Seton Church,3747 Brick Schoolhouse Road,,Hamlin,NY,14464
+transfiguration-st-catherine-mendon,Church of the Transfiguration,50 West Bloomfield Road,,Pittsford,NY,14534
+transfiguration-st-catherine-mendon,St. Catherine of Siena Church,26 Mendon-Ionia Road,,Mendon,NY,14506
+st-monica-emmanuel,St. Monica Church,34 Monica Street,,Rochester,NY,14619
+good-shepherd-catholic-community,St. Patrick's Church,51 Grove Street,,Moravia,NY,13118
+good-shepherd-catholic-community,St. Patrick's Church,303 Main Street,,Aurora,NY,13026
+good-shepherd-catholic-community,Our Lady of the Lake,8695 State Route 90,,King Ferry,NY,13081
+good-shepherd-catholic-community,St. Michael's Church,162 Cayuga Street,,Union Springs,NY,13160
+holy-apostles,Holy Apostles Church,530 Lyell Avenue,,Rochester,NY,14606
+our-mother-of-sorrows-holy-cross,Our Mother of Sorrows,5000 Mount Read Boulevard,,Rochester,NY,14612
+our-mother-of-sorrows-holy-cross,Holy Cross Church,4492 Lake Avenue,,Rochester,NY,14612
+holy-family-catholic-community,St. Joseph Church,208 Fremont Street,,Wayland,NY,14572
+holy-family-catholic-community,St. Mary Church,38 Elizabeth Street,,Dansville,NY,14437
+holy-family-catholic-community,Sacred Heart of Jesus Church,11114 Chapel Street,,Perkinsville,NY,14529
+holy-family-catholic-community,St. Pius V Church,35 Maple Avenue,,Cohocton,NY,14826
+holy-trinity-webster,Holy Trinity Church,1460 Ridge Road,,Webster,NY,14580
+immaculate-conception-ithaca,Immaculate Conception Church,113 North Geneva Street,,Ithaca,NY,14850
+immaculate-conception-st-bridgets,Immaculate Conception/St. Bridget's Church,445 Frederick Douglass Street,,Rochester,NY,14608
+mary-mother-of-mercy,Holy Cross Church,7231 Main Street,,Ovid,NY,14521
+mary-mother-of-mercy,St. Francis Solanus Church,3660 Orchard Street,,Interlaken,NY,14847
+mary-mother-of-mercy,St. James the Apostle,17 Whig Street,,Trumansburg,NY,14886
+our-lady-of-lourdes-st-anne,Our Lady of Lourdes Church,150 Varinna Drive,,Rochester,NY,14618
+our-lady-of-lourdes-st-anne,Saint Anne Church,1600 Mount Hope Avenue,,Rochester,NY,14620
+our-lady-of-peace-geneva,St. Francis deSales Church,130 Exchange Street,,Geneva,NY,14456
+our-lady-of-peace-geneva,St. Stephen Church,48 Pulteney Street,,Geneva,NY,14456
+our-lady-of-peace-geneva,St. John's Chapel,630 South Main Street,,Geneva,NY,14456
+our-lady-of-the-lakes,Saint Michael's Church,312 Liberty Street,,Penn Yan,NY,14527
+our-lady-of-the-lakes,Saint Januarius' Church,180 North Main Street,,Naples,NY,14512
+our-lady-of-the-lakes,Saint Patrick's Church,47 North Main Street,,Prattsburgh,NY,14873
+our-lady-of-the-snow-saints-mary-and-martha,St. Joseph Church,8831 South Seneca Street,,Weedsport,NY,13166
+our-lady-of-the-snow-saints-mary-and-martha,St. Patrick Church,2576 East Mechanic Street,,Cato,NY,13033
+our-lady-of-the-valley,St. Ann's Church,27 Erie Avenue,,Hornell,NY,14843
+our-lady-of-the-valley,St. Mary's Church,Church Street,,Rexville,NY,14877
+our-lady-of-victory-st-joseph,Our Lady of Victory / St. Joseph,210 Pleasant Street,,Rochester,NY,14604
+our-lady-queen-of-peace-st-thomas-more,Our Lady Queen of Peace,601 Edgewood Avenue,,Brighton,NY,14618
+our-lady-queen-of-peace-st-thomas-more,St. Thomas More,2617 East Avenue,,Brighton,NY,14610
+parish-of-the-holy-family,The Parish of the Holy Family,4100 Lyell Road,,Rochester,NY,14606
+most-holy-name-of-jesus,St. Mary's Church,224 Franklin Street,,Elmira,NY,14904
+most-holy-name-of-jesus,St. Patrick's Church,604 Park Place,,Elmira,NY,14901
+peace-of-christ,St. Ambrose Church,25 Empire Boulevard,,Rochester,NY,14609
+peace-of-christ,St. James Church,130 Brett Road,,Rochester,NY,14609
+peace-of-christ,St. John the Evangelist Church,553 Humboldt Street,,Rochester,NY,14610
+sacred-heart-auburn-cluster,Sacred Heart,90 Melrose Road,,Auburn,NY,13021
+sacred-heart-auburn-cluster,St. Alphonsus,85 East Genesee Street,,Auburn,NY,13021
+sacred-heart-auburn-cluster,St. Ann,4890 Twelve Corners Road,,Auburn,NY,13021
+sacred-heart-cathedral,Sacred Heart Cathedral,296 Flower City Park,,Rochester,NY,14615
+saint-rita-webster,St. Rita Roman Catholic Church,1008 Maple Drive,,Webster,NY,14580
+ss-isidore-maria-torribia,St. Catherine of Siena,51 Maple Street,,Addison,NY,14801
+ss-isidore-maria-torribia,St. Stanislaus Bishop & Martyr,7646 Whitehead Hill Road,,Bradford,NY,14815
+ss-isidore-maria-torribia,St. Joseph the Carpenter,8508 Main Street,,Campbell,NY,14821
+our-lady-of-the-snow-saints-mary-and-martha,St. Francis of Assisi Church,303 Clark Street,,Auburn,NY,13021
+our-lady-of-the-snow-saints-mary-and-martha,St. Hyacinth Church,63 Pulaski Street,,Auburn,NY,13021
+st-agnes-paul-rose,St. Agnes Church,96 Prospect Street,,Avon,NY,14414
+st-agnes-paul-rose,St. Paul of the Cross,31 Monroe Street,,Honeoye Falls,NY,14472
+st-agnes-paul-rose,St. Rose Church,1985 Lake Avenue,,Lima,NY,14485
+st-benedict-parish,St. Bridget's Church,15 Church Street,,Bloomfield,NY,14469
+st-benedict-parish,St. Mary's Church,95 North Main Street,,Canandaigua,NY,14424
+st-benedicts-st-marys-lake,St. Benedict's Church,304 Speedway Road,,Odessa,NY,14869
+st-benedicts-st-marys-lake,St. Mary's of the Lake,905 North Decatur Street,,Watkins Glen,NY,14891
+st-catherine-of-siena-ithaca,St. Catherine of Siena Church,309 Siena Drive,,Ithaca,NY,14850
+st-charles-borromeo,St. Charles Borromeo,3003 Dewey Avenue,,Rochester,NY,14616
+st-christopher,St. Christopher's Church,3350 Union Street,,North Chili,NY,14514
+st-frances-xavier-cabrini,Annunciation,1760 Norton Street,,Rochester,NY,14609
+st-frances-xavier-cabrini,Corpus Christi,864 East Main Street,,Rochester,NY,14605
+st-frances-xavier-cabrini,Saint Michael,869 North Clinton Avenue,,Rochester,NY,14605
+st-francis-and-st-clare,St. Mary's Church,35 Center Street,,Waterloo,NY,13165
+st-francis-and-st-clare,St. Patrick's Church,97 West Bayard Street,,Seneca Falls,NY,13148
+st-john-of-rochester,St. John of Rochester,8 Wickford Way,,Fairport,NY,14450
+st-john-greece,St. John the Evangelist,2400 West Ridge Road,,Rochester,NY,14626
+st-john-spencerport,St. John the Evangelist,55 Martha Street,,Spencerport,NY,14559
+st-john-vianney,St. Mary's Church,32 East Morris Street,,Bath,NY,14810
+st-john-vianney,St. Gabriel's Church,78 Shethar Street,,Hammondsport,NY,14840
+catholic-parishes-eastern-wayne-county,St. John the Evangelist,114 Sodus Street,,Clyde,NY,14433
+catholic-parishes-eastern-wayne-county,St. Michael,3 Holley Street,,Lyons,NY,14489
+catholic-parishes-eastern-wayne-county,St. Patrick,52 Clyde Street,,Savannah,NY,13146
+st-kateri-tekakwitha,Christ the King,445 Kings Highway South,,Rochester,NY,14617
+st-kateri-tekakwitha,St. Margaret Mary,401 Rogers Parkway,,Rochester,NY,14617
+st-kateri-tekakwitha,St. Cecilia,2732 Culver Road,,Rochester,NY,14622
+st-kateri-tekakwitha,St. Thomas the Apostle,4536 Saint Paul Boulevard,,Rochester,NY,14617
+st-katharine-drexel-st-maximilian-kolbe,St. Patrick's Church,52 Main Street,,Macedon,NY,14502
+st-katharine-drexel-st-maximilian-kolbe,St. Anne's Church,136 Church Street,,Palmyra,NY,14522
+st-katharine-drexel-st-maximilian-kolbe,St. Mary's of the Lake Church,5823 Walworth Road,,Ontario,NY,14519
+st-katharine-drexel-st-maximilian-kolbe,Church of the Epiphany,105 West Main Street,,Sodus,NY,14551
+st-katharine-drexel-st-maximilian-kolbe,St. Mary Star of the Sea,7502 South Fitzhugh Street,,Sodus Point,NY,14555
+st-lawrence,St. Lawrence Church,1000 North Greece Road,,Rochester,NY,14626
+st-leo-the-great,St. Leo the Great Catholic Parish,110 Old Hojack Lane,,Hilton,NY,14468
+st-louis-pittsford,St. Louis Church,64 South Main Street,,Pittsford,NY,14534
+st-luke-the-evangelist,St. Mary,13 North Street,,Geneseo,NY,14454
+st-luke-the-evangelist,St. Patrick,46 Stanley Street,,Mount Morris,NY,14510
+st-luke-the-evangelist,Holy Angels,45 North Church Street,,Nunda,NY,14517
+st-luke-the-evangelist,St. Lucy,2770 Retsof Avenue,,Piffard,NY,14533
+st-luke-the-evangelist,St. Juan Diego Community,175 Main Street,,Leicester,NY,14481
+st-marianne-cope,Guardian Angels Church,2061 East Henrietta Road,,Rochester,NY,14623
+st-marks-greece,St. Mark's Roman Catholic Church,54 Kuhn Road,,Rochester,NY,14612
+st-martin-de-porres,St. Columba,198 North Street,,Caledonia,NY,14423
+st-martin-de-porres,St. Mary of the Assumption,99 Main Street,,Scottsville,NY,14546
+st-martin-de-porres,St. Vincent de Paul,11 North Main Street,,Churchville,NY,14428
+st-mary-our-mother,St. Mary Our Mother,816 West Broad Street,,Horseheads,NY,14845
+st-marys-st-matthew,St. Mary's,8961 West Main Street,,Honeoye,NY,14471
+st-marys-st-matthew,St. Matthew,6591 Richmond Mills Road,,Livonia,NY,14487
+catholic-parishes-eastern-wayne-county,St. Michael Church,401 South Main Street,,Newark,NY,14513
+st-patricks-victor,St. Patrick's Church,115 Maple Avenue,,Victor,NY,14564
+st-pauls-webster,St. Paul's Roman Catholic Church,783 Hard Road,,Webster,NY,14580
+st-peters-ontario-county,St. Dominic,97 West Main Street,,Shortsville,NY,14548
+st-peters-ontario-county,St. Felix,12 Hibbard Avenue,,Clifton Springs,NY,14432
+st-peters-ontario-county,St. Francis,12 Church Street,,Phelps,NY,14532
+st-pius-x-chili,St. Pius X Church,3010 Chili Avenue,,Rochester,NY,14624
+st-stanislaus-kostka,St. Stanislaus Kostka Church,34 St. Stanislaus Street,,Rochester,NY,14621
+st-theodores-gates,St. Theodore's Catholic Church,168 Spencerport Road,,Rochester,NY,14606

@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import L from "leaflet";
 import type { ChurchMapItem } from "../types";
-import { titleCase } from "../utils";
+import { formatAddress, titleCase } from "../utils";
 
 const defaultCenter: [number, number] = [43.1566, -77.6088];
 
@@ -40,7 +40,7 @@ export function ChurchMap({ churches }: ChurchMapProps) {
         >
           <Popup minWidth={220}>
             <h3>{church.name ?? "Unnamed church"}</h3>
-            {church.address ? <p>{church.address}</p> : null}
+            {formatAddress(church) ? <p>{formatAddress(church)}</p> : null}
             <p className="map-popup-types">
               {church.event_types.length > 0
                 ? church.event_types.map(titleCase).join(", ")

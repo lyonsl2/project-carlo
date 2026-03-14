@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 from pathlib import Path
 
+from pdf_extract.address import format_address
 from pdf_extract.schedule_extraction import extract_verification
 from pdf_extract.storage import (
     VERIFY_RESULTS_PATH,
@@ -71,7 +72,13 @@ def verify_churches(
             # Get existing churches
             church_rows = list_churches(conn, parish_id)
             church_list = [
-                {"name": r["name"], "address": r["address"]}
+                {
+                    "name": r["name"],
+                    "address": format_address(
+                        r["address_line1"], r["address_line2"],
+                        r["city"], r["state"], r["postal_code"],
+                    ),
+                }
                 for r in church_rows
             ]
 

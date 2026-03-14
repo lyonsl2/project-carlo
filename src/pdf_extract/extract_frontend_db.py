@@ -31,7 +31,11 @@ def extract(source: Path = SOURCE_DB, dest: Path = DEST_DB) -> None:
                 id INTEGER PRIMARY KEY,
                 parish_id INTEGER NOT NULL,
                 name TEXT,
-                address TEXT,
+                address_line1 TEXT,
+                address_line2 TEXT,
+                city TEXT,
+                state TEXT,
+                postal_code TEXT,
                 latitude REAL,
                 longitude REAL
             )
@@ -56,10 +60,11 @@ def extract(source: Path = SOURCE_DB, dest: Path = DEST_DB) -> None:
         dst.execute("CREATE INDEX idx_event_type ON event(event_type)")
 
         churches = src.execute(
-            "SELECT id, parish_id, name, address, latitude, longitude FROM church"
+            "SELECT id, parish_id, name, address_line1, address_line2, city, state, postal_code,"
+            " latitude, longitude FROM church"
         ).fetchall()
         dst.executemany(
-            "INSERT INTO church VALUES (?, ?, ?, ?, ?, ?)", churches
+            "INSERT INTO church VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", churches
         )
 
         events = src.execute(

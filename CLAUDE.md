@@ -56,7 +56,7 @@ parishes.csv → [detect.py] Playwright → detect_results.json
                               [db.py] create DB from schema.sql + data files
                                       (churches.csv, verify_results.json, geocode_results.json)
                                             ↓
-                       [fetch.py] fetch_bulletins() → download PDFs → bulletins/metadata.json
+                       [fetch.py] fetch_bulletins() → download PDFs → metadata.json
                                             ↓
                        [process.py] process_bulletins() → [schedule_extraction.py] Gemini AI
                                             ↓

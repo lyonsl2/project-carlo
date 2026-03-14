@@ -18,7 +18,7 @@ SCHEMA_PATH = DATA_DIR / "schema.sql"
 PARISHES_CSV_PATH = DATA_DIR / "parishes.csv"
 DETECT_RESULTS_PATH = DATA_DIR / "detect_results.json"
 BULLETINS_DIR = DATA_DIR / "bulletins"
-BULLETINS_METADATA_PATH = BULLETINS_DIR / "metadata.json"
+BULLETINS_METADATA_PATH = DATA_DIR / "metadata.json"
 CHURCHES_CSV_PATH = DATA_DIR / "churches.csv"
 VERIFY_RESULTS_PATH = DATA_DIR / "verify_results.json"
 GEOCODE_RESULTS_PATH = DATA_DIR / "geocode_results.json"
@@ -87,6 +87,7 @@ def list_existing_bulletin_urls(conn: sqlite3.Connection, parish_id: int) -> set
 
 def list_churches(conn: sqlite3.Connection, parish_id: int) -> list[sqlite3.Row]:
     return conn.execute(
-        "SELECT id, parish_id, name, address FROM church WHERE parish_id = ? ORDER BY id",
+        "SELECT id, parish_id, name, address_line1, address_line2, city, state, postal_code"
+        " FROM church WHERE parish_id = ? ORDER BY id",
         (parish_id,),
     ).fetchall()

@@ -16,7 +16,11 @@ export interface ChurchMapItem {
   id: number;
   parish_id: number;
   name: string | null;
-  address: string | null;
+  address_line1: string | null;
+  address_line2: string | null;
+  city: string | null;
+  state: string | null;
+  postal_code: string | null;
   latitude: number | null;
   longitude: number | null;
   event_types: EventType[];
@@ -27,7 +31,11 @@ export interface ChurchDetail {
   id: number;
   parish_id: number;
   name: string | null;
-  address: string | null;
+  address_line1: string | null;
+  address_line2: string | null;
+  city: string | null;
+  state: string | null;
+  postal_code: string | null;
   latitude: number | null;
   longitude: number | null;
 }

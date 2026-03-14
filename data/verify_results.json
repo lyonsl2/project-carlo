@@ -7,7 +7,13 @@
         "name_status": "verified",
         "address_status": "incorrect",
         "corrected_name": null,
-        "corrected_address": "158 State Street, Corning, NY 14830"
+        "corrected_address": {
+          "line1": "158 State Street",
+          "line2": null,
+          "city": "Corning",
+          "state": "NY",
+          "postal_code": "14830"
+        }
       }
     ],
     "new_churches": []
@@ -47,7 +53,13 @@
         "name_status": "verified",
         "address_status": "incorrect",
         "corrected_name": null,
-        "corrected_address": "534 Oxford St., Rochester, NY 14607"
+        "corrected_address": {
+          "line1": "534 Oxford St.",
+          "line2": null,
+          "city": "Rochester",
+          "state": "NY",
+          "postal_code": "14607"
+        }
       },
       {
         "church_name": "St. Boniface Church",
@@ -129,7 +141,13 @@
         "name_status": "incorrect",
         "address_status": "incorrect",
         "corrected_name": "Church of St. Jerome",
-        "corrected_address": "207 Garfield Street, East Rochester, NY 14445"
+        "corrected_address": {
+          "line1": "207 Garfield Street",
+          "line2": null,
+          "city": "East Rochester",
+          "state": "NY",
+          "postal_code": "14445"
+        }
       }
     ],
     "new_churches": []

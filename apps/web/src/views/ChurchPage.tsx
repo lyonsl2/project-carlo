@@ -2,7 +2,7 @@ import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { fetchChurch, fetchChurchEvents } from "../api";
 import type { EventSummary } from "../types";
-import { titleCase } from "../utils";
+import { formatAddress, titleCase } from "../utils";
 
 function eventLine(event: EventSummary): string {
   if (event.kind === "weekly") {
@@ -46,7 +46,7 @@ export function ChurchPage() {
         <header className="topbar">
           <div>
             <h1>{churchQuery.data.name ?? "Unnamed church"}</h1>
-            <p>{churchQuery.data.address ?? "Address unavailable"}</p>
+            <p>{formatAddress(churchQuery.data) ?? "Address unavailable"}</p>
           </div>
         </header>
       ) : null}

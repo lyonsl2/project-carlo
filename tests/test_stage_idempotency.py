@@ -17,8 +17,10 @@ def _setup_test_db(tmp_path: Path) -> Path:
     )
     parish_id = conn.execute("SELECT id FROM parish WHERE slug = 'test-parish'").fetchone()["id"]
     conn.execute(
-        "INSERT INTO church(parish_id, name, address, created_at) VALUES (?, ?, ?, ?)",
-        (parish_id, "St. Mary", "123 Main", "2026-01-01T00:00:00Z"),
+        "INSERT INTO church(parish_id, name, address_line1, city, state, postal_code, created_at)"
+        " VALUES (?, ?, ?, ?, ?, ?, ?)",
+        (parish_id, "St. Mary", "123 Main St", "Anytown", "NY", "14000",
+         "2026-01-01T00:00:00Z"),
     )
     conn.commit()
     conn.close()

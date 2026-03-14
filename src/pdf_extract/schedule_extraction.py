@@ -34,6 +34,16 @@ class SchedulePayload(BaseModel):
 # ── Verification models ──────────────────────────────────────────────────────
 
 
+class Address(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    line1: str | None = None
+    line2: str | None = None
+    city: str | None = None
+    state: str | None = None
+    postal_code: str | None = None
+
+
 class ChurchVerification(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -41,14 +51,14 @@ class ChurchVerification(BaseModel):
     name_status: Literal["verified", "incorrect", "unverifiable"]
     address_status: Literal["verified", "incorrect", "unverifiable"]
     corrected_name: str | None = None
-    corrected_address: str | None = None
+    corrected_address: Address | None = None
 
 
 class NewChurch(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     name: str
-    address: str | None = None
+    address: Address | None = None
 
 
 class VerificationPayload(BaseModel):
@@ -212,10 +222,10 @@ For each church in the provided list:
   - "unverifiable" if the bulletin doesn't mention this church
 - Check if the church address can be verified from the bulletin. Report address_status as:
   - "verified" if the address matches what's in the bulletin
-  - "incorrect" if the bulletin shows a different address — provide corrected_address
+  - "incorrect" if the bulletin shows a different address — provide corrected_address as a structured object with fields: line1, line2 (or null), city, state, postal_code
   - "unverifiable" if the bulletin doesn't show an address for this church
 
-For any churches that are clearly part of this parish (not guest/visiting churches) and are NOT in the provided list, add them to new_churches with name and address (if available).
+For any churches that are clearly part of this parish (not guest/visiting churches) and are NOT in the provided list, add them to new_churches with name and address (as a structured object with line1, line2, city, state, postal_code).
 
 Return output that matches the provided JSON schema exactly."""
 
@@ -293,7 +303,7 @@ def _normalize_verification(data: dict[str, Any]) -> dict[str, Any]:
             entry["corrected_name"] = None
         if address_status == "incorrect":
             corrected = c.get("corrected_address")
-            entry["corrected_address"] = corrected if isinstance(corrected, str) else None
+            entry["corrected_address"] = corrected if isinstance(corrected, dict) else None
         else:
             entry["corrected_address"] = None
         existing.append(entry)
@@ -306,7 +316,7 @@ def _normalize_verification(data: dict[str, Any]) -> dict[str, Any]:
             continue
         new_churches.append({
             "name": name,
-            "address": c.get("address") if isinstance(c.get("address"), str) else None,
+            "address": c.get("address") if isinstance(c.get("address"), dict) else None,
         })
 
     payload = VerificationPayload.model_validate(
