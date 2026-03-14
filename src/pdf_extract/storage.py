@@ -7,6 +7,7 @@ import logging
 import sqlite3
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
 LOGGER = logging.getLogger(__name__)
 
@@ -46,24 +47,24 @@ def utc_now_iso() -> str:
 
 
 # ── JSON file helpers ───────────────────────────────────────────────────────
-def load_json_list(path: Path) -> list:
+def load_json_list(path: Path) -> list[Any]:
     if not path.exists():
         return []
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def save_json_list(path: Path, data: list) -> None:
+def save_json_list(path: Path, data: list[Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
 
-def load_json_dict(path: Path) -> dict:
+def load_json_dict(path: Path) -> dict[str, Any]:
     if not path.exists():
         return {}
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def save_json_dict(path: Path, data: dict) -> None:
+def save_json_dict(path: Path, data: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 

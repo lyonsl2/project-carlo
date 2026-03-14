@@ -9,9 +9,13 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import date, timedelta
 from pathlib import Path
+from typing import TYPE_CHECKING
 from urllib.error import HTTPError, URLError
 from urllib.parse import parse_qs, unquote, urljoin, urlparse
 from urllib.request import Request, urlopen
+
+if TYPE_CHECKING:
+    from playwright.sync_api import Browser, Page, Playwright
 
 from pdf_extract.storage import (
     BULLETINS_DIR,
@@ -50,7 +54,7 @@ def _next_sunday_after(d: date) -> date:
 # ── eCatholic bulletin resolution ───────────────────────────────────────────
 
 def build_latest_ecatholic_bulletin_links(
-    *, provider_id: str, reference_date: date | None = None, page: object | None = None,
+    *, provider_id: str, reference_date: date | None = None, page: Page | None = None,
 ) -> BulletinLink:
     _ = reference_date
     source_url, fetch_url = _resolve_ecatholic_latest_link(provider_id=provider_id, page=page)
@@ -58,7 +62,7 @@ def build_latest_ecatholic_bulletin_links(
 
 
 def _resolve_ecatholic_latest_link(
-    *, provider_id: str, page: object | None = None,
+    *, provider_id: str, page: Page | None = None,
 ) -> tuple[str, str]:
     bulletins_url = urljoin(provider_id.rstrip("/") + "/", ECATHOLIC_BULLETINS_PATH.lstrip("/"))
     return _resolve_latest_anchor_link_with_playwright(
@@ -74,7 +78,7 @@ def _resolve_ecatholic_latest_link(
 
 
 def _resolve_parishes_online_latest_link(
-    *, provider_id: str, page: object | None = None,
+    *, provider_id: str, page: Page | None = None,
 ) -> tuple[str, str]:
     org_url = PARISHES_ONLINE_ORG_URL_TEMPLATE.format(provider_id=provider_id)
     return _resolve_latest_anchor_link_with_playwright(
@@ -90,7 +94,7 @@ def _resolve_parishes_online_latest_link(
     )
 
 
-def _launch_browser() -> tuple[object, object, object]:
+def _launch_browser() -> tuple[Playwright, Browser, Page]:
     """Launch a Playwright browser with stealth. Returns (playwright, browser, page)."""
     playwright_module = importlib.import_module("playwright.sync_api")
     sync_playwright = getattr(playwright_module, "sync_playwright")
@@ -111,7 +115,7 @@ def _resolve_latest_anchor_link_with_playwright(
     anchor_selector: str,
     source_label: str,
     href_to_urls: Callable[[str], tuple[str, str] | None],
-    page: object | None = None,
+    page: Page | None = None,
 ) -> tuple[str, str]:
     owns_browser = page is None
     pw = None
@@ -159,7 +163,7 @@ def _extract_ecatholic_pdf_url_from_href(*, href: str, base_url: str) -> tuple[s
 
 
 def build_latest_parishes_online_bulletin_links(
-    *, provider_id: str, reference_date: date | None = None, page: object | None = None,
+    *, provider_id: str, reference_date: date | None = None, page: Page | None = None,
 ) -> BulletinLink:
     source_url, fetch_url = _resolve_parishes_online_latest_link(provider_id=provider_id, page=page)
     _ = reference_date
@@ -190,7 +194,7 @@ def _extract_parishes_online_pdf_url_from_href(
 # ── Bulletin link resolution ────────────────────────────────────────────────
 
 def _build_bulletin_link(
-    source_type: str, source_provider_id: str, *, page: object | None = None,
+    source_type: str, source_provider_id: str, *, page: Page | None = None,
 ) -> BulletinLink:
     if source_type == "ecatholic":
         return build_latest_ecatholic_bulletin_links(provider_id=source_provider_id, page=page)
@@ -214,13 +218,8 @@ def _http_get_bytes(url: str, *, referer: str | None = None, timeout: int = 60) 
         headers["Referer"] = referer
     req = Request(url, headers=headers)
     LOGGER.info("Fetching URL: %s", url)
-    try:
-        with urlopen(req, timeout=timeout) as resp:
-            return resp.read()
-    except HTTPError:
-        raise
-    except URLError:
-        raise
+    with urlopen(req, timeout=timeout) as resp:
+        return resp.read()
 
 
 def _download_pdf(*, fetch_url: str, source_url: str) -> bytes:
@@ -228,8 +227,8 @@ def _download_pdf(*, fetch_url: str, source_url: str) -> bytes:
     try:
         LOGGER.info("Attempting primary fetch URL: %s", fetch_url)
         return _http_get_bytes(fetch_url, referer=referer, timeout=60)
-    except Exception:
-        LOGGER.warning("Primary fetch failed, falling back to source URL: %s", source_url)
+    except (HTTPError, URLError, OSError) as exc:
+        LOGGER.warning("Primary fetch failed (%s), falling back to source URL: %s", exc, source_url)
         return _http_get_bytes(source_url, referer=referer, timeout=60)
 
 
@@ -275,8 +274,8 @@ def fetch_bulletins(
 
             try:
                 pdf_bytes = _download_pdf(fetch_url=link.fetch_url, source_url=link.source_url)
-            except Exception:
-                LOGGER.warning("Failed downloading bulletin for %s", slug, exc_info=True)
+            except (HTTPError, URLError, OSError) as exc:
+                LOGGER.warning("Failed downloading bulletin for %s: %s", slug, exc)
                 continue
 
             content_hash = hashlib.sha256(pdf_bytes).hexdigest()

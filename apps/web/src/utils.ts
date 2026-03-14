@@ -1,0 +1,4 @@
+/** Capitalize the first letter of a string. */
+export function titleCase(value: string): string {
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}

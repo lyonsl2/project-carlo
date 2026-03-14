@@ -148,8 +148,8 @@ def _detect_from_bulletin_links(page) -> tuple[str, str | None]:  # type: ignore
             provider, provider_id = detect_provider(html)
             if provider != "other":
                 return provider, provider_id
-        except Exception:
-            LOGGER.exception("  Failed to load bulletin link %s", href)
+        except (TimeoutError, OSError) as exc:
+            LOGGER.warning("  Failed to load bulletin link %s: %s", href, exc)
     return "other", None
 
 
@@ -202,8 +202,8 @@ def run_detection(
                         LOGGER.info("No provider on homepage, checking bulletin links for %s", url)
                         provider, provider_id = _detect_from_bulletin_links(page)
                     LOGGER.info("Detected provider=%s provider_id=%s for %s", provider, provider_id, url)
-                except Exception:
-                    LOGGER.exception("Failed to load %s", url)
+                except (TimeoutError, OSError) as exc:
+                    LOGGER.warning("Failed to load %s: %s", url, exc)
                     failed += 1
                     continue
 

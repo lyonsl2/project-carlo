@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import L from "leaflet";
 import type { ChurchMapItem } from "../types";
+import { titleCase } from "../utils";
 
 const defaultCenter: [number, number] = [43.1566, -77.6088];
 
@@ -15,10 +16,6 @@ const markerIcon = new L.Icon({
 
 interface ChurchMapProps {
   churches: ChurchMapItem[];
-}
-
-function readableType(value: string): string {
-  return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
 export function ChurchMap({ churches }: ChurchMapProps) {
@@ -46,14 +43,14 @@ export function ChurchMap({ churches }: ChurchMapProps) {
             {church.address ? <p>{church.address}</p> : null}
             <p className="map-popup-types">
               {church.event_types.length > 0
-                ? church.event_types.map(readableType).join(", ")
+                ? church.event_types.map(titleCase).join(", ")
                 : "No event types yet"}
             </p>
             <ul className="event-list compact">
               {church.upcoming_events.length > 0 ? (
                 church.upcoming_events.map((eventItem) => (
                   <li key={eventItem.id}>
-                    <strong>{readableType(eventItem.type)}:</strong> {eventItem.start_time}
+                    <strong>{titleCase(eventItem.type)}:</strong> {eventItem.start_time}
                   </li>
                 ))
               ) : (

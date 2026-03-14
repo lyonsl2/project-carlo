@@ -85,8 +85,8 @@ def run_backfill(
     for r in pending:
         try:
             coords = geocode_address(str(r["address"]), email=email)
-        except Exception:
-            LOGGER.warning("Geocode failed for %s", r["address"], exc_info=True)
+        except (OSError, ValueError, KeyError) as exc:
+            LOGGER.warning("Geocode failed for %s: %s", r["address"], exc)
             failed += 1
             if pause_seconds > 0:
                 time.sleep(pause_seconds)

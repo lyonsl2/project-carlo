@@ -2,10 +2,7 @@ import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { fetchChurch, fetchChurchEvents } from "../api";
 import type { EventSummary } from "../types";
-
-function titleCase(value: string): string {
-  return value.charAt(0).toUpperCase() + value.slice(1);
-}
+import { titleCase } from "../utils";
 
 function eventLine(event: EventSummary): string {
   if (event.kind === "weekly") {

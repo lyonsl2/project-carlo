@@ -1,14 +1,11 @@
 import type { EventType } from "../types";
+import { titleCase } from "../utils";
 
 const ORDERED_TYPES: EventType[] = ["mass", "confession", "adoration"];
 
 interface EventFiltersProps {
   selected: EventType[];
   onChange: (value: EventType[]) => void;
-}
-
-function toLabel(value: EventType): string {
-  return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
 export function EventFilters({ selected, onChange }: EventFiltersProps) {
@@ -29,7 +26,7 @@ export function EventFilters({ selected, onChange }: EventFiltersProps) {
                 }
               }}
             />
-            <span>{toLabel(eventType)}</span>
+            <span>{titleCase(eventType)}</span>
           </label>
         );
       })}

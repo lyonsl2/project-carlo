@@ -151,28 +151,31 @@ function queryEvents(
      WHERE church_id IN (${churchPh})
        AND event_type IN (${typePh})`,
   );
-  stmt.bind([...churchIds, ...effectiveTypes]);
+  try {
+    stmt.bind([...churchIds, ...effectiveTypes]);
 
-  const results: RawEvent[] = [];
-  while (stmt.step()) {
-    const row = stmt.getAsObject();
-    const ev: RawEvent = {
-      id: row["id"] as number,
-      church_id: row["church_id"] as number,
-      event_type: row["event_type"] as EventType,
-      event_kind: row["event_kind"] as "weekly" | "specific_date",
-      day_of_week: str(row["day_of_week"]),
-      date: str(row["date"]),
-      start_time: row["start_time"] as string,
-      end_time: str(row["end_time"]),
-      cancelled: Boolean(row["cancelled"]),
-      occurrence: null,
-    };
-    ev.occurrence = computeOccurrence(ev);
-    results.push(ev);
+    const results: RawEvent[] = [];
+    while (stmt.step()) {
+      const row = stmt.getAsObject();
+      const ev: RawEvent = {
+        id: row["id"] as number,
+        church_id: row["church_id"] as number,
+        event_type: row["event_type"] as EventType,
+        event_kind: row["event_kind"] as "weekly" | "specific_date",
+        day_of_week: str(row["day_of_week"]),
+        date: str(row["date"]),
+        start_time: row["start_time"] as string,
+        end_time: str(row["end_time"]),
+        cancelled: Boolean(row["cancelled"]),
+        occurrence: null,
+      };
+      ev.occurrence = computeOccurrence(ev);
+      results.push(ev);
+    }
+    return results;
+  } finally {
+    stmt.free();
   }
-  stmt.free();
-  return results;
 }
 
 function toEventSummary(ev: RawEvent): EventSummary {
@@ -197,19 +200,22 @@ export async function fetchChurches(
   const stmt = db.prepare(
     "SELECT id, parish_id, name, address, latitude, longitude FROM church ORDER BY name",
   );
-  const churches: { id: number; parish_id: number; name: string | null; address: string | null; latitude: number | null; longitude: number | null }[] = [];
-  while (stmt.step()) {
-    const row = stmt.getAsObject();
-    churches.push({
-      id: row["id"] as number,
-      parish_id: row["parish_id"] as number,
-      name: str(row["name"]),
-      address: str(row["address"]),
-      latitude: num(row["latitude"]),
-      longitude: num(row["longitude"]),
-    });
+  const churches: ChurchDetail[] = [];
+  try {
+    while (stmt.step()) {
+      const row = stmt.getAsObject();
+      churches.push({
+        id: row["id"] as number,
+        parish_id: row["parish_id"] as number,
+        name: str(row["name"]),
+        address: str(row["address"]),
+        latitude: num(row["latitude"]),
+        longitude: num(row["longitude"]),
+      });
+    }
+  } finally {
+    stmt.free();
   }
-  stmt.free();
 
   const churchIds = churches.map((c) => c.id);
   const events = queryEvents(db, churchIds, types);
@@ -247,21 +253,23 @@ export async function fetchChurch(churchId: number): Promise<ChurchDetail> {
   const stmt = db.prepare(
     "SELECT id, parish_id, name, address, latitude, longitude FROM church WHERE id = ?",
   );
-  stmt.bind([churchId]);
-  if (!stmt.step()) {
+  try {
+    stmt.bind([churchId]);
+    if (!stmt.step()) {
+      throw new Error("Church not found");
+    }
+    const row = stmt.getAsObject();
+    return {
+      id: row["id"] as number,
+      parish_id: row["parish_id"] as number,
+      name: str(row["name"]),
+      address: str(row["address"]),
+      latitude: num(row["latitude"]),
+      longitude: num(row["longitude"]),
+    };
+  } finally {
     stmt.free();
-    throw new Error("Church not found");
   }
-  const row = stmt.getAsObject();
-  stmt.free();
-  return {
-    id: row["id"] as number,
-    parish_id: row["parish_id"] as number,
-    name: str(row["name"]),
-    address: str(row["address"]),
-    latitude: num(row["latitude"]),
-    longitude: num(row["longitude"]),
-  };
 }
 
 export async function fetchChurchEvents(
