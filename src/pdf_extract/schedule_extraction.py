@@ -8,27 +8,121 @@ from google.genai import types
 from pydantic import BaseModel, ConfigDict, Field
 
 
-# ── Event extraction models ──────────────────────────────────────────────────
+# ── LLM extraction schema ──────────────────────────────────────────────────
 
 
-class Event(BaseModel):
+class WeeklySlot(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     church_slug: str = Field(min_length=1)
-    type: Literal["mass", "confession", "adoration"]
-    kind: Literal["weekly", "specific_date"]
-    day_of_week: str | None
-    date: str | None
+    day_of_week: str = Field(min_length=1)
     start_time: str = Field(min_length=1)
-    end_time: str | None
-    cancelled: bool
+    end_time: str | None = None
+
+
+class DateSlot(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    church_slug: str = Field(min_length=1)
+    date: str = Field(min_length=1)
+    start_time: str = Field(min_length=1)
+    end_time: str | None = None
+
+
+class WeeklySchedule(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    masses: list[WeeklySlot] = []
+    confessions: list[WeeklySlot] = []
+    adorations: list[WeeklySlot] = []
+
+
+class SingleEvents(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    masses: list[DateSlot] = []
+    confessions: list[DateSlot] = []
+    adorations: list[DateSlot] = []
+
+
+class Cancellations(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    masses: list[DateSlot] = []
+    confessions: list[DateSlot] = []
+    adorations: list[DateSlot] = []
 
 
 class SchedulePayload(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    events: list[Event]
+    weekly_schedule: WeeklySchedule = Field(default_factory=WeeklySchedule)
+    single_events: SingleEvents = Field(default_factory=SingleEvents)
+    cancellations: Cancellations = Field(default_factory=Cancellations)
     church_list_needs_review: bool = False
+
+
+def _valid_str(s: Any) -> bool:
+    return isinstance(s, str) and bool(s.strip())
+
+
+def _collect_events(
+    section: dict[str, Any],
+    *,
+    kind: Literal["weekly", "specific_date"],
+    cancelled: bool,
+) -> list[dict[str, Any]]:
+    """Collect flat events from a section (weekly_schedule, single_events, or cancellations)."""
+    if not isinstance(section, dict):
+        return []
+    events: list[dict[str, Any]] = []
+    for event_type, key in [("mass", "masses"), ("confession", "confessions"), ("adoration", "adorations")]:
+        for item in section.get(key) or []:
+            if not isinstance(item, dict):
+                continue
+            church_slug = item.get("church_slug")
+            start_time = item.get("start_time")
+            if kind == "weekly":
+                day_of_week = item.get("day_of_week")
+                date_val = None
+                if not _valid_str(church_slug) or not _valid_str(start_time) or not _valid_str(day_of_week):
+                    continue
+            else:
+                day_of_week = None
+                date_val = item.get("date")
+                if not _valid_str(church_slug) or not _valid_str(start_time) or not _valid_str(date_val):
+                    continue
+            end_time = item.get("end_time") if isinstance(item.get("end_time"), str) else None
+            events.append({
+                "church_slug": church_slug,
+                "type": event_type,
+                "kind": kind,
+                "day_of_week": day_of_week,
+                "date": date_val,
+                "start_time": start_time,
+                "end_time": end_time,
+                "cancelled": cancelled,
+            })
+    return events
+
+
+def reconstruct_events(raw: dict[str, Any]) -> dict[str, Any]:
+    """Convert structured schema to flat events format.
+
+    Returns:
+        Dict with "events" (list of flat event dicts) and "church_list_needs_review" (bool).
+    """
+    ws = raw.get("weekly_schedule") or {}
+    se = raw.get("single_events") or {}
+    can = raw.get("cancellations") or {}
+
+    events: list[dict[str, Any]] = []
+    events.extend(_collect_events(ws, kind="weekly", cancelled=False))
+    events.extend(_collect_events(se, kind="specific_date", cancelled=False))
+    events.extend(_collect_events(can, kind="specific_date", cancelled=True))
+
+    church_list_needs_review = bool(raw.get("church_list_needs_review", False))
+    return {"events": events, "church_list_needs_review": church_list_needs_review}
 
 
 # ── Verification models ──────────────────────────────────────────────────────
@@ -86,25 +180,31 @@ Each church in the list has a "slug" (stable identifier), "name", and "address".
 
 Structure your response as follows:
 
-events: An array of schedule entries. Each entry has:
-   - church_slug: the slug of the matching church from the provided list (required)
-   - type: one of "mass", "confession", "adoration"
-   - kind: "weekly" or "specific_date"
-   - start_time: time when it starts
-   - end_time: optional, include when provided in source text
-   - cancelled: true only when this entry indicates a weekly time is cancelled for a specific day; otherwise false
-   - day_of_week: required when kind = "weekly"
-   - date: required when kind = "specific_date"
+weekly_schedule: Recurring weekly schedule. Each category (masses, confessions, adorations) is an array of entries:
+   - masses: church_slug, day_of_week, start_time (no end_time for Mass)
+   - confessions: church_slug, day_of_week, start_time, end_time (optional, include when provided)
+   - adorations: church_slug, day_of_week, start_time, end_time (optional, include when provided)
+
+single_events: One-off or exception dates (e.g. extra Mass on a holiday, special confession times). Same structure as weekly_schedule but use "date" instead of "day_of_week":
+   - masses: church_slug, date, start_time
+   - confessions: church_slug, date, start_time, end_time (optional)
+   - adorations: church_slug, date, start_time, end_time (optional)
+
+cancellations: Specific dates/times when a regular schedule is cancelled. Same structure as single_events:
+   - masses: church_slug, date, start_time
+   - confessions: church_slug, date, start_time, end_time (optional)
+   - adorations: church_slug, date, start_time, end_time (optional)
 
 church_list_needs_review: boolean flag
 
 Rules:
-- Every event must use a church_slug that exactly matches one of the provided churches.
-- For Mass: always include start_time; end_time is usually null/omitted unless explicitly provided.
+- Every entry must use a church_slug that exactly matches one of the provided churches.
+- For Mass: always include start_time; end_time is omitted.
 - For Confession and Adoration: include end_time when the document provides it.
-- Use kind="weekly" for recurring weekly schedule entries.
-- Use kind="specific_date" for one-off or exception entries.
-- Do NOT include a specific-date event if it is identical to an existing weekly entry.
+- Put recurring weekly entries in weekly_schedule.
+- Put one-off or exception dates in single_events (e.g. extra Mass on Christmas).
+- Put cancelled times in cancellations (e.g. "No 8am Mass on March 16").
+- Do NOT put a single_events entry if it is identical to an existing weekly_schedule entry.
 - Set church_list_needs_review to true ONLY if:
   - The bulletin clearly shows a church that is NOT in the provided list
   - A provided church name/address is obviously wrong
@@ -127,12 +227,12 @@ def extract_events(
 
     Returns:
         Dict with:
-        - "events": list of events keyed by church_slug
+        - "events": list of event dicts (each with church_slug, type, kind, etc.)
         - "church_list_needs_review": bool
 
     """
     if not pdf_bytes:
-        return _normalize_payload({})
+        return reconstruct_events({})
 
     churches_json = json.dumps(churches, ensure_ascii=False)
     prompt = EVENTS_SYSTEM_PROMPT.format(churches_json=churches_json)
@@ -156,55 +256,7 @@ def extract_events(
         data = {}
     if not isinstance(data, dict):
         data = {}
-    return _normalize_payload(data)
-
-
-def _normalize_payload(data: dict[str, Any]) -> dict[str, Any]:
-    """Normalize model payload to {events: [...], church_list_needs_review: bool}."""
-    events: list[dict[str, Any]] = []
-
-    raw_events = data.get("events")
-    if isinstance(raw_events, list):
-        for e in raw_events:
-            if not isinstance(e, dict):
-                continue
-            church_slug = e.get("church_slug")
-            if not isinstance(church_slug, str) or not church_slug.strip():
-                continue
-            event_type = e.get("type")
-            if event_type not in {"mass", "confession", "adoration"}:
-                continue
-            event_kind = e.get("kind")
-            if event_kind not in {"weekly", "specific_date"}:
-                continue
-            start_time = e.get("start_time")
-            if not isinstance(start_time, str) or not start_time.strip():
-                continue
-            day_of_week = e.get("day_of_week")
-            date = e.get("date")
-            if event_kind == "weekly" and not isinstance(day_of_week, str):
-                continue
-            if event_kind == "specific_date" and not isinstance(date, str):
-                continue
-            events.append(
-                {
-                    "church_slug": church_slug,
-                    "type": event_type,
-                    "kind": event_kind,
-                    "day_of_week": day_of_week if isinstance(day_of_week, str) else None,
-                    "date": date if isinstance(date, str) else None,
-                    "start_time": start_time,
-                    "end_time": e.get("end_time") if isinstance(e.get("end_time"), str) else None,
-                    "cancelled": bool(e.get("cancelled", False)),
-                }
-            )
-
-    church_list_needs_review = bool(data.get("church_list_needs_review", False))
-
-    payload = SchedulePayload.model_validate(
-        {"events": events, "church_list_needs_review": church_list_needs_review}
-    )
-    return payload.model_dump(mode="json")
+    return reconstruct_events(data)
 
 
 # ── Verification extraction ──────────────────────────────────────────────────

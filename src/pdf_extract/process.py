@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 import logging
 from pathlib import Path
 
@@ -100,7 +99,6 @@ def process_bulletins(
                     "start_time": str(ev.get("start_time", "")),
                     "end_time": ev.get("end_time") if isinstance(ev.get("end_time"), str) else None,
                     "cancelled": bool(ev.get("cancelled", False)),
-                    "raw_json": json.dumps(ev, sort_keys=True),
                 })
                 inserted_events += 1
 

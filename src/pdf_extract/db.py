@@ -412,8 +412,8 @@ def _load_events(conn) -> int:
             bulletin_id = bulletin_row["id"]
 
         conn.execute(
-            """INSERT INTO event(church_id, bulletin_id, event_type, event_kind, day_of_week, date, start_time, end_time, cancelled, raw_json)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            """INSERT INTO event(church_id, bulletin_id, event_type, event_kind, day_of_week, date, start_time, end_time, cancelled)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
             (
                 church_row["id"],
                 bulletin_id,
@@ -424,7 +424,6 @@ def _load_events(conn) -> int:
                 entry.get("start_time", ""),
                 entry.get("end_time"),
                 int(entry.get("cancelled", False)),
-                entry.get("raw_json"),
             ),
         )
 

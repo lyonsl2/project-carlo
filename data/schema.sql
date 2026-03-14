@@ -68,8 +68,7 @@ CREATE TABLE IF NOT EXISTS event (
     date TEXT,
     start_time TEXT NOT NULL,
     end_time TEXT,
-    cancelled INTEGER NOT NULL DEFAULT 0,
-    raw_json TEXT
+    cancelled INTEGER NOT NULL DEFAULT 0
 );
 
 CREATE INDEX IF NOT EXISTS idx_event_bulletin ON event(bulletin_id);

@@ -31,8 +31,8 @@ def test_event_belongs_to_church_and_bulletin(tmp_path: Path) -> None:
     bulletin_id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
 
     conn.execute(
-        "INSERT INTO event(church_id, bulletin_id, event_type, event_kind, day_of_week, start_time, cancelled, raw_json) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-        (church_id, bulletin_id, "mass", "weekly", "Sunday", "9:30am", 0, "{}"),
+        "INSERT INTO event(church_id, bulletin_id, event_type, event_kind, day_of_week, start_time, cancelled) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        (church_id, bulletin_id, "mass", "weekly", "Sunday", "9:30am", 0),
     )
     event_id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
     conn.commit()
