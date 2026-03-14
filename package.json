@@ -4,8 +4,8 @@
   "version": "0.0.0",
   "packageManager": "pnpm@10.12.1",
   "scripts": {
-    "db:create": "uv run python -m pdf_extract db create",
     "db:drop": "uv run python -m pdf_extract db drop",
+    "db:create": "uv run python -m pdf_extract db create",
     "detect": "uv run python -m pdf_extract detect",
     "fetch": "uv run python -m pdf_extract fetch",
     "process": "uv run python -m pdf_extract process",
