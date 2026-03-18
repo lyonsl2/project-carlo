@@ -1,6 +1,6 @@
 import { useMemo, useState, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchChurches } from "../api";
+import { fetchChurches, type ChurchSearchResult } from "../api";
 import { ChurchMap } from "../components/ChurchMap";
 import {
   FilterPanel,
@@ -8,6 +8,7 @@ import {
   type FilterState,
 } from "../components/FilterPanel";
 import { FilterPills } from "../components/FilterPills";
+import { SearchTypeahead } from "../components/SearchTypeahead";
 
 const MINUTES_PER_DAY = 24 * 60;
 
@@ -23,6 +24,11 @@ export function HomePage() {
   const [appliedFilters, setAppliedFilters] =
     useState<FilterState>(DEFAULT_FILTERS);
   const [filterPanelOpen, setFilterPanelOpen] = useState(false);
+  const [centerOn, setCenterOn] = useState<{
+    lat: number;
+    lng: number;
+    churchId: number;
+  } | null>(null);
 
   const apiFilters = useMemo(() => {
     const { from, to } = getTimeRange(appliedFilters);
@@ -47,30 +53,35 @@ export function HomePage() {
     setFilterPanelOpen(false);
   }, [filters]);
 
+  const handleChurchSelect = useCallback((church: ChurchSearchResult) => {
+    if (church.latitude != null && church.longitude != null) {
+      setCenterOn({
+        lat: church.latitude,
+        lng: church.longitude,
+        churchId: church.id,
+      });
+      // Clear after pan so selecting the same church again re-centers
+      setTimeout(() => setCenterOn(null), 1000);
+    }
+  }, []);
+
   return (
     <main className="app-layout">
       <header className="search-header">
-        <div className="search-bar">
-          <span className="search-bar__icon" aria-hidden>
-            🔍
-          </span>
-          <input
-            type="search"
-            className="search-bar__input"
-            placeholder="Find a parish or event"
-            aria-label="Search for parish or event"
-            readOnly
-          />
-          <button
-            type="button"
-            className="search-bar__filter"
-            onClick={() => setFilterPanelOpen(true)}
-            aria-label="Open filters"
-          >
-            <span className="search-bar__filter-icon">☰</span>
-            <span className="search-bar__filter-text">FILTER</span>
-          </button>
-        </div>
+        <SearchTypeahead
+          onSelect={handleChurchSelect}
+          filterButton={
+            <button
+              type="button"
+              className="search-bar__filter"
+              onClick={() => setFilterPanelOpen(true)}
+              aria-label="Open filters"
+            >
+              <span className="search-bar__filter-icon">☰</span>
+              <span className="search-bar__filter-text">FILTER</span>
+            </button>
+          }
+        />
         <FilterPills filters={appliedFilters} />
       </header>
 
@@ -82,7 +93,9 @@ export function HomePage() {
           {error ? (
             <p className="map-error">Failed to load church map data.</p>
           ) : null}
-          {data ? <ChurchMap churches={data} /> : null}
+          {data ? (
+            <ChurchMap churches={data} centerOn={centerOn} />
+          ) : null}
         </div>
       </section>
 

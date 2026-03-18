@@ -292,6 +292,39 @@ export async function fetchChurches(
     .filter((church) => church.event_types.length > 0);
 }
 
+export interface ChurchSearchResult {
+  id: number;
+  slug: string;
+  name: string | null;
+  latitude: number | null;
+  longitude: number | null;
+}
+
+export async function fetchAllChurchesForSearch(): Promise<ChurchSearchResult[]> {
+  const db = await getDb();
+  const stmt = db.prepare(
+    `SELECT id, slug, name, latitude, longitude FROM church
+     WHERE latitude IS NOT NULL AND longitude IS NOT NULL
+     ORDER BY name`,
+  );
+  try {
+    const results: ChurchSearchResult[] = [];
+    while (stmt.step()) {
+      const row = stmt.getAsObject();
+      results.push({
+        id: row["id"] as number,
+        slug: row["slug"] as string,
+        name: str(row["name"]),
+        latitude: num(row["latitude"]),
+        longitude: num(row["longitude"]),
+      });
+    }
+    return results;
+  } finally {
+    stmt.free();
+  }
+}
+
 export async function fetchChurch(slug: string): Promise<ChurchDetail> {
   const db = await getDb();
   const stmt = db.prepare(

@@ -1,5 +1,7 @@
+import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
+import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
+import type { Marker as LeafletMarker } from "leaflet";
 import L from "leaflet";
 import type { ChurchMapItem, EventSummary } from "../types";
 import {
@@ -94,9 +96,95 @@ const markerIcon = new L.Icon({
 
 interface ChurchMapProps {
   churches: ChurchMapItem[];
+  centerOn?: { lat: number; lng: number; churchId?: number } | null;
 }
 
-export function ChurchMap({ churches }: ChurchMapProps) {
+function ChangeView({ center }: { center: { lat: number; lng: number } }) {
+  const map = useMap();
+  useEffect(() => {
+    map.panTo([center.lat, center.lng]);
+  }, [map, center.lat, center.lng]);
+  return null;
+}
+
+function ChurchMarker({
+  church,
+  openPopupForChurchId,
+}: {
+  church: ChurchMapItem;
+  openPopupForChurchId: number | undefined;
+}) {
+  const markerRef = useRef<LeafletMarker | null>(null);
+  useEffect(() => {
+    if (openPopupForChurchId === church.id && markerRef.current) {
+      markerRef.current.openPopup();
+    }
+  }, [church.id, openPopupForChurchId]);
+  return (
+    <Marker
+      ref={markerRef}
+      icon={markerIcon}
+      position={[church.latitude as number, church.longitude as number]}
+    >
+      <Popup minWidth={220}>
+        <div className="map-popup">
+          <h3>{church.name ?? "Unnamed church"}</h3>
+          {formatAddress(church) ? (
+            <p className="map-popup-address">{formatAddress(church)}</p>
+          ) : null}
+          <p className="map-popup-types">
+            {church.event_types.length > 0
+              ? church.event_types.map(titleCase).join(", ")
+              : "No event types yet"}
+          </p>
+          <ul className="event-list compact">
+            {church.upcoming_events.length > 0 ? (
+              <>
+                {[...church.upcoming_events]
+                  .sort(compareEvents)
+                  .slice(0, 3)
+                  .map((eventItem) => {
+                    const day = formatEventDay(eventItem);
+                    const time = formatMinutesToTime(eventItem.start_time);
+                    return (
+                      <li key={eventItem.id}>
+                        {day ? (
+                          <>
+                            <span className="map-popup-event-day">
+                              {day}
+                            </span>{" "}
+                            <span className="map-popup-event-time">
+                              {time}
+                            </span>
+                          </>
+                        ) : (
+                          <span className="map-popup-event-time">
+                            {time}
+                          </span>
+                        )}
+                      </li>
+                    );
+                  })}
+                {church.upcoming_events.length > 3 ? (
+                  <li className="map-popup-more">
+                    {church.upcoming_events.length - 3} more…
+                  </li>
+                ) : null}
+              </>
+            ) : (
+              <li>No upcoming events found</li>
+            )}
+          </ul>
+          <Link to={`/churches/${church.slug}`} className="map-popup__link">
+            View church page
+          </Link>
+        </div>
+      </Popup>
+    </Marker>
+  );
+}
+
+export function ChurchMap({ churches, centerOn }: ChurchMapProps) {
   const withCoords = churches.filter(
     (church) => church.latitude !== null && church.longitude !== null,
   );
@@ -109,71 +197,17 @@ export function ChurchMap({ churches }: ChurchMapProps) {
       className="map-container"
       scrollWheelZoom
     >
+      {centerOn && <ChangeView center={centerOn} />}
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       {withCoords.map((church) => (
-        <Marker
+        <ChurchMarker
           key={church.id}
-          icon={markerIcon}
-          position={[church.latitude as number, church.longitude as number]}
-        >
-          <Popup minWidth={220}>
-            <div className="map-popup">
-              <h3>{church.name ?? "Unnamed church"}</h3>
-              {formatAddress(church) ? (
-                <p className="map-popup-address">{formatAddress(church)}</p>
-              ) : null}
-              <p className="map-popup-types">
-                {church.event_types.length > 0
-                  ? church.event_types.map(titleCase).join(", ")
-                  : "No event types yet"}
-              </p>
-              <ul className="event-list compact">
-                {church.upcoming_events.length > 0 ? (
-                  <>
-                    {[...church.upcoming_events]
-                      .sort(compareEvents)
-                      .slice(0, 3)
-                      .map((eventItem) => {
-                        const day = formatEventDay(eventItem);
-                        const time = formatMinutesToTime(eventItem.start_time);
-                        return (
-                          <li key={eventItem.id}>
-                            {day ? (
-                              <>
-                                <span className="map-popup-event-day">
-                                  {day}
-                                </span>{" "}
-                                <span className="map-popup-event-time">
-                                  {time}
-                                </span>
-                              </>
-                            ) : (
-                              <span className="map-popup-event-time">
-                                {time}
-                              </span>
-                            )}
-                          </li>
-                        );
-                      })}
-                    {church.upcoming_events.length > 3 ? (
-                      <li className="map-popup-more">
-                        {church.upcoming_events.length - 3} more…
-                      </li>
-                    ) : null}
-                  </>
-                ) : (
-                  <li>No upcoming events found</li>
-                )}
-              </ul>
-              <Link to={`/churches/${church.slug}`} className="map-popup__link">
-                View church page
-              </Link>
-            </div>
-          </Popup>
-        </Marker>
+          church={church}
+          openPopupForChurchId={centerOn?.churchId}
+        />
       ))}
     </MapContainer>
   );
