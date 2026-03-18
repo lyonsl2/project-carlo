@@ -1,17 +1,45 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchChurches } from "../api";
 import { ChurchMap } from "../components/ChurchMap";
-import { EventFilters } from "../components/EventFilters";
-import type { EventType } from "../types";
+import {
+  FilterPanel,
+  getTimeRange,
+  type FilterState,
+} from "../components/FilterPanel";
+import { FilterPills } from "../components/FilterPills";
 
-const DEFAULT_FILTERS: EventType[] = ["mass", "confession", "adoration"];
+const MINUTES_PER_DAY = 24 * 60;
+
+const DEFAULT_FILTERS: FilterState = {
+  eventType: "mass",
+  daysOfWeek: [],
+  timeFrom: 0,
+  timeTo: MINUTES_PER_DAY - 1,
+};
 
 export function HomePage() {
-  const [filters, setFilters] = useState<EventType[]>(DEFAULT_FILTERS);
+  const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
+  const [appliedFilters, setAppliedFilters] =
+    useState<FilterState>(DEFAULT_FILTERS);
+  const [filterPanelOpen, setFilterPanelOpen] = useState(false);
+
+  const apiFilters = useMemo(() => {
+    const { from, to } = getTimeRange(appliedFilters);
+    return {
+      types: [appliedFilters.eventType],
+      daysOfWeek:
+        appliedFilters.daysOfWeek.length > 0
+          ? appliedFilters.daysOfWeek
+          : undefined,
+      timeFrom: from,
+      timeTo: to,
+    };
+  }, [appliedFilters]);
+
   const { data, isLoading, error } = useQuery({
-    queryKey: ["churches", filters],
-    queryFn: () => fetchChurches(filters),
+    queryKey: ["churches", apiFilters],
+    queryFn: () => fetchChurches(apiFilters),
   });
 
   const churchesWithCoordinates = useMemo(
@@ -22,28 +50,57 @@ export function HomePage() {
     [data],
   );
 
+  const handleApplyFilters = useCallback(() => {
+    setAppliedFilters(filters);
+    setFilterPanelOpen(false);
+  }, [filters]);
+
   return (
-    <main className="layout">
-      <header className="topbar">
-        <div>
-          <h1>Project Carlo</h1>
-          <p>Find Mass, confession, and adoration schedules by church.</p>
+    <main className="app-layout">
+      <header className="search-header">
+        <div className="search-bar">
+          <span className="search-bar__icon" aria-hidden>
+            🔍
+          </span>
+          <input
+            type="search"
+            className="search-bar__input"
+            placeholder="Find a parish or event"
+            aria-label="Search for parish or event"
+            readOnly
+          />
+          <button
+            type="button"
+            className="search-bar__filter"
+            onClick={() => setFilterPanelOpen(true)}
+            aria-label="Open filters"
+          >
+            <span className="search-bar__filter-icon">☰</span>
+            <span className="search-bar__filter-text">FILTER</span>
+          </button>
         </div>
+        <FilterPills filters={appliedFilters} />
       </header>
 
-      <section className="panel">
-        <h2>Filters</h2>
-        <EventFilters selected={filters} onChange={setFilters} />
-        <p className="caption">
-          Showing {data?.length ?? 0} churches ({churchesWithCoordinates.length} mappable)
-        </p>
+      <section className="map-section">
+        <div className="map-wrap">
+          {isLoading ? (
+            <p className="map-loading">Loading map data...</p>
+          ) : null}
+          {error ? (
+            <p className="map-error">Failed to load church map data.</p>
+          ) : null}
+          {data ? <ChurchMap churches={data} /> : null}
+        </div>
       </section>
 
-      <section className="map-wrap">
-        {isLoading ? <p>Loading map data...</p> : null}
-        {error ? <p>Failed to load church map data.</p> : null}
-        {data ? <ChurchMap churches={data} /> : null}
-      </section>
+      <FilterPanel
+        isOpen={filterPanelOpen}
+        onClose={() => setFilterPanelOpen(false)}
+        filters={filters}
+        onChange={setFilters}
+        onApply={handleApplyFilters}
+      />
     </main>
   );
 }

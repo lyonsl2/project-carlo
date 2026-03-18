@@ -38,7 +38,9 @@ def extract(source: Path = SOURCE_DB, dest: Path = DEST_DB) -> None:
                 state TEXT,
                 postal_code TEXT,
                 latitude REAL,
-                longitude REAL
+                longitude REAL,
+                homepage_url TEXT,
+                bulletin_url TEXT
             )
             """
         )
@@ -62,18 +64,41 @@ def extract(source: Path = SOURCE_DB, dest: Path = DEST_DB) -> None:
         dst.execute("CREATE INDEX idx_event_type ON event(event_type)")
 
         churches = src.execute(
-            "SELECT id, parish_id, slug, name, address_line1, address_line2, city, state,"
-            " postal_code, latitude, longitude FROM church"
+            """
+            SELECT c.id, c.parish_id, c.slug, c.name, c.address_line1, c.address_line2,
+                   c.city, c.state, c.postal_code, c.latitude, c.longitude,
+                   w.homepage_url,
+                   (SELECT b.source_url FROM bulletin b
+                    WHERE b.parish_id = c.parish_id AND b.source_url IS NOT NULL
+                    ORDER BY COALESCE(b.published_date, '') DESC,
+                             COALESCE(b.processed_at, '') DESC, b.id DESC
+                    LIMIT 1)
+            FROM church c
+            LEFT JOIN parish p ON c.parish_id = p.id
+            LEFT JOIN website w ON w.slug = p.slug
+            """
         ).fetchall()
         dst.executemany(
-            "INSERT INTO church VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", churches
+            "INSERT INTO church VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            churches,
         )
 
         events = src.execute(
             """
-            SELECT id, church_id, event_type, event_kind,
-                   day_of_week, date, start_time, end_time, cancelled
-            FROM event
+            SELECT e.id, e.church_id, e.event_type, e.event_kind,
+                   e.day_of_week, e.date, e.start_time, e.end_time, e.cancelled
+            FROM event e
+            INNER JOIN bulletin b ON e.bulletin_id = b.id
+            INNER JOIN (
+                SELECT parish_id, id,
+                       ROW_NUMBER() OVER (
+                           PARTITION BY parish_id
+                           ORDER BY COALESCE(published_date, '') DESC,
+                                    COALESCE(processed_at, '') DESC,
+                                    id DESC
+                       ) AS rn
+                FROM bulletin
+            ) latest ON b.parish_id = latest.parish_id AND b.id = latest.id AND latest.rn = 1
             """
         ).fetchall()
         dst.executemany(

@@ -19,6 +19,23 @@ const DAY_TO_INDEX: Record<string, number> = {
   sunday: 6,
 };
 
+const INDEX_TO_DAY: Record<number, string> = {
+  0: "monday",
+  1: "tuesday",
+  2: "wednesday",
+  3: "thursday",
+  4: "friday",
+  5: "saturday",
+  6: "sunday",
+};
+
+export interface ChurchFilters {
+  types: EventType[];
+  daysOfWeek?: number[];
+  timeFrom?: number;
+  timeTo?: number;
+}
+
 interface RawEvent {
   id: number;
   church_id: number;
@@ -154,10 +171,47 @@ function toEventSummary(ev: RawEvent): EventSummary {
   };
 }
 
+function eventMatchesFilters(
+  ev: RawEvent,
+  filters: ChurchFilters,
+): boolean {
+  if (filters.daysOfWeek && filters.daysOfWeek.length > 0) {
+    if (ev.event_kind === "weekly" && ev.day_of_week) {
+      const dayIdx = DAY_TO_INDEX[ev.day_of_week.toLowerCase()];
+      if (dayIdx === undefined || !filters.daysOfWeek.includes(dayIdx)) {
+        return false;
+      }
+    }
+    // For specific_date, check if the date falls on a selected weekday
+    if (ev.event_kind === "specific_date" && ev.date) {
+      const parts = ev.date.split("-");
+      if (parts.length === 3) {
+        const d = new Date(
+          parseInt(parts[0]),
+          parseInt(parts[1]) - 1,
+          parseInt(parts[2]),
+        );
+        const jsDay = d.getDay();
+        const dayIdx = jsDay === 0 ? 6 : jsDay - 1;
+        if (!filters.daysOfWeek.includes(dayIdx)) return false;
+      }
+    }
+  }
+  if (
+    filters.timeFrom != null &&
+    filters.timeTo != null &&
+    (ev.start_time < filters.timeFrom || ev.start_time > filters.timeTo)
+  ) {
+    return false;
+  }
+  return true;
+}
+
 export async function fetchChurches(
-  types: EventType[],
+  filters: ChurchFilters,
 ): Promise<ChurchMapItem[]> {
   const db = await getDb();
+  const types = filters.types.length > 0 ? filters.types : ALL_TYPES;
 
   const stmt = db.prepare(
     `SELECT id, parish_id, slug, name, address_line1, address_line2, city, state, postal_code,
@@ -190,6 +244,7 @@ export async function fetchChurches(
 
   const grouped = new Map<number, RawEvent[]>();
   for (const ev of events) {
+    if (!eventMatchesFilters(ev, filters)) continue;
     let list = grouped.get(ev.church_id);
     if (!list) {
       list = [];
@@ -198,29 +253,60 @@ export async function fetchChurches(
     list.push(ev);
   }
 
-  const UPCOMING_LIMIT = 3;
-  return churches.map((c) => {
-    const churchEvents = grouped.get(c.id) ?? [];
-    const upcomingSorted = churchEvents
-      .filter((e) => e.occurrence !== null)
-      .sort((a, b) => a.occurrence!.localeCompare(b.occurrence!))
-      .slice(0, UPCOMING_LIMIT);
-    const eventTypes = [
-      ...new Set(churchEvents.map((e) => e.event_type)),
-    ].sort() as EventType[];
-    return {
-      ...c,
-      event_types: eventTypes,
-      upcoming_events: upcomingSorted.map(toEventSummary),
-    };
-  });
+  const EVENING_START_MINUTES = 16 * 60; // 4:00 PM
+  const POPUP_DAY_ORDER = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+
+  function popupScheduleSortKey(ev: RawEvent): number {
+    if (ev.event_kind !== "weekly" || !ev.day_of_week) return 99999;
+    const day = ev.day_of_week.toLowerCase();
+    const dayIdx = POPUP_DAY_ORDER.indexOf(day);
+    if (dayIdx < 0) return 99999;
+    const isSaturdayEvening = day === "saturday" && ev.start_time >= EVENING_START_MINUTES;
+    if (day === "sunday") return ev.start_time;
+    if (isSaturdayEvening) return 2000 + ev.start_time;
+    return 3000 + dayIdx * 1000 + ev.start_time;
+  }
+
+  return churches
+    .map((c) => {
+      const churchEvents = grouped.get(c.id) ?? [];
+      const weeklyEvents = churchEvents.filter(
+        (e) => e.event_kind === "weekly" && e.day_of_week && !e.cancelled,
+      );
+      const seen = new Set<string>();
+      let popupSchedule = weeklyEvents
+        .filter((e) => {
+          const key = `${e.day_of_week!.toLowerCase()}-${e.start_time}`;
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        })
+        .sort((a, b) => popupScheduleSortKey(a) - popupScheduleSortKey(b))
+        .map(toEventSummary);
+      if (popupSchedule.length === 0) {
+        popupSchedule = churchEvents
+          .filter((e) => e.occurrence !== null)
+          .sort((a, b) => a.occurrence!.localeCompare(b.occurrence!))
+          .slice(0, 5)
+          .map(toEventSummary);
+      }
+      const eventTypes = [
+        ...new Set(churchEvents.map((e) => e.event_type)),
+      ].sort() as EventType[];
+      return {
+        ...c,
+        event_types: eventTypes,
+        upcoming_events: popupSchedule,
+      };
+    })
+    .filter((church) => church.event_types.length > 0);
 }
 
 export async function fetchChurch(slug: string): Promise<ChurchDetail> {
   const db = await getDb();
   const stmt = db.prepare(
     `SELECT id, parish_id, slug, name, address_line1, address_line2, city, state, postal_code,
-            latitude, longitude FROM church WHERE slug = ?`,
+            latitude, longitude, homepage_url, bulletin_url FROM church WHERE slug = ?`,
   );
   try {
     stmt.bind([slug]);
@@ -240,6 +326,8 @@ export async function fetchChurch(slug: string): Promise<ChurchDetail> {
       postal_code: str(row["postal_code"]),
       latitude: num(row["latitude"]),
       longitude: num(row["longitude"]),
+      homepage_url: str(row["homepage_url"]),
+      bulletin_url: str(row["bulletin_url"]),
     };
   } finally {
     stmt.free();

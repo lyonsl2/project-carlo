@@ -13,6 +13,18 @@ export function titleCase(value: string): string {
   return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
+/** Format YYYY-MM-DD to "April 2nd" style. */
+export function formatEventDate(dateStr: string): string {
+  const d = new Date(dateStr + "T12:00:00");
+  const month = d.toLocaleDateString("en-US", { month: "long" });
+  const day = d.getDate();
+  const suffix =
+    day >= 11 && day <= 13
+      ? "th"
+      : { 1: "st", 2: "nd", 3: "rd" }[day % 10] ?? "th";
+  return `${month} ${day}${suffix}`;
+}
+
 /** Format structured address fields into a single display string. */
 export function formatAddress(church: {
   address_line1: string | null;

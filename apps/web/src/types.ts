@@ -40,4 +40,6 @@ export interface ChurchDetail {
   postal_code: string | null;
   latitude: number | null;
   longitude: number | null;
+  homepage_url: string | null;
+  bulletin_url: string | null;
 }
