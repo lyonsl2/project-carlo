@@ -36,8 +36,7 @@ CREATE TABLE IF NOT EXISTS church (
     longitude REAL,
     name_verified INTEGER NOT NULL DEFAULT 0,
     address_verified INTEGER NOT NULL DEFAULT 0,
-    created_at TEXT,
-    UNIQUE(parish_id, name)
+    created_at TEXT
 );
 
 CREATE INDEX IF NOT EXISTS idx_church_slug ON church(slug);
@@ -66,8 +65,8 @@ CREATE TABLE IF NOT EXISTS event (
     event_kind TEXT NOT NULL,
     day_of_week TEXT,
     date TEXT,
-    start_time TEXT NOT NULL,
-    end_time TEXT,
+    start_time INTEGER NOT NULL,  -- minutes since midnight (0-1439)
+    end_time INTEGER,             -- minutes since midnight, NULL if not applicable
     cancelled INTEGER NOT NULL DEFAULT 0
 );
 

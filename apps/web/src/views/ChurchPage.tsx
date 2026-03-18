@@ -2,13 +2,14 @@ import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { fetchChurch, fetchChurchEvents } from "../api";
 import type { EventSummary } from "../types";
-import { formatAddress, titleCase } from "../utils";
+import { formatAddress, formatMinutesToTime, titleCase } from "../utils";
 
 function eventLine(event: EventSummary): string {
+  const timeStr = formatMinutesToTime(event.start_time);
   if (event.kind === "weekly") {
-    return `${event.day_of_week ?? "Unknown day"} at ${event.start_time}`;
+    return `${event.day_of_week ?? "Unknown day"} at ${timeStr}`;
   }
-  return `${event.date ?? "Unknown date"} at ${event.start_time}`;
+  return `${event.date ?? "Unknown date"} at ${timeStr}`;
 }
 
 export function ChurchPage() {
@@ -64,7 +65,7 @@ export function ChurchPage() {
                 <strong>{titleCase(event.type)}</strong>
               </div>
               <div>{eventLine(event)}</div>
-              {event.end_time ? <div>Ends {event.end_time}</div> : null}
+              {event.end_time != null ? <div>Ends {formatMinutesToTime(event.end_time)}</div> : null}
               {event.next_occurrence ? <div>Next: {event.next_occurrence}</div> : null}
             </li>
           ))}

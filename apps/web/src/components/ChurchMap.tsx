@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import L from "leaflet";
 import type { ChurchMapItem } from "../types";
-import { formatAddress, titleCase } from "../utils";
+import { formatAddress, formatMinutesToTime, titleCase } from "../utils";
 
 const defaultCenter: [number, number] = [43.1566, -77.6088];
 
@@ -50,7 +50,7 @@ export function ChurchMap({ churches }: ChurchMapProps) {
               {church.upcoming_events.length > 0 ? (
                 church.upcoming_events.map((eventItem) => (
                   <li key={eventItem.id}>
-                    <strong>{titleCase(eventItem.type)}:</strong> {eventItem.start_time}
+                    <strong>{titleCase(eventItem.type)}:</strong> {formatMinutesToTime(eventItem.start_time)}
                   </li>
                 ))
               ) : (

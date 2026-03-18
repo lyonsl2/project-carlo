@@ -1,3 +1,13 @@
+/** Format minutes since midnight to "h:MM AM/PM" display string. */
+export function formatMinutesToTime(minutes: number): string {
+  const h = Math.floor(minutes / 60);
+  const m = minutes % 60;
+  if (h === 0) return `12:${m.toString().padStart(2, "0")} AM`;
+  if (h === 12) return `12:${m.toString().padStart(2, "0")} PM`;
+  if (h < 12) return `${h}:${m.toString().padStart(2, "0")} AM`;
+  return `${h - 12}:${m.toString().padStart(2, "0")} PM`;
+}
+
 /** Capitalize the first letter of a string. */
 export function titleCase(value: string): string {
   return value.charAt(0).toUpperCase() + value.slice(1);

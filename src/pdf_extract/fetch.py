@@ -267,6 +267,9 @@ def fetch_bulletins(
             except ValueError:
                 LOGGER.warning("Skipping parish %s: no supported source", slug)
                 continue
+            except Exception as exc:
+                LOGGER.warning("Failed resolving bulletin link for parish %s: %s", slug, exc, exc_info=True)
+                continue
 
             if link.source_url in existing_urls:
                 skipped_existing += 1
@@ -278,25 +281,29 @@ def fetch_bulletins(
                 LOGGER.warning("Failed downloading bulletin for %s: %s", slug, exc)
                 continue
 
-            content_hash = hashlib.sha256(pdf_bytes).hexdigest()
-            parish_dir = pdf_dir / slug
-            parish_dir.mkdir(parents=True, exist_ok=True)
-            pdf_path = parish_dir / f"{content_hash}.pdf"
-            if not pdf_path.exists():
-                pdf_path.write_bytes(pdf_bytes)
+            try:
+                content_hash = hashlib.sha256(pdf_bytes).hexdigest()
+                parish_dir = pdf_dir / slug
+                parish_dir.mkdir(parents=True, exist_ok=True)
+                pdf_path = parish_dir / f"{content_hash}.pdf"
+                if not pdf_path.exists():
+                    pdf_path.write_bytes(pdf_bytes)
 
-            metadata.append({
-                "parish_slug": slug,
-                "source_url": link.source_url,
-                "pdf_path": str(pdf_path),
-                "content_hash": content_hash,
-                "fetched_at": utc_now_iso(),
-                "processed_at": None,
-                "published_date": None,
-            })
-            existing_urls.add(link.source_url)
-            fetched += 1
-            save_json_list(BULLETINS_METADATA_PATH, metadata)
+                metadata.append({
+                    "parish_slug": slug,
+                    "source_url": link.source_url,
+                    "pdf_path": str(pdf_path),
+                    "content_hash": content_hash,
+                    "fetched_at": utc_now_iso(),
+                    "processed_at": None,
+                    "published_date": None,
+                })
+                existing_urls.add(link.source_url)
+                fetched += 1
+                save_json_list(BULLETINS_METADATA_PATH, metadata)
+            except Exception as exc:
+                LOGGER.warning("Failed saving bulletin for parish %s: %s", slug, exc, exc_info=True)
+                continue
     finally:
         browser.close()
         pw.stop()

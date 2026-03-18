@@ -6,8 +6,8 @@ export interface EventSummary {
   kind: "weekly" | "specific_date";
   day_of_week: string | null;
   date: string | null;
-  start_time: string;
-  end_time: string | null;
+  start_time: number;
+  end_time: number | null;
   cancelled: boolean;
   next_occurrence: string | null;
 }

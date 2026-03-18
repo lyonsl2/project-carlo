@@ -199,6 +199,7 @@ church_list_needs_review: boolean flag
 
 Rules:
 - Every entry must use a church_slug that exactly matches one of the provided churches.
+- Format all times as "h:MM AM" or "h:MM PM".
 - For Mass: always include start_time; end_time is omitted.
 - For Confession and Adoration: include end_time when the document provides it.
 - Put recurring weekly entries in weekly_schedule.

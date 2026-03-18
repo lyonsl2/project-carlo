@@ -26,48 +26,10 @@ interface RawEvent {
   event_kind: "weekly" | "specific_date";
   day_of_week: string | null;
   date: string | null;
-  start_time: string;
-  end_time: string | null;
+  start_time: number;
+  end_time: number | null;
   cancelled: boolean;
   occurrence: string | null;
-}
-
-function parseTime(value: string): { hours: number; minutes: number } | null {
-  const raw = value.trim();
-  const patterns: [RegExp, (m: RegExpMatchArray) => { hours: number; minutes: number }][] = [
-    // 12:30 PM / 12:30PM
-    [/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i, (m) => {
-      let h = parseInt(m[1]);
-      const min = parseInt(m[2]);
-      const ampm = m[3].toUpperCase();
-      if (ampm === "PM" && h !== 12) h += 12;
-      if (ampm === "AM" && h === 12) h = 0;
-      return { hours: h, minutes: min };
-    }],
-    // 8 AM / 8AM
-    [/^(\d{1,2})\s*(AM|PM)$/i, (m) => {
-      let h = parseInt(m[1]);
-      const ampm = m[2].toUpperCase();
-      if (ampm === "PM" && h !== 12) h += 12;
-      if (ampm === "AM" && h === 12) h = 0;
-      return { hours: h, minutes: 0 };
-    }],
-    // 14:30
-    [/^(\d{1,2}):(\d{2})$/, (m) => ({
-      hours: parseInt(m[1]),
-      minutes: parseInt(m[2]),
-    })],
-    // 1430
-    [/^(\d{2})(\d{2})$/, (m) => ({
-      hours: parseInt(m[1]),
-      minutes: parseInt(m[2]),
-    })],
-  ];
-  for (const [re, extract] of patterns) {
-    const match = raw.match(re);
-    if (match) return extract(match);
-  }
-  return null;
 }
 
 function todayDate(): Date {
@@ -77,33 +39,33 @@ function todayDate(): Date {
 
 function nextForWeekly(
   dayOfWeek: string,
-  startTime: string,
+  startMinutes: number,
   today: Date,
 ): Date | null {
   const dayIdx = DAY_TO_INDEX[dayOfWeek.toLowerCase()];
   if (dayIdx === undefined) return null;
-  const parsed = parseTime(startTime);
-  if (!parsed) return null;
+  const hours = Math.floor(startMinutes / 60);
+  const minutes = startMinutes % 60;
   const jsDay = (dayIdx + 1) % 7; // Python: Monday=0; JS: Sunday=0
   const currentDay = today.getDay();
   const daysAhead = (jsDay - currentDay + 7) % 7;
   const target = new Date(today);
   target.setDate(target.getDate() + daysAhead);
-  target.setHours(parsed.hours, parsed.minutes, 0, 0);
+  target.setHours(hours, minutes, 0, 0);
   return target;
 }
 
-function nextForSpecific(eventDate: string, startTime: string): Date | null {
-  const parsed = parseTime(startTime);
-  if (!parsed) return null;
+function nextForSpecific(eventDate: string, startMinutes: number): Date | null {
+  const hours = Math.floor(startMinutes / 60);
+  const minutes = startMinutes % 60;
   const parts = eventDate.split("-");
   if (parts.length !== 3) return null;
   const d = new Date(
     parseInt(parts[0]),
     parseInt(parts[1]) - 1,
     parseInt(parts[2]),
-    parsed.hours,
-    parsed.minutes,
+    hours,
+    minutes,
   );
   if (isNaN(d.getTime())) return null;
   return d;
@@ -113,7 +75,7 @@ function computeOccurrence(event: {
   cancelled: boolean;
   event_kind: string;
   day_of_week: string | null;
-  start_time: string;
+  start_time: number;
   date: string | null;
 }): string | null {
   if (event.cancelled) return null;
@@ -164,8 +126,8 @@ function queryEvents(
         event_kind: row["event_kind"] as "weekly" | "specific_date",
         day_of_week: str(row["day_of_week"]),
         date: str(row["date"]),
-        start_time: row["start_time"] as string,
-        end_time: str(row["end_time"]),
+        start_time: row["start_time"] as number,
+        end_time: num(row["end_time"]),
         cancelled: Boolean(row["cancelled"]),
         occurrence: null,
       };

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import csv
 import logging
+import re
 from pathlib import Path
 
 from pdf_extract.storage import (
@@ -23,6 +24,62 @@ from pdf_extract.storage import (
 )
 
 LOGGER = logging.getLogger(__name__)
+
+
+def _time_to_minutes(s: str | None) -> int | None:
+    """Parse time string (h:MM AM/PM, a.m./p.m., etc.) to minutes since midnight.
+
+    Returns None for null/empty. Handles: 8:00 AM, 5:30pm, 8:00 a.m., midnight, noon.
+    """
+    if s is None or not isinstance(s, str):
+        return None
+    raw = s.strip()
+    if not raw:
+        return None
+
+    # Normalize a.m. / p.m. to AM / PM
+    raw = re.sub(r"a\.m\.?(?=\s|$)", "AM", raw, flags=re.I)
+    raw = re.sub(r"p\.m\.?(?=\s|$)", "PM", raw, flags=re.I)
+
+    if re.match(r"^midnight$", raw, re.I):
+        return 0
+    if re.match(r"^noon$", raw, re.I):
+        return 720
+
+    m = re.match(r"^(\d{1,2}):(\d{2})\s*(AM|PM)$", raw, re.I)
+    if m:
+        h = int(m[1])
+        mins = int(m[2])
+        ampm = m[3].upper()
+        if ampm == "PM" and h != 12:
+            h += 12
+        elif ampm == "AM" and h == 12:
+            h = 0
+        return h * 60 + mins
+
+    m = re.match(r"^(\d{1,2})\s*(AM|PM)$", raw, re.I)
+    if m:
+        h = int(m[1])
+        ampm = m[2].upper()
+        if ampm == "PM" and h != 12:
+            h += 12
+        elif ampm == "AM" and h == 12:
+            h = 0
+        return h * 60
+
+    m = re.match(r"^(\d{1,2}):(\d{2})$", raw)
+    if m:
+        h, mins = int(m[1]), int(m[2])
+        if 0 <= h <= 23 and 0 <= mins <= 59:
+            return h * 60 + mins
+
+    m = re.match(r"^(\d{2})(\d{2})$", raw)
+    if m:
+        h, mins = int(m[1]), int(m[2])
+        if 0 <= h <= 23 and 0 <= mins <= 59:
+            return h * 60 + mins
+
+    return None
 
 
 def _validate_csv_headers(
@@ -202,7 +259,7 @@ def _load_churches_from_csv(conn) -> int:
             ).fetchone()
             if not parish_row:
                 continue
-            conn.execute(
+            cursor = conn.execute(
                 """INSERT OR IGNORE INTO church(
                     parish_id, slug, name, address_line1, address_line2, city, state, postal_code,
                     created_at
@@ -219,7 +276,8 @@ def _load_churches_from_csv(conn) -> int:
                     now,
                 ),
             )
-            count += 1
+            if cursor.rowcount > 0:
+                count += 1
     LOGGER.info("Loaded %d churches from churches.csv", count)
     return count
 
@@ -411,6 +469,16 @@ def _load_events(conn) -> int:
         if bulletin_row:
             bulletin_id = bulletin_row["id"]
 
+        start_minutes = _time_to_minutes(entry.get("start_time"))
+        if start_minutes is None:
+            LOGGER.warning(
+                "Skipping event: unparseable start_time %r (church=%s)",
+                entry.get("start_time"), church_slug,
+            )
+            continue
+
+        end_minutes = _time_to_minutes(entry.get("end_time"))
+
         conn.execute(
             """INSERT INTO event(church_id, bulletin_id, event_type, event_kind, day_of_week, date, start_time, end_time, cancelled)
                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
@@ -421,8 +489,8 @@ def _load_events(conn) -> int:
                 entry.get("event_kind", ""),
                 entry.get("day_of_week"),
                 entry.get("date"),
-                entry.get("start_time", ""),
-                entry.get("end_time"),
+                start_minutes,
+                end_minutes,
                 int(entry.get("cancelled", False)),
             ),
         )

@@ -32,7 +32,7 @@ def test_event_belongs_to_church_and_bulletin(tmp_path: Path) -> None:
 
     conn.execute(
         "INSERT INTO event(church_id, bulletin_id, event_type, event_kind, day_of_week, start_time, cancelled) VALUES (?, ?, ?, ?, ?, ?, ?)",
-        (church_id, bulletin_id, "mass", "weekly", "Sunday", "9:30am", 0),
+        (church_id, bulletin_id, "mass", "weekly", "Sunday", 570, 0),  # 9:30 AM = 570 min
     )
     event_id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
     conn.commit()

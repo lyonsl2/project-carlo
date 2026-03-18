@@ -52,8 +52,8 @@ def extract(source: Path = SOURCE_DB, dest: Path = DEST_DB) -> None:
                 event_kind TEXT NOT NULL,
                 day_of_week TEXT,
                 date TEXT,
-                start_time TEXT NOT NULL,
-                end_time TEXT,
+                start_time INTEGER NOT NULL,
+                end_time INTEGER,
                 cancelled INTEGER NOT NULL
             )
             """
