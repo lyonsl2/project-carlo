@@ -42,14 +42,6 @@ export function HomePage() {
     queryFn: () => fetchChurches(apiFilters),
   });
 
-  const churchesWithCoordinates = useMemo(
-    () =>
-      (data ?? []).filter(
-        (church) => church.latitude !== null && church.longitude !== null,
-      ),
-    [data],
-  );
-
   const handleApplyFilters = useCallback(() => {
     setAppliedFilters(filters);
     setFilterPanelOpen(false);

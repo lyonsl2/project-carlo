@@ -1,4 +1,3 @@
-import type { EventType } from "../types";
 import { formatMinutesToTime, titleCase } from "../utils";
 import type { FilterState } from "./FilterPanel";
 

@@ -19,16 +19,6 @@ const DAY_TO_INDEX: Record<string, number> = {
   sunday: 6,
 };
 
-const INDEX_TO_DAY: Record<number, string> = {
-  0: "monday",
-  1: "tuesday",
-  2: "wednesday",
-  3: "thursday",
-  4: "friday",
-  5: "saturday",
-  6: "sunday",
-};
-
 export interface ChurchFilters {
   types: EventType[];
   daysOfWeek?: number[];
@@ -217,7 +207,7 @@ export async function fetchChurches(
     `SELECT id, parish_id, slug, name, address_line1, address_line2, city, state, postal_code,
             latitude, longitude FROM church ORDER BY name`,
   );
-  const churches: ChurchDetail[] = [];
+  const churches: Omit<ChurchMapItem, "event_types" | "upcoming_events">[] = [];
   try {
     while (stmt.step()) {
       const row = stmt.getAsObject();
