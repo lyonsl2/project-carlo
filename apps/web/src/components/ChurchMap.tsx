@@ -2,7 +2,12 @@ import { Link } from "react-router-dom";
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import L from "leaflet";
 import type { ChurchMapItem, EventSummary } from "../types";
-import { formatAddress, formatMinutesToTime, titleCase } from "../utils";
+import {
+  formatAddress,
+  formatEventDate,
+  formatMinutesToTime,
+  titleCase,
+} from "../utils";
 
 const DAY_ORDER = [
   "sunday",
@@ -15,22 +20,53 @@ const DAY_ORDER = [
 ];
 const EVENING_START_MINUTES = 16 * 60; // 4:00 PM
 
-function getEventSortKey(event: EventSummary): number {
-  let day: string;
-  if (event.kind === "weekly" && event.day_of_week) {
-    day = event.day_of_week.toLowerCase();
-  } else if (event.date) {
-    const d = new Date(event.date + "T12:00:00");
-    day = DAY_ORDER[d.getDay()];
-  } else {
-    return 999;
+function compareEvents(a: EventSummary, b: EventSummary): number {
+  const aIsSpecific = a.kind === "specific_date" && a.date;
+  const bIsSpecific = b.kind === "specific_date" && b.date;
+
+  if (aIsSpecific && bIsSpecific) {
+    const dateCompare = (a.date ?? "").localeCompare(b.date ?? "");
+    if (dateCompare !== 0) return dateCompare;
+    return a.start_time - b.start_time;
   }
-  const dayIdx = DAY_ORDER.indexOf(day);
-  const isSaturdayEvening =
-    day === "saturday" && event.start_time >= EVENING_START_MINUTES;
-  if (day === "sunday") return event.start_time;
-  if (isSaturdayEvening) return 1000 + event.start_time;
-  return 2000 + dayIdx * 1000 + event.start_time;
+  if (aIsSpecific && !bIsSpecific) return 1;
+  if (!aIsSpecific && bIsSpecific) return -1;
+
+  let dayA: string;
+  let dayB: string;
+  if (a.kind === "weekly" && a.day_of_week) {
+    dayA = a.day_of_week.toLowerCase();
+  } else if (a.date) {
+    const d = new Date(a.date + "T12:00:00");
+    dayA = DAY_ORDER[d.getDay()];
+  } else return 1;
+  if (b.kind === "weekly" && b.day_of_week) {
+    dayB = b.day_of_week.toLowerCase();
+  } else if (b.date) {
+    const d = new Date(b.date + "T12:00:00");
+    dayB = DAY_ORDER[d.getDay()];
+  } else return -1;
+
+  const dayIdxA = DAY_ORDER.indexOf(dayA);
+  const dayIdxB = DAY_ORDER.indexOf(dayB);
+  const isSatEveA =
+    dayA === "saturday" && a.start_time >= EVENING_START_MINUTES;
+  const isSatEveB =
+    dayB === "saturday" && b.start_time >= EVENING_START_MINUTES;
+
+  const keyA =
+    dayA === "sunday"
+      ? a.start_time
+      : isSatEveA
+        ? 1000 + a.start_time
+        : 2000 + dayIdxA * 1000 + a.start_time;
+  const keyB =
+    dayB === "sunday"
+      ? b.start_time
+      : isSatEveB
+        ? 1000 + b.start_time
+        : 2000 + dayIdxB * 1000 + b.start_time;
+  return keyA - keyB;
 }
 
 function formatEventDay(event: EventSummary): string {
@@ -39,7 +75,8 @@ function formatEventDay(event: EventSummary): string {
   }
   if (event.date) {
     const d = new Date(event.date + "T12:00:00");
-    return d.toLocaleDateString("en-US", { weekday: "long" });
+    const weekday = d.toLocaleDateString("en-US", { weekday: "long" });
+    return `${weekday}, ${formatEventDate(event.date)}`;
   }
   return "";
 }
@@ -97,7 +134,7 @@ export function ChurchMap({ churches }: ChurchMapProps) {
                 {church.upcoming_events.length > 0 ? (
                   <>
                     {[...church.upcoming_events]
-                      .sort((a, b) => getEventSortKey(a) - getEventSortKey(b))
+                      .sort(compareEvents)
                       .slice(0, 3)
                       .map((eventItem) => {
                         const day = formatEventDay(eventItem);
