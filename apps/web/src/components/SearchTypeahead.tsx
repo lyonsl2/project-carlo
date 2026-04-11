@@ -94,9 +94,9 @@ export function SearchTypeahead({
     >
       <Popover open={showDropdown} onOpenChange={setIsOpen}>
         <PopoverAnchor asChild>
-          <div className="relative">
+          <div className="relative w-full">
             <div
-              className="group flex items-center gap-3 border-b pb-1.5 transition-colors"
+              className="group flex w-full items-center gap-2 border-b pb-1.5 transition-colors"
               style={{
                 borderBottomColor: isFocused
                   ? "var(--rubric)"
@@ -133,7 +133,7 @@ export function SearchTypeahead({
                 placeholder="Search for a parish…"
                 aria-label="Search for parish by name"
                 autoComplete="off"
-                className="flex-1 bg-transparent font-serif text-[1.0625rem] text-ink outline-none placeholder:text-ink-faint placeholder:italic"
+                className="min-w-0 flex-1 bg-transparent font-serif text-[1.0625rem] text-ink outline-none placeholder:text-ink-faint placeholder:italic"
               />
               {query.length > 0 ? (
                 <button

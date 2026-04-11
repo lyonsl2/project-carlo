@@ -28,12 +28,12 @@ export function TimeRangeSlider({
 
   return (
     <div className="space-y-5">
-      <div className="flex items-baseline justify-between gap-4 font-serif text-base text-ink">
-        <span className="tabular-nums">{formatValue(start)}</span>
+      <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-baseline gap-4 font-serif text-base text-ink">
+        <span className="justify-self-start tabular-nums">{formatValue(start)}</span>
         <span className="smallcaps text-[0.8125rem] text-ink-faint">
           through
         </span>
-        <span className="tabular-nums">{formatValue(end)}</span>
+        <span className="justify-self-end tabular-nums">{formatValue(end)}</span>
       </div>
 
       <div className="relative h-6 px-1">

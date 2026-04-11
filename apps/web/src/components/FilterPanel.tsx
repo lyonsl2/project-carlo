@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 import type { EventType } from "../types";
 import type { FilterState } from "./filterState";
 import { TimeRangeSlider } from "./TimeRangeSlider";
@@ -41,34 +41,16 @@ const TIME_STEP_MINUTES = 15;
 
 interface FilterPanelProps {
   isOpen: boolean;
+  isDesktop: boolean;
   onClose: () => void;
   filters: FilterState;
   onChange: (filters: FilterState) => void;
   onApply: () => void;
 }
 
-function useIsDesktop() {
-  const [isDesktop, setIsDesktop] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return window.matchMedia("(min-width: 768px)").matches;
-  });
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const mediaQuery = window.matchMedia("(min-width: 768px)");
-    const update = () => setIsDesktop(mediaQuery.matches);
-
-    update();
-    mediaQuery.addEventListener("change", update);
-    return () => mediaQuery.removeEventListener("change", update);
-  }, []);
-
-  return isDesktop;
-}
-
 export function FilterPanel({
   isOpen,
+  isDesktop,
   onClose,
   filters,
   onChange,
@@ -123,8 +105,6 @@ export function FilterPanel({
     });
   }, [onChange]);
 
-  const isDesktop = useIsDesktop();
-
   const handleApply = useCallback(() => {
     onApply();
     if (!isDesktop) {
@@ -152,15 +132,15 @@ export function FilterPanel({
                   aria-pressed={isSelected}
                   onClick={() => selectEventType(option.id)}
                   className={`group flex min-w-0 flex-1 basis-0 flex-col items-center gap-1.5 px-1 py-2.5 text-center transition-colors ${
-                    isSelected
-                      ? "bg-paper-deep/80"
-                      : "hover:bg-paper-deep/40"
+                    isSelected ? "bg-paper-deep/80" : "hover:bg-paper-deep/40"
                   }`}
                 >
                   <span
                     aria-hidden
                     className={`inline-block size-2 shrink-0 rounded-full transition-colors ${
-                      isSelected ? "bg-rubric" : "bg-transparent ring-1 ring-rule-strong"
+                      isSelected
+                        ? "bg-rubric"
+                        : "bg-transparent ring-1 ring-rule-strong"
                     }`}
                   />
                   <span
@@ -209,7 +189,9 @@ export function FilterPanel({
                 >
                   <span
                     className={`smallcaps block text-[0.875rem] transition-colors ${
-                      isSelected ? "text-rubric" : "text-ink-soft group-hover:text-ink"
+                      isSelected
+                        ? "text-rubric"
+                        : "text-ink-soft group-hover:text-ink"
                     }`}
                   >
                     {day.abbr}

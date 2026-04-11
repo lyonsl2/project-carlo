@@ -79,7 +79,11 @@
     font-family: var(--font-sans);
     /* Old-style numerals + common ligatures sitewide. This single line is
      * what makes Garamond feel like a book instead of a UI font. */
-    font-feature-settings: "onum" 1, "liga" 1, "dlig" 0, "kern" 1;
+    font-feature-settings:
+      "onum" 1,
+      "liga" 1,
+      "dlig" 0,
+      "kern" 1;
     font-variant-numeric: oldstyle-nums;
   }
 
@@ -125,13 +129,19 @@
     padding-right: 0.08em;
     padding-top: 0.08em;
     color: var(--rubric);
-    font-feature-settings: "onum" 0, "lnum" 1;
+    font-feature-settings:
+      "onum" 0,
+      "lnum" 1;
   }
 
   /* Small-caps label style — reused for day names, section headers, etc. */
   .smallcaps {
     font-family: var(--font-display);
-    font-feature-settings: "smcp" 1, "c2sc" 1, "onum" 0, "lnum" 1;
+    font-feature-settings:
+      "smcp" 1,
+      "c2sc" 1,
+      "onum" 0,
+      "lnum" 1;
     font-variant-caps: all-small-caps;
     letter-spacing: 0.12em;
     text-transform: uppercase;
@@ -244,9 +254,9 @@
 
   .leaflet-popup-content {
     margin: 0;
-    padding: 1rem 1.1rem 0.9rem;
-    min-width: 220px;
-    max-width: 300px;
+    padding: 0.7rem 0.7rem 0.65rem;
+    min-width: 205px;
+    max-width: 275px;
     font-family: var(--font-sans);
     color: var(--ink);
     line-height: 1.5;
@@ -300,8 +310,10 @@
     transition: transform 200ms ease;
     filter: drop-shadow(0 2px 3px rgb(22 18 16 / 0.28));
   }
-  .church-map-marker:hover svg {
-    transform: translateY(-2px) scale(1.06);
+  @media (hover: hover) and (pointer: fine) {
+    .church-map-marker:hover svg {
+      transform: translateY(-2px) scale(1.06);
+    }
   }
 }
 
@@ -358,14 +370,16 @@
 }
 
 @theme inline {
-  --font-display: "Cardo", "Iowan Old Style", "Palatino Linotype",
-    "Book Antiqua", Georgia, serif;
-  --font-heading: "Cardo", "Iowan Old Style", "Palatino Linotype",
-    "Book Antiqua", Georgia, serif;
-  --font-serif: "EB Garamond Variable", "EB Garamond", "Iowan Old Style",
-    Georgia, serif;
-  --font-sans: "EB Garamond Variable", "EB Garamond", "Iowan Old Style",
-    Georgia, serif;
+  --font-display:
+    "Cardo", "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia,
+    serif;
+  --font-heading:
+    "Cardo", "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia,
+    serif;
+  --font-serif:
+    "EB Garamond Variable", "EB Garamond", "Iowan Old Style", Georgia, serif;
+  --font-sans:
+    "EB Garamond Variable", "EB Garamond", "Iowan Old Style", Georgia, serif;
   --color-paper: var(--paper);
   --color-paper-deep: var(--paper-deep);
   --color-paper-edge: var(--paper-edge);

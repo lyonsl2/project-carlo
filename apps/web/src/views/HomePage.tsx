@@ -49,7 +49,6 @@ export function HomePage() {
     lng: number;
     churchId: number;
   } | null>(null);
-
   const apiFilters = useMemo(() => {
     const { from, to } = getTimeRange(appliedFilters);
     return {
@@ -99,8 +98,9 @@ export function HomePage() {
 
   return (
     <main className="relative flex min-h-svh flex-col overflow-hidden bg-paper">
-      {/* Full-bleed map lives behind everything */}
-      <div className="absolute inset-0 z-0">
+      {/* Full-bleed map — no z-index so it doesn't create a stacking context;
+       *  the elevated popup pane inside can then layer above the header. */}
+      <div className="absolute inset-0">
         {data ? <ChurchMap churches={data} centerOn={centerOn} /> : null}
       </div>
 
@@ -108,8 +108,13 @@ export function HomePage() {
       {isLoading && !data ? (
         <div className="pointer-events-none absolute inset-0 z-[800] flex items-center justify-center">
           <div className="pointer-events-auto flex items-center gap-3 border border-rule-strong bg-paper/95 px-5 py-3 shadow-[0_12px_30px_-12px_rgb(22_18_16/0.25)]">
-            <span className="h-2 w-2 animate-pulse rounded-full bg-rubric" aria-hidden />
-            <span className="font-serif text-sm text-ink-soft">Loading map…</span>
+            <span
+              className="h-2 w-2 animate-pulse rounded-full bg-rubric"
+              aria-hidden
+            />
+            <span className="font-serif text-sm text-ink-soft">
+              Loading map…
+            </span>
           </div>
         </div>
       ) : null}
@@ -137,8 +142,8 @@ export function HomePage() {
       {/* Floating card — masthead, search, filter pills; filter panel is only as tall
        *  as its content on md+ (capped + scroll inside when needed). */}
       <div className="pointer-events-none absolute inset-x-0 top-0 bottom-0 z-[900] flex justify-center px-4 pt-[calc(1rem+var(--safe-area-inset-top))] pb-[calc(1rem+var(--safe-area-inset-bottom))] md:justify-start md:px-6 md:pt-6 md:pb-6">
-        <div className="pointer-events-auto flex w-full max-w-[28rem] flex-col gap-4">
-          <div className="rise-in shrink-0 border border-rule-strong bg-paper/96 px-6 pt-5 pb-4 shadow-[0_22px_48px_-20px_rgb(22_18_16/0.4),0_3px_8px_-3px_rgb(22_18_16/0.14)] backdrop-blur-sm">
+        <div className="pointer-events-none flex w-full max-w-[28rem] flex-col gap-4">
+          <div className="pointer-events-auto rise-in shrink-0 border border-rule-strong bg-paper/96 px-6 pt-5 pb-4 shadow-[0_22px_48px_-20px_rgb(22_18_16/0.4),0_3px_8px_-3px_rgb(22_18_16/0.14)] backdrop-blur-sm">
             <Masthead />
             <div className="mt-5">
               <SearchTypeahead
@@ -149,7 +154,7 @@ export function HomePage() {
                     onClick={() => setFilterPanelOpen(true)}
                     aria-label="Open filters"
                     data-active={filterPanelOpen}
-                    className="rubric-link smallcaps ml-1 text-[0.875rem] md:hidden"
+                    className="rubric-link smallcaps ml-1 whitespace-nowrap text-[0.875rem] md:hidden"
                   >
                     Filters
                   </button>
@@ -159,9 +164,16 @@ export function HomePage() {
             <FilterPills filters={appliedFilters} />
           </div>
 
-          <div className="w-full md:min-h-0">
+          <div
+            className={`w-full md:min-h-0 ${
+              !isDesktop && !filterPanelOpen
+                ? "pointer-events-none"
+                : "pointer-events-auto"
+            }`}
+          >
             <FilterPanel
               isOpen={!isDesktop && filterPanelOpen}
+              isDesktop={isDesktop}
               onClose={() => setFilterPanelOpen(false)}
               filters={filters}
               onChange={handleFiltersChange}
@@ -169,15 +181,6 @@ export function HomePage() {
             />
           </div>
         </div>
-      </div>
-
-      {/* Attribution corner — small cream notch so the Leaflet credit doesn't
-       *  clash with the masthead. */}
-      <div className="pointer-events-none absolute bottom-3 right-3 z-[900]">
-        <p className="font-serif text-[0.8125rem] text-ink-faint/80">
-          Map data ©{" "}
-          <span className="smallcaps">OpenStreetMap</span> contributors
-        </p>
       </div>
     </main>
   );

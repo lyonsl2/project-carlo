@@ -121,6 +121,42 @@ interface ChurchMapProps {
   centerOn?: { lat: number; lng: number; churchId?: number } | null;
 }
 
+/**
+ * Relocate the popup pane from inside `.leaflet-map-pane` (whose `transform`
+ * creates a stacking context that traps child z-indexes) to the container
+ * root. The pane's transform is kept in sync via MutationObserver so popups
+ * stay geo-anchored, but its z-index now participates in the page-level
+ * stacking context — letting popups render above the header overlay.
+ */
+function PopupPaneElevator() {
+  const map = useMap();
+  useEffect(() => {
+    const mapPane = map.getPane("mapPane");
+    const popupPane = map.getPane("popupPane");
+    const container = map.getContainer();
+    if (!mapPane || !popupPane) return;
+
+    container.appendChild(popupPane);
+    popupPane.style.zIndex = "1100";
+
+    const sync = () => {
+      popupPane.style.transform = mapPane.style.transform;
+    };
+    const observer = new MutationObserver(sync);
+    observer.observe(mapPane, {
+      attributes: true,
+      attributeFilter: ["style"],
+    });
+    sync();
+
+    return () => {
+      observer.disconnect();
+      mapPane.appendChild(popupPane);
+    };
+  }, [map]);
+  return null;
+}
+
 function ChangeView({ center }: { center: { lat: number; lng: number } }) {
   const map = useMap();
   useEffect(() => {
@@ -154,9 +190,9 @@ const ChurchMarker = memo(function ChurchMarker({
       icon={markerIcon}
       position={[church.latitude as number, church.longitude as number]}
     >
-      <Popup minWidth={240} maxWidth={300}>
+      <Popup minWidth={225} maxWidth={275}>
         <div className="w-full">
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             <h3 className="font-display text-[1.35rem] leading-[1.1] font-normal text-ink">
               {church.name ?? "Unnamed parish"}
             </h3>
@@ -168,7 +204,7 @@ const ChurchMarker = memo(function ChurchMarker({
           </div>
 
           <div
-            className="my-3 flex items-center justify-center gap-2 text-brass"
+            className="my-3.5 flex items-center justify-center gap-2 text-brass"
             aria-hidden
           >
             <span className="h-px flex-1 bg-rule-strong" />
@@ -176,10 +212,10 @@ const ChurchMarker = memo(function ChurchMarker({
             <span className="h-px flex-1 bg-rule-strong" />
           </div>
 
-          <div className="smallcaps mb-1.5 text-[0.75rem] text-ink-faint">
+          <div className="smallcaps mb-2 text-[0.75rem] text-ink-faint">
             Upcoming
           </div>
-          <ul role="list" className="m-0 space-y-1 p-0 list-none">
+          <ul role="list" className="m-0 space-y-1.5 p-0 list-none">
             {topEvents.length > 0 ? (
               topEvents.map((eventItem) => {
                 const day = formatEventDay(eventItem);
@@ -207,7 +243,7 @@ const ChurchMarker = memo(function ChurchMarker({
             ) : null}
           </ul>
 
-          <div className="mt-3.5 border-t border-rule-strong pt-2.5">
+          <div className="mt-4 border-t border-rule-strong pt-3">
             <Link
               to={`/churches/${church.slug}`}
               className="rubric-link smallcaps text-[0.8125rem]"
@@ -243,6 +279,7 @@ export const ChurchMap = memo(function ChurchMap({
       zoomControl={false}
     >
       {centerOn && <ChangeView center={centerOn} />}
+      <PopupPaneElevator />
       <TileLayer
         attribution={OSM_ATTRIBUTION}
         url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
