@@ -11,7 +11,6 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import { InputGroup, InputGroupAddon } from "@/components/ui/input-group";
 import {
   Popover,
   PopoverAnchor,
@@ -25,10 +24,14 @@ interface SearchTypeaheadProps {
   filterButton: React.ReactNode;
 }
 
-export function SearchTypeahead({ onSelect, filterButton }: SearchTypeaheadProps) {
+export function SearchTypeahead({
+  onSelect,
+  filterButton,
+}: SearchTypeaheadProps) {
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
 
   useEffect(() => {
     const t = setTimeout(() => setDebouncedQuery(query), DEBOUNCE_MS);
@@ -85,86 +88,106 @@ export function SearchTypeahead({ onSelect, filterButton }: SearchTypeaheadProps
   );
 
   return (
-    <Command shouldFilter={false} className="overflow-visible bg-transparent p-0">
+    <Command
+      shouldFilter={false}
+      className="overflow-visible bg-transparent p-0"
+    >
       <Popover open={showDropdown} onOpenChange={setIsOpen}>
         <PopoverAnchor asChild>
           <div className="relative">
-            <div className="flex items-center gap-2 rounded-full border bg-card/95 p-1 shadow-sm backdrop-blur-sm">
-              <InputGroup className="h-10 rounded-full border-0 bg-transparent shadow-none ring-0 focus-within:ring-0">
-                <InputGroupAddon className="pl-3 text-muted-foreground">
-                  <SearchIcon className="size-4" />
-                </InputGroupAddon>
-                <CommandPrimitive.Input
-                  value={query}
-                  onValueChange={(value) => {
-                    setQuery(value);
-                    setIsOpen(true);
-                  }}
-                  onFocus={() => setIsOpen(true)}
-                  onKeyDown={(event) => {
-                    if (event.key === "Escape") {
-                      if (query.length > 0) {
-                        setQuery("");
-                        setDebouncedQuery("");
-                      } else {
-                        setIsOpen(false);
-                      }
+            <div
+              className="group flex items-center gap-3 border-b pb-1.5 transition-colors"
+              style={{
+                borderBottomColor: isFocused
+                  ? "var(--rubric)"
+                  : "var(--rule-strong)",
+                borderBottomWidth: isFocused ? 1.5 : 1,
+              }}
+            >
+              <SearchIcon
+                className={`size-4 shrink-0 transition-colors ${
+                  isFocused ? "text-rubric" : "text-ink-faint"
+                }`}
+              />
+              <CommandPrimitive.Input
+                value={query}
+                onValueChange={(value) => {
+                  setQuery(value);
+                  setIsOpen(true);
+                }}
+                onFocus={() => {
+                  setIsFocused(true);
+                  setIsOpen(true);
+                }}
+                onBlur={() => setIsFocused(false)}
+                onKeyDown={(event) => {
+                  if (event.key === "Escape") {
+                    if (query.length > 0) {
+                      setQuery("");
+                      setDebouncedQuery("");
+                    } else {
+                      setIsOpen(false);
                     }
+                  }
+                }}
+                placeholder="Search for a parish…"
+                aria-label="Search for parish by name"
+                autoComplete="off"
+                className="flex-1 bg-transparent font-serif text-[1.0625rem] text-ink outline-none placeholder:text-ink-faint placeholder:italic"
+              />
+              {query.length > 0 ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setQuery("");
+                    setDebouncedQuery("");
+                    setIsOpen(false);
                   }}
-                  placeholder="Search by parish name"
-                  aria-label="Search for parish by name"
-                  autoComplete="off"
-                  className="flex-1 bg-transparent pr-1 text-sm outline-none placeholder:text-muted-foreground"
-                />
-                {query.length > 0 ? (
-                  <InputGroupAddon className="pr-1">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setQuery("");
-                        setDebouncedQuery("");
-                        setIsOpen(false);
-                      }}
-                      aria-label="Clear search"
-                      className="flex size-6 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-                    >
-                      <XIcon className="size-3.5" />
-                    </button>
-                  </InputGroupAddon>
-                ) : null}
-              </InputGroup>
+                  aria-label="Clear search"
+                  className="flex size-6 shrink-0 items-center justify-center text-ink-faint transition-colors hover:text-rubric"
+                >
+                  <XIcon className="size-3.5" />
+                </button>
+              ) : null}
               <div className="shrink-0">{filterButton}</div>
             </div>
           </div>
         </PopoverAnchor>
         <PopoverContent
-          align="center"
-          sideOffset={8}
-          className="w-[min(32rem,calc(100vw-2rem))] p-1"
+          align="start"
+          sideOffset={10}
+          className="w-[min(32rem,calc(100vw-2rem))] border-rule-strong bg-paper p-0 shadow-[0_18px_40px_-18px_rgb(22_18_16/0.32),0_2px_6px_-2px_rgb(22_18_16/0.1)]"
           onOpenAutoFocus={(event) => event.preventDefault()}
         >
-          <CommandList className="max-h-80">
+          <div className="border-b border-rule-strong px-4 pt-3 pb-2">
+            <span className="smallcaps text-[0.8125rem] text-ink-faint">
+              Matching parishes
+            </span>
+          </div>
+          <CommandList className="max-h-80 px-2 py-2">
             {isLoading ? (
-              <div className="px-3 py-4 text-sm text-muted-foreground">
-                Loading parishes…
+              <div className="px-3 py-4 font-serif text-sm italic text-ink-faint">
+                Loading the parish registry…
               </div>
             ) : hasResults ? (
-              <CommandGroup heading="Matching parishes">
+              <CommandGroup className="[&_[cmdk-group-heading]]:hidden">
                 {results.map((church) => (
                   <CommandItem
                     key={church.id}
                     value={church.name ?? `church-${church.id}`}
                     onSelect={() => handleSelect(church)}
-                    className="py-2"
+                    className="group relative cursor-pointer gap-0 rounded-none border-l-2 border-transparent px-3 py-2.5 font-serif text-base text-ink data-[selected=true]:border-rubric data-[selected=true]:bg-paper-deep/60 data-[selected=true]:text-ink"
                   >
-                    <div className="flex flex-col">
-                      <span>{church.name ?? "Unnamed parish"}</span>
-                    </div>
+                    <span className="truncate">
+                      {church.name ?? "Unnamed parish"}
+                    </span>
                   </CommandItem>
                 ))}
               </CommandGroup>
             ) : (
-              <CommandEmpty>No parishes match that search.</CommandEmpty>
+              <CommandEmpty className="px-3 py-4 text-center font-serif text-sm italic text-ink-faint">
+                No parishes by that name.
+              </CommandEmpty>
             )}
           </CommandList>
         </PopoverContent>

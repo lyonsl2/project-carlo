@@ -1,4 +1,4 @@
-import { formatMinutesToTime } from "../utils";
+import { formatMinutesMissal } from "../utils";
 
 interface TimeRangeSliderProps {
   min: number;
@@ -24,32 +24,27 @@ export function TimeRangeSlider({
   const startPercent = getPercent(start, min, max);
   const endPercent = getPercent(end, min, max);
   const formatValue = (minutes: number) =>
-    formatMinutesToTime(Math.min(minutes, max - 1));
+    formatMinutesMissal(Math.min(minutes, max - 1));
 
   return (
-    <div className="space-y-4">
-      <div className="grid gap-3 sm:grid-cols-2">
-        <div className="rounded-2xl border bg-muted/30 px-4 py-3">
-          <p className="text-xs font-semibold tracking-[0.18em] text-muted-foreground uppercase">
-            Start
-          </p>
-          <p className="mt-1 text-sm font-medium">{formatValue(start)}</p>
-        </div>
-        <div className="rounded-2xl border bg-muted/30 px-4 py-3">
-          <p className="text-xs font-semibold tracking-[0.18em] text-muted-foreground uppercase">
-            End
-          </p>
-          <p className="mt-1 text-sm font-medium">{formatValue(end)}</p>
-        </div>
+    <div className="space-y-5">
+      <div className="flex items-baseline justify-between gap-4 font-serif text-base text-ink">
+        <span className="tabular-nums">{formatValue(start)}</span>
+        <span className="smallcaps text-[0.8125rem] text-ink-faint">
+          through
+        </span>
+        <span className="tabular-nums">{formatValue(end)}</span>
       </div>
 
-      <div className="relative h-8">
-        <div className="pointer-events-none absolute top-1/2 h-2 w-full -translate-y-1/2 rounded-full bg-muted" />
+      <div className="relative h-6 px-1">
+        <div className="pointer-events-none absolute top-1/2 left-1 right-1 h-px -translate-y-1/2 bg-rule-strong" />
         <div
-          className="pointer-events-none absolute top-1/2 h-2 -translate-y-1/2 rounded-full bg-primary"
+          className="pointer-events-none absolute top-1/2 h-[2px] -translate-y-1/2 bg-rubric"
           style={{
-            left: `${startPercent}%`,
-            width: `${Math.max(endPercent - startPercent, 0)}%`,
+            left: `calc(${startPercent}% + 0.25rem)`,
+            width: `calc(${Math.max(endPercent - startPercent, 0)}% - 0.5rem * ${
+              (endPercent - startPercent) / 100
+            })`,
           }}
         />
         <input
@@ -59,7 +54,7 @@ export function TimeRangeSlider({
           step={step}
           value={start}
           aria-label="Start time"
-          className="time-range-slider absolute inset-0 h-8 w-full"
+          className="time-range-slider absolute inset-0 h-6 w-full"
           onChange={(event) => {
             const nextStart = Math.min(Number(event.target.value), end);
             onValueChange([nextStart, end]);
@@ -72,12 +67,20 @@ export function TimeRangeSlider({
           step={step}
           value={end}
           aria-label="End time"
-          className="time-range-slider absolute inset-0 h-8 w-full"
+          className="time-range-slider absolute inset-0 h-6 w-full"
           onChange={(event) => {
             const nextEnd = Math.max(Number(event.target.value), start);
             onValueChange([start, nextEnd]);
           }}
         />
+      </div>
+
+      <div className="flex items-center justify-between font-serif text-[0.875rem] italic text-ink-faint">
+        <span>midnight</span>
+        <span>dawn</span>
+        <span>noon</span>
+        <span>dusk</span>
+        <span>midnight</span>
       </div>
     </div>
   );

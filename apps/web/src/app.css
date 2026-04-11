@@ -1,7 +1,15 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
-@import "@fontsource-variable/geist";
+
+/* Liturgical-missal typography: Cardo for display (literally designed for
+ * classical + liturgical texts) and EB Garamond as a warm body serif. Both
+ * are self-hosted via fontsource, no external CDN fetches. */
+@import "@fontsource/cardo/400.css";
+@import "@fontsource/cardo/400-italic.css";
+@import "@fontsource/cardo/700.css";
+@import "@fontsource-variable/eb-garamond";
+@import "@fontsource-variable/eb-garamond/wght-italic.css";
 
 /* Dark mode is intentionally disabled. The `dark` variant is kept as a no-op
  * so existing `dark:*` utilities in shadcn primitives compile without error,
@@ -11,38 +19,55 @@
 :root {
   --safe-area-inset-top: env(safe-area-inset-top, 0);
   --safe-area-inset-bottom: env(safe-area-inset-bottom, 0);
-  --background: oklch(0.985 0.008 84);
-  --foreground: oklch(0.27 0.028 255);
-  --card: oklch(0.995 0.005 84);
-  --card-foreground: oklch(0.27 0.028 255);
-  --popover: oklch(0.992 0.006 84);
-  --popover-foreground: oklch(0.27 0.028 255);
-  --primary: oklch(0.43 0.105 258);
-  --primary-foreground: oklch(0.985 0.008 84);
-  --secondary: oklch(0.93 0.024 232);
-  --secondary-foreground: oklch(0.31 0.04 252);
-  --muted: oklch(0.955 0.012 84);
-  --muted-foreground: oklch(0.57 0.024 248);
-  --accent: oklch(0.84 0.088 82);
-  --accent-foreground: oklch(0.38 0.052 72);
-  --destructive: oklch(0.58 0.19 26);
-  --border: oklch(0.89 0.015 84);
-  --input: oklch(0.91 0.014 84);
-  --ring: oklch(0.59 0.09 258);
-  --chart-1: oklch(0.62 0.14 255);
-  --chart-2: oklch(0.72 0.11 84);
-  --chart-3: oklch(0.69 0.08 180);
-  --chart-4: oklch(0.63 0.14 18);
-  --chart-5: oklch(0.56 0.1 310);
-  --radius: 0.875rem;
-  --sidebar: oklch(0.978 0.007 84);
-  --sidebar-foreground: oklch(0.27 0.028 255);
-  --sidebar-primary: oklch(0.43 0.105 258);
-  --sidebar-primary-foreground: oklch(0.985 0.008 84);
-  --sidebar-accent: oklch(0.93 0.024 232);
-  --sidebar-accent-foreground: oklch(0.31 0.04 252);
-  --sidebar-border: oklch(0.89 0.015 84);
-  --sidebar-ring: oklch(0.59 0.09 258);
+
+  /* "The Missal" palette — paper, ink, rubric red, and a touch of aged brass. */
+  --paper: oklch(0.955 0.022 82);
+  --paper-deep: oklch(0.915 0.028 82);
+  --paper-edge: oklch(0.88 0.03 82);
+  --ink: oklch(0.2 0.015 50);
+  --ink-soft: oklch(0.4 0.018 50);
+  --ink-faint: oklch(0.55 0.02 50);
+  --rubric: oklch(0.46 0.165 28);
+  --rubric-deep: oklch(0.36 0.155 28);
+  --brass: oklch(0.66 0.095 75);
+  --rule: color-mix(in oklch, var(--ink) 14%, transparent);
+  --rule-strong: color-mix(in oklch, var(--ink) 26%, transparent);
+
+  /* Shadcn contract — map our semantic tokens onto the variables its
+   * primitives already consume, so buttons/dialogs/etc inherit the new look
+   * without rewriting every component. */
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: var(--paper);
+  --card-foreground: var(--ink);
+  --popover: var(--paper);
+  --popover-foreground: var(--ink);
+  --primary: var(--rubric);
+  --primary-foreground: var(--paper);
+  --secondary: var(--paper-deep);
+  --secondary-foreground: var(--ink);
+  --muted: var(--paper-deep);
+  --muted-foreground: var(--ink-soft);
+  --accent: var(--brass);
+  --accent-foreground: var(--ink);
+  --destructive: var(--rubric-deep);
+  --border: var(--rule);
+  --input: var(--rule-strong);
+  --ring: var(--rubric);
+  --chart-1: var(--rubric);
+  --chart-2: var(--brass);
+  --chart-3: var(--ink-soft);
+  --chart-4: var(--rubric-deep);
+  --chart-5: var(--ink-faint);
+  --radius: 0.125rem;
+  --sidebar: var(--paper);
+  --sidebar-foreground: var(--ink);
+  --sidebar-primary: var(--rubric);
+  --sidebar-primary-foreground: var(--paper);
+  --sidebar-accent: var(--paper-deep);
+  --sidebar-accent-foreground: var(--ink);
+  --sidebar-border: var(--rule);
+  --sidebar-ring: var(--rubric);
 }
 
 @layer base {
@@ -51,13 +76,34 @@
   }
 
   html {
-    @apply font-sans;
+    font-family: var(--font-sans);
+    /* Old-style numerals + common ligatures sitewide. This single line is
+     * what makes Garamond feel like a book instead of a UI font. */
+    font-feature-settings: "onum" 1, "liga" 1, "dlig" 0, "kern" 1;
+    font-variant-numeric: oldstyle-nums;
   }
 
   body {
     min-height: 100svh;
     -webkit-font-smoothing: antialiased;
-    @apply bg-background text-foreground;
+    text-rendering: optimizeLegibility;
+    background-color: var(--paper);
+    color: var(--ink);
+    /* Soft paper grain: a faint two-stop radial "stain" plus an SVG fractal
+     * noise overlay. Low opacity so it reads as texture, not pattern. */
+    background-image:
+      radial-gradient(
+        ellipse 80% 60% at 50% 0%,
+        color-mix(in oklch, var(--paper) 70%, white) 0%,
+        transparent 70%
+      ),
+      radial-gradient(
+        ellipse 120% 80% at 50% 100%,
+        color-mix(in oklch, var(--paper-deep) 50%, transparent) 0%,
+        transparent 75%
+      ),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.09  0 0 0 0 0.07  0 0 0 0 0.05  0 0 0 0.06 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    background-blend-mode: normal, normal, multiply;
   }
 
   #root {
@@ -69,29 +115,200 @@
     text-decoration: none;
   }
 
+  /* Drop cap utility, used on parish names and masthead titles. */
+  .dropcap::first-letter {
+    font-family: var(--font-display);
+    font-weight: 700;
+    float: left;
+    font-size: 3.25em;
+    line-height: 0.82;
+    padding-right: 0.08em;
+    padding-top: 0.08em;
+    color: var(--rubric);
+    font-feature-settings: "onum" 0, "lnum" 1;
+  }
+
+  /* Small-caps label style — reused for day names, section headers, etc. */
+  .smallcaps {
+    font-family: var(--font-display);
+    font-feature-settings: "smcp" 1, "c2sc" 1, "onum" 0, "lnum" 1;
+    font-variant-caps: all-small-caps;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  /* Hand-drawn rubric underline that appears on hover/focus of text links. */
+  .rubric-link {
+    position: relative;
+    color: var(--rubric);
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.35em;
+    transition: color 160ms ease;
+  }
+  .rubric-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -0.05em;
+    height: 1px;
+    background: currentColor;
+    transform-origin: left center;
+    transform: scaleX(var(--rubric-underline, 0));
+    transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .rubric-link:hover,
+  .rubric-link:focus-visible {
+    --rubric-underline: 1;
+    color: var(--rubric-deep);
+  }
+  .rubric-link[data-active="true"] {
+    --rubric-underline: 1;
+  }
+
+  /* A hairline rule used everywhere instead of box borders. */
+  .hairline {
+    border: none;
+    height: 1px;
+    background: var(--rule-strong);
+  }
+
+  /* Staggered mount reveal used on masthead + schedule blocks. */
+  @keyframes rise-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .rise-in {
+    opacity: 0;
+    animation: rise-in 520ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  /* ---- Leaflet overrides ------------------------------------------------- */
+
+  .leaflet-container {
+    background: var(--paper-deep);
+    font-family: var(--font-sans);
+  }
+
   .leaflet-container *,
   .leaflet-container *::before,
   .leaflet-container *::after {
     border-style: none;
   }
 
+  /* Warm the tiles so they read as aged paper without having to host our own
+   * tileset. The filter combo below works on CartoDB Positron; the result is
+   * a muted cream map that still retains label legibility. */
+  .leaflet-tile-pane {
+    filter: sepia(0.28) saturate(0.78) brightness(1.02) contrast(0.92)
+      hue-rotate(-8deg);
+  }
+
+  .leaflet-control-attribution {
+    background: color-mix(in oklch, var(--paper) 82%, transparent) !important;
+    color: var(--ink-soft) !important;
+    font-size: 11px !important;
+    padding: 2px 6px !important;
+    font-family: var(--font-sans) !important;
+  }
+  .leaflet-control-attribution a {
+    color: var(--rubric) !important;
+  }
+
+  .leaflet-control-zoom a {
+    background: var(--paper) !important;
+    color: var(--ink) !important;
+    border: 1px solid var(--rule-strong) !important;
+    font-family: var(--font-display) !important;
+    font-weight: 400 !important;
+  }
+  .leaflet-control-zoom a:hover {
+    background: var(--paper-deep) !important;
+    color: var(--rubric) !important;
+  }
+
   .leaflet-popup-content-wrapper {
-    border: 1px solid var(--border);
-    border-radius: var(--radius-lg);
-    background: var(--popover);
-    box-shadow: 0 12px 32px rgb(15 23 42 / 0.14);
+    border: 1px solid var(--rule-strong);
+    border-radius: 2px;
+    background: var(--paper);
+    box-shadow:
+      0 1px 0 rgb(22 18 16 / 0.04),
+      0 18px 40px -18px rgb(22 18 16 / 0.35),
+      0 2px 6px -2px rgb(22 18 16 / 0.12);
+    padding: 0;
   }
 
   .leaflet-popup-content {
-    margin: 0.875rem 1rem;
-    min-width: 200px;
-    max-width: 320px;
+    margin: 0;
+    padding: 1rem 1.1rem 0.9rem;
+    min-width: 220px;
+    max-width: 300px;
+    font-family: var(--font-sans);
+    color: var(--ink);
+    line-height: 1.5;
   }
 
   .leaflet-popup-tip {
-    background: var(--popover);
+    background: var(--paper);
+    border: 1px solid var(--rule-strong);
+  }
+
+  .leaflet-popup-close-button {
+    color: var(--ink-faint) !important;
+    font-size: 20px !important;
+    padding: 6px 8px 0 0 !important;
+    font-family: var(--font-display) !important;
+  }
+  .leaflet-popup-close-button:hover {
+    color: var(--rubric) !important;
+    background: transparent !important;
+  }
+
+  /* Marker settle-in animation. IMPORTANT: never animate `transform` on the
+   * `.church-map-marker` wrapper itself — Leaflet sets `transform:
+   * translate3d(...)` on that same element to position each marker, so any
+   * CSS transform here will clobber positioning and all pins stack at the
+   * top-left of the map pane. Animate opacity on the wrapper and leave any
+   * transform effects (hover lift, entry scale) to the inner <svg>. */
+  @keyframes marker-settle {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes marker-settle-svg {
+    from {
+      transform: scale(0.82) translateY(-4px);
+    }
+    to {
+      transform: scale(1) translateY(0);
+    }
+  }
+  .church-map-marker {
+    animation: marker-settle 380ms ease-out both;
+  }
+  .church-map-marker svg {
+    display: block;
+    transform-origin: 50% 100%;
+    animation: marker-settle-svg 380ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    transition: transform 200ms ease;
+    filter: drop-shadow(0 2px 3px rgb(22 18 16 / 0.28));
+  }
+  .church-map-marker:hover svg {
+    transform: translateY(-2px) scale(1.06);
   }
 }
+
+/* ---- Time range slider (missal rubric styling) --------------------------- */
 
 .time-range-slider {
   appearance: none;
@@ -112,30 +329,57 @@
 .time-range-slider::-webkit-slider-thumb {
   appearance: none;
   pointer-events: auto;
-  margin-top: 4px;
-  height: 1.25rem;
-  width: 1.25rem;
-  border: 2px solid var(--primary);
+  margin-top: -0.4375rem;
+  height: 1rem;
+  width: 1rem;
+  border: 1.5px solid var(--rubric);
   border-radius: 9999px;
-  background: var(--background);
-  box-shadow: 0 1px 2px rgb(15 23 42 / 0.14);
+  background: var(--paper);
+  box-shadow: 0 1px 2px rgb(22 18 16 / 0.2);
   cursor: pointer;
+  transition:
+    transform 150ms ease,
+    background 150ms ease;
+}
+.time-range-slider::-webkit-slider-thumb:hover {
+  background: var(--rubric);
+  transform: scale(1.1);
 }
 
 .time-range-slider::-moz-range-thumb {
   pointer-events: auto;
-  height: 1.25rem;
-  width: 1.25rem;
-  border: 2px solid var(--primary);
+  height: 1rem;
+  width: 1rem;
+  border: 1.5px solid var(--rubric);
   border-radius: 9999px;
-  background: var(--background);
-  box-shadow: 0 1px 2px rgb(15 23 42 / 0.14);
+  background: var(--paper);
+  box-shadow: 0 1px 2px rgb(22 18 16 / 0.2);
   cursor: pointer;
+}
+.time-range-slider::-moz-range-thumb:hover {
+  background: var(--rubric);
 }
 
 @theme inline {
-  --font-heading: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
-  --font-sans: 'Geist Variable', sans-serif;
+  --font-display: "Cardo", "Iowan Old Style", "Palatino Linotype",
+    "Book Antiqua", Georgia, serif;
+  --font-heading: "Cardo", "Iowan Old Style", "Palatino Linotype",
+    "Book Antiqua", Georgia, serif;
+  --font-serif: "EB Garamond Variable", "EB Garamond", "Iowan Old Style",
+    Georgia, serif;
+  --font-sans: "EB Garamond Variable", "EB Garamond", "Iowan Old Style",
+    Georgia, serif;
+  --color-paper: var(--paper);
+  --color-paper-deep: var(--paper-deep);
+  --color-paper-edge: var(--paper-edge);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-faint: var(--ink-faint);
+  --color-rubric: var(--rubric);
+  --color-rubric-deep: var(--rubric-deep);
+  --color-brass: var(--brass);
+  --color-rule: var(--rule);
+  --color-rule-strong: var(--rule-strong);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -167,12 +411,11 @@
   --color-card: var(--card);
   --color-foreground: var(--foreground);
   --color-background: var(--background);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+  --radius-sm: 2px;
+  --radius-md: 2px;
+  --radius-lg: 2px;
+  --radius-xl: 3px;
+  --radius-2xl: 4px;
+  --radius-3xl: 4px;
+  --radius-4xl: 6px;
 }
-

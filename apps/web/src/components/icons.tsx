@@ -153,3 +153,70 @@ export function RefreshCwIcon(props: IconProps) {
     </Icon>
   );
 }
+
+/** A slim Latin cross — used for event-type glyphs and the map pin. */
+export function LatinCrossIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M12 3v18" />
+      <path d="M7 8h10" />
+    </Icon>
+  );
+}
+
+/** A stylised fleuron (❦), used as a section divider. Rendered as paths so it
+ * respects `currentColor` and doesn't depend on a font glyph being present. */
+export function FleuronIcon(props: IconProps) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 48 24"
+      width="48"
+      height="24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.1"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      {...props}
+    >
+      <path d="M1 12h14" />
+      <path d="M33 12h14" />
+      <path d="M18 12c0-3 2-5 4-5s4 2 4 5-2 5-4 5-4-2-4-5Z" />
+      <path d="M22 12c0-3-2-5-4-5" />
+      <path d="M26 12c0 3 2 5 4 5" />
+      <circle cx="24" cy="12" r="0.9" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+/** A small candle icon used as the loading glyph. */
+export function CandleIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M12 3c1 1 1 2 0 3s-1 2 0 3" />
+      <rect x="9" y="9" width="6" height="10" rx="0.5" />
+      <path d="M7 19h10" />
+    </Icon>
+  );
+}
+
+/** A sun-with-rays icon for the Adoration monstrance. */
+export function MonstranceIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <circle cx="12" cy="10" r="3.2" />
+      <path d="M12 4.5v1.2" />
+      <path d="M12 14.5v1.2" />
+      <path d="M5.5 10h1.3" />
+      <path d="M17.2 10h1.3" />
+      <path d="m7.6 5.6.9.9" />
+      <path d="m15.5 13.5.9.9" />
+      <path d="m7.6 14.4.9-.9" />
+      <path d="m15.5 6.5.9-.9" />
+      <path d="M12 13.2V20" />
+      <path d="M8 20h8" />
+    </Icon>
+  );
+}

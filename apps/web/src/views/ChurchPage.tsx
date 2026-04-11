@@ -1,54 +1,38 @@
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
 import { fetchChurch, fetchChurchEvents } from "../api";
 import type { EventSummary, EventType } from "../types";
 import {
   formatAddress,
   formatEventDate,
-  formatMinutesToTime,
+  formatMinutesMissal,
 } from "../utils";
 import {
   ArrowLeftIcon,
-  ChurchIcon,
   ExternalLinkIcon,
   FileTextIcon,
-  HandshakeIcon,
   MapPinIcon,
   RefreshCwIcon,
-  SunIcon,
 } from "@/components/icons";
-import type { ComponentType, SVGProps } from "react";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import { Fleuron } from "@/components/Fleuron";
+import { Masthead } from "@/components/Masthead";
 
 const EVENT_TYPE_ORDER: EventType[] = ["mass", "confession", "adoration"];
 const DAY_ORDER = [
+  "sunday",
   "monday",
   "tuesday",
   "wednesday",
   "thursday",
   "friday",
   "saturday",
-  "sunday",
 ];
 
 const EVENT_TYPE_LABELS: Record<EventType, string> = {
   mass: "Mass",
-  adoration: "Adoration",
   confession: "Confession",
-};
-
-const EVENT_TYPE_ICONS: Record<EventType, ComponentType<SVGProps<SVGSVGElement>>> = {
-  mass: ChurchIcon,
-  adoration: SunIcon,
-  confession: HandshakeIcon,
+  adoration: "Adoration",
 };
 
 interface EventsByType {
@@ -56,10 +40,9 @@ interface EventsByType {
   specificDate: EventSummary[];
 }
 
-function partitionEventsByType(events: EventSummary[]): Record<
-  EventType,
-  EventsByType
-> {
+function partitionEventsByType(
+  events: EventSummary[],
+): Record<EventType, EventsByType> {
   const result: Record<EventType, EventsByType> = {
     mass: { weeklyByDay: {}, specificDate: [] },
     confession: { weeklyByDay: {}, specificDate: [] },
@@ -97,19 +80,26 @@ function partitionEventsByType(events: EventSummary[]): Record<
   return result;
 }
 
-function formatEventTime(event: EventSummary): string {
-  const start = formatMinutesToTime(event.start_time);
-  if (event.end_time != null) {
-    return `${start} – ${formatMinutesToTime(event.end_time)}`;
-  }
-  return start;
-}
-
 function formatDayLabel(day: string): string {
   const d = day.toLowerCase();
-  if (d === "sunday") return "SUNDAYS";
-  if (d === "saturday") return "SATURDAYS";
-  return d.charAt(0).toUpperCase() + d.slice(1).toUpperCase() + "S";
+  if (d === "sunday") return "Sundays";
+  if (d === "saturday") return "Saturdays";
+  return d.charAt(0).toUpperCase() + d.slice(1) + "s";
+}
+
+/** Takes a day's events and returns a comma-separated run of times, e.g.
+ *  `7:00 · 9:30 · 11:15 a.m.` — with the meridiem merged on shared halves. */
+function formatTimeRun(events: EventSummary[]): string {
+  if (events.length === 0) return "";
+  return events
+    .map((e) => {
+      const main = formatMinutesMissal(e.start_time);
+      if (e.end_time != null) {
+        return `${main} – ${formatMinutesMissal(e.end_time)}`;
+      }
+      return main;
+    })
+    .join("  ·  ");
 }
 
 export function ChurchPage() {
@@ -123,193 +113,229 @@ export function ChurchPage() {
   });
   const eventsQuery = useQuery({
     queryKey: ["church-events", churchSlug],
-    queryFn: () => fetchChurchEvents(churchSlug!, ["mass", "confession", "adoration"]),
+    queryFn: () =>
+      fetchChurchEvents(churchSlug!, ["mass", "confession", "adoration"]),
     enabled,
   });
 
+  const events = eventsQuery.data;
+  const byType = useMemo(
+    () => (events ? partitionEventsByType(events) : null),
+    [events],
+  );
   if (!enabled) {
     return (
-      <main className="flex min-h-svh flex-col items-center justify-center gap-4 bg-background px-4 py-8 text-center">
-        <p className="text-sm text-muted-foreground">
+      <main className="flex min-h-svh flex-col items-center justify-center gap-4 bg-paper px-4 py-8 text-center">
+        <p className="font-serif text-base italic text-ink-soft">
           We couldn&apos;t find that parish.
         </p>
-        <Button asChild variant="outline" size="sm">
-          <Link to="/">
-            <ArrowLeftIcon className="size-4" />
-            Back to map
-          </Link>
-        </Button>
+          <Link to="/" className="rubric-link smallcaps text-[0.875rem]">
+          <ArrowLeftIcon className="size-3" />
+          Back to the bulletin
+        </Link>
       </main>
     );
   }
 
   const church = churchQuery.data;
-  const events = eventsQuery.data;
-  const byType = events ? partitionEventsByType(events) : null;
 
   return (
-    <main className="min-h-svh bg-background pt-[calc(3.75rem+var(--safe-area-inset-top))]">
-      <header className="fixed inset-x-0 top-0 z-[1000] border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/85">
-        <div className="mx-auto flex w-full max-w-3xl items-center px-4 pt-[calc(0.75rem+var(--safe-area-inset-top))] pb-3 md:px-6">
-          <Button asChild variant="ghost" size="sm" className="-ml-2">
-            <Link to="/">
-              <ArrowLeftIcon className="size-4" />
-              Back to map
-            </Link>
-          </Button>
+    <main className="min-h-svh bg-paper">
+      {/* Slim header bar — just a back link, styled as a rubric text link. */}
+      <header className="sticky top-0 z-40 border-b border-rule-strong bg-paper/95 backdrop-blur supports-[backdrop-filter]:bg-paper/85">
+        <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-6 pt-[calc(0.85rem+var(--safe-area-inset-top))] pb-3">
+          <Link to="/" className="rubric-link smallcaps text-[0.875rem]">
+            <ArrowLeftIcon className="size-3" />
+            Back to the bulletin
+          </Link>
+          <Masthead compact />
         </div>
       </header>
 
-      <div className="mx-auto flex w-full max-w-3xl flex-col gap-5 px-4 py-6 pb-[calc(1.5rem+var(--safe-area-inset-bottom))] md:px-6">
+      <div className="mx-auto w-full max-w-5xl px-6 py-10 pb-[calc(3rem+var(--safe-area-inset-bottom))] md:py-14">
         {churchQuery.isLoading ? (
-          <p className="my-2 text-sm text-muted-foreground">Loading parish details…</p>
+          <p className="font-serif text-sm italic text-ink-soft">
+            Leafing through the parish registry…
+          </p>
         ) : null}
         {churchQuery.error ? (
-          <div className="my-2 flex flex-col items-start gap-3">
-            <p className="text-sm text-muted-foreground">
-              We couldn&apos;t load this parish. Check your connection and try again.
+          <div className="flex flex-col items-start gap-3">
+            <p className="font-serif text-sm italic text-ink-soft">
+              We couldn&apos;t load this parish.
             </p>
-            <Button
+            <button
               type="button"
-              variant="outline"
-              size="sm"
               onClick={() => churchQuery.refetch()}
+              className="rubric-link smallcaps inline-flex items-center gap-1.5 text-[0.875rem]"
             >
-              <RefreshCwIcon className="size-4" />
+              <RefreshCwIcon className="size-3" />
               Try again
-            </Button>
+            </button>
           </div>
         ) : null}
 
         {church ? (
-          <section className="space-y-4">
-            <h2 className="font-heading text-3xl font-medium tracking-tight text-foreground">
-              {church.name ?? "Unnamed parish"}
-            </h2>
-            {formatAddress(church) ? (
-              <p className="flex items-start gap-2 text-sm text-muted-foreground">
-                <MapPinIcon className="mt-0.5 size-4 shrink-0" />
-                {formatAddress(church)}
+          <>
+            {/* Centered masthead block — like the top of a service leaflet */}
+            <section className="rise-in mx-auto max-w-2xl text-center">
+              <p className="smallcaps text-[0.875rem] text-ink-faint">
+                Parish of
+              </p>
+              <h2 className="mt-2 font-display text-[clamp(2.25rem,6vw,3.75rem)] leading-[1.05] font-normal tracking-tight text-ink">
+                {church.name ?? "Unnamed parish"}
+              </h2>
+
+              {formatAddress(church) ? (
+                <p className="mt-4 flex items-center justify-center gap-2 font-serif text-[0.95rem] italic text-ink-soft">
+                  <MapPinIcon className="size-3.5 text-brass" />
+                  {formatAddress(church)}
+                </p>
+              ) : null}
+
+              <Fleuron className="my-7" />
+
+              {(church.homepage_url || church.bulletin_url) ? (
+                <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
+                  {church.homepage_url ? (
+                    <a
+                      href={church.homepage_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="rubric-link smallcaps inline-flex items-center gap-2 text-[0.875rem]"
+                    >
+                      <ExternalLinkIcon className="size-3" />
+                      Visit the parish website
+                    </a>
+                  ) : null}
+                  {church.bulletin_url ? (
+                    <a
+                      href={church.bulletin_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="rubric-link smallcaps inline-flex items-center gap-2 text-[0.875rem]"
+                    >
+                      <FileTextIcon className="size-3" />
+                      Read the Sunday bulletin
+                    </a>
+                  ) : null}
+                </div>
+              ) : null}
+            </section>
+
+            {eventsQuery.isLoading ? (
+              <p className="mx-auto max-w-2xl font-serif text-sm italic text-ink-soft">
+                Collecting the schedule…
               </p>
             ) : null}
-            <div className="flex flex-col gap-3 sm:flex-row">
-              {church.homepage_url ? (
-                <Button asChild size="lg" className="sm:flex-1">
-                  <a href={church.homepage_url} target="_blank" rel="noopener noreferrer">
-                    <ExternalLinkIcon className="size-4" />
-                    Visit website
-                  </a>
-                </Button>
-              ) : null}
-              {church.bulletin_url ? (
-                <Button asChild variant="outline" size="lg" className="sm:flex-1">
-                  <a href={church.bulletin_url} target="_blank" rel="noopener noreferrer">
-                    <FileTextIcon className="size-4" />
-                    View bulletin
-                  </a>
-                </Button>
-              ) : null}
-            </div>
-          </section>
-        ) : null}
+            {eventsQuery.error ? (
+              <div className="mx-auto flex max-w-2xl flex-col items-start gap-3">
+                <p className="font-serif text-sm italic text-ink-soft">
+                  We couldn&apos;t load services for this parish.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => eventsQuery.refetch()}
+                  className="rubric-link smallcaps inline-flex items-center gap-1.5 text-[0.875rem]"
+                >
+                  <RefreshCwIcon className="size-3" />
+                  Try again
+                </button>
+              </div>
+            ) : null}
+            {events && events.length === 0 ? (
+              <p className="mx-auto max-w-2xl text-center font-serif text-sm italic text-ink-soft">
+                No Mass, Confession, or Adoration times are listed for this
+                parish yet.
+              </p>
+            ) : null}
 
-        {eventsQuery.isLoading ? (
-          <p className="my-2 text-sm text-muted-foreground">Loading services…</p>
-        ) : null}
-        {eventsQuery.error ? (
-          <div className="my-2 flex flex-col items-start gap-3">
-            <p className="text-sm text-muted-foreground">
-              We couldn&apos;t load services for this parish.
-            </p>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => eventsQuery.refetch()}
-            >
-              <RefreshCwIcon className="size-4" />
-              Try again
-            </Button>
-          </div>
-        ) : null}
-        {events && events.length === 0 ? (
-          <p className="my-2 text-sm text-muted-foreground">
-            No Mass, Confession, or Adoration times are listed for this parish yet.
-          </p>
-        ) : null}
+            {byType ? (
+              <div className="mx-auto max-w-4xl">
+                <div className="rise-in space-y-12" style={{ animationDelay: "80ms" }}>
+                  {EVENT_TYPE_ORDER.map((eventType) => {
+                    const { weeklyByDay, specificDate } = byType[eventType];
+                    const hasWeekly = DAY_ORDER.some(
+                      (d) => (weeklyByDay[d]?.length ?? 0) > 0,
+                    );
+                    const hasAny = hasWeekly || specificDate.length > 0;
+                    if (!hasAny) return null;
 
-        {byType ? (
-          <div className="flex flex-col gap-4">
-            {EVENT_TYPE_ORDER.map((eventType) => {
-              const { weeklyByDay, specificDate } = byType[eventType];
-              const hasWeekly = DAY_ORDER.some(
-                (d) => (weeklyByDay[d]?.length ?? 0) > 0,
-              );
-              const hasAny = hasWeekly || specificDate.length > 0;
-              if (!hasAny) return null;
+                    return (
+                      <section key={eventType}>
+                        <div className="mb-5">
+                          <h3 className="font-display text-[1.75rem] leading-none font-normal text-ink">
+                            {EVENT_TYPE_LABELS[eventType]}
+                          </h3>
+                        </div>
 
-              const EventTypeIcon = EVENT_TYPE_ICONS[eventType];
-              return (
-                <Card key={eventType} className="shadow-sm">
-                  <CardHeader className="gap-3">
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="flex size-10 items-center justify-center rounded-full border bg-primary/10 text-primary"
-                        aria-hidden
-                      >
-                        <EventTypeIcon className="size-5" />
-                      </div>
-                      <CardTitle>{EVENT_TYPE_LABELS[eventType]}</CardTitle>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {DAY_ORDER.map((day) => {
-                      const dayEvents = weeklyByDay[day];
-                      if (!dayEvents || dayEvents.length === 0) return null;
-                      return (
-                        <div key={day} className="space-y-2">
-                          <p className="text-xs font-semibold tracking-[0.18em] text-muted-foreground uppercase">
-                            {formatDayLabel(day)}
-                          </p>
-                          <div className="flex flex-wrap gap-2">
-                            {dayEvents.map((event) => (
-                              <Badge
-                                key={event.id}
-                                variant="secondary"
-                                className="rounded-full px-3 py-1 text-sm font-medium"
+                        <dl className="divide-y divide-rule">
+                          {DAY_ORDER.map((day) => {
+                            const dayEvents = weeklyByDay[day];
+                            if (!dayEvents || dayEvents.length === 0)
+                              return null;
+                            return (
+                              <div
+                                key={day}
+                                className="grid grid-cols-[6rem_1fr] items-baseline gap-4 py-2.5"
                               >
-                                {formatEventTime(event)}
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-                      );
-                    })}
+                                <dt className="smallcaps text-[0.875rem] text-ink-soft">
+                                  {formatDayLabel(day)}
+                                </dt>
+                                <dd className="font-serif text-[1.05rem] leading-snug tabular-nums text-ink">
+                                  {formatTimeRun(dayEvents)}
+                                </dd>
+                              </div>
+                            );
+                          })}
 
-                    {specificDate.length > 0 ? (
-                      <>
-                        {DAY_ORDER.some((day) => (weeklyByDay[day]?.length ?? 0) > 0) ? (
-                          <Separator />
-                        ) : null}
-                        <div className="space-y-3">
-                          {specificDate.map((event) => (
-                            <div key={event.id} className="space-y-1">
-                              <p className="text-xs font-semibold tracking-[0.18em] text-muted-foreground uppercase">
-                                {event.date ? formatEventDate(event.date) : "Specific date"}
-                              </p>
-                              <p className="text-base font-medium text-foreground">
-                                {formatEventTime(event)}
-                              </p>
-                            </div>
-                          ))}
-                        </div>
-                      </>
-                    ) : null}
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
+                          {specificDate.length > 0 ? (
+                            <>
+                              {specificDate.map((event) => (
+                                <div
+                                  key={event.id}
+                                  className="grid grid-cols-[6rem_1fr] items-baseline gap-4 py-2.5"
+                                >
+                                  <dt className="smallcaps text-[0.875rem] text-rubric">
+                                    {event.date
+                                      ? formatEventDate(event.date).replace(
+                                          /, .+$/,
+                                          "",
+                                        )
+                                      : "Special"}
+                                  </dt>
+                                  <dd className="font-serif text-[1.05rem] leading-snug text-ink">
+                                    <span className="tabular-nums">
+                                      {formatMinutesMissal(event.start_time)}
+                                      {event.end_time != null
+                                        ? ` – ${formatMinutesMissal(event.end_time)}`
+                                        : ""}
+                                    </span>
+                                    {event.date ? (
+                                      <span className="ml-2 font-serif text-[0.9rem] italic text-ink-faint">
+                                        {formatEventDate(event.date)}
+                                      </span>
+                                    ) : null}
+                                  </dd>
+                                </div>
+                              ))}
+                            </>
+                          ) : null}
+                        </dl>
+                      </section>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : null}
+
+            <div className="mx-auto mt-16 max-w-2xl">
+              <Fleuron solo className="text-brass" />
+              <p className="mt-4 text-center font-serif text-[0.9rem] italic text-ink-faint">
+                Times are drawn from each parish&apos;s most recent bulletin.
+                When in doubt, consult the parish directly.
+              </p>
+            </div>
+          </>
         ) : null}
       </div>
     </main>

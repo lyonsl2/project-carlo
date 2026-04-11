@@ -1,6 +1,5 @@
-import { formatMinutesToTime, titleCase } from "../utils";
+import { formatMinutesMissal, titleCase } from "../utils";
 import type { FilterState } from "./filterState";
-import { Badge } from "@/components/ui/badge";
 
 const DAY_NAMES = [
   "Monday",
@@ -19,40 +18,52 @@ interface FilterPillsProps {
   filters: FilterState;
 }
 
+/** A single line of small-caps labels separated by bullet points — styled
+ *  like the standing heads beneath a newspaper masthead ("VOL. I · NO. 1 ·
+ *  PRICE FIVE CENTS"). Replaces the chunkier pill badges of the old UI. */
 export function FilterPills({ filters }: FilterPillsProps) {
-  const pills: string[] = [];
+  const parts: string[] = [];
 
-  // Only show the event type pill when it deviates from the default.
   if (filters.eventType !== DEFAULT_EVENT_TYPE) {
-    pills.push(titleCase(filters.eventType));
+    parts.push(titleCase(filters.eventType));
   }
 
-  // Days of week — only show when specific days are selected.
   if (filters.daysOfWeek.length > 0) {
-    filters.daysOfWeek.forEach((i) => pills.push(DAY_NAMES[i]));
+    if (filters.daysOfWeek.length <= 3) {
+      filters.daysOfWeek.forEach((i) => parts.push(DAY_NAMES[i]));
+    } else {
+      parts.push(`${filters.daysOfWeek.length} days`);
+    }
   }
 
-  // Time range — only show when not a full day.
   const isFullDay =
     filters.timeFrom <= 0 && filters.timeTo >= MINUTES_PER_DAY - 1;
   if (!isFullDay) {
-    pills.push(
-      `${formatMinutesToTime(filters.timeFrom)} – ${formatMinutesToTime(filters.timeTo)}`,
+    parts.push(
+      `${formatMinutesMissal(filters.timeFrom)} – ${formatMinutesMissal(
+        filters.timeTo,
+      )}`,
     );
   }
 
-  if (pills.length === 0) return null;
+  if (parts.length === 0) return null;
 
   return (
-    <div className="mt-3 flex min-h-0 flex-wrap gap-2">
-      {pills.map((label) => (
-        <Badge
-          key={label}
-          variant="outline"
-          className="rounded-full bg-background/90 px-3 py-1 text-xs font-medium"
-        >
-          {label}
-        </Badge>
+    <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
+      <span className="smallcaps text-[0.8125rem] text-ink-faint">
+        Showing
+      </span>
+      {parts.map((label, idx) => (
+        <span key={label} className="flex items-center gap-3">
+          {idx > 0 ? (
+            <span aria-hidden className="text-brass">
+              ·
+            </span>
+          ) : null}
+          <span className="smallcaps text-[0.875rem] text-rubric">
+            {label}
+          </span>
+        </span>
       ))}
     </div>
   );

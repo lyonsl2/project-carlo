@@ -7,11 +7,10 @@ import type { ChurchMapItem, EventSummary } from "../types";
 import {
   formatAddress,
   formatEventDate,
-  formatMinutesToTime,
+  formatMinutesMissal,
   titleCase,
 } from "../utils";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { FleuronIcon } from "@/components/icons";
 
 const DAY_ORDER = [
   "sunday",
@@ -75,7 +74,7 @@ function compareEvents(a: EventSummary, b: EventSummary): number {
 
 function formatEventDay(event: EventSummary): string {
   if (event.kind === "weekly" && event.day_of_week) {
-    return titleCase(event.day_of_week);
+    return titleCase(event.day_of_week) + "s";
   }
   if (event.date) {
     return formatEventDate(event.date);
@@ -85,24 +84,32 @@ function formatEventDay(event: EventSummary): string {
 
 const defaultCenter: [number, number] = [43.1566, -77.6088];
 
-// Themed SVG pin using CSS variables so it follows the site palette.
-// Rendered as a divIcon so nothing is fetched from a CDN at runtime.
+/* A cross-in-roundel pin: cream disc with a brass ring, a rubric-red Latin
+ * cross at the center, and a subtle drop-shadow. Rendered via divIcon so
+ * nothing is fetched from a CDN at runtime. */
 const markerSvg = `
-<svg xmlns="http://www.w3.org/2000/svg" width="30" height="40" viewBox="0 0 30 40" fill="none" aria-hidden="true">
-  <path d="M15 1C7.82 1 2 6.82 2 14c0 9.5 11.5 23.2 12.08 23.88a1.2 1.2 0 0 0 1.84 0C16.5 37.2 28 23.5 28 14 28 6.82 22.18 1 15 1Z"
-        fill="var(--primary)" stroke="var(--primary-foreground)" stroke-width="1.6" />
-  <g transform="translate(15 14)" fill="none" stroke="var(--primary-foreground)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M0 -6 V 2" />
-    <path d="M-3 -3 H 3" />
-    <path d="M-5 6 V -1 L 0 -5 L 5 -1 V 6 Z" />
+<svg xmlns="http://www.w3.org/2000/svg" width="34" height="42" viewBox="0 0 34 42" fill="none" aria-hidden="true">
+  <defs>
+    <filter id="marker-shadow" x="-30%" y="-10%" width="160%" height="130%">
+      <feDropShadow dx="0" dy="2" stdDeviation="1.6" flood-color="#161210" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  <g filter="url(#marker-shadow)">
+    <path d="M17 2C9.27 2 3 8.27 3 16c0 3.7 1.73 7.3 4 10.5C9.5 30 13.5 34.4 15.8 38.6a1.35 1.35 0 0 0 2.4 0C20.5 34.4 24.5 30 27 26.5 29.27 23.3 31 19.7 31 16 31 8.27 24.73 2 17 2Z"
+          fill="var(--paper)" stroke="var(--brass)" stroke-width="1.3" />
+    <circle cx="17" cy="16" r="9.5" fill="none" stroke="var(--rule-strong)" stroke-width="0.8" />
+    <g stroke="var(--rubric)" stroke-width="2" stroke-linecap="round">
+      <path d="M17 9.5 V 21.5" />
+      <path d="M12.5 13.5 H 21.5" />
+    </g>
   </g>
 </svg>`;
 
 const markerIcon = L.divIcon({
   html: markerSvg,
   className: "church-map-marker",
-  iconSize: [30, 40],
-  iconAnchor: [15, 38],
+  iconSize: [34, 42],
+  iconAnchor: [17, 40],
   popupAnchor: [0, -34],
 });
 
@@ -132,75 +139,82 @@ const ChurchMarker = memo(function ChurchMarker({
       markerRef.current.openPopup();
     }
   }, [church.id, openPopupForChurchId]);
+
+  const topEvents = useMemo(
+    () => [...church.upcoming_events].sort(compareEvents).slice(0, 3),
+    [church.upcoming_events],
+  );
+
   return (
     <Marker
       ref={markerRef}
       icon={markerIcon}
       position={[church.latitude as number, church.longitude as number]}
     >
-      <Popup minWidth={220}>
-        <div className="w-full space-y-3 text-sm">
-          <div className="space-y-1">
-            <h3 className="font-heading font-medium text-foreground">
+      <Popup minWidth={240} maxWidth={300}>
+        <div className="w-full">
+          <div className="space-y-1.5">
+            <div className="smallcaps text-[0.75rem] text-ink-faint">
+              Parish of
+            </div>
+            <h3 className="font-display text-[1.35rem] leading-[1.1] font-normal text-ink">
               {church.name ?? "Unnamed parish"}
             </h3>
             {formatAddress(church) ? (
-              <p className="text-xs leading-5 text-muted-foreground">
+              <p className="font-serif text-[0.875rem] italic leading-snug text-ink-soft">
                 {formatAddress(church)}
               </p>
             ) : null}
           </div>
-          <div className="flex flex-wrap gap-1.5">
-            {church.event_types.length > 0 ? (
-              church.event_types.map((eventType) => (
-                <Badge key={eventType} variant="outline" className="capitalize">
-                  {titleCase(eventType)}
-                </Badge>
-              ))
-            ) : (
-              <Badge variant="outline">No services listed</Badge>
-            )}
+
+          <div
+            className="my-3 flex items-center justify-center gap-2 text-brass"
+            aria-hidden
+          >
+            <span className="h-px flex-1 bg-rule-strong" />
+            <FleuronIcon className="h-3 w-8" />
+            <span className="h-px flex-1 bg-rule-strong" />
           </div>
-          <ul role="list" className="space-y-2 pl-0">
-            {church.upcoming_events.length > 0 ? (
-              <>
-                {[...church.upcoming_events]
-                  .sort(compareEvents)
-                  .slice(0, 3)
-                  .map((eventItem) => {
-                    const day = formatEventDay(eventItem);
-                    const time = formatMinutesToTime(eventItem.start_time);
-                    return (
-                      <li
-                        key={eventItem.id}
-                        className="flex items-start justify-between gap-3 rounded-md border bg-muted/30 px-3 py-2"
-                      >
-                        <span className="font-medium text-foreground">
-                          {day || "Upcoming"}
-                        </span>
-                        <span className="text-muted-foreground">{time}</span>
-                      </li>
-                    );
-                  })}
-                {church.upcoming_events.length > 3 ? (
-                  <li className="text-xs italic text-muted-foreground">
-                    {church.upcoming_events.length - 3} more
+
+          <div className="smallcaps mb-1.5 text-[0.75rem] text-ink-faint">
+            Upcoming
+          </div>
+          <ul role="list" className="m-0 space-y-1 p-0 list-none">
+            {topEvents.length > 0 ? (
+              topEvents.map((eventItem) => {
+                const day = formatEventDay(eventItem);
+                const time = formatMinutesMissal(eventItem.start_time);
+                return (
+                  <li
+                    key={eventItem.id}
+                    className="flex items-baseline justify-between gap-3 font-serif text-[0.9rem]"
+                  >
+                    <span className="text-ink">{day || "Upcoming"}</span>
+                    <span className="flex-1 border-b border-dotted border-rule-strong translate-y-[-3px]" />
+                    <span className="tabular-nums text-rubric">{time}</span>
                   </li>
-                ) : null}
-              </>
+                );
+              })
             ) : (
-              <li className="text-sm text-muted-foreground">
+              <li className="font-serif text-[0.9rem] italic text-ink-faint">
                 No services listed yet.
               </li>
             )}
+            {church.upcoming_events.length > 3 ? (
+              <li className="pt-1 font-serif text-[0.8125rem] italic text-ink-faint">
+                …and {church.upcoming_events.length - 3} more
+              </li>
+            ) : null}
           </ul>
-          <Button
-            asChild
-            size="sm"
-            className="w-full !text-primary-foreground hover:!text-primary-foreground"
-          >
-            <Link to={`/churches/${church.slug}`}>View church page</Link>
-          </Button>
+
+          <div className="mt-3.5 border-t border-rule-strong pt-2.5">
+            <Link
+              to={`/churches/${church.slug}`}
+              className="rubric-link smallcaps text-[0.8125rem]"
+            >
+              Read the full leaflet →
+            </Link>
+          </div>
         </div>
       </Popup>
     </Marker>
@@ -224,13 +238,18 @@ export const ChurchMap = memo(function ChurchMap({
     <MapContainer
       center={center}
       zoom={11}
-      className="h-full min-h-[calc(100vh-5rem)] w-full"
+      className="h-full w-full"
       scrollWheelZoom
+      zoomControl={false}
     >
       {centerOn && <ChangeView center={centerOn} />}
+      {/* CartoDB Positron — a clean, low-saturation base that takes the
+       * warm sepia CSS filter (set in app.css) gracefully. Free, no API key. */}
       <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
+        url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+        subdomains={["a", "b", "c", "d"]}
+        maxZoom={19}
       />
       {withCoords.map((church) => (
         <ChurchMarker
