@@ -1,6 +1,10 @@
+import { lazy, Suspense } from "react";
 import { createBrowserRouter } from "react-router-dom";
 import { HomePage } from "./views/HomePage";
-import { ChurchPage } from "./views/ChurchPage";
+
+const ChurchPage = lazy(() =>
+  import("./views/ChurchPage").then((m) => ({ default: m.ChurchPage })),
+);
 
 export const router = createBrowserRouter([
   {
@@ -9,6 +13,10 @@ export const router = createBrowserRouter([
   },
   {
     path: "/churches/:churchSlug",
-    element: <ChurchPage />,
+    element: (
+      <Suspense>
+        <ChurchPage />
+      </Suspense>
+    ),
   },
 ]);

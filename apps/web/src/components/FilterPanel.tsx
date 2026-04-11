@@ -1,13 +1,24 @@
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { EventType } from "../types";
 import { titleCase } from "../utils";
-
-export interface FilterState {
-  eventType: EventType; // single selection: mass, adoration, or confession
-  daysOfWeek: number[]; // 0=Mon, 6=Sun
-  timeFrom: number; // minutes since midnight
-  timeTo: number; // minutes since midnight
-}
+import type { FilterState } from "./filterState";
+import { TimeRangeSlider } from "./TimeRangeSlider";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const EVENT_TYPES: EventType[] = ["mass", "adoration", "confession"];
 const DAY_NAMES = [
@@ -21,28 +32,7 @@ const DAY_NAMES = [
 ];
 
 const MINUTES_PER_DAY = 24 * 60;
-
-function minutesToTimeValue(minutes: number): string {
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
-  return `${h.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")}`;
-}
-
-function timeValueToMinutes(value: string): number {
-  const [h, m] = value.split(":").map(Number);
-  return (h ?? 0) * 60 + (m ?? 0);
-}
-
-export function getTimeRange(filters: FilterState): {
-  from?: number;
-  to?: number;
-} {
-  // If full range selected, no filter
-  if (filters.timeFrom <= 0 && filters.timeTo >= MINUTES_PER_DAY - 1) {
-    return {};
-  }
-  return { from: filters.timeFrom, to: filters.timeTo };
-}
+const TIME_STEP_MINUTES = 15;
 
 interface FilterPanelProps {
   isOpen: boolean;
@@ -50,6 +40,26 @@ interface FilterPanelProps {
   filters: FilterState;
   onChange: (filters: FilterState) => void;
   onApply: () => void;
+}
+
+function useIsDesktop() {
+  const [isDesktop, setIsDesktop] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.matchMedia("(min-width: 768px)").matches;
+  });
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const mediaQuery = window.matchMedia("(min-width: 768px)");
+    const update = () => setIsDesktop(mediaQuery.matches);
+
+    update();
+    mediaQuery.addEventListener("change", update);
+    return () => mediaQuery.removeEventListener("change", update);
+  }, []);
+
+  return isDesktop;
 }
 
 export function FilterPanel({
@@ -86,20 +96,14 @@ export function FilterPanel({
     [filters, onChange],
   );
 
-  const handleTimeFromChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const minutes = timeValueToMinutes(e.target.value);
-      const newFrom = Math.min(minutes, filters.timeTo);
-      onChange({ ...filters, timeFrom: newFrom });
-    },
-    [filters, onChange],
-  );
-
-  const handleTimeToChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const minutes = timeValueToMinutes(e.target.value);
-      const newTo = Math.max(minutes, filters.timeFrom);
-      onChange({ ...filters, timeTo: newTo });
+  const handleTimeRangeChange = useCallback(
+    ([timeFrom, timeTo]: [number, number]) => {
+      onChange({
+        ...filters,
+        timeFrom,
+        timeTo:
+          timeTo >= MINUTES_PER_DAY ? MINUTES_PER_DAY - 1 : timeTo,
+      });
     },
     [filters, onChange],
   );
@@ -118,136 +122,150 @@ export function FilterPanel({
     onClose();
   }, [onApply, onClose]);
 
-  return (
+  const isDesktop = useIsDesktop();
+
+  const panelBody = (
     <>
-      <div
-        className={`filter-overlay ${isOpen ? "filter-overlay--open" : ""}`}
-        onClick={onClose}
-        aria-hidden={!isOpen}
-      />
-      <div
-        className={`filter-panel ${isOpen ? "filter-panel--open" : ""}`}
-        role="dialog"
-        aria-modal="true"
-        aria-label="Refine search"
-      >
-        <div className="filter-panel__header">
-          <h2 className="filter-panel__title">Find Mass</h2>
-          <button
+      <div className="space-y-5 px-5 py-4">
+        <section className="space-y-2">
+          <h3 className="text-xs font-semibold tracking-[0.18em] text-muted-foreground uppercase">
+            Event type
+          </h3>
+          <div className="flex flex-wrap gap-2">
+            {EVENT_TYPES.map((type) => {
+              const isSelected = filters.eventType === type;
+              return (
+                <Button
+                  key={type}
+                  type="button"
+                  variant={isSelected ? "default" : "outline"}
+                  className="h-11 rounded-full px-5 text-sm"
+                  aria-pressed={isSelected}
+                  onClick={() => selectEventType(type)}
+                >
+                  {titleCase(type)}
+                </Button>
+              );
+            })}
+          </div>
+        </section>
+
+        <section className="space-y-2">
+          <h3 className="text-xs font-semibold tracking-[0.18em] text-muted-foreground uppercase">
+            Day of week
+          </h3>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant={filters.daysOfWeek.length === 0 ? "default" : "outline"}
+              className="h-11 rounded-full px-5 text-sm"
+              aria-pressed={filters.daysOfWeek.length === 0}
+              onClick={selectAnyDay}
+            >
+              Any day
+            </Button>
+            {DAY_NAMES.map((name, dayIndex) => {
+              const isSelected = filters.daysOfWeek.includes(dayIndex);
+              return (
+                <Button
+                  key={dayIndex}
+                  type="button"
+                  variant={isSelected ? "default" : "outline"}
+                  className="h-11 rounded-full px-5 text-sm"
+                  aria-pressed={isSelected}
+                  onClick={() => selectDay(dayIndex)}
+                >
+                  {name}
+                </Button>
+              );
+            })}
+          </div>
+        </section>
+
+        <section className="space-y-3">
+          <h3 className="text-xs font-semibold tracking-[0.18em] text-muted-foreground uppercase">
+            Time range
+          </h3>
+          <TimeRangeSlider
+            min={0}
+            max={MINUTES_PER_DAY}
+            step={TIME_STEP_MINUTES}
+            value={[
+              filters.timeFrom,
+              filters.timeTo >= MINUTES_PER_DAY - 1
+                ? MINUTES_PER_DAY
+                : filters.timeTo,
+            ]}
+            onValueChange={handleTimeRangeChange}
+          />
+        </section>
+      </div>
+      <div className="border-t px-5 pt-3 pb-[calc(0.75rem+var(--safe-area-inset-bottom))]">
+        <div className="flex items-center gap-2">
+          <Button
             type="button"
-            className="filter-panel__close"
-            onClick={onClose}
-            aria-label="Close filter panel"
-          >
-            <span aria-hidden>×</span>
-          </button>
-        </div>
-
-        <div className="filter-panel__body">
-          <section className="filter-section">
-            <h3 className="filter-section__label">EVENT TYPE</h3>
-            <div className="filter-section__options filter-section__options--event-type">
-              {EVENT_TYPES.map((type) => {
-                const isSelected = filters.eventType === type;
-                const icon =
-                  type === "mass" ? "▲" : type === "adoration" ? "✶" : "🔒";
-                return (
-                  <button
-                    key={type}
-                    type="button"
-                    className={`filter-option filter-option--event ${
-                      isSelected ? "filter-option--selected" : ""
-                    }`}
-                    onClick={() => selectEventType(type)}
-                  >
-                    <span className="filter-option__icon">{icon}</span>
-                    {titleCase(type)}
-                  </button>
-                );
-              })}
-            </div>
-          </section>
-
-          <section className="filter-section">
-            <h3 className="filter-section__label">DAY OF WEEK</h3>
-            <div className="filter-section__options filter-section__options--days">
-              <button
-                type="button"
-                className={`filter-option filter-option--day ${
-                  filters.daysOfWeek.length === 0 ? "filter-option--selected" : ""
-                }`}
-                onClick={selectAnyDay}
-              >
-                Any day
-              </button>
-              {DAY_NAMES.map((name, dayIndex) => {
-                const isSelected = filters.daysOfWeek.includes(dayIndex);
-                return (
-                  <button
-                    key={dayIndex}
-                    type="button"
-                    className={`filter-option filter-option--day ${
-                      isSelected ? "filter-option--selected" : ""
-                    }`}
-                    onClick={() => selectDay(dayIndex)}
-                  >
-                    {name}
-                  </button>
-                );
-              })}
-            </div>
-          </section>
-
-          <section className="filter-section">
-            <h3 className="filter-section__label">TIME RANGE</h3>
-            <div className="time-pickers">
-              <div className="time-picker">
-                <label htmlFor="time-from" className="time-picker__label">
-                  Start time
-                </label>
-                <input
-                  id="time-from"
-                  type="time"
-                  value={minutesToTimeValue(filters.timeFrom)}
-                  onChange={handleTimeFromChange}
-                  className="time-picker__input"
-                  aria-label="Start time"
-                />
-              </div>
-              <div className="time-picker">
-                <label htmlFor="time-to" className="time-picker__label">
-                  End time
-                </label>
-                <input
-                  id="time-to"
-                  type="time"
-                  value={minutesToTimeValue(filters.timeTo)}
-                  onChange={handleTimeToChange}
-                  className="time-picker__input"
-                  aria-label="End time"
-                />
-              </div>
-            </div>
-          </section>
-        </div>
-
-        <div className="filter-panel__footer">
-          <button
-            type="button"
-            className="filter-panel__apply"
-            onClick={handleApply}
-          >
-            Apply Filters
-          </button>
-          <button
-            type="button"
-            className="filter-panel__clear"
+            variant="ghost"
+            className="h-12 px-4 text-sm"
             onClick={handleClear}
           >
-            Clear All
-          </button>
+            Clear all
+          </Button>
+          <Button
+            type="button"
+            className="h-12 flex-1 text-base"
+            onClick={handleApply}
+          >
+            Apply filters
+          </Button>
         </div>
       </div>
     </>
+  );
+
+  if (isDesktop) {
+    return (
+      <Dialog
+        open={isOpen}
+        onOpenChange={(open) => {
+          if (!open) onClose();
+        }}
+      >
+        <DialogContent
+          className="z-[1200] max-w-[420px] gap-0 overflow-hidden p-0"
+          showCloseButton
+        >
+          <DialogHeader className="border-b px-5 py-3 text-left">
+            <DialogTitle className="text-base">Filters</DialogTitle>
+            <DialogDescription className="sr-only">
+              Filter churches by event type, day of week, and time.
+            </DialogDescription>
+          </DialogHeader>
+          <ScrollArea className="max-h-[70vh]">{panelBody}</ScrollArea>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  return (
+    <Sheet
+      open={isOpen}
+      onOpenChange={(open) => {
+        if (!open) onClose();
+      }}
+    >
+      <SheetContent
+        side="bottom"
+        className="z-[1200] max-h-[85vh] gap-0 rounded-t-[1.75rem] border-x-0 px-0 pb-0"
+        showCloseButton
+      >
+        <SheetHeader className="border-b px-5 py-3 text-left">
+          <SheetTitle className="text-base">Filters</SheetTitle>
+          <SheetDescription className="sr-only">
+            Filter churches by event type, day of week, and time.
+          </SheetDescription>
+        </SheetHeader>
+        <ScrollArea className="flex-1">{panelBody}</ScrollArea>
+      </SheetContent>
+    </Sheet>
   );
 }

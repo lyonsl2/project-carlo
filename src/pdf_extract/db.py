@@ -170,7 +170,7 @@ def _load_detect_results_and_seed_parishes(conn) -> int:
     rows = conn.execute(
         """SELECT slug, name, homepage_url, bulletin_provider, provider_id
            FROM website
-           WHERE bulletin_provider IN ('ecatholic', 'parishes_online')"""
+           WHERE bulletin_provider IN ('ecatholic', 'parishes_online', 'other')"""
     ).fetchall()
 
     count = 0
@@ -183,6 +183,9 @@ def _load_detect_results_and_seed_parishes(conn) -> int:
         elif provider == "parishes_online":
             source_type = "parishes-online"
             source_provider_id = row["provider_id"]
+        elif provider == "other":
+            source_type = "other"
+            source_provider_id = row["homepage_url"]
         else:
             continue
 

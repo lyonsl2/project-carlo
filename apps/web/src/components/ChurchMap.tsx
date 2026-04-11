@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { memo, useEffect, useMemo, useRef } from "react";
 import { Link } from "react-router-dom";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import type { Marker as LeafletMarker } from "leaflet";
@@ -10,6 +10,8 @@ import {
   formatMinutesToTime,
   titleCase,
 } from "../utils";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 const DAY_ORDER = [
   "sunday",
@@ -76,22 +78,32 @@ function formatEventDay(event: EventSummary): string {
     return titleCase(event.day_of_week);
   }
   if (event.date) {
-    const d = new Date(event.date + "T12:00:00");
-    const weekday = d.toLocaleDateString("en-US", { weekday: "long" });
-    return `${weekday}, ${formatEventDate(event.date)}`;
+    return formatEventDate(event.date);
   }
   return "";
 }
 
 const defaultCenter: [number, number] = [43.1566, -77.6088];
 
-const markerIcon = new L.Icon({
-  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  iconRetinaUrl:
-    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
-  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
+// Themed SVG pin using CSS variables so it follows the site palette.
+// Rendered as a divIcon so nothing is fetched from a CDN at runtime.
+const markerSvg = `
+<svg xmlns="http://www.w3.org/2000/svg" width="30" height="40" viewBox="0 0 30 40" fill="none" aria-hidden="true">
+  <path d="M15 1C7.82 1 2 6.82 2 14c0 9.5 11.5 23.2 12.08 23.88a1.2 1.2 0 0 0 1.84 0C16.5 37.2 28 23.5 28 14 28 6.82 22.18 1 15 1Z"
+        fill="var(--primary)" stroke="var(--primary-foreground)" stroke-width="1.6" />
+  <g transform="translate(15 14)" fill="none" stroke="var(--primary-foreground)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M0 -6 V 2" />
+    <path d="M-3 -3 H 3" />
+    <path d="M-5 6 V -1 L 0 -5 L 5 -1 V 6 Z" />
+  </g>
+</svg>`;
+
+const markerIcon = L.divIcon({
+  html: markerSvg,
+  className: "church-map-marker",
+  iconSize: [30, 40],
+  iconAnchor: [15, 38],
+  popupAnchor: [0, -34],
 });
 
 interface ChurchMapProps {
@@ -107,7 +119,7 @@ function ChangeView({ center }: { center: { lat: number; lng: number } }) {
   return null;
 }
 
-function ChurchMarker({
+const ChurchMarker = memo(function ChurchMarker({
   church,
   openPopupForChurchId,
 }: {
@@ -127,17 +139,29 @@ function ChurchMarker({
       position={[church.latitude as number, church.longitude as number]}
     >
       <Popup minWidth={220}>
-        <div className="map-popup">
-          <h3>{church.name ?? "Unnamed church"}</h3>
-          {formatAddress(church) ? (
-            <p className="map-popup-address">{formatAddress(church)}</p>
-          ) : null}
-          <p className="map-popup-types">
-            {church.event_types.length > 0
-              ? church.event_types.map(titleCase).join(", ")
-              : "No event types yet"}
-          </p>
-          <ul className="event-list compact">
+        <div className="w-full space-y-3 text-sm">
+          <div className="space-y-1">
+            <h3 className="font-heading font-medium text-foreground">
+              {church.name ?? "Unnamed parish"}
+            </h3>
+            {formatAddress(church) ? (
+              <p className="text-xs leading-5 text-muted-foreground">
+                {formatAddress(church)}
+              </p>
+            ) : null}
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {church.event_types.length > 0 ? (
+              church.event_types.map((eventType) => (
+                <Badge key={eventType} variant="outline" className="capitalize">
+                  {titleCase(eventType)}
+                </Badge>
+              ))
+            ) : (
+              <Badge variant="outline">No services listed</Badge>
+            )}
+          </div>
+          <ul role="list" className="space-y-2 pl-0">
             {church.upcoming_events.length > 0 ? (
               <>
                 {[...church.upcoming_events]
@@ -147,46 +171,52 @@ function ChurchMarker({
                     const day = formatEventDay(eventItem);
                     const time = formatMinutesToTime(eventItem.start_time);
                     return (
-                      <li key={eventItem.id}>
-                        {day ? (
-                          <>
-                            <span className="map-popup-event-day">
-                              {day}
-                            </span>{" "}
-                            <span className="map-popup-event-time">
-                              {time}
-                            </span>
-                          </>
-                        ) : (
-                          <span className="map-popup-event-time">
-                            {time}
-                          </span>
-                        )}
+                      <li
+                        key={eventItem.id}
+                        className="flex items-start justify-between gap-3 rounded-md border bg-muted/30 px-3 py-2"
+                      >
+                        <span className="font-medium text-foreground">
+                          {day || "Upcoming"}
+                        </span>
+                        <span className="text-muted-foreground">{time}</span>
                       </li>
                     );
                   })}
                 {church.upcoming_events.length > 3 ? (
-                  <li className="map-popup-more">
-                    {church.upcoming_events.length - 3} more…
+                  <li className="text-xs italic text-muted-foreground">
+                    {church.upcoming_events.length - 3} more
                   </li>
                 ) : null}
               </>
             ) : (
-              <li>No upcoming events found</li>
+              <li className="text-sm text-muted-foreground">
+                No services listed yet.
+              </li>
             )}
           </ul>
-          <Link to={`/churches/${church.slug}`} className="map-popup__link">
-            View church page
-          </Link>
+          <Button
+            asChild
+            size="sm"
+            className="w-full !text-primary-foreground hover:!text-primary-foreground"
+          >
+            <Link to={`/churches/${church.slug}`}>View church page</Link>
+          </Button>
         </div>
       </Popup>
     </Marker>
   );
-}
+});
 
-export function ChurchMap({ churches, centerOn }: ChurchMapProps) {
-  const withCoords = churches.filter(
-    (church) => church.latitude !== null && church.longitude !== null,
+export const ChurchMap = memo(function ChurchMap({
+  churches,
+  centerOn,
+}: ChurchMapProps) {
+  const withCoords = useMemo(
+    () =>
+      churches.filter(
+        (church) => church.latitude !== null && church.longitude !== null,
+      ),
+    [churches],
   );
   const center = defaultCenter;
 
@@ -194,7 +224,7 @@ export function ChurchMap({ churches, centerOn }: ChurchMapProps) {
     <MapContainer
       center={center}
       zoom={11}
-      className="map-container"
+      className="h-full min-h-[calc(100vh-5rem)] w-full"
       scrollWheelZoom
     >
       {centerOn && <ChangeView center={centerOn} />}
@@ -211,4 +241,4 @@ export function ChurchMap({ churches, centerOn }: ChurchMapProps) {
       ))}
     </MapContainer>
   );
-}
+});

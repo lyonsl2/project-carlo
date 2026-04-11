@@ -7,13 +7,20 @@ from pdf_extract.storage import (
 )
 from pdf_extract.fetch import (
     BulletinLink,
+    OTHER_TYPE,
     PARISHES_ONLINE_TYPE,
     _build_bulletin_link,
     _extract_ecatholic_pdf_url_from_href,
     _extract_parishes_online_pdf_url_from_href,
+    _find_other_bulletin_page_url,
+    _goto_with_retry,
+    _normalize_url_for_request,
+    _parse_relaxed_date,
+    _resolve_other_latest_link,
     _next_sunday_after,
     _resolve_latest_anchor_link_with_playwright,
     build_latest_ecatholic_bulletin_links,
+    build_latest_other_bulletin_links,
     build_latest_parishes_online_bulletin_links,
 )
 
@@ -179,3 +186,188 @@ def test_build_bulletin_link_parishes_online(monkeypatch) -> None:
     monkeypatch.setattr("pdf_extract.fetch.build_latest_parishes_online_bulletin_links", fake_build)
     link = _build_bulletin_link(PARISHES_ONLINE_TYPE, "123")
     assert link.fetch_url == "https://po.com/fetch.pdf"
+
+
+def test_build_latest_other_bulletin_links(monkeypatch) -> None:
+    def fake_resolve(*, provider_id: str, reference_date=None, page=None) -> tuple[str, str]:
+        assert provider_id == "https://example.org"
+        assert reference_date == date(2026, 2, 19)
+        return (
+            "https://example.org/bulletins/2026-02-16.pdf",
+            "https://example.org/bulletins/2026-02-16.pdf",
+        )
+
+    monkeypatch.setattr("pdf_extract.fetch._resolve_other_latest_link", fake_resolve)
+    link = build_latest_other_bulletin_links(
+        provider_id="https://example.org",
+        reference_date=date(2026, 2, 19),
+    )
+    assert link.source_url == "https://example.org/bulletins/2026-02-16.pdf"
+    assert link.fetch_url == "https://example.org/bulletins/2026-02-16.pdf"
+
+
+def test_find_other_bulletin_page_url_prefers_href_and_text_match() -> None:
+    class FakeAnchor:
+        def __init__(self, href: str, text: str):
+            self._href = href
+            self._text = text
+
+        def get_attribute(self, name: str):
+            if name == "href":
+                return self._href
+            return None
+
+        def inner_text(self):
+            return self._text
+
+    class FakePage:
+        def query_selector_all(self, selector: str):
+            assert selector == "a[href]"
+            return [
+                FakeAnchor("/news", "Parish News"),
+                FakeAnchor("/weekly", "Weekly Bulletin"),
+                FakeAnchor("/bulletins", "Read Bulletins"),
+            ]
+
+    resolved = _find_other_bulletin_page_url(page=FakePage(), base_url="https://example.org")
+    assert resolved == "https://example.org/bulletins"
+
+
+def test_resolve_other_latest_link_prefers_latest_parseable_within_plus_minus_week() -> None:
+    class FakeAnchor:
+        def __init__(self, href: str, text: str):
+            self._href = href
+            self._text = text
+
+        def get_attribute(self, name: str):
+            if name == "href":
+                return self._href
+            return None
+
+        def inner_text(self):
+            return self._text
+
+    class FakePage:
+        def __init__(self):
+            self.url = ""
+
+        def goto(self, url: str, wait_until: str) -> None:
+            assert wait_until == "domcontentloaded"
+            self.url = url
+
+        def wait_for_selector(self, selector: str, timeout: int) -> None:
+            assert selector == "a[href]"
+            assert timeout == 15000
+
+        def query_selector_all(self, selector: str):
+            assert selector == "a[href]"
+            if self.url == "https://example.org":
+                return [
+                    FakeAnchor("/weekly", "Weekly"),
+                    FakeAnchor("/bulletins", "Bulletin Archive"),
+                ]
+            assert self.url == "https://example.org/bulletins"
+            return [
+                FakeAnchor("/pdfs/old-2026-01-10.pdf", "Jan 10, 2026 Bulletin"),
+                FakeAnchor("/pdfs/new-2026-02-18.pdf", "Feb 18, 2026 Bulletin"),
+                FakeAnchor("/pdfs/future-2026-03-10.pdf", "Mar 10, 2026 Bulletin"),
+            ]
+
+    source_url, fetch_url = _resolve_other_latest_link(
+        provider_id="https://example.org",
+        reference_date=date(2026, 2, 19),
+        page=FakePage(),
+    )
+    assert source_url == "https://example.org/pdfs/new-2026-02-18.pdf"
+    assert fetch_url == "https://example.org/pdfs/new-2026-02-18.pdf"
+
+
+def test_resolve_other_latest_link_falls_back_to_first_pdf_when_no_date_match() -> None:
+    class FakeAnchor:
+        def __init__(self, href: str, text: str):
+            self._href = href
+            self._text = text
+
+        def get_attribute(self, name: str):
+            if name == "href":
+                return self._href
+            return None
+
+        def inner_text(self):
+            return self._text
+
+    class FakePage:
+        def __init__(self):
+            self.url = ""
+
+        def goto(self, url: str, wait_until: str) -> None:
+            self.url = url
+
+        def wait_for_selector(self, selector: str, timeout: int) -> None:
+            assert selector == "a[href]"
+            assert timeout == 15000
+
+        def query_selector_all(self, selector: str):
+            assert selector == "a[href]"
+            if self.url == "https://example.org":
+                return [FakeAnchor("/bulletins", "Bulletin Archive")]
+            return [
+                FakeAnchor("/pdfs/no-date-1.pdf", "This Week"),
+                FakeAnchor("/pdfs/no-date-2.pdf", "Latest PDF"),
+            ]
+
+    source_url, fetch_url = _resolve_other_latest_link(
+        provider_id="https://example.org",
+        reference_date=date(2026, 2, 19),
+        page=FakePage(),
+    )
+    assert source_url == "https://example.org/pdfs/no-date-1.pdf"
+    assert fetch_url == "https://example.org/pdfs/no-date-1.pdf"
+
+
+def test_build_bulletin_link_other(monkeypatch) -> None:
+    def fake_build(*, provider_id, reference_date=None, page=None):
+        assert provider_id == "https://example.org"
+        return BulletinLink(source_url="https://example.org/weekly.pdf", fetch_url="https://example.org/weekly.pdf")
+
+    monkeypatch.setattr("pdf_extract.fetch.build_latest_other_bulletin_links", fake_build)
+    link = _build_bulletin_link(OTHER_TYPE, "https://example.org")
+    assert link.fetch_url == "https://example.org/weekly.pdf"
+
+
+def test_parse_relaxed_date_handles_multiple_formats() -> None:
+    ref = date(2026, 2, 19)
+    assert _parse_relaxed_date("Bulletin Feb 18, 2026", ref) == date(2026, 2, 18)
+    assert _parse_relaxed_date("Bulletin 02/18/26", ref) == date(2026, 2, 18)
+    assert _parse_relaxed_date("Bulletin 2026-02-18", ref) == date(2026, 2, 18)
+
+
+def test_normalize_url_for_request_encodes_spaces() -> None:
+    raw = "https://s3-us-west-2.amazonaws.com/classrooms.stritawebster.org/Bulletins/2026/March 22.pdf"
+    normalized = _normalize_url_for_request(raw)
+    assert normalized.endswith("/March%2022.pdf")
+
+
+def test_goto_with_retry_on_interrupted_navigation() -> None:
+    class FakePage:
+        def __init__(self) -> None:
+            self.calls = 0
+            self.waits = 0
+
+        def goto(self, page_url: str, wait_until: str) -> None:
+            self.calls += 1
+            assert page_url == "https://example.org/page"
+            assert wait_until == "domcontentloaded"
+            if self.calls == 1:
+                raise Exception(
+                    'Page.goto: Navigation to "https://example.org/page" is interrupted by another navigation'
+                )
+
+        def wait_for_timeout(self, ms: int) -> None:
+            assert ms == 250
+            self.waits += 1
+
+    page = FakePage()
+    _goto_with_retry(page=page, page_url="https://example.org/page")
+    assert page.calls == 2
+    assert page.waits == 1

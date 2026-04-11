@@ -2,7 +2,31 @@ import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { fetchChurch, fetchChurchEvents } from "../api";
 import type { EventSummary, EventType } from "../types";
-import { formatAddress, formatEventDate, formatMinutesToTime } from "../utils";
+import {
+  formatAddress,
+  formatEventDate,
+  formatMinutesToTime,
+} from "../utils";
+import {
+  ArrowLeftIcon,
+  ChurchIcon,
+  ExternalLinkIcon,
+  FileTextIcon,
+  HandshakeIcon,
+  MapPinIcon,
+  RefreshCwIcon,
+  SunIcon,
+} from "@/components/icons";
+import type { ComponentType, SVGProps } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
 const EVENT_TYPE_ORDER: EventType[] = ["mass", "confession", "adoration"];
 const DAY_ORDER = [
@@ -16,15 +40,15 @@ const DAY_ORDER = [
 ];
 
 const EVENT_TYPE_LABELS: Record<EventType, string> = {
-  mass: "Holy Mass",
+  mass: "Mass",
   adoration: "Adoration",
-  confession: "Sacrament of Reconciliation",
+  confession: "Confession",
 };
 
-const EVENT_TYPE_ICONS: Record<EventType, string> = {
-  mass: "✞",
-  adoration: "✦",
-  confession: "†",
+const EVENT_TYPE_ICONS: Record<EventType, ComponentType<SVGProps<SVGSVGElement>>> = {
+  mass: ChurchIcon,
+  adoration: SunIcon,
+  confession: HandshakeIcon,
 };
 
 interface EventsByType {
@@ -105,8 +129,16 @@ export function ChurchPage() {
 
   if (!enabled) {
     return (
-      <main className="church-page">
-        <p>Invalid church id.</p>
+      <main className="flex min-h-svh flex-col items-center justify-center gap-4 bg-background px-4 py-8 text-center">
+        <p className="text-sm text-muted-foreground">
+          We couldn&apos;t find that parish.
+        </p>
+        <Button asChild variant="outline" size="sm">
+          <Link to="/">
+            <ArrowLeftIcon className="size-4" />
+            Back to map
+          </Link>
+        </Button>
       </main>
     );
   }
@@ -116,74 +148,98 @@ export function ChurchPage() {
   const byType = events ? partitionEventsByType(events) : null;
 
   return (
-    <main className="church-page">
-      <header className="church-page__header">
-        <Link to="/" className="church-page__back">
-          <span className="church-page__back-arrow" aria-hidden>←</span>
-          {" "}BACK TO MAP
-        </Link>
-        <h1 className="church-page__title">Project Carlo</h1>
+    <main className="min-h-svh bg-background pt-[calc(3.75rem+var(--safe-area-inset-top))]">
+      <header className="fixed inset-x-0 top-0 z-[1000] border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/85">
+        <div className="mx-auto flex w-full max-w-3xl items-center px-4 pt-[calc(0.75rem+var(--safe-area-inset-top))] pb-3 md:px-6">
+          <Button asChild variant="ghost" size="sm" className="-ml-2">
+            <Link to="/">
+              <ArrowLeftIcon className="size-4" />
+              Back to map
+            </Link>
+          </Button>
+        </div>
       </header>
 
-      <div className="church-page__hero" aria-hidden />
-
-      <div className="church-page__content">
+      <div className="mx-auto flex w-full max-w-3xl flex-col gap-5 px-4 py-6 pb-[calc(1.5rem+var(--safe-area-inset-bottom))] md:px-6">
         {churchQuery.isLoading ? (
-          <p className="church-page__loading">Loading church details...</p>
+          <p className="my-2 text-sm text-muted-foreground">Loading parish details…</p>
         ) : null}
         {churchQuery.error ? (
-          <p className="church-page__error">Unable to load church details.</p>
+          <div className="my-2 flex flex-col items-start gap-3">
+            <p className="text-sm text-muted-foreground">
+              We couldn&apos;t load this parish. Check your connection and try again.
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => churchQuery.refetch()}
+            >
+              <RefreshCwIcon className="size-4" />
+              Try again
+            </Button>
+          </div>
         ) : null}
 
         {church ? (
-          <section className="church-profile">
-            <span className="church-profile__label">PARISH PROFILE</span>
-            <h2 className="church-profile__name">
-              {church.name ?? "Unnamed church"}
+          <section className="space-y-4">
+            <h2 className="font-heading text-3xl font-medium tracking-tight text-foreground">
+              {church.name ?? "Unnamed parish"}
             </h2>
             {formatAddress(church) ? (
-              <p className="church-profile__address">
-                <span className="church-profile__icon" aria-hidden>📍</span>
+              <p className="flex items-start gap-2 text-sm text-muted-foreground">
+                <MapPinIcon className="mt-0.5 size-4 shrink-0" />
                 {formatAddress(church)}
               </p>
             ) : null}
-            <div className="church-profile__actions">
+            <div className="flex flex-col gap-3 sm:flex-row">
               {church.homepage_url ? (
-                <a
-                  href={church.homepage_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="church-profile__btn"
-                >
-                  Visit Website
-                </a>
+                <Button asChild size="lg" className="sm:flex-1">
+                  <a href={church.homepage_url} target="_blank" rel="noopener noreferrer">
+                    <ExternalLinkIcon className="size-4" />
+                    Visit website
+                  </a>
+                </Button>
               ) : null}
               {church.bulletin_url ? (
-                <a
-                  href={church.bulletin_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="church-profile__btn church-profile__btn--secondary"
-                >
-                  View Bulletin
-                </a>
+                <Button asChild variant="outline" size="lg" className="sm:flex-1">
+                  <a href={church.bulletin_url} target="_blank" rel="noopener noreferrer">
+                    <FileTextIcon className="size-4" />
+                    View bulletin
+                  </a>
+                </Button>
               ) : null}
             </div>
           </section>
         ) : null}
 
         {eventsQuery.isLoading ? (
-          <p className="church-page__loading">Loading events...</p>
+          <p className="my-2 text-sm text-muted-foreground">Loading services…</p>
         ) : null}
         {eventsQuery.error ? (
-          <p className="church-page__error">Unable to load events.</p>
+          <div className="my-2 flex flex-col items-start gap-3">
+            <p className="text-sm text-muted-foreground">
+              We couldn&apos;t load services for this parish.
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => eventsQuery.refetch()}
+            >
+              <RefreshCwIcon className="size-4" />
+              Try again
+            </Button>
+          </div>
         ) : null}
         {events && events.length === 0 ? (
-          <p className="church-page__empty">No upcoming events found.</p>
+          <p className="my-2 text-sm text-muted-foreground">
+            No Mass, Confession, or Adoration times are listed for this parish yet.
+          </p>
         ) : null}
 
         {byType ? (
-          <div className="schedule-cards">
+          <div className="flex flex-col gap-4">
             {EVENT_TYPE_ORDER.map((eventType) => {
               const { weeklyByDay, specificDate } = byType[eventType];
               const hasWeekly = DAY_ORDER.some(
@@ -192,64 +248,65 @@ export function ChurchPage() {
               const hasAny = hasWeekly || specificDate.length > 0;
               if (!hasAny) return null;
 
+              const EventTypeIcon = EVENT_TYPE_ICONS[eventType];
               return (
-                <article
-                  key={eventType}
-                  className={`schedule-card schedule-card--${eventType}`}
-                >
-                  <div className="schedule-card__header">
-                    <span
-                      className="schedule-card__icon"
-                      aria-hidden
-                    >
-                      {EVENT_TYPE_ICONS[eventType]}
-                    </span>
-                    <h3 className="schedule-card__title">
-                      {EVENT_TYPE_LABELS[eventType]}
-                    </h3>
-                  </div>
-
-                  {DAY_ORDER.map((day) => {
-                    const dayEvents = weeklyByDay[day];
-                    if (!dayEvents || dayEvents.length === 0) return null;
-                    return (
-                      <div key={day} className="schedule-card__day-group">
-                        <span className="schedule-card__day">
-                          {formatDayLabel(day)}
-                        </span>
-                        <div className="schedule-card__times">
-                          {dayEvents.map((event, i) => (
-                            <span key={event.id}>
-                              {i > 0 ? (
-                                <>
-                                  <span className="schedule-card__sep" />
-                                  {formatEventTime(event)}
-                                </>
-                              ) : (
-                                formatEventTime(event)
-                              )}
-                            </span>
-                          ))}
-                        </div>
+                <Card key={eventType} className="shadow-sm">
+                  <CardHeader className="gap-3">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="flex size-10 items-center justify-center rounded-full border bg-primary/10 text-primary"
+                        aria-hidden
+                      >
+                        <EventTypeIcon className="size-5" />
                       </div>
-                    );
-                  })}
-
-                  {specificDate.length > 0 ? (
-                    <div className="schedule-card__specific">
-                      {specificDate.map((event) => (
-                        <div key={event.id} className="schedule-card__day-group">
-                          <span className="schedule-card__day">
-                            {event.date ? formatEventDate(event.date) : "Specific date"}
-                          </span>
-                          <div className="schedule-card__times">
-                            {formatEventTime(event)}
+                      <CardTitle>{EVENT_TYPE_LABELS[eventType]}</CardTitle>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {DAY_ORDER.map((day) => {
+                      const dayEvents = weeklyByDay[day];
+                      if (!dayEvents || dayEvents.length === 0) return null;
+                      return (
+                        <div key={day} className="space-y-2">
+                          <p className="text-xs font-semibold tracking-[0.18em] text-muted-foreground uppercase">
+                            {formatDayLabel(day)}
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {dayEvents.map((event) => (
+                              <Badge
+                                key={event.id}
+                                variant="secondary"
+                                className="rounded-full px-3 py-1 text-sm font-medium"
+                              >
+                                {formatEventTime(event)}
+                              </Badge>
+                            ))}
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  ) : null}
-                </article>
+                      );
+                    })}
+
+                    {specificDate.length > 0 ? (
+                      <>
+                        {DAY_ORDER.some((day) => (weeklyByDay[day]?.length ?? 0) > 0) ? (
+                          <Separator />
+                        ) : null}
+                        <div className="space-y-3">
+                          {specificDate.map((event) => (
+                            <div key={event.id} className="space-y-1">
+                              <p className="text-xs font-semibold tracking-[0.18em] text-muted-foreground uppercase">
+                                {event.date ? formatEventDate(event.date) : "Specific date"}
+                              </p>
+                              <p className="text-base font-medium text-foreground">
+                                {formatEventTime(event)}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                      </>
+                    ) : null}
+                  </CardContent>
+                </Card>
               );
             })}
           </div>

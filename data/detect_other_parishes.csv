@@ -1,0 +1,21 @@
+slug,name,website,note
+blessed-trinity-st-patrick,Blessed Trinity and St. Patrick Parishes,https://blessed-trinity-parish.org,Only .pdf, has bulletin in link. Alt: got to bulletins-archive, first .pdf on page
+no holy-apostles,Holy Apostles Church,https://holyapostleschurchfamily.org,can't find bulletin
+x holy-trinity-webster,Holy Trinity Church,https://holytrinityweb.org, click link with bulletin in text inside anchor, then first anchor with .pdf, alternatively parse date from text in element
+x immaculate-conception-ithaca,Immaculate Conception Church,https://www.immconch.org, click link with bulletin in text inside anchor and href, first anchor with .pdf
+x? immaculate-conception-st-bridgets,Immaculate Conception/St. Bridget's,https://www.immaculateconceptionrochester.org, click link with bulletin in text inside anchor and href, parse latest date - future ones have last year's
+mary-mother-of-mercy,"The Parish of Mary, Mother of Mercy",https://www.marymotherofmercy.com, bulletin anchor+text, .pdf parse date latest
+most-holy-name-of-jesus,Parish of the Most Holy Name of Jesus,https://elmiracatholic.org, bulletin anchor+text, not .pdf but bulletin in link and date
+x our-lady-of-the-valley,Our Lady of the Valley Parish,https://www.olv14843.org, bulletin anchor+text, .pdf parse date latest+first
+sacred-heart-auburn-cluster,"Catholic Community of Sacred Heart, St. Alphonsus, St. Ann Parish and Holy Family",https://sacredheartauburn.org, bulletin anchor+text, .pdf parse date latest+first
+x saint-rita-webster,Saint Rita,https://www.saintritawebster.org, bulletin anchor+text, .pdf parse date latest+first
+st-christopher,St. Christopher,https://www.stchristophersnchili.org, not https, parishes-online, st-christophers-church
+x st-francis-and-st-clare,St. Francis and St. Clare,https://sfscrcc.org, bulletin anchor+text, .pdf parse date latest+first
+x st-john-greece,St. John the Evangelist (Greece),https://www.stjohngreece.org, bulletin anchor+text, .pdf parse date latest+first
+st-john-vianney,St. John Vianney,https://sjvbath.org, bulletin anchor+text, .pdf parse date in link - latest+first
+x st-lawrence,St. Lawrence,https://stlawrencegreeceny.org
+st-mary-our-mother,St. Mary Our Mother,https://stmaryourmother.com
+x st-marys-st-matthew,St. Mary's / St. Matthew,https://www.stsmaryandmatthew.com
+no st-monica-emmanuel,St. Monica / Emmanuel Church of the Deaf,https://www.stmonicaofrochester.org
+st-pauls-webster,St. Paul's Roman Catholic Church,https://www.stpaulsrcc.org
+x st-peters-ontario-county,St. Peter's Roman Catholic Parish,https://www.stpeterparish.us
