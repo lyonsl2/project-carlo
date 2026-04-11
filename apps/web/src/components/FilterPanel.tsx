@@ -3,13 +3,7 @@ import type { EventType } from "../types";
 import type { FilterState } from "./filterState";
 import { TimeRangeSlider } from "./TimeRangeSlider";
 import { Fleuron } from "./Fleuron";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface EventTypeOption {
@@ -141,14 +135,14 @@ export function FilterPanel({
   const panelBody = (
     <div className="flex flex-col">
       <div className="space-y-7 px-6 py-6">
-        {/* Event type — typeset as a numbered service list */}
+        {/* Event type */}
         <section>
           <div className="mb-3 flex items-baseline justify-between">
             <h3 className="smallcaps text-[0.875rem] text-ink-faint">
-              I. &nbsp; The service
+              Service type
             </h3>
           </div>
-          <div className="divide-y divide-rule">
+          <div className="flex divide-x divide-rule overflow-hidden rounded-md border border-rule-strong">
             {EVENT_TYPE_OPTIONS.map((option) => {
               const isSelected = filters.eventType === option.id;
               return (
@@ -157,22 +151,24 @@ export function FilterPanel({
                   type="button"
                   aria-pressed={isSelected}
                   onClick={() => selectEventType(option.id)}
-                  className="group flex w-full items-baseline gap-3 py-3 text-left transition-colors hover:bg-paper-deep/40"
+                  className={`group flex min-w-0 flex-1 basis-0 flex-col items-center gap-1.5 px-1 py-2.5 text-center transition-colors ${
+                    isSelected
+                      ? "bg-paper-deep/80"
+                      : "hover:bg-paper-deep/40"
+                  }`}
                 >
                   <span
                     aria-hidden
-                    className={`mt-1 inline-block size-2 shrink-0 rounded-full transition-colors ${
+                    className={`inline-block size-2 shrink-0 rounded-full transition-colors ${
                       isSelected ? "bg-rubric" : "bg-transparent ring-1 ring-rule-strong"
                     }`}
                   />
-                  <span className="flex-1">
-                    <span
-                      className={`font-display text-[1.25rem] leading-tight ${
-                        isSelected ? "text-rubric" : "text-ink"
-                      }`}
-                    >
-                      {option.label}
-                    </span>
+                  <span
+                    className={`font-display text-[0.95rem] leading-snug sm:text-[1.05rem] ${
+                      isSelected ? "text-rubric" : "text-ink"
+                    }`}
+                  >
+                    {option.label}
                   </span>
                 </button>
               );
@@ -184,7 +180,7 @@ export function FilterPanel({
         <section>
           <div className="mb-3 flex items-baseline justify-between gap-3">
             <h3 className="smallcaps text-[0.875rem] text-ink-faint">
-              II. &nbsp; The day
+              Day of week
             </h3>
             <button
               type="button"
@@ -196,7 +192,7 @@ export function FilterPanel({
                   : "text-ink-soft hover:text-rubric-deep"
               }`}
             >
-              {isAnyDaySelected ? "Any day selected" : "Show every day"}
+              {isAnyDaySelected ? "All days" : "Show every day"}
             </button>
           </div>
           <div className="flex items-center justify-between gap-1">
@@ -228,18 +224,13 @@ export function FilterPanel({
               );
             })}
           </div>
-          <p className="mt-2 font-serif text-[0.875rem] italic text-ink-faint">
-            {isAnyDaySelected
-              ? "Showing results from the whole week until you choose a day."
-              : "Choose one or more days, or use 'Show every day' to clear the day filter."}
-          </p>
         </section>
 
         {/* Time range */}
         <section>
           <div className="mb-3">
             <h3 className="smallcaps text-[0.875rem] text-ink-faint">
-              III. &nbsp; The hour
+              Time of day
             </h3>
           </div>
           <TimeRangeSlider
@@ -259,7 +250,11 @@ export function FilterPanel({
         <Fleuron />
       </div>
 
-      <div className="flex items-center gap-4 border-t border-rule-strong bg-paper-deep/30 px-6 py-4 pb-[calc(1rem+var(--safe-area-inset-bottom))]">
+      <div
+        className={`flex items-center gap-4 border-t border-rule-strong bg-paper-deep/30 px-6 py-4 ${
+          isDesktop ? "" : "pb-[calc(1rem+var(--safe-area-inset-bottom))]"
+        }`}
+      >
         <button
           type="button"
           onClick={handleClear}
@@ -267,30 +262,26 @@ export function FilterPanel({
         >
           Reset
         </button>
-        <div className="flex-1" />
-        <button
-          type="button"
-          onClick={handleApply}
-          className="smallcaps bg-rubric px-6 py-3 text-[0.875rem] text-paper transition-colors hover:bg-rubric-deep"
-        >
-          Apply filters
-        </button>
+        {!isDesktop ? (
+          <>
+            <div className="flex-1" />
+            <button
+              type="button"
+              onClick={handleApply}
+              className="smallcaps bg-rubric px-6 py-3 text-[0.875rem] text-paper transition-colors hover:bg-rubric-deep"
+            >
+              Apply filters
+            </button>
+          </>
+        ) : null}
       </div>
     </div>
   );
 
   if (isDesktop) {
     return (
-      <section className="rise-in overflow-hidden border border-rule-strong bg-paper/96 shadow-[0_20px_40px_-20px_rgb(22_18_16/0.35),0_3px_8px_-3px_rgb(22_18_16/0.14)] backdrop-blur-sm">
-        <div className="border-b border-rule-strong px-6 pt-5 pb-4 text-left">
-          <h2 className="font-display text-2xl font-normal tracking-tight text-ink">
-              Narrow the search
-          </h2>
-          <p className="font-serif text-sm italic text-ink-faint">
-            Refine by service, day, and hour.
-          </p>
-        </div>
-        <ScrollArea className="max-h-[calc(100svh-14rem)]">
+      <section className="rise-in h-fit w-full overflow-hidden border border-rule-strong bg-paper/96 shadow-[0_20px_40px_-20px_rgb(22_18_16/0.35),0_3px_8px_-3px_rgb(22_18_16/0.14)] backdrop-blur-sm">
+        <ScrollArea className="max-h-[calc(100svh-12rem)]">
           {panelBody}
         </ScrollArea>
       </section>
@@ -309,14 +300,7 @@ export function FilterPanel({
         className="z-[1200] max-h-[88vh] gap-0 border-x-0 border-rule-strong bg-paper px-0 pb-0"
         showCloseButton
       >
-        <SheetHeader className="border-b border-rule-strong px-6 pt-4 pb-3 text-left">
-          <SheetTitle className="font-display text-xl font-normal tracking-tight text-ink">
-            Narrow the search
-          </SheetTitle>
-          <SheetDescription className="font-serif text-sm italic text-ink-faint">
-            Refine by service, day, and hour.
-          </SheetDescription>
-        </SheetHeader>
+        <SheetTitle className="sr-only">Filters</SheetTitle>
         <ScrollArea className="flex-1">{panelBody}</ScrollArea>
       </SheetContent>
     </Sheet>

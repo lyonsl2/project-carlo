@@ -8,9 +8,8 @@ export function formatMinutesToTime(minutes: number): string {
   return `${h - 12}:${m.toString().padStart(2, "0")} PM`;
 }
 
-/** Format minutes since midnight in the missal-page style used throughout
- *  the UI: e.g. `7:30 a.m.` — lowercase meridiem, no uppercase noise.
- *  Omits `:00` for on-the-hour times so `8 a.m.` reads naturally. */
+/** Format minutes since midnight for display: e.g. `7:30 a.m.` — lowercase
+ *  meridiem. Omits `:00` for on-the-hour times so `8 a.m.` reads naturally. */
 export function formatMinutesMissal(minutes: number): string {
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
@@ -36,14 +35,6 @@ export function formatEventDate(dateStr: string): string {
       ? "th"
       : { 1: "st", 2: "nd", 3: "rd" }[day % 10] ?? "th";
   return `${weekday}, ${month} ${day}${suffix}`;
-}
-
-/** Short masthead date — e.g. `April 10, 2026` for use in the paper header. */
-export function formatMastheadDate(date: Date = new Date()): string {
-  const month = date.toLocaleDateString("en-US", { month: "long" });
-  const day = date.getDate();
-  const year = date.getFullYear();
-  return `${month} ${day}, ${year}`;
 }
 
 /** Format structured address fields into a single display string. */

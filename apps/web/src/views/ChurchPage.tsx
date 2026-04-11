@@ -126,12 +126,12 @@ export function ChurchPage() {
   if (!enabled) {
     return (
       <main className="flex min-h-svh flex-col items-center justify-center gap-4 bg-paper px-4 py-8 text-center">
-        <p className="font-serif text-base italic text-ink-soft">
+        <p className="font-serif text-base text-ink-soft">
           We couldn&apos;t find that parish.
         </p>
           <Link to="/" className="rubric-link smallcaps text-[0.875rem]">
           <ArrowLeftIcon className="size-3" />
-          Back to the bulletin
+          Back to map
         </Link>
       </main>
     );
@@ -141,12 +141,12 @@ export function ChurchPage() {
 
   return (
     <main className="min-h-svh bg-paper">
-      {/* Slim header bar — just a back link, styled as a rubric text link. */}
+      {/* Slim header bar */}
       <header className="sticky top-0 z-40 border-b border-rule-strong bg-paper/95 backdrop-blur supports-[backdrop-filter]:bg-paper/85">
         <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-6 pt-[calc(0.85rem+var(--safe-area-inset-top))] pb-3">
           <Link to="/" className="rubric-link smallcaps text-[0.875rem]">
             <ArrowLeftIcon className="size-3" />
-            Back to the bulletin
+            Back to map
           </Link>
           <Masthead compact />
         </div>
@@ -154,13 +154,11 @@ export function ChurchPage() {
 
       <div className="mx-auto w-full max-w-5xl px-6 py-10 pb-[calc(3rem+var(--safe-area-inset-bottom))] md:py-14">
         {churchQuery.isLoading ? (
-          <p className="font-serif text-sm italic text-ink-soft">
-            Leafing through the parish registry…
-          </p>
+          <p className="font-serif text-sm text-ink-soft">Loading parish…</p>
         ) : null}
         {churchQuery.error ? (
           <div className="flex flex-col items-start gap-3">
-            <p className="font-serif text-sm italic text-ink-soft">
+            <p className="font-serif text-sm text-ink-soft">
               We couldn&apos;t load this parish.
             </p>
             <button
@@ -176,17 +174,13 @@ export function ChurchPage() {
 
         {church ? (
           <>
-            {/* Centered masthead block — like the top of a service leaflet */}
             <section className="rise-in mx-auto max-w-2xl text-center">
-              <p className="smallcaps text-[0.875rem] text-ink-faint">
-                Parish of
-              </p>
-              <h2 className="mt-2 font-display text-[clamp(2.25rem,6vw,3.75rem)] leading-[1.05] font-normal tracking-tight text-ink">
+              <h2 className="font-display text-[clamp(2.25rem,6vw,3.75rem)] leading-[1.05] font-normal tracking-tight text-ink">
                 {church.name ?? "Unnamed parish"}
               </h2>
 
               {formatAddress(church) ? (
-                <p className="mt-4 flex items-center justify-center gap-2 font-serif text-[0.95rem] italic text-ink-soft">
+                <p className="mt-4 flex items-center justify-center gap-2 font-serif text-[0.95rem] text-ink-soft">
                   <MapPinIcon className="size-3.5 text-brass" />
                   {formatAddress(church)}
                 </p>
@@ -215,7 +209,7 @@ export function ChurchPage() {
                       className="rubric-link smallcaps inline-flex items-center gap-2 text-[0.875rem]"
                     >
                       <FileTextIcon className="size-3" />
-                      Read the Sunday bulletin
+                      Latest parish bulletin (PDF)
                     </a>
                   ) : null}
                 </div>
@@ -223,14 +217,14 @@ export function ChurchPage() {
             </section>
 
             {eventsQuery.isLoading ? (
-              <p className="mx-auto max-w-2xl font-serif text-sm italic text-ink-soft">
-                Collecting the schedule…
+              <p className="mx-auto max-w-2xl font-serif text-sm text-ink-soft">
+                Loading times…
               </p>
             ) : null}
             {eventsQuery.error ? (
               <div className="mx-auto flex max-w-2xl flex-col items-start gap-3">
-                <p className="font-serif text-sm italic text-ink-soft">
-                  We couldn&apos;t load services for this parish.
+                <p className="font-serif text-sm text-ink-soft">
+                  We couldn&apos;t load times for this parish.
                 </p>
                 <button
                   type="button"
@@ -243,7 +237,7 @@ export function ChurchPage() {
               </div>
             ) : null}
             {events && events.length === 0 ? (
-              <p className="mx-auto max-w-2xl text-center font-serif text-sm italic text-ink-soft">
+              <p className="mx-auto max-w-2xl text-center font-serif text-sm text-ink-soft">
                 No Mass, Confession, or Adoration times are listed for this
                 parish yet.
               </p>
@@ -330,9 +324,10 @@ export function ChurchPage() {
 
             <div className="mx-auto mt-16 max-w-2xl">
               <Fleuron solo className="text-brass" />
-              <p className="mt-4 text-center font-serif text-[0.9rem] italic text-ink-faint">
-                Times are drawn from each parish&apos;s most recent bulletin.
-                When in doubt, consult the parish directly.
+              <p className="mt-4 text-center font-serif text-[0.9rem] text-ink-faint">
+                Mass times are extracted with AI from each parish&apos;s latest
+                available bulletin and may not always be accurate. Please
+                confirm details with the parish before attending.
               </p>
             </div>
           </>

@@ -75,12 +75,12 @@ export function TimeRangeSlider({
         />
       </div>
 
-      <div className="flex items-center justify-between font-serif text-[0.875rem] italic text-ink-faint">
-        <span>midnight</span>
-        <span>dawn</span>
-        <span>noon</span>
-        <span>dusk</span>
-        <span>midnight</span>
+      <div className="flex items-center justify-between font-serif text-[0.8125rem] tabular-nums text-ink-faint">
+        <span>12a</span>
+        <span>6a</span>
+        <span>12p</span>
+        <span>6p</span>
+        <span>12a</span>
       </div>
     </div>
   );

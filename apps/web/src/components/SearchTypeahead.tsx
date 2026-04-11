@@ -166,8 +166,8 @@ export function SearchTypeahead({
           </div>
           <CommandList className="max-h-80 px-2 py-2">
             {isLoading ? (
-              <div className="px-3 py-4 font-serif text-sm italic text-ink-faint">
-                Loading the parish registry…
+              <div className="px-3 py-4 font-serif text-sm text-ink-faint">
+                Loading parishes…
               </div>
             ) : hasResults ? (
               <CommandGroup className="[&_[cmdk-group-heading]]:hidden">
@@ -185,8 +185,8 @@ export function SearchTypeahead({
                 ))}
               </CommandGroup>
             ) : (
-              <CommandEmpty className="px-3 py-4 text-center font-serif text-sm italic text-ink-faint">
-                No parishes by that name.
+              <CommandEmpty className="px-3 py-4 text-center font-serif text-sm text-ink-faint">
+                No matching parishes.
               </CommandEmpty>
             )}
           </CommandList>

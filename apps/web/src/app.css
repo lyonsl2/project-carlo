@@ -203,12 +203,9 @@
     border-style: none;
   }
 
-  /* Warm the tiles so they read as aged paper without having to host our own
-   * tileset. The filter combo below works on CartoDB Positron; the result is
-   * a muted cream map that still retains label legibility. */
-  .leaflet-tile-pane {
-    filter: sepia(0.28) saturate(0.78) brightness(1.02) contrast(0.92)
-      hue-rotate(-8deg);
+  /* OSM tiles: muted to match the missal card UI (ChurchMap). */
+  .leaflet-container.church-map .leaflet-tile-pane {
+    filter: saturate(0.6) brightness(1.03) contrast(1.05) hue-rotate(-14deg);
   }
 
   .leaflet-control-attribution {

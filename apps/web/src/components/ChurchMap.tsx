@@ -12,6 +12,9 @@ import {
 } from "../utils";
 import { FleuronIcon } from "@/components/icons";
 
+const OSM_ATTRIBUTION =
+  '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+
 const DAY_ORDER = [
   "sunday",
   "monday",
@@ -154,14 +157,11 @@ const ChurchMarker = memo(function ChurchMarker({
       <Popup minWidth={240} maxWidth={300}>
         <div className="w-full">
           <div className="space-y-1.5">
-            <div className="smallcaps text-[0.75rem] text-ink-faint">
-              Parish of
-            </div>
             <h3 className="font-display text-[1.35rem] leading-[1.1] font-normal text-ink">
               {church.name ?? "Unnamed parish"}
             </h3>
             {formatAddress(church) ? (
-              <p className="font-serif text-[0.875rem] italic leading-snug text-ink-soft">
+              <p className="font-serif text-[0.875rem] leading-snug text-ink-soft">
                 {formatAddress(church)}
               </p>
             ) : null}
@@ -212,7 +212,7 @@ const ChurchMarker = memo(function ChurchMarker({
               to={`/churches/${church.slug}`}
               className="rubric-link smallcaps text-[0.8125rem]"
             >
-              Read the full leaflet →
+              Full schedule →
             </Link>
           </div>
         </div>
@@ -238,17 +238,14 @@ export const ChurchMap = memo(function ChurchMap({
     <MapContainer
       center={center}
       zoom={11}
-      className="h-full w-full"
+      className="church-map h-full w-full"
       scrollWheelZoom
       zoomControl={false}
     >
       {centerOn && <ChangeView center={centerOn} />}
-      {/* CartoDB Positron — a clean, low-saturation base that takes the
-       * warm sepia CSS filter (set in app.css) gracefully. Free, no API key. */}
       <TileLayer
-        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-        url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
-        subdomains={["a", "b", "c", "d"]}
+        attribution={OSM_ATTRIBUTION}
+        url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
         maxZoom={19}
       />
       {withCoords.map((church) => (
