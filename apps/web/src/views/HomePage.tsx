@@ -86,37 +86,35 @@ export function HomePage() {
   }, []);
 
   return (
-    <main className="relative flex min-h-svh flex-col overflow-hidden bg-paper">
-      {/* Full-bleed map lives behind everything */}
+    <main className="relative flex min-h-svh flex-col overflow-hidden bg-nave-deep text-paper">
       <div className="absolute inset-0 z-0">
         {data ? <ChurchMap churches={data} centerOn={centerOn} /> : null}
       </div>
 
-      {/* Loading + error overlays */}
       {isLoading ? (
         <div className="pointer-events-none absolute inset-0 z-[800] flex items-center justify-center">
-          <div className="pointer-events-auto flex items-center gap-3 border border-rule-strong bg-paper/95 px-5 py-3 shadow-[0_12px_30px_-12px_rgb(22_18_16/0.25)]">
-            <CandleIcon className="size-4 animate-pulse text-rubric" />
+          <div className="glass-panel-strong pointer-events-auto flex items-center gap-3 rounded-full px-5 py-3">
+            <CandleIcon className="size-4 animate-pulse text-brass" />
             <span className="font-serif text-sm italic text-ink-soft">
-              Ringing the bells…
+              Lighting the transept…
             </span>
           </div>
         </div>
       ) : null}
       {error ? (
         <div className="pointer-events-none absolute inset-0 z-[800] flex items-center justify-center p-4">
-          <div className="pointer-events-auto max-w-sm border border-rule-strong bg-paper/95 px-6 py-5 text-center shadow-[0_18px_40px_-18px_rgb(22_18_16/0.35)]">
-            <p className="smallcaps mb-2 text-[0.8125rem] text-rubric">
-              An interruption
+          <div className="glass-panel-strong pointer-events-auto max-w-sm rounded-[1.75rem] px-6 py-5 text-center">
+            <p className="smallcaps mb-2 text-[0.78rem] text-brass">
+              The nave has gone dim
             </p>
             <p className="font-serif text-sm italic text-ink-soft">
-              The bulletin could not be reached. Check the connection and try
-              once more.
+              The parish registry could not be reached. Check the connection and
+              open the window again.
             </p>
             <button
               type="button"
               onClick={() => refetch()}
-              className="rubric-link smallcaps mt-4 inline-flex items-center gap-1.5 text-[0.875rem]"
+              className="rubric-link smallcaps mt-4 inline-flex items-center gap-1.5 text-[0.8rem]"
             >
               <RefreshCwIcon className="size-3" />
               Try again
@@ -125,12 +123,11 @@ export function HomePage() {
         </div>
       ) : null}
 
-      {/* Floating "broadsheet" card — masthead, search, filter pills */}
       <div className="pointer-events-none absolute inset-x-0 top-0 z-[900] flex justify-center px-4 pt-[calc(1rem+var(--safe-area-inset-top))] md:justify-start md:px-6 md:pt-6">
-        <div className="pointer-events-auto w-full max-w-[28rem] space-y-4">
-          <div className="rise-in border border-rule-strong bg-paper/96 px-6 pt-5 pb-4 shadow-[0_22px_48px_-20px_rgb(22_18_16/0.4),0_3px_8px_-3px_rgb(22_18_16/0.14)] backdrop-blur-sm">
+        <div className="pointer-events-auto w-full max-w-[32.5rem] space-y-4">
+          <div className="glass-panel-strong came-frame rise-in rounded-[2rem] px-6 pt-5 pb-5 shadow-[0_40px_90px_-42px_rgb(0_0_0/0.82)]">
             <Masthead />
-            <div className="mt-5">
+            <div className="mt-6">
               <SearchTypeahead
                 onSelect={handleChurchSelect}
                 filterButton={
@@ -139,7 +136,7 @@ export function HomePage() {
                     onClick={() => setFilterPanelOpen(true)}
                     aria-label="Open filters"
                     data-active={filterPanelOpen}
-                    className="rubric-link smallcaps ml-1 text-[0.875rem] md:hidden"
+                    className="glass-chip smallcaps ml-1 rounded-full px-3 py-1.5 text-[0.76rem] text-brass md:hidden"
                   >
                     Filters
                   </button>
@@ -159,12 +156,12 @@ export function HomePage() {
         </div>
       </div>
 
-      {/* Attribution corner — small cream notch so the Leaflet credit doesn't
-       *  clash with the masthead. */}
-      <div className="pointer-events-none absolute bottom-3 right-3 z-[900]">
-        <p className="font-serif text-[0.8125rem] italic text-ink-faint/80">
-          Set from{" "}
-          <span className="smallcaps not-italic">open street map</span>
+      <div className="pointer-events-none absolute right-4 bottom-4 z-[900]">
+        <p className="glass-chip rounded-full px-3 py-1.5 font-serif text-[0.78rem] italic text-ink-faint/90">
+          Cartography from{" "}
+          <span className="smallcaps not-italic text-brass/85">
+            OpenStreetMap
+          </span>
         </p>
       </div>
     </main>

@@ -11,9 +11,15 @@ importers:
       '@fontsource-variable/eb-garamond':
         specifier: ^5.2.7
         version: 5.2.7
+      '@fontsource-variable/literata':
+        specifier: ^5.2.8
+        version: 5.2.8
       '@fontsource/cardo':
         specifier: ^5.2.8
         version: 5.2.8
+      '@fontsource/uncial-antiqua':
+        specifier: ^5.2.7
+        version: 5.2.7
       '@tanstack/react-query':
         specifier: ^5.90.3
         version: 5.90.21(react@19.2.4)
@@ -539,8 +545,14 @@ packages:
   '@fontsource-variable/eb-garamond@5.2.7':
     resolution: {integrity: sha512-TbR+Pun4k5g85lgdxRNSbWka5vJgi9pzdFzFswgf7/7NRhKssvoumft1+ZGz3n91YYet96JcnjWrgPGGj6JTzg==}
 
+  '@fontsource-variable/literata@5.2.8':
+    resolution: {integrity: sha512-LhxHyo0lDNu2w8FJ7OfTZl6kT8pDYhXiCmWxFAqpUmOqHz1z3OWOaaWBDVOCDOE8b+GWJQX9HYHZ2CERQjjlWA==}
+
   '@fontsource/cardo@5.2.8':
     resolution: {integrity: sha512-EsHtfb83KANO2dMrTkTVYN7eRLEX7aWGbpKwd7Qqy3k+Yc4GTQJrTyMmxaJzIiZo/RyC3xXM7L2p5uDASMDISQ==}
+
+  '@fontsource/uncial-antiqua@5.2.7':
+    resolution: {integrity: sha512-Nkjaw4biwlL/QPbQoveXeoZLMkz7r6ynz0ui/vBZvoHiTB+bB1AoRAHOHQg4CO7S7EmagrBJh8OuUEhvTGA+Zg==}
 
   '@hono/node-server@1.19.13':
     resolution: {integrity: sha512-TsQLe4i2gvoTtrHje625ngThGBySOgSK3Xo2XRYOdqGN1teR8+I7vchQC46uLJi8OF62YTYA3AhSpumtkhsaKQ==}
@@ -3974,7 +3986,11 @@ snapshots:
 
   '@fontsource-variable/eb-garamond@5.2.7': {}
 
+  '@fontsource-variable/literata@5.2.8': {}
+
   '@fontsource/cardo@5.2.8': {}
+
+  '@fontsource/uncial-antiqua@5.2.7': {}
 
   '@hono/node-server@1.19.13(hono@4.12.12)':
     dependencies:

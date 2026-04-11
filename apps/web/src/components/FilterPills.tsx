@@ -49,18 +49,12 @@ export function FilterPills({ filters }: FilterPillsProps) {
   if (parts.length === 0) return null;
 
   return (
-    <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
-      <span className="smallcaps text-[0.8125rem] text-ink-faint">
-        Showing
-      </span>
+    <div className="mt-4 flex flex-wrap items-center gap-2">
+      <span className="smallcaps text-[0.78rem] text-ink-faint">Window set to</span>
       {parts.map((label, idx) => (
-        <span key={label} className="flex items-center gap-3">
-          {idx > 0 ? (
-            <span aria-hidden className="text-brass">
-              ·
-            </span>
-          ) : null}
-          <span className="smallcaps text-[0.875rem] text-rubric">
+        <span key={label} className="flex items-center gap-2">
+          {idx > 0 ? <span aria-hidden className="text-ink-faint/60">+</span> : null}
+          <span className="glass-chip smallcaps rounded-full px-3 py-1.5 text-[0.78rem] text-brass">
             {label}
           </span>
         </span>

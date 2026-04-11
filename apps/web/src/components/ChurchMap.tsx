@@ -84,23 +84,28 @@ function formatEventDay(event: EventSummary): string {
 
 const defaultCenter: [number, number] = [43.1566, -77.6088];
 
-/* A cross-in-roundel pin: cream disc with a brass ring, a rubric-red Latin
- * cross at the center, and a subtle drop-shadow. Rendered via divIcon so
- * nothing is fetched from a CDN at runtime. */
+/* A stained-glass lancet pin: jewel-tone panes held together by lead lines.
+ * Rendered via divIcon so nothing is fetched from a CDN at runtime. */
 const markerSvg = `
-<svg xmlns="http://www.w3.org/2000/svg" width="34" height="42" viewBox="0 0 34 42" fill="none" aria-hidden="true">
+<svg xmlns="http://www.w3.org/2000/svg" width="38" height="48" viewBox="0 0 38 48" fill="none" aria-hidden="true">
   <defs>
-    <filter id="marker-shadow" x="-30%" y="-10%" width="160%" height="130%">
-      <feDropShadow dx="0" dy="2" stdDeviation="1.6" flood-color="#161210" flood-opacity="0.3"/>
+    <filter id="marker-shadow" x="-40%" y="-20%" width="180%" height="160%">
+      <feDropShadow dx="0" dy="5" stdDeviation="2.8" flood-color="#02040A" flood-opacity="0.5"/>
     </filter>
+    <linearGradient id="marker-body" x1="19" y1="4" x2="19" y2="42" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="var(--sapphire)" />
+      <stop offset="1" stop-color="var(--amethyst)" />
+    </linearGradient>
   </defs>
   <g filter="url(#marker-shadow)">
-    <path d="M17 2C9.27 2 3 8.27 3 16c0 3.7 1.73 7.3 4 10.5C9.5 30 13.5 34.4 15.8 38.6a1.35 1.35 0 0 0 2.4 0C20.5 34.4 24.5 30 27 26.5 29.27 23.3 31 19.7 31 16 31 8.27 24.73 2 17 2Z"
-          fill="var(--paper)" stroke="var(--brass)" stroke-width="1.3" />
-    <circle cx="17" cy="16" r="9.5" fill="none" stroke="var(--rule-strong)" stroke-width="0.8" />
-    <g stroke="var(--rubric)" stroke-width="2" stroke-linecap="round">
-      <path d="M17 9.5 V 21.5" />
-      <path d="M12.5 13.5 H 21.5" />
+    <path d="M19 3C10.16 3 3 10.16 3 19c0 4.4 2.01 8.42 4.77 12.14 2.67 3.58 6.3 7.53 9.39 12.91.68 1.18 2.38 1.18 3.06 0 3.09-5.38 6.72-9.33 9.39-12.91C32.99 27.42 35 23.4 35 19 35 10.16 27.84 3 19 3Z"
+          fill="url(#marker-body)" stroke="var(--brass)" stroke-width="1.4" />
+    <path d="M19 8.5 27.5 19 19 29.5 10.5 19 19 8.5Z" fill="var(--ruby)" fill-opacity="0.92" stroke="var(--brass)" stroke-width="0.9" />
+    <path d="M19 8.5V29.5M10.5 19H27.5" stroke="var(--lead)" stroke-width="1.1" />
+    <circle cx="19" cy="19" r="3.3" fill="var(--paper)" fill-opacity="0.96" />
+    <g stroke="var(--brass)" stroke-width="1.8" stroke-linecap="round">
+      <path d="M19 15.8v6.3" />
+      <path d="M15.9 18.9h6.2" />
     </g>
   </g>
 </svg>`;
@@ -108,9 +113,9 @@ const markerSvg = `
 const markerIcon = L.divIcon({
   html: markerSvg,
   className: "church-map-marker",
-  iconSize: [34, 42],
-  iconAnchor: [17, 40],
-  popupAnchor: [0, -34],
+  iconSize: [38, 48],
+  iconAnchor: [19, 45],
+  popupAnchor: [0, -40],
 });
 
 interface ChurchMapProps {
@@ -154,10 +159,10 @@ const ChurchMarker = memo(function ChurchMarker({
       <Popup minWidth={240} maxWidth={300}>
         <div className="w-full">
           <div className="space-y-1.5">
-            <div className="smallcaps text-[0.75rem] text-ink-faint">
+            <div className="smallcaps text-[0.72rem] text-ink-faint">
               Parish of
             </div>
-            <h3 className="font-display text-[1.35rem] leading-[1.1] font-normal text-ink">
+            <h3 className="halo-title font-display text-[1.18rem] leading-[1.15] font-normal tracking-[0.03em] text-paper">
               {church.name ?? "Unnamed parish"}
             </h3>
             {formatAddress(church) ? (
@@ -171,13 +176,13 @@ const ChurchMarker = memo(function ChurchMarker({
             className="my-3 flex items-center justify-center gap-2 text-brass"
             aria-hidden
           >
-            <span className="h-px flex-1 bg-rule-strong" />
+            <span className="window-divider flex-1" />
             <FleuronIcon className="h-3 w-8" />
-            <span className="h-px flex-1 bg-rule-strong" />
+            <span className="window-divider flex-1" />
           </div>
 
-          <div className="smallcaps mb-1.5 text-[0.75rem] text-ink-faint">
-            Upcoming
+          <div className="smallcaps mb-1.5 text-[0.72rem] text-ink-faint">
+            Next light
           </div>
           <ul role="list" className="m-0 space-y-1 p-0 list-none">
             {topEvents.length > 0 ? (
@@ -187,11 +192,11 @@ const ChurchMarker = memo(function ChurchMarker({
                 return (
                   <li
                     key={eventItem.id}
-                    className="flex items-baseline justify-between gap-3 font-serif text-[0.9rem]"
+                    className="flex items-baseline justify-between gap-3 font-serif text-[0.92rem]"
                   >
-                    <span className="text-ink">{day || "Upcoming"}</span>
-                    <span className="flex-1 border-b border-dotted border-rule-strong translate-y-[-3px]" />
-                    <span className="tabular-nums text-rubric">{time}</span>
+                    <span className="text-paper">{day || "Upcoming"}</span>
+                    <span className="flex-1 border-b border-dotted border-brass/20 translate-y-[-3px]" />
+                    <span className="tabular-nums text-brass">{time}</span>
                   </li>
                 );
               })
@@ -207,12 +212,12 @@ const ChurchMarker = memo(function ChurchMarker({
             ) : null}
           </ul>
 
-          <div className="mt-3.5 border-t border-rule-strong pt-2.5">
+          <div className="mt-3.5 border-t border-brass/15 pt-2.5">
             <Link
               to={`/churches/${church.slug}`}
-              className="rubric-link smallcaps text-[0.8125rem]"
+              className="rubric-link smallcaps text-[0.78rem]"
             >
-              Read the full leaflet →
+              Enter the chapel
             </Link>
           </div>
         </div>
@@ -243,11 +248,9 @@ export const ChurchMap = memo(function ChurchMap({
       zoomControl={false}
     >
       {centerOn && <ChangeView center={centerOn} />}
-      {/* CartoDB Positron — a clean, low-saturation base that takes the
-       * warm sepia CSS filter (set in app.css) gracefully. Free, no API key. */}
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>'
-        url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+        url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
         subdomains={["a", "b", "c", "d"]}
         maxZoom={19}
       />

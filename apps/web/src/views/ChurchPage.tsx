@@ -125,13 +125,13 @@ export function ChurchPage() {
   );
   if (!enabled) {
     return (
-      <main className="flex min-h-svh flex-col items-center justify-center gap-4 bg-paper px-4 py-8 text-center">
+      <main className="flex min-h-svh flex-col items-center justify-center gap-4 bg-nave-deep px-4 py-8 text-center text-paper">
         <p className="font-serif text-base italic text-ink-soft">
           We couldn&apos;t find that parish.
         </p>
-          <Link to="/" className="rubric-link smallcaps text-[0.875rem]">
+        <Link to="/" className="rubric-link smallcaps text-[0.8rem]">
           <ArrowLeftIcon className="size-3" />
-          Back to the bulletin
+          Back to the nave
         </Link>
       </main>
     );
@@ -140,22 +140,21 @@ export function ChurchPage() {
   const church = churchQuery.data;
 
   return (
-    <main className="min-h-svh bg-paper">
-      {/* Slim header bar — just a back link, styled as a rubric text link. */}
-      <header className="sticky top-0 z-40 border-b border-rule-strong bg-paper/95 backdrop-blur supports-[backdrop-filter]:bg-paper/85">
-        <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-6 pt-[calc(0.85rem+var(--safe-area-inset-top))] pb-3">
-          <Link to="/" className="rubric-link smallcaps text-[0.875rem]">
+    <main className="min-h-svh bg-nave-deep text-paper">
+      <header className="sticky top-0 z-40 border-b border-brass/12 bg-[rgb(6_10_22/0.7)] backdrop-blur-xl supports-[backdrop-filter]:bg-[rgb(6_10_22/0.55)]">
+        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 pt-[calc(0.85rem+var(--safe-area-inset-top))] pb-3">
+          <Link to="/" className="rubric-link smallcaps text-[0.8rem]">
             <ArrowLeftIcon className="size-3" />
-            Back to the bulletin
+            Back to the nave
           </Link>
           <Masthead compact />
         </div>
       </header>
 
-      <div className="mx-auto w-full max-w-5xl px-6 py-10 pb-[calc(3rem+var(--safe-area-inset-bottom))] md:py-14">
+      <div className="mx-auto w-full max-w-6xl px-6 py-10 pb-[calc(3rem+var(--safe-area-inset-bottom))] md:py-14">
         {churchQuery.isLoading ? (
           <p className="font-serif text-sm italic text-ink-soft">
-            Leafing through the parish registry…
+            Lighting the chapel records…
           </p>
         ) : null}
         {churchQuery.error ? (
@@ -166,7 +165,7 @@ export function ChurchPage() {
             <button
               type="button"
               onClick={() => churchQuery.refetch()}
-              className="rubric-link smallcaps inline-flex items-center gap-1.5 text-[0.875rem]"
+              className="rubric-link smallcaps inline-flex items-center gap-1.5 text-[0.8rem]"
             >
               <RefreshCwIcon className="size-3" />
               Try again
@@ -176,17 +175,16 @@ export function ChurchPage() {
 
         {church ? (
           <>
-            {/* Centered masthead block — like the top of a service leaflet */}
-            <section className="rise-in mx-auto max-w-2xl text-center">
-              <p className="smallcaps text-[0.875rem] text-ink-faint">
+            <section className="glass-panel-strong came-frame rise-in mx-auto max-w-4xl rounded-[2rem] px-6 py-8 text-center md:px-10">
+              <p className="smallcaps text-[0.78rem] text-ink-faint">
                 Parish of
               </p>
-              <h2 className="mt-2 font-display text-[clamp(2.25rem,6vw,3.75rem)] leading-[1.05] font-normal tracking-tight text-ink">
+              <h2 className="halo-title mt-3 font-display text-[clamp(2.2rem,6vw,4.2rem)] leading-[1.06] font-normal tracking-[0.03em] text-paper">
                 {church.name ?? "Unnamed parish"}
               </h2>
 
               {formatAddress(church) ? (
-                <p className="mt-4 flex items-center justify-center gap-2 font-serif text-[0.95rem] italic text-ink-soft">
+                <p className="mt-5 flex items-center justify-center gap-2 font-serif text-[0.95rem] italic text-ink-soft">
                   <MapPinIcon className="size-3.5 text-brass" />
                   {formatAddress(church)}
                 </p>
@@ -195,13 +193,13 @@ export function ChurchPage() {
               <Fleuron className="my-7" />
 
               {(church.homepage_url || church.bulletin_url) ? (
-                <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
+                <div className="flex flex-wrap items-center justify-center gap-3">
                   {church.homepage_url ? (
                     <a
                       href={church.homepage_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="rubric-link smallcaps inline-flex items-center gap-2 text-[0.875rem]"
+                      className="glass-chip smallcaps inline-flex items-center gap-2 rounded-full px-4 py-2 text-[0.76rem] text-brass hover:text-glow"
                     >
                       <ExternalLinkIcon className="size-3" />
                       Visit the parish website
@@ -212,10 +210,10 @@ export function ChurchPage() {
                       href={church.bulletin_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="rubric-link smallcaps inline-flex items-center gap-2 text-[0.875rem]"
+                      className="glass-chip smallcaps inline-flex items-center gap-2 rounded-full px-4 py-2 text-[0.76rem] text-brass hover:text-glow"
                     >
                       <FileTextIcon className="size-3" />
-                      Read the Sunday bulletin
+                      Read the latest bulletin
                     </a>
                   ) : null}
                 </div>
@@ -223,19 +221,19 @@ export function ChurchPage() {
             </section>
 
             {eventsQuery.isLoading ? (
-              <p className="mx-auto max-w-2xl font-serif text-sm italic text-ink-soft">
-                Collecting the schedule…
+              <p className="mx-auto mt-8 max-w-2xl font-serif text-sm italic text-ink-soft">
+                Lighting the schedule panes…
               </p>
             ) : null}
             {eventsQuery.error ? (
-              <div className="mx-auto flex max-w-2xl flex-col items-start gap-3">
+              <div className="mx-auto mt-8 flex max-w-2xl flex-col items-start gap-3">
                 <p className="font-serif text-sm italic text-ink-soft">
                   We couldn&apos;t load services for this parish.
                 </p>
                 <button
                   type="button"
                   onClick={() => eventsQuery.refetch()}
-                  className="rubric-link smallcaps inline-flex items-center gap-1.5 text-[0.875rem]"
+                  className="rubric-link smallcaps inline-flex items-center gap-1.5 text-[0.8rem]"
                 >
                   <RefreshCwIcon className="size-3" />
                   Try again
@@ -243,15 +241,15 @@ export function ChurchPage() {
               </div>
             ) : null}
             {events && events.length === 0 ? (
-              <p className="mx-auto max-w-2xl text-center font-serif text-sm italic text-ink-soft">
+              <p className="mx-auto mt-8 max-w-2xl text-center font-serif text-sm italic text-ink-soft">
                 No Mass, Confession, or Adoration times are listed for this
                 parish yet.
               </p>
             ) : null}
 
             {byType ? (
-              <div className="mx-auto max-w-4xl">
-                <div className="rise-in space-y-12" style={{ animationDelay: "80ms" }}>
+              <div className="mx-auto mt-10 max-w-5xl">
+                <div className="rise-in space-y-8" style={{ animationDelay: "80ms" }}>
                   {EVENT_TYPE_ORDER.map((eventType) => {
                     const { weeklyByDay, specificDate } = byType[eventType];
                     const hasWeekly = DAY_ORDER.some(
@@ -261,14 +259,24 @@ export function ChurchPage() {
                     if (!hasAny) return null;
 
                     return (
-                      <section key={eventType}>
+                      <section
+                        key={eventType}
+                        className="glass-panel came-frame rounded-[1.8rem] px-5 py-5 md:px-7"
+                      >
                         <div className="mb-5">
-                          <h3 className="font-display text-[1.75rem] leading-none font-normal text-ink">
+                          <p className="smallcaps text-[0.76rem] text-ink-faint">
+                            {eventType === "mass"
+                              ? "Ruby chapel"
+                              : eventType === "confession"
+                                ? "Sapphire chapel"
+                                : "Emerald chapel"}
+                          </p>
+                          <h3 className="mt-2 font-display text-[1.45rem] leading-none font-normal tracking-[0.03em] text-paper">
                             {EVENT_TYPE_LABELS[eventType]}
                           </h3>
                         </div>
 
-                        <dl className="divide-y divide-rule">
+                        <dl className="divide-y divide-brass/12">
                           {DAY_ORDER.map((day) => {
                             const dayEvents = weeklyByDay[day];
                             if (!dayEvents || dayEvents.length === 0)
@@ -276,12 +284,12 @@ export function ChurchPage() {
                             return (
                               <div
                                 key={day}
-                                className="grid grid-cols-[6rem_1fr] items-baseline gap-4 py-2.5"
+                                className="grid grid-cols-[6.75rem_1fr] items-baseline gap-4 py-3"
                               >
-                                <dt className="smallcaps text-[0.875rem] text-ink-soft">
+                                <dt className="smallcaps text-[0.78rem] text-brass/90">
                                   {formatDayLabel(day)}
                                 </dt>
-                                <dd className="font-serif text-[1.05rem] leading-snug tabular-nums text-ink">
+                                <dd className="font-serif text-[1.03rem] leading-snug tabular-nums text-paper">
                                   {formatTimeRun(dayEvents)}
                                 </dd>
                               </div>
@@ -293,9 +301,9 @@ export function ChurchPage() {
                               {specificDate.map((event) => (
                                 <div
                                   key={event.id}
-                                  className="grid grid-cols-[6rem_1fr] items-baseline gap-4 py-2.5"
+                                  className="grid grid-cols-[6.75rem_1fr] items-baseline gap-4 py-3"
                                 >
-                                  <dt className="smallcaps text-[0.875rem] text-rubric">
+                                  <dt className="smallcaps text-[0.78rem] text-brass">
                                     {event.date
                                       ? formatEventDate(event.date).replace(
                                           /, .+$/,
@@ -303,7 +311,7 @@ export function ChurchPage() {
                                         )
                                       : "Special"}
                                   </dt>
-                                  <dd className="font-serif text-[1.05rem] leading-snug text-ink">
+                                  <dd className="font-serif text-[1.03rem] leading-snug text-paper">
                                     <span className="tabular-nums">
                                       {formatMinutesMissal(event.start_time)}
                                       {event.end_time != null

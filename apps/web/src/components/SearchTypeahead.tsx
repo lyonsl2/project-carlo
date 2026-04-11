@@ -96,17 +96,16 @@ export function SearchTypeahead({
         <PopoverAnchor asChild>
           <div className="relative">
             <div
-              className="group flex items-center gap-3 border-b pb-1.5 transition-colors"
+              className="glass-panel came-frame group flex items-center gap-3 rounded-[1.5rem] px-4 py-3 transition-all"
               style={{
-                borderBottomColor: isFocused
-                  ? "var(--rubric)"
-                  : "var(--rule-strong)",
-                borderBottomWidth: isFocused ? 1.5 : 1,
+                boxShadow: isFocused
+                  ? "inset 0 1px 0 rgb(255 255 255 / 0.12), 0 0 0 1px color-mix(in oklch, var(--brass) 32%, transparent), 0 20px 45px -28px rgb(0 0 0 / 0.8), 0 0 24px color-mix(in oklch, var(--sapphire) 18%, transparent)"
+                  : undefined,
               }}
             >
               <SearchIcon
                 className={`size-4 shrink-0 transition-colors ${
-                  isFocused ? "text-rubric" : "text-ink-faint"
+                  isFocused ? "text-brass" : "text-ink-faint"
                 }`}
               />
               <CommandPrimitive.Input
@@ -133,7 +132,7 @@ export function SearchTypeahead({
                 placeholder="Search for a parish…"
                 aria-label="Search for parish by name"
                 autoComplete="off"
-                className="flex-1 bg-transparent font-serif text-[1.0625rem] text-ink outline-none placeholder:text-ink-faint placeholder:italic"
+                className="flex-1 bg-transparent font-serif text-[1.02rem] text-paper outline-none placeholder:text-ink-faint placeholder:italic"
               />
               {query.length > 0 ? (
                 <button
@@ -144,23 +143,23 @@ export function SearchTypeahead({
                     setIsOpen(false);
                   }}
                   aria-label="Clear search"
-                  className="flex size-6 shrink-0 items-center justify-center text-ink-faint transition-colors hover:text-rubric"
+                  className="glass-chip flex size-7 shrink-0 items-center justify-center rounded-full text-ink-faint transition-colors hover:text-brass"
                 >
                   <XIcon className="size-3.5" />
                 </button>
               ) : null}
-              <div className="shrink-0">{filterButton}</div>
+              <div className="shrink-0 pl-1">{filterButton}</div>
             </div>
           </div>
         </PopoverAnchor>
         <PopoverContent
           align="start"
           sideOffset={10}
-          className="w-[min(32rem,calc(100vw-2rem))] border-rule-strong bg-paper p-0 shadow-[0_18px_40px_-18px_rgb(22_18_16/0.32),0_2px_6px_-2px_rgb(22_18_16/0.1)]"
+          className="glass-panel-strong w-[min(34rem,calc(100vw-2rem))] rounded-[1.5rem] border-brass/25 p-0 text-paper shadow-[0_30px_65px_-30px_rgb(0_0_0/0.82)]"
           onOpenAutoFocus={(event) => event.preventDefault()}
         >
-          <div className="border-b border-rule-strong px-4 pt-3 pb-2">
-            <span className="smallcaps text-[0.8125rem] text-ink-faint">
+          <div className="border-b border-brass/15 px-4 pt-3 pb-2">
+            <span className="smallcaps text-[0.76rem] text-ink-faint">
               Matching parishes
             </span>
           </div>
@@ -176,7 +175,7 @@ export function SearchTypeahead({
                     key={church.id}
                     value={church.name ?? `church-${church.id}`}
                     onSelect={() => handleSelect(church)}
-                    className="group relative cursor-pointer gap-0 rounded-none border-l-2 border-transparent px-3 py-2.5 font-serif text-base text-ink data-[selected=true]:border-rubric data-[selected=true]:bg-paper-deep/60 data-[selected=true]:text-ink"
+                    className="group relative cursor-pointer gap-0 rounded-xl border border-transparent px-3 py-3 font-serif text-base text-paper data-[selected=true]:border-brass/20 data-[selected=true]:bg-white/6 data-[selected=true]:text-paper"
                   >
                     <span className="truncate">
                       {church.name ?? "Unnamed parish"}

@@ -11,7 +11,7 @@ function Icon({ children, ...props }: IconProps) {
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="2"
+      strokeWidth="1.8"
       strokeLinecap="round"
       strokeLinejoin="round"
       {...props}
@@ -170,7 +170,7 @@ export function FleuronIcon(props: IconProps) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 48 24"
+      viewBox="0 0 64 24"
       width="48"
       height="24"
       fill="none"
@@ -181,12 +181,48 @@ export function FleuronIcon(props: IconProps) {
       aria-hidden="true"
       {...props}
     >
-      <path d="M1 12h14" />
-      <path d="M33 12h14" />
-      <path d="M18 12c0-3 2-5 4-5s4 2 4 5-2 5-4 5-4-2-4-5Z" />
-      <path d="M22 12c0-3-2-5-4-5" />
-      <path d="M26 12c0 3 2 5 4 5" />
-      <circle cx="24" cy="12" r="0.9" fill="currentColor" stroke="none" />
+      <path d="M1 12h15" />
+      <path d="M48 12h15" />
+      <circle cx="32" cy="12" r="6.5" />
+      <circle cx="32" cy="12" r="2.2" />
+      <path d="M32 2.5v3.5" />
+      <path d="M32 18v3.5" />
+      <path d="M22.2 6.1l2.5 2.5" />
+      <path d="M39.3 15.4l2.5 2.5" />
+      <path d="M18.5 12h3.5" />
+      <path d="M42 12h3.5" />
+      <path d="M22.2 17.9l2.5-2.5" />
+      <path d="M39.3 8.6l2.5-2.5" />
+    </svg>
+  );
+}
+
+export function RoseWindowIcon(props: IconProps) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 32 32"
+      width="32"
+      height="32"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      {...props}
+    >
+      <circle cx="16" cy="16" r="11.5" />
+      <circle cx="16" cy="16" r="6.5" />
+      <circle cx="16" cy="16" r="1.8" fill="currentColor" stroke="none" />
+      <path d="M16 4.5v5" />
+      <path d="M16 22.5v5" />
+      <path d="M4.5 16h5" />
+      <path d="M22.5 16h5" />
+      <path d="m8 8 3.5 3.5" />
+      <path d="m20.5 20.5 3.5 3.5" />
+      <path d="m8 24 3.5-3.5" />
+      <path d="m20.5 11.5 3.5-3.5" />
     </svg>
   );
 }
@@ -195,9 +231,10 @@ export function FleuronIcon(props: IconProps) {
 export function CandleIcon(props: IconProps) {
   return (
     <Icon {...props}>
-      <path d="M12 3c1 1 1 2 0 3s-1 2 0 3" />
-      <rect x="9" y="9" width="6" height="10" rx="0.5" />
-      <path d="M7 19h10" />
+      <path d="M12 3c1.1 1.2 1.2 2.6.2 3.8-.9 1.1-1 2.2-.2 3.2" />
+      <path d="M9 10.5h6l1.5 8H7.5Z" />
+      <path d="M8 20h8" />
+      <path d="M10 10.5V8.8h4v1.7" />
     </Icon>
   );
 }
