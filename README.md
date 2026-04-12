@@ -25,6 +25,8 @@ uv sync --group dev
 pnpm install
 ```
 
+`pnpm install` uses [`pnpm-workspace.yaml`](pnpm-workspace.yaml) and installs JavaScript dependencies for `apps/web` (package name `web`) into the workspace store. The root `package.json` has no Node dependencies of its own; `pnpm install:web` is the same command if you prefer an explicit name.
+
 ## Run the web app
 
 Refresh the frontend SQLite snapshot:

@@ -17,11 +17,11 @@
     "test": "uv run pytest",
     "lint": "uv run ruff check .",
     "extract:web": "uv run python -m pdf_extract.extract_frontend_db",
-    "install:web": "pnpm --dir apps/web install",
-    "dev:web": "pnpm --dir apps/web dev",
-    "build:web": "pnpm --dir apps/web build",
-    "preview:web": "pnpm --dir apps/web preview",
-    "lint:web": "pnpm --dir apps/web lint",
-    "check:web": "pnpm --dir apps/web check"
+    "install:web": "pnpm install",
+    "dev:web": "pnpm --filter web dev",
+    "build:web": "pnpm --filter web build",
+    "preview:web": "pnpm --filter web preview",
+    "lint:web": "pnpm --filter web lint",
+    "check:web": "pnpm --filter web check"
   }
 }
