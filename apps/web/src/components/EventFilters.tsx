@@ -1,7 +1,6 @@
+import { EVENT_TYPE_ORDER } from "../constants/eventTypes";
 import type { EventType } from "../types";
 import { titleCase } from "../utils";
-
-const ORDERED_TYPES: EventType[] = ["mass", "confession", "adoration"];
 
 interface EventFiltersProps {
   selected: EventType[];
@@ -11,7 +10,7 @@ interface EventFiltersProps {
 export function EventFilters({ selected, onChange }: EventFiltersProps) {
   return (
     <div className="flex flex-wrap gap-2">
-      {ORDERED_TYPES.map((eventType) => {
+      {EVENT_TYPE_ORDER.map((eventType) => {
         const isChecked = selected.includes(eventType);
         return (
           <label

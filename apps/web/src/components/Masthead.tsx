@@ -1,3 +1,5 @@
+import { cn } from "@/lib/utils";
+
 interface MastheadProps {
   /** Optional tagline rendered beneath the wordmark. */
   tagline?: string;
@@ -14,7 +16,7 @@ export function Masthead({
 }: MastheadProps) {
   if (compact) {
     return (
-      <div className={`flex items-baseline justify-between gap-4 ${className}`}>
+      <div className={cn("flex items-baseline gap-4", className)}>
         <span className="font-display text-lg leading-none font-normal tracking-tight text-ink">
           Project <span className="italic text-rubric">Carlo</span>
         </span>
@@ -23,7 +25,7 @@ export function Masthead({
   }
 
   return (
-    <header className={`space-y-2 ${className}`}>
+    <header className={cn("space-y-2", className)}>
       <h1 className="font-display text-[2rem] leading-none font-normal tracking-tight text-ink sm:text-[2.5rem]">
         Project <span className="italic text-rubric">Carlo</span>
       </h1>

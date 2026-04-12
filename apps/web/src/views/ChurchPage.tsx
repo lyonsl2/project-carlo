@@ -2,6 +2,8 @@ import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { fetchChurch, fetchChurchEvents } from "../api";
+import { DAY_ORDER } from "../constants/days";
+import { EVENT_TYPE_LABELS, EVENT_TYPE_ORDER } from "../constants/eventTypes";
 import type { EventSummary, EventType } from "../types";
 import {
   formatAddress,
@@ -13,27 +15,10 @@ import {
   ExternalLinkIcon,
   FileTextIcon,
   MapPinIcon,
-  RefreshCwIcon,
 } from "@/components/icons";
+import { InlineQueryError } from "@/components/InlineQueryError";
 import { Fleuron } from "@/components/Fleuron";
 import { Masthead } from "@/components/Masthead";
-
-const EVENT_TYPE_ORDER: EventType[] = ["mass", "confession", "adoration"];
-const DAY_ORDER = [
-  "sunday",
-  "monday",
-  "tuesday",
-  "wednesday",
-  "thursday",
-  "friday",
-  "saturday",
-];
-
-const EVENT_TYPE_LABELS: Record<EventType, string> = {
-  mass: "Mass",
-  confession: "Confession",
-  adoration: "Adoration",
-};
 
 interface EventsByType {
   weeklyByDay: Record<string, EventSummary[]>;
@@ -113,8 +98,7 @@ export function ChurchPage() {
   });
   const eventsQuery = useQuery({
     queryKey: ["church-events", churchSlug],
-    queryFn: () =>
-      fetchChurchEvents(churchSlug!, ["mass", "confession", "adoration"]),
+    queryFn: () => fetchChurchEvents(churchSlug!, [...EVENT_TYPE_ORDER]),
     enabled,
   });
 
@@ -129,7 +113,7 @@ export function ChurchPage() {
         <p className="font-serif text-base text-ink-soft">
           We couldn&apos;t find that parish.
         </p>
-          <Link to="/" className="rubric-link smallcaps text-[0.875rem]">
+        <Link to="/" className="rubric-link smallcaps text-[0.875rem]">
           <ArrowLeftIcon className="size-3" />
           Back to map
         </Link>
@@ -157,19 +141,10 @@ export function ChurchPage() {
           <p className="font-serif text-sm text-ink-soft">Loading parish…</p>
         ) : null}
         {churchQuery.error ? (
-          <div className="flex flex-col items-start gap-3">
-            <p className="font-serif text-sm text-ink-soft">
-              We couldn&apos;t load this parish.
-            </p>
-            <button
-              type="button"
-              onClick={() => churchQuery.refetch()}
-              className="rubric-link smallcaps inline-flex items-center gap-1.5 text-[0.875rem]"
-            >
-              <RefreshCwIcon className="size-3" />
-              Try again
-            </button>
-          </div>
+          <InlineQueryError
+            message={"We couldn't load this parish."}
+            onRetry={() => churchQuery.refetch()}
+          />
         ) : null}
 
         {church ? (
@@ -222,19 +197,11 @@ export function ChurchPage() {
               </p>
             ) : null}
             {eventsQuery.error ? (
-              <div className="mx-auto flex max-w-2xl flex-col items-start gap-3">
-                <p className="font-serif text-sm text-ink-soft">
-                  We couldn&apos;t load times for this parish.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => eventsQuery.refetch()}
-                  className="rubric-link smallcaps inline-flex items-center gap-1.5 text-[0.875rem]"
-                >
-                  <RefreshCwIcon className="size-3" />
-                  Try again
-                </button>
-              </div>
+              <InlineQueryError
+                className="mx-auto max-w-2xl"
+                message={"We couldn't load times for this parish."}
+                onRetry={() => eventsQuery.refetch()}
+              />
             ) : null}
             {events && events.length === 0 ? (
               <p className="mx-auto max-w-2xl text-center font-serif text-sm text-ink-soft">

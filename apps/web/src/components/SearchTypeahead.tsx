@@ -1,4 +1,11 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo,
+  useRef,
+  type ReactNode,
+} from "react";
 import { Command as CommandPrimitive } from "cmdk";
 import { useQuery } from "@tanstack/react-query";
 import type FuseType from "fuse.js";
@@ -21,7 +28,7 @@ const DEBOUNCE_MS = 200;
 
 interface SearchTypeaheadProps {
   onSelect: (church: ChurchSearchResult) => void;
-  filterButton: React.ReactNode;
+  filterButton: ReactNode;
 }
 
 export function SearchTypeahead({
@@ -156,7 +163,7 @@ export function SearchTypeahead({
         <PopoverContent
           align="start"
           sideOffset={10}
-          className="w-[min(32rem,calc(100vw-2rem))] border-rule-strong bg-paper p-0 shadow-[0_18px_40px_-18px_rgb(22_18_16/0.32),0_2px_6px_-2px_rgb(22_18_16/0.1)]"
+          className="w-[min(32rem,calc(100vw-2rem))] border-rule-strong bg-paper p-0 shadow-missal-popover"
           onOpenAutoFocus={(event) => event.preventDefault()}
         >
           <div className="border-b border-rule-strong px-4 pt-3 pb-2">

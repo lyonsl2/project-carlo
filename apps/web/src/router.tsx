@@ -6,6 +6,12 @@ const ChurchPage = lazy(() =>
   import("./views/ChurchPage").then((m) => ({ default: m.ChurchPage })),
 );
 
+const churchPageFallback = (
+  <main className="flex min-h-svh items-center justify-center bg-paper px-4">
+    <p className="font-serif text-sm text-ink-soft">Loading…</p>
+  </main>
+);
+
 export const router = createBrowserRouter([
   {
     path: "/",
@@ -14,7 +20,7 @@ export const router = createBrowserRouter([
   {
     path: "/churches/:churchSlug",
     element: (
-      <Suspense>
+      <Suspense fallback={churchPageFallback}>
         <ChurchPage />
       </Suspense>
     ),

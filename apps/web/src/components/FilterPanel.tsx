@@ -1,30 +1,15 @@
 import { useCallback } from "react";
 import type { EventType } from "../types";
-import type { FilterState } from "./filterState";
+import {
+  DEFAULT_FILTER_STATE,
+  MINUTES_PER_DAY,
+  type FilterState,
+} from "./filterState";
+import { EVENT_TYPE_OPTIONS } from "../constants/eventTypes";
 import { TimeRangeSlider } from "./TimeRangeSlider";
 import { Fleuron } from "./Fleuron";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
-
-interface EventTypeOption {
-  id: EventType;
-  label: string;
-}
-
-const EVENT_TYPE_OPTIONS: EventTypeOption[] = [
-  {
-    id: "mass",
-    label: "Mass",
-  },
-  {
-    id: "confession",
-    label: "Confession",
-  },
-  {
-    id: "adoration",
-    label: "Adoration",
-  },
-];
 
 const DAY_NAMES = [
   { full: "Monday", abbr: "Mon" },
@@ -36,7 +21,6 @@ const DAY_NAMES = [
   { full: "Sunday", abbr: "Sun" },
 ];
 
-const MINUTES_PER_DAY = 24 * 60;
 const TIME_STEP_MINUTES = 15;
 
 interface FilterPanelProps {
@@ -97,12 +81,7 @@ export function FilterPanel({
   );
 
   const handleClear = useCallback(() => {
-    onChange({
-      eventType: "mass",
-      daysOfWeek: [],
-      timeFrom: 0,
-      timeTo: MINUTES_PER_DAY - 1,
-    });
+    onChange({ ...DEFAULT_FILTER_STATE });
   }, [onChange]);
 
   const handleApply = useCallback(() => {
@@ -262,7 +241,7 @@ export function FilterPanel({
 
   if (isDesktop) {
     return (
-      <section className="rise-in h-fit w-full overflow-hidden border border-rule-strong bg-paper/96 shadow-[0_20px_40px_-20px_rgb(22_18_16/0.35),0_3px_8px_-3px_rgb(22_18_16/0.14)] backdrop-blur-sm">
+      <section className="rise-in h-fit w-full overflow-hidden border border-rule-strong bg-paper/96 shadow-missal-panel backdrop-blur-sm">
         <ScrollArea className="max-h-[calc(100svh-12rem)]">
           {panelBody}
         </ScrollArea>

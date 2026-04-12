@@ -1,5 +1,5 @@
 import { formatMinutesMissal, titleCase } from "../utils";
-import type { FilterState } from "./filterState";
+import { MINUTES_PER_DAY, type FilterState } from "./filterState";
 
 const DAY_NAMES = [
   "Monday",
@@ -10,8 +10,6 @@ const DAY_NAMES = [
   "Saturday",
   "Sunday",
 ];
-
-const MINUTES_PER_DAY = 24 * 60;
 
 interface FilterPillsProps {
   filters: FilterState;

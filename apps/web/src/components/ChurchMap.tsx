@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import type { Marker as LeafletMarker } from "leaflet";
 import L from "leaflet";
+import { DAY_ORDER } from "../constants/days";
 import type { ChurchMapItem, EventSummary } from "../types";
 import {
   formatAddress,
@@ -14,16 +15,6 @@ import { FleuronIcon } from "@/components/icons";
 
 const OSM_ATTRIBUTION =
   '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
-
-const DAY_ORDER = [
-  "sunday",
-  "monday",
-  "tuesday",
-  "wednesday",
-  "thursday",
-  "friday",
-  "saturday",
-];
 const EVENING_START_MINUTES = 16 * 60; // 4:00 PM
 
 function compareEvents(a: EventSummary, b: EventSummary): number {

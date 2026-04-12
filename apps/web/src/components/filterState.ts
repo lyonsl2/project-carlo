@@ -7,7 +7,14 @@ export interface FilterState {
   timeTo: number; // minutes since midnight
 }
 
-const MINUTES_PER_DAY = 24 * 60;
+export const MINUTES_PER_DAY = 24 * 60;
+
+export const DEFAULT_FILTER_STATE: FilterState = {
+  eventType: "mass",
+  daysOfWeek: [],
+  timeFrom: 0,
+  timeTo: MINUTES_PER_DAY - 1,
+};
 
 export function getTimeRange(filters: FilterState): {
   from?: number;
