@@ -9,8 +9,7 @@ CREATE TABLE IF NOT EXISTS website (
     name TEXT NOT NULL,
     homepage_url TEXT NOT NULL UNIQUE,
     bulletin_provider TEXT,
-    provider_id TEXT,
-    bulletin_page TEXT
+    provider_id TEXT
 );
 
 CREATE TABLE IF NOT EXISTS parish (

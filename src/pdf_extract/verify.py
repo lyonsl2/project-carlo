@@ -2,22 +2,45 @@
 
 from __future__ import annotations
 
+import csv
 import logging
 from pathlib import Path
 
 from pdf_extract.address import format_address
 from pdf_extract.schedule_extraction import extract_verification
 from pdf_extract.storage import (
+    CHURCHES_CSV_PATH,
     VERIFY_RESULTS_PATH,
     connect_db,
     get_parish_by_name,
     list_churches,
-    load_json_dict,
     save_json_dict,
     utc_now_iso,
 )
 
 LOGGER = logging.getLogger(__name__)
+
+
+def _find_verified_parishes() -> set[str]:
+    """Read churches.csv to find parishes where all churches are already verified."""
+    if not CHURCHES_CSV_PATH.exists():
+        return set()
+
+    parish_status: dict[str, bool] = {}
+    with open(CHURCHES_CSV_PATH, encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            parish_id = row["parish_id"]
+            nv = (row.get("name_verified") or "").strip()
+            av = (row.get("address_verified") or "").strip()
+            church_done = nv != "" and av != ""
+            # A parish is fully verified only if ALL its churches are done
+            if parish_id not in parish_status:
+                parish_status[parish_id] = church_done
+            elif not church_done:
+                parish_status[parish_id] = False
+
+    return {slug for slug, done in parish_status.items() if done}
 
 
 def verify_churches(
@@ -26,7 +49,10 @@ def verify_churches(
     model: str = "gemini-3-flash-preview",
 ) -> dict[str, int]:
     LOGGER.info("Starting verify stage (parish_name=%s, model=%s)", parish_name or "*all*", model)
-    verify_results = load_json_dict(VERIFY_RESULTS_PATH)
+    verify_results: dict[str, dict] = {}
+
+    # Build set of parishes where ALL churches are already verified
+    already_verified = _find_verified_parishes()
 
     conn = connect_db()
     try:
@@ -45,6 +71,10 @@ def verify_churches(
         for parish in parishes:
             parish_id = parish["id"]
             parish_slug = parish["slug"]
+
+            if parish_slug in already_verified and not parish_name:
+                LOGGER.info("Skipping already-verified parish %s", parish_slug)
+                continue
 
             # Get latest bulletin PDF for this parish
             bulletin_row = conn.execute(

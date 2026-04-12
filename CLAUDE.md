@@ -18,11 +18,14 @@ pnpm install           # Node dependencies (includes web app)
 ### Pipeline (via pnpm scripts)
 
 ```bash
-pnpm run fetch             # Download bulletins from provider URLs
-pnpm process           # Extract schedules via Gemini
 pnpm detect            # Detect bulletin providers (Playwright)
+pnpm detect:apply      # Write detect results into parishes.csv
+pnpm run fetch         # Download bulletins from provider URLs
+pnpm process           # Extract schedules via Gemini
 pnpm verify            # Verify church data via Gemini
+pnpm verify:apply      # Write verify results into churches.csv
 pnpm geocode           # Backfill church coordinates (Nominatim)
+pnpm geocode:apply     # Write geocode results into churches.csv
 pnpm db:create         # Recreate DB from schema + data files
 pnpm db:drop           # Delete database
 ```
@@ -53,8 +56,9 @@ pnpm extract:web   # Build frontend.db snapshot from main DB
 ```
 parishes.csv → [detect.py] Playwright → detect_results.json
                                             ↓
-                              [db.py] create DB from schema.sql + data files
-                                      (churches.csv, verify_results.json, geocode_results.json)
+               [apply.py] detect apply → parishes.csv (+ bulletin_provider, provider_id)
+                                            ↓
+                              [db.py] create DB from schema.sql + CSV data files
                                             ↓
                        [fetch.py] fetch_bulletins() → download PDFs → metadata.json
                                             ↓
@@ -63,7 +67,11 @@ parishes.csv → [detect.py] Playwright → detect_results.json
                                         events.json
                                             ↓
                        [verify.py] verify_churches() → verify_results.json
+                                            ↓
+               [apply.py] verify apply → churches.csv (+ name_verified, address_verified)
                        [geocode.py] run_backfill() → geocode_results.json
+                                            ↓
+               [apply.py] geocode apply → churches.csv (+ latitude, longitude)
                                             ↓
                        [db.py] create_db() → parish_events.db
                                             ↓
@@ -77,7 +85,8 @@ Key modules:
 - **verify.py** — Church verification: validates church names/addresses against bulletin PDFs via Gemini
 - **schedule_extraction.py** — Pydantic models + Gemini prompts for extraction and verification
 - **storage.py** — Data paths, SQLite helpers, JSON file I/O
-- **db.py** — Database creation: loads schema.sql then populates from CSV/JSON data files
+- **apply.py** — Merge detect/verify/geocode JSON results back into source CSVs (parishes.csv, churches.csv)
+- **db.py** — Database creation: loads schema.sql then populates from CSV data files
 - **detect.py** — Playwright-based provider detection (ecatholic, parishes_online, discover_mass)
 - **geocode.py** — Nominatim geocoding, writes results to geocode_results.json
 

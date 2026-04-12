@@ -8,11 +8,13 @@ import time
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
+import csv
+
 from pdf_extract.address import address_key, format_address
 from pdf_extract.storage import (
+    CHURCHES_CSV_PATH,
     GEOCODE_RESULTS_PATH,
     connect_db,
-    load_json_list,
     save_json_list,
 )
 
@@ -54,21 +56,27 @@ def run_backfill(
     pause_seconds: float,
     email: str | None,
 ) -> dict[str, int]:
-    # Load existing geocode results for dedup by address key
-    geocode_results = load_json_list(GEOCODE_RESULTS_PATH)
-    already_geocoded = {
-        address_key(r.get("line1"), r.get("line2"), r.get("city"), r.get("state"), r.get("postal_code"))
-        for r in geocode_results
-    }
+    geocode_results: list[dict] = []
 
-    # Query churches with NULL lat/lng and non-null address from DB
+    # Read churches.csv to find already-geocoded address keys
+    already_geocoded: set[str] = set()
+    if CHURCHES_CSV_PATH.exists():
+        with open(CHURCHES_CSV_PATH, encoding="utf-8") as f:
+            for row in csv.DictReader(f):
+                if (row.get("latitude") or "").strip() and (row.get("longitude") or "").strip():
+                    key = address_key(
+                        row.get("line1"), row.get("line2"),
+                        row.get("city"), row.get("state"), row.get("postal_code"),
+                    )
+                    already_geocoded.add(key)
+
+    # Query churches with non-null address from DB, skip already-geocoded
     conn = connect_db()
     try:
         rows = conn.execute(
             """SELECT c.address_line1, c.address_line2, c.city, c.state, c.postal_code
                FROM church c
-               WHERE (c.latitude IS NULL OR c.longitude IS NULL)
-                 AND c.address_line1 IS NOT NULL AND c.address_line1 != ''"""
+               WHERE c.address_line1 IS NOT NULL AND c.address_line1 != ''"""
         ).fetchall()
     finally:
         conn.close()

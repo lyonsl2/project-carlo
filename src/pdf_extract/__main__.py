@@ -53,24 +53,42 @@ def _build_parser() -> argparse.ArgumentParser:
 
     # -- detect --
     detect_parser = subparsers.add_parser("detect", help="Detect bulletin provider for parish websites")
-    detect_parser.add_argument("--dry-run", action="store_true")
-    detect_parser.add_argument("--limit", type=int, default=None)
-    detect_parser.add_argument("--pause-seconds", type=float, default=0.5)
-    _add_common_args(detect_parser)
+    detect_subparsers = detect_parser.add_subparsers(dest="detect_command")
+
+    detect_run_parser = detect_subparsers.add_parser("run", help="Run provider detection")
+    detect_run_parser.add_argument("--dry-run", action="store_true")
+    detect_run_parser.add_argument("--limit", type=int, default=None)
+    detect_run_parser.add_argument("--pause-seconds", type=float, default=0.5)
+    _add_common_args(detect_run_parser)
+
+    detect_apply_parser = detect_subparsers.add_parser("apply", help="Write detect results into parishes.csv")
+    _add_common_args(detect_apply_parser)
 
     # -- verify --
     verify_parser = subparsers.add_parser("verify", help="Verify church data against latest bulletin")
-    verify_parser.add_argument("--parish", help="Parish name (omit for all)")
-    verify_parser.add_argument("--model", default="gemini-3-flash-preview", help="Gemini model (default: gemini-3-flash-preview)")
-    _add_common_args(verify_parser)
+    verify_subparsers = verify_parser.add_subparsers(dest="verify_command")
+
+    verify_run_parser = verify_subparsers.add_parser("run", help="Run church verification")
+    verify_run_parser.add_argument("--parish", help="Parish name (omit for all)")
+    verify_run_parser.add_argument("--model", default="gemini-3-flash-preview", help="Gemini model (default: gemini-3-flash-preview)")
+    _add_common_args(verify_run_parser)
+
+    verify_apply_parser = verify_subparsers.add_parser("apply", help="Write verify results into churches.csv")
+    _add_common_args(verify_apply_parser)
 
     # -- geocode --
     geocode_parser = subparsers.add_parser("geocode", help="Backfill church lat/lng from address")
-    geocode_parser.add_argument("--dry-run", action="store_true")
-    geocode_parser.add_argument("--limit", type=int, default=None)
-    geocode_parser.add_argument("--pause-seconds", type=float, default=1.0)
-    geocode_parser.add_argument("--email", type=str, default=None, help="Email for Nominatim usage policy")
-    _add_common_args(geocode_parser)
+    geocode_subparsers = geocode_parser.add_subparsers(dest="geocode_command")
+
+    geocode_run_parser = geocode_subparsers.add_parser("run", help="Run geocoding via Nominatim")
+    geocode_run_parser.add_argument("--dry-run", action="store_true")
+    geocode_run_parser.add_argument("--limit", type=int, default=None)
+    geocode_run_parser.add_argument("--pause-seconds", type=float, default=1.0)
+    geocode_run_parser.add_argument("--email", type=str, default=None, help="Email for Nominatim usage policy")
+    _add_common_args(geocode_run_parser)
+
+    geocode_apply_parser = geocode_subparsers.add_parser("apply", help="Write geocode results into churches.csv")
+    _add_common_args(geocode_apply_parser)
 
     # -- db --
     db_parser = subparsers.add_parser("db", help="Database management commands")
@@ -108,29 +126,50 @@ def main(argv: list[str] | None = None) -> int:
             result = process_bulletins(parish_name=args.parish, model=args.model)
 
         elif args.command == "detect":
-            _ensure_db()
-            from pdf_extract.detect import run_detection
-            result = run_detection(
-                db_path=DEFAULT_DB_PATH,
-                dry_run=args.dry_run,
-                limit=args.limit,
-                pause_seconds=args.pause_seconds,
-            )
+            if args.detect_command == "run":
+                _ensure_db()
+                from pdf_extract.detect import run_detection
+                result = run_detection(
+                    db_path=DEFAULT_DB_PATH,
+                    dry_run=args.dry_run,
+                    limit=args.limit,
+                    pause_seconds=args.pause_seconds,
+                )
+            elif args.detect_command == "apply":
+                from pdf_extract.apply import apply_detect_results
+                result = apply_detect_results()
+            else:
+                parser.parse_args(["detect", "--help"])
+                return 1
 
         elif args.command == "verify":
-            _ensure_db()
-            from pdf_extract.verify import verify_churches
-            result = verify_churches(parish_name=args.parish, model=args.model)
+            if args.verify_command == "run":
+                _ensure_db()
+                from pdf_extract.verify import verify_churches
+                result = verify_churches(parish_name=args.parish, model=args.model)
+            elif args.verify_command == "apply":
+                from pdf_extract.apply import apply_verify_results
+                result = apply_verify_results()
+            else:
+                parser.parse_args(["verify", "--help"])
+                return 1
 
         elif args.command == "geocode":
-            _ensure_db()
-            from pdf_extract.geocode import run_backfill
-            result = run_backfill(
-                dry_run=args.dry_run,
-                limit=args.limit,
-                pause_seconds=args.pause_seconds,
-                email=args.email,
-            )
+            if args.geocode_command == "run":
+                _ensure_db()
+                from pdf_extract.geocode import run_backfill
+                result = run_backfill(
+                    dry_run=args.dry_run,
+                    limit=args.limit,
+                    pause_seconds=args.pause_seconds,
+                    email=args.email,
+                )
+            elif args.geocode_command == "apply":
+                from pdf_extract.apply import apply_geocode_results
+                result = apply_geocode_results()
+            else:
+                parser.parse_args(["geocode", "--help"])
+                return 1
 
         elif args.command == "db":
             if args.db_command == "create":

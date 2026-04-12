@@ -1,63 +1,63 @@
-slug,name,website
-all-saints-corning,All Saints Parish,https://allsaintsparish.org
-net-catholic,N.E.T. Catholic,https://netcatholic.org
-southeast-rochester-catholic-community,Southeast Rochester Catholic Community,https://southeastrochestercatholics.org
-blessed-trinity-st-patrick,Blessed Trinity and St. Patrick Parishes,https://blessed-trinity-parish.org
-catholic-parishes-eastern-wayne-county,Catholic Parishes of Eastern Wayne County,https://www.cpewc.org
-saint-jerome,Church of Saint Jerome,https://stjeromerochester.org
-assumption-resurrection,Assumption & Resurrection,https://assumptionresurrection.org
-holy-spirit-st-josephs,Holy Spirit & St. Joseph's,https://holyspirit-saintjoseph.org
-nativity-seas,Nativity of the Blessed Virgin Mary / Saint Elizabeth Ann Seton,https://nativitybrockport.org
-transfiguration-st-catherine-mendon,Church of the Transfiguration / St. Catherine of Siena,https://www.transfigurationpittsford.org
-st-monica-emmanuel,St. Monica / Emmanuel Church of the Deaf,https://www.stmonicaofrochester.org
-good-shepherd-catholic-community,Good Shepherd Catholic Community,https://thegoodshepherd.cc
-holy-apostles,Holy Apostles Church,https://holyapostleschurchfamily.org
-our-mother-of-sorrows-holy-cross,Our Mother of Sorrows / Holy Cross,https://moshc.org
-holy-family-catholic-community,Holy Family Catholic Community,https://www.hfccwny.org
-holy-trinity-webster,Holy Trinity Church,https://holytrinityweb.org
-immaculate-conception-ithaca,Immaculate Conception Church,https://www.immconch.org
-immaculate-conception-st-bridgets,Immaculate Conception/St. Bridget's,https://www.immaculateconceptionrochester.org
-mary-mother-of-mercy,"The Parish of Mary, Mother of Mercy",https://www.marymotherofmercy.com
-our-lady-of-lourdes-st-anne,Our Lady of Lourdes + St. Anne,https://ololsa.org
-our-lady-of-peace-geneva,Our Lady of Peace,https://ourladyofpeacegeneva.org
-our-lady-of-the-lakes,Our Lady of the Lakes Catholic Community,https://ourladyofthelakescc.org
-our-lady-of-the-valley,Our Lady of the Valley Parish,https://www.olv14843.org
-our-lady-of-victory-st-joseph,Our Lady of Victory / St. Joseph,https://olvsj.org
-our-lady-queen-of-peace-st-thomas-more,Our Lady Queen of Peace and St. Thomas More Catholic Community,https://olqpstm.com
-parish-of-the-holy-family,The Parish of the Holy Family,https://theparishoftheholyfamily.org
-most-holy-name-of-jesus,Parish of the Most Holy Name of Jesus,https://elmiracatholic.org
-peace-of-christ,Peace of Christ Parish,https://peaceofchristparish.org
-sacred-heart-auburn-cluster,"Catholic Community of Sacred Heart, St. Alphonsus, St. Ann Parish and Holy Family",https://sacredheartauburn.org
-sacred-heart-cathedral,Sacred Heart Cathedral,https://sacredheartrochester.org
-saint-rita-webster,Saint Rita,https://www.saintritawebster.org
-ss-isidore-maria-torribia,Ss. Isidore & Maria Torribia Parish,https://simtparish.org
-our-lady-of-the-snow-saints-mary-and-martha,Our Lady of the Snow / Saints Mary and Martha Parish,https://www.stmaryauburn.org
-st-agnes-paul-rose,St. Agnes / St. Paul of the Cross / St. Rose,https://www.saintagnespaulrose.org
-st-benedict-parish,St. Benedict Parish,https://stbenedictonline.org
-st-benedicts-st-marys-lake,St. Benedict's / St. Mary's of the Lake,https://stmarystben.org
-st-catherine-of-siena-ithaca,St. Catherine of Siena Church,https://stcathofsiena.org
-st-charles-borromeo,St. Charles Borromeo,https://stcharlesgreece.org
-st-christopher,St. Christopher,https://www.stchristophersnchili.org
-st-frances-xavier-cabrini,St. Frances Xavier Cabrini Parish,https://cabriniroc.org
-st-francis-and-st-clare,St. Francis and St. Clare,https://sfscrcc.org
-st-john-of-rochester,St. John of Rochester,https://stjohnfairport.org
-st-john-greece,St. John the Evangelist (Greece),https://www.stjohngreece.org
-st-john-spencerport,St. John the Evangelist (Spencerport),https://stjohnschurchspencerport.org
-st-john-vianney,St. John Vianney,https://sjvbath.org
-st-kateri-tekakwitha,St. Kateri Tekakwitha,https://www.kateriirondequoit.org
-st-katharine-drexel-st-maximilian-kolbe,St. Katharine Drexel Parish / St. Maximilian Kolbe Parish,https://www.catholicparisheswwc.org
-st-lawrence,St. Lawrence,https://stlawrencegreeceny.org
-st-leo-the-great,St. Leo the Great Catholic Parish,https://stleohilton.org
-st-louis-pittsford,St. Louis Church,https://stlouischurch.org
-st-luke-the-evangelist,St. Luke the Evangelist Parish,https://www.stlukelivingstoncounty.org
-st-marianne-cope,St. Marianne Cope,https://www.smcrcc.org
-st-marks-greece,St. Mark's,https://www.stmarksgreece.com
-st-martin-de-porres,St. Martin de Porres,https://www.stmartinrochester.org
-st-mary-our-mother,St. Mary Our Mother,https://stmaryourmother.com
-st-marys-st-matthew,St. Mary's / St. Matthew,https://www.stsmaryandmatthew.com
-st-patricks-victor,St. Patrick's (Victor),https://stpatricksvictor.org
-st-pauls-webster,St. Paul's Roman Catholic Church,https://www.stpaulsrcc.org
-st-peters-ontario-county,St. Peter's Roman Catholic Parish,https://www.stpeterparish.us
-st-pius-x-chili,St. Pius X,https://www.saintpiustenth.org
-st-stanislaus-kostka,St. Stanislaus Kostka,https://www.saintstanislausrochester.org
-st-theodores-gates,St. Theodore's Catholic Church,https://www.sttheodoreschurch.com
+slug,name,website,bulletin_provider,provider_id
+all-saints-corning,All Saints Parish,https://allsaintsparish.org,parishes_online,all-saints-parish
+net-catholic,N.E.T. Catholic,https://netcatholic.org,ecatholic,
+southeast-rochester-catholic-community,Southeast Rochester Catholic Community,https://southeastrochestercatholics.org,ecatholic,
+blessed-trinity-st-patrick,Blessed Trinity and St. Patrick Parishes,https://blessed-trinity-parish.org,other,
+catholic-parishes-eastern-wayne-county,Catholic Parishes of Eastern Wayne County,https://www.cpewc.org,parishes_online,st-michael-s-church-st-joseph-the-worker-and-blessed-trinity-catholic-church
+saint-jerome,Church of Saint Jerome,https://stjeromerochester.org,ecatholic,
+assumption-resurrection,Assumption & Resurrection,https://assumptionresurrection.org,ecatholic,
+holy-spirit-st-josephs,Holy Spirit & St. Joseph's,https://holyspirit-saintjoseph.org,ecatholic,
+nativity-seas,Nativity of the Blessed Virgin Mary / Saint Elizabeth Ann Seton,https://nativitybrockport.org,parishes_online,church-of-the-nativity-of-the-blessed-virgin-mary-and-st-elizabeth-ann-seton
+transfiguration-st-catherine-mendon,Church of the Transfiguration / St. Catherine of Siena,https://www.transfigurationpittsford.org,parishes_online,church-of-the-transfiguration-and-st-catherine-of-siena-church
+st-monica-emmanuel,St. Monica / Emmanuel Church of the Deaf,https://www.stmonicaofrochester.org,other,
+good-shepherd-catholic-community,Good Shepherd Catholic Community,https://thegoodshepherd.cc,parishes_online,good-shepherd-catholic-community
+holy-apostles,Holy Apostles Church,https://holyapostleschurchfamily.org,other,
+our-mother-of-sorrows-holy-cross,Our Mother of Sorrows / Holy Cross,https://moshc.org,parishes_online,our-mother-of-sorrows-church
+holy-family-catholic-community,Holy Family Catholic Community,https://www.hfccwny.org,parishes_online,holy-family-catholic-community-14572
+holy-trinity-webster,Holy Trinity Church,https://holytrinityweb.org,other,
+immaculate-conception-ithaca,Immaculate Conception Church,https://www.immconch.org,other,
+immaculate-conception-st-bridgets,Immaculate Conception/St. Bridget's,https://www.immaculateconceptionrochester.org,other,
+mary-mother-of-mercy,"The Parish of Mary, Mother of Mercy",https://www.marymotherofmercy.com,other,
+our-lady-of-lourdes-st-anne,Our Lady of Lourdes + St. Anne,https://ololsa.org,parishes_online,our-lady-of-lourdes-saint-anne-church
+our-lady-of-peace-geneva,Our Lady of Peace,https://ourladyofpeacegeneva.org,parishes_online,our-lady-of-peace-parish-14456
+our-lady-of-the-lakes,Our Lady of the Lakes Catholic Community,https://ourladyofthelakescc.org,parishes_online,our-lady-of-the-lakes-catholic-community
+our-lady-of-the-valley,Our Lady of the Valley Parish,https://www.olv14843.org,other,
+our-lady-of-victory-st-joseph,Our Lady of Victory / St. Joseph,https://olvsj.org,parishes_online,our-lady-of-victory-st-joseph-church
+our-lady-queen-of-peace-st-thomas-more,Our Lady Queen of Peace and St. Thomas More Catholic Community,https://olqpstm.com,ecatholic,
+parish-of-the-holy-family,The Parish of the Holy Family,https://theparishoftheholyfamily.org,ecatholic,
+most-holy-name-of-jesus,Parish of the Most Holy Name of Jesus,https://elmiracatholic.org,other,
+peace-of-christ,Peace of Christ Parish,https://peaceofchristparish.org,discover_mass,
+sacred-heart-auburn-cluster,"Catholic Community of Sacred Heart, St. Alphonsus, St. Ann Parish and Holy Family",https://sacredheartauburn.org,other,
+sacred-heart-cathedral,Sacred Heart Cathedral,https://sacredheartrochester.org,parishes_online,
+saint-rita-webster,Saint Rita,https://www.saintritawebster.org,other,
+ss-isidore-maria-torribia,Ss. Isidore & Maria Torribia Parish,https://simtparish.org,parishes_online,sts-isidore-maria-torribia-parish
+our-lady-of-the-snow-saints-mary-and-martha,Our Lady of the Snow / Saints Mary and Martha Parish,https://www.stmaryauburn.org,parishes_online,st-marys-church-13021
+st-agnes-paul-rose,St. Agnes / St. Paul of the Cross / St. Rose,https://www.saintagnespaulrose.org,parishes_online,st-agnes-church-st-paul-of-the-cross-and-st-rose-church
+st-benedict-parish,St. Benedict Parish,https://stbenedictonline.org,ecatholic,
+st-benedicts-st-marys-lake,St. Benedict's / St. Mary's of the Lake,https://stmarystben.org,parishes_online,st-marys-on-the-lake-st-benedicts
+st-catherine-of-siena-ithaca,St. Catherine of Siena Church,https://stcathofsiena.org,ecatholic,
+st-charles-borromeo,St. Charles Borromeo,https://stcharlesgreece.org,,
+st-christopher,St. Christopher,https://www.stchristophersnchili.org,other,
+st-frances-xavier-cabrini,St. Frances Xavier Cabrini Parish,https://cabriniroc.org,ecatholic,
+st-francis-and-st-clare,St. Francis and St. Clare,https://sfscrcc.org,other,
+st-john-of-rochester,St. John of Rochester,https://stjohnfairport.org,ecatholic,
+st-john-greece,St. John the Evangelist (Greece),https://www.stjohngreece.org,other,
+st-john-spencerport,St. John the Evangelist (Spencerport),https://stjohnschurchspencerport.org,ecatholic,
+st-john-vianney,St. John Vianney,https://sjvbath.org,other,
+st-kateri-tekakwitha,St. Kateri Tekakwitha,https://www.kateriirondequoit.org,parishes_online,st-kateri-tekakwitha-parish-14617
+st-katharine-drexel-st-maximilian-kolbe,St. Katharine Drexel Parish / St. Maximilian Kolbe Parish,https://www.catholicparisheswwc.org,parishes_online,st-maximillian-kolbe-parish
+st-lawrence,St. Lawrence,https://stlawrencegreeceny.org,other,
+st-leo-the-great,St. Leo the Great Catholic Parish,https://stleohilton.org,ecatholic,
+st-louis-pittsford,St. Louis Church,https://stlouischurch.org,ecatholic,
+st-luke-the-evangelist,St. Luke the Evangelist Parish,https://www.stlukelivingstoncounty.org,parishes_online,st-luke-the-evangelist
+st-marianne-cope,St. Marianne Cope,https://www.smcrcc.org,parishes_online,st-marianne-cope-roman-catholic-parish
+st-marks-greece,St. Mark's,https://www.stmarksgreece.com,parishes_online,st-marks-church-14612
+st-martin-de-porres,St. Martin de Porres,https://www.stmartinrochester.org,parishes_online,st-martin-de-porres-parish-at-st-mary-of-the-assumption-church
+st-mary-our-mother,St. Mary Our Mother,https://stmaryourmother.com,other,
+st-marys-st-matthew,St. Mary's / St. Matthew,https://www.stsmaryandmatthew.com,other,
+st-patricks-victor,St. Patrick's (Victor),https://stpatricksvictor.org,discover_mass,
+st-pauls-webster,St. Paul's Roman Catholic Church,https://www.stpaulsrcc.org,other,
+st-peters-ontario-county,St. Peter's Roman Catholic Parish,https://www.stpeterparish.us,other,
+st-pius-x-chili,St. Pius X,https://www.saintpiustenth.org,parishes_online,st-pius-x-church-14624
+st-stanislaus-kostka,St. Stanislaus Kostka,https://www.saintstanislausrochester.org,parishes_online,st-stanislaus-kostka-church
+st-theodores-gates,St. Theodore's Catholic Church,https://www.sttheodoreschurch.com,ecatholic,

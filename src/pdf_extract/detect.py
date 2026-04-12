@@ -11,7 +11,6 @@ from pathlib import Path
 from pdf_extract.storage import (
     DETECT_RESULTS_PATH,
     connect_db,
-    load_json_dict,
     save_json_dict,
 )
 
@@ -160,17 +159,17 @@ def run_detection(
     limit: int | None,
     pause_seconds: float,
 ) -> dict[str, int]:
-    # Load existing results to skip already-processed slugs
-    results = load_json_dict(DETECT_RESULTS_PATH)
+    results: dict[str, dict[str, str | None]] = {}
 
     conn = connect_db(db_path)
     try:
-        rows = conn.execute("SELECT slug, homepage_url FROM website ORDER BY id").fetchall()
+        rows = conn.execute(
+            "SELECT slug, homepage_url FROM website WHERE bulletin_provider IS NULL ORDER BY id"
+        ).fetchall()
     finally:
         conn.close()
 
-    # Only process websites not already in results
-    pending = [r for r in rows if r["slug"] not in results]
+    pending = list(rows)
     if limit is not None:
         pending = pending[:limit]
 
@@ -211,7 +210,6 @@ def run_detection(
                     results[slug] = {
                         "bulletin_provider": provider,
                         "provider_id": provider_id,
-                        "bulletin_page": None,
                     }
                 updated += 1
 
