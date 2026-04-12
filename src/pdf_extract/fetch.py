@@ -31,12 +31,14 @@ from pdf_extract.storage import (
 
 ECATHOLIC_BULLETINS_PATH = "/bulletins"
 PARISHES_ONLINE_TYPE = "parishes_online"
+DISCOVER_MASS_TYPE = "discover_mass"
 OTHER_TYPE = "other"
-SUPPORTED_BULLETIN_PROVIDERS = {"ecatholic", PARISHES_ONLINE_TYPE, OTHER_TYPE}
+SUPPORTED_BULLETIN_PROVIDERS = {"ecatholic", PARISHES_ONLINE_TYPE, DISCOVER_MASS_TYPE, OTHER_TYPE}
 PARISHES_ONLINE_ORG_URL_TEMPLATE = "https://parishesonline.com/organization/{provider_id}"
 PARISHES_ONLINE_PUBLICATION_URL_PREFIX = (
     "https://parishesonline.com/publication-page/{provider_id}?selectedPublication="
 )
+DISCOVER_MASS_BULLETIN_URL_TEMPLATE = "https://discovermass.com/church/{provider_id}/"
 LOGGER = logging.getLogger(__name__)
 
 
@@ -125,6 +127,7 @@ def _resolve_latest_anchor_link_with_playwright(
     anchor_selector: str,
     source_label: str,
     href_to_urls: Callable[[str], tuple[str, str] | None],
+    wait_for_state: str | None = None,
     page: Page | None = None,
 ) -> tuple[str, str]:
     owns_browser = page is None
@@ -137,7 +140,12 @@ def _resolve_latest_anchor_link_with_playwright(
         LOGGER.info("Resolving latest anchor link (%s)", source_label)
         LOGGER.info("Visiting page URL: %s", page_url)
         _goto_with_retry(page=page, page_url=page_url)  # type: ignore[arg-type]
-        page.wait_for_selector(anchor_selector, timeout=15000)  # type: ignore[union-attr]
+        if wait_for_state is None:
+            page.wait_for_selector(anchor_selector, timeout=15000)  # type: ignore[union-attr]
+        else:
+            page.wait_for_selector(  # type: ignore[union-attr]
+                anchor_selector, timeout=15000, state=wait_for_state
+            )
         anchors = page.query_selector_all(anchor_selector)  # type: ignore[union-attr]
         for anchor in anchors:
             href = anchor.get_attribute("href")
@@ -178,6 +186,44 @@ def build_latest_parishes_online_bulletin_links(
     source_url, fetch_url = _resolve_parishes_online_latest_link(provider_id=provider_id, page=page)
     _ = reference_date
     return BulletinLink(source_url=source_url, fetch_url=fetch_url)
+
+
+def build_latest_discover_mass_bulletin_links(
+    *, provider_id: str, reference_date: date | None = None, page: Page | None = None,
+) -> BulletinLink:
+    _ = reference_date
+    source_url, fetch_url = _resolve_discover_mass_latest_link(provider_id=provider_id, page=page)
+    return BulletinLink(source_url=source_url, fetch_url=fetch_url)
+
+
+def _resolve_discover_mass_latest_link(
+    *, provider_id: str, page: Page | None = None,
+) -> tuple[str, str]:
+    bulletin_url = DISCOVER_MASS_BULLETIN_URL_TEMPLATE.format(provider_id=provider_id.strip("/"))
+    return _resolve_latest_anchor_link_with_playwright(
+        page_url=bulletin_url,
+        anchor_selector="a#bulletin-current[href]",
+        source_label=f"discover-mass provider_id={provider_id}",
+        wait_for_state="attached",
+        href_to_urls=lambda href: _extract_discover_mass_pdf_url_from_href(
+            href=href,
+            base_url=bulletin_url,
+        ),
+        page=page,
+    )
+
+
+def _extract_discover_mass_pdf_url_from_href(*, href: str, base_url: str) -> tuple[str, str] | None:
+    absolute_href = urljoin(base_url, href)
+    parsed = urlparse(absolute_href)
+    if parsed.netloc.lower() != "bulletins.discovermass.com":
+        return None
+    if parsed.path.lower() != "/download.php":
+        return None
+    bulletin_values = parse_qs(parsed.query).get("bulletin")
+    if not bulletin_values or not bulletin_values[0].strip():
+        return None
+    return absolute_href, absolute_href
 
 
 def build_latest_other_bulletin_links(
@@ -452,6 +498,8 @@ def _build_bulletin_link(
         return build_latest_ecatholic_bulletin_links(provider_id=fetch_provider_id, page=page)
     if bulletin_provider == PARISHES_ONLINE_TYPE:
         return build_latest_parishes_online_bulletin_links(provider_id=fetch_provider_id, page=page)
+    if bulletin_provider == DISCOVER_MASS_TYPE:
+        return build_latest_discover_mass_bulletin_links(provider_id=fetch_provider_id, page=page)
     if bulletin_provider == OTHER_TYPE:
         return build_latest_other_bulletin_links(provider_id=fetch_provider_id, page=page)
     raise ValueError(f"Unsupported bulletin_provider: {bulletin_provider}")
@@ -462,7 +510,7 @@ def _resolve_fetch_source(parish) -> tuple[str, str] | None:
     if provider not in SUPPORTED_BULLETIN_PROVIDERS:
         return None
 
-    if provider == PARISHES_ONLINE_TYPE:
+    if provider in {PARISHES_ONLINE_TYPE, DISCOVER_MASS_TYPE}:
         provider_id = (parish["provider_id"] or "").strip()
         if not provider_id:
             return None

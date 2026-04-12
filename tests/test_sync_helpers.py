@@ -7,18 +7,22 @@ from pdf_extract.storage import (
 )
 from pdf_extract.fetch import (
     BulletinLink,
+    DISCOVER_MASS_TYPE,
     OTHER_TYPE,
     PARISHES_ONLINE_TYPE,
     _build_bulletin_link,
+    _extract_discover_mass_pdf_url_from_href,
     _extract_ecatholic_pdf_url_from_href,
     _extract_parishes_online_pdf_url_from_href,
     _find_other_bulletin_page_url,
     _goto_with_retry,
     _normalize_url_for_request,
     _parse_relaxed_date,
+    _resolve_fetch_source,
     _resolve_other_latest_link,
     _next_sunday_after,
     _resolve_latest_anchor_link_with_playwright,
+    build_latest_discover_mass_bulletin_links,
     build_latest_ecatholic_bulletin_links,
     build_latest_other_bulletin_links,
     build_latest_parishes_online_bulletin_links,
@@ -89,6 +93,87 @@ def test_build_latest_parishes_online_bulletin_links(monkeypatch) -> None:
         reference_date=date(2026, 2, 19),
     )
     assert link.fetch_url == "https://container.parishesonline.com/path/latest.pdf"
+
+
+def test_build_latest_discover_mass_bulletin_links() -> None:
+    class FakePage:
+        def goto(self, url: str, wait_until: str) -> None:
+            assert url == "https://discovermass.com/church/st-joseph-rush/"
+            assert wait_until == "domcontentloaded"
+
+        def wait_for_selector(self, selector: str, timeout: int, state=None) -> None:
+            assert selector == "a#bulletin-current[href]"
+            assert timeout == 15000
+            assert state == "attached"
+
+        def query_selector_all(self, selector: str):
+            assert selector == "a#bulletin-current[href]"
+
+            class _Anchor:
+                def __init__(self, href):
+                    self._href = href
+
+                def get_attribute(self, name: str):
+                    if name == "href":
+                        return self._href
+                    return None
+
+            return [
+                _Anchor("/church/st-joseph-rush/"),
+                _Anchor("https://bulletins.discovermass.com/download.php?bulletin=abc123"),
+            ]
+
+    link = build_latest_discover_mass_bulletin_links(
+        provider_id="/st-joseph-rush/",
+        page=FakePage(),
+    )
+    assert link.source_url == "https://bulletins.discovermass.com/download.php?bulletin=abc123"
+    assert link.fetch_url == "https://bulletins.discovermass.com/download.php?bulletin=abc123"
+
+
+def test_build_latest_discover_mass_bulletin_links_raises_when_bulletin_anchor_missing() -> None:
+    class FakePage:
+        def goto(self, url: str, wait_until: str) -> None:
+            assert url == "https://discovermass.com/church/st-joseph-rush/"
+            assert wait_until == "domcontentloaded"
+
+        def wait_for_selector(self, selector: str, timeout: int, state=None) -> None:
+            assert selector == "a#bulletin-current[href]"
+            assert timeout == 15000
+            assert state == "attached"
+
+        def query_selector_all(self, selector: str):
+            assert selector == "a#bulletin-current[href]"
+            return []
+
+    try:
+        build_latest_discover_mass_bulletin_links(
+            provider_id="st-joseph-rush",
+            page=FakePage(),
+        )
+    except ValueError as exc:
+        assert "No matching anchor link found for discover-mass provider_id=st-joseph-rush" in str(exc)
+    else:
+        raise AssertionError("Expected ValueError when Discover Mass bulletin anchor is missing")
+
+
+def test_extract_discover_mass_pdf_url_from_href() -> None:
+    urls = _extract_discover_mass_pdf_url_from_href(
+        href="https://bulletins.discovermass.com/download.php?bulletin=abc123",
+        base_url="https://discovermass.com/church/st-joseph-rush/",
+    )
+    assert urls == (
+        "https://bulletins.discovermass.com/download.php?bulletin=abc123",
+        "https://bulletins.discovermass.com/download.php?bulletin=abc123",
+    )
+
+
+def test_extract_discover_mass_pdf_url_from_href_rejects_non_download_urls() -> None:
+    urls = _extract_discover_mass_pdf_url_from_href(
+        href="https://bulletins.discovermass.com/image.php?bulletin=abc123",
+        base_url="https://discovermass.com/church/st-joseph-rush/",
+    )
+    assert urls is None
 
 
 def test_extract_parishes_online_pdf_url_from_absolute_href() -> None:
@@ -195,6 +280,18 @@ def test_build_bulletin_link_parishes_online(monkeypatch) -> None:
     monkeypatch.setattr("pdf_extract.fetch.build_latest_parishes_online_bulletin_links", fake_build)
     link = _build_bulletin_link(PARISHES_ONLINE_TYPE, "123")
     assert link.fetch_url == "https://po.com/fetch.pdf"
+
+
+def test_build_bulletin_link_discover_mass(monkeypatch) -> None:
+    def fake_build(*, provider_id, reference_date=None, page=None):
+        return BulletinLink(
+            source_url="https://discovermass.com/church/st-joseph-rush/",
+            fetch_url="https://discovermass.com/church/st-joseph-rush/",
+        )
+
+    monkeypatch.setattr("pdf_extract.fetch.build_latest_discover_mass_bulletin_links", fake_build)
+    link = _build_bulletin_link(DISCOVER_MASS_TYPE, "st-joseph-rush")
+    assert link.fetch_url == "https://discovermass.com/church/st-joseph-rush/"
 
 
 def test_build_latest_other_bulletin_links(monkeypatch) -> None:
@@ -380,3 +477,21 @@ def test_goto_with_retry_on_interrupted_navigation() -> None:
     _goto_with_retry(page=page, page_url="https://example.org/page")
     assert page.calls == 2
     assert page.waits == 1
+
+
+def test_resolve_fetch_source_discover_mass_uses_provider_id() -> None:
+    parish = {
+        "bulletin_provider": DISCOVER_MASS_TYPE,
+        "provider_id": "st-joseph-rush",
+        "homepage_url": "https://stjoseph.example.org",
+    }
+    assert _resolve_fetch_source(parish) == (DISCOVER_MASS_TYPE, "st-joseph-rush")
+
+
+def test_resolve_fetch_source_discover_mass_without_provider_id_returns_none() -> None:
+    parish = {
+        "bulletin_provider": DISCOVER_MASS_TYPE,
+        "provider_id": "",
+        "homepage_url": "https://stjoseph.example.org",
+    }
+    assert _resolve_fetch_source(parish) is None

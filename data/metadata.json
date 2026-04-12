@@ -1141,5 +1141,23 @@
     "fetched_at": "2026-04-12T20:45:50Z",
     "processed_at": null,
     "published_date": null
+  },
+  {
+    "parish_slug": "st-patricks-victor",
+    "source_url": "https://bulletins.discovermass.com/download.php?bulletin=yAifBzEcPKUUiilZ9BvwkzX8GerKXio3ZaypSgcZOyFDzTJbmKHdxYsALQPynaQpa%2BRYwP7F90OtOUO7rAnDZ73bfGFU9Wc8XLrKH%2B8Z%2FrQ%3D",
+    "pdf_path": "data\\bulletins\\st-patricks-victor\\962bbcfc1ccf0893b57da4602772bbf03d52953fb91246378522b0cd1ef9afc7.pdf",
+    "content_hash": "962bbcfc1ccf0893b57da4602772bbf03d52953fb91246378522b0cd1ef9afc7",
+    "fetched_at": "2026-04-12T22:32:24Z",
+    "processed_at": null,
+    "published_date": null
+  },
+  {
+    "parish_slug": "peace-of-christ",
+    "source_url": "https://bulletins.discovermass.com/download.php?bulletin=bzM2dX8W48GfUgPsmWBzFuHm0ANP0o%2B5hdsG%2BXsuJ%2BF152PFtEF5ZWhG3DK8z3uv1J2aMPIzxYU1cFqUYz%2FLl%2FRq3mIa1SCaJqhFVrpYT2E%3D",
+    "pdf_path": "data\\bulletins\\peace-of-christ\\7e6b0d1e21dc2a6847776ecf4ce06f0148844b23d83087b55624139b25570f3d.pdf",
+    "content_hash": "7e6b0d1e21dc2a6847776ecf4ce06f0148844b23d83087b55624139b25570f3d",
+    "fetched_at": "2026-04-12T22:33:15Z",
+    "processed_at": null,
+    "published_date": null
   }
 ]
