@@ -95,7 +95,7 @@ Key modules:
 - Schema source of truth: `data/schema.sql`
 - Main DB: `data/parish_events.db`
 - Frontend DB: `apps/web/public/frontend.db` (subset for browser WASM SQLite)
-- Tables: website, parish, church, bulletin, event
+- Tables: parish, church, bulletin, event
 
 ### Web Frontend (`apps/web/`)
 

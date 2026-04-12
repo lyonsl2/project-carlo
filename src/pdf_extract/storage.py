@@ -72,12 +72,16 @@ def save_json_dict(path: Path, data: dict[str, Any]) -> None:
 # ── DB read helpers (used by pipeline steps) ────────────────────────────────
 def list_parishes(conn: sqlite3.Connection) -> list[sqlite3.Row]:
     return conn.execute(
-        "SELECT id, slug, name, source_type, source_provider_id FROM parish ORDER BY id"
+        "SELECT id, slug, name, homepage_url, bulletin_provider, provider_id FROM parish ORDER BY id"
     ).fetchall()
 
 
 def get_parish_by_name(conn: sqlite3.Connection, name: str) -> sqlite3.Row | None:
-    return conn.execute("SELECT id, slug, name, source_type, source_provider_id FROM parish WHERE name = ?", (name,)).fetchone()
+    return conn.execute(
+        "SELECT id, slug, name, homepage_url, bulletin_provider, provider_id"
+        " FROM parish WHERE name = ?",
+        (name,),
+    ).fetchone()
 
 
 def list_existing_bulletin_urls(conn: sqlite3.Connection, parish_id: int) -> set[str]:

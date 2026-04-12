@@ -67,7 +67,7 @@ def extract(source: Path = SOURCE_DB, dest: Path = DEST_DB) -> None:
             """
             SELECT c.id, c.parish_id, c.slug, c.name, c.address_line1, c.address_line2,
                    c.city, c.state, c.postal_code, c.latitude, c.longitude,
-                   w.homepage_url,
+                   p.homepage_url,
                    (SELECT b.source_url FROM bulletin b
                     WHERE b.parish_id = c.parish_id AND b.source_url IS NOT NULL
                     ORDER BY COALESCE(b.published_date, '') DESC,
@@ -75,7 +75,6 @@ def extract(source: Path = SOURCE_DB, dest: Path = DEST_DB) -> None:
                     LIMIT 1)
             FROM church c
             LEFT JOIN parish p ON c.parish_id = p.id
-            LEFT JOIN website w ON w.slug = p.slug
             """
         ).fetchall()
         dst.executemany(

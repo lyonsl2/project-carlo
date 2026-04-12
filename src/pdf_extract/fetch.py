@@ -30,8 +30,9 @@ from pdf_extract.storage import (
 )
 
 ECATHOLIC_BULLETINS_PATH = "/bulletins"
-PARISHES_ONLINE_TYPE = "parishes-online"
+PARISHES_ONLINE_TYPE = "parishes_online"
 OTHER_TYPE = "other"
+SUPPORTED_BULLETIN_PROVIDERS = {"ecatholic", PARISHES_ONLINE_TYPE, OTHER_TYPE}
 PARISHES_ONLINE_ORG_URL_TEMPLATE = "https://parishesonline.com/organization/{provider_id}"
 PARISHES_ONLINE_PUBLICATION_URL_PREFIX = (
     "https://parishesonline.com/publication-page/{provider_id}?selectedPublication="
@@ -445,15 +446,32 @@ def _extract_parishes_online_pdf_url_from_href(
 # ── Bulletin link resolution ────────────────────────────────────────────────
 
 def _build_bulletin_link(
-    source_type: str, source_provider_id: str, *, page: Page | None = None,
+    bulletin_provider: str, fetch_provider_id: str, *, page: Page | None = None,
 ) -> BulletinLink:
-    if source_type == "ecatholic":
-        return build_latest_ecatholic_bulletin_links(provider_id=source_provider_id, page=page)
-    if source_type == PARISHES_ONLINE_TYPE:
-        return build_latest_parishes_online_bulletin_links(provider_id=source_provider_id, page=page)
-    if source_type == OTHER_TYPE:
-        return build_latest_other_bulletin_links(provider_id=source_provider_id, page=page)
-    raise ValueError(f"Unsupported source_type: {source_type}")
+    if bulletin_provider == "ecatholic":
+        return build_latest_ecatholic_bulletin_links(provider_id=fetch_provider_id, page=page)
+    if bulletin_provider == PARISHES_ONLINE_TYPE:
+        return build_latest_parishes_online_bulletin_links(provider_id=fetch_provider_id, page=page)
+    if bulletin_provider == OTHER_TYPE:
+        return build_latest_other_bulletin_links(provider_id=fetch_provider_id, page=page)
+    raise ValueError(f"Unsupported bulletin_provider: {bulletin_provider}")
+
+
+def _resolve_fetch_source(parish) -> tuple[str, str] | None:
+    provider = (parish["bulletin_provider"] or "").strip()
+    if provider not in SUPPORTED_BULLETIN_PROVIDERS:
+        return None
+
+    if provider == PARISHES_ONLINE_TYPE:
+        provider_id = (parish["provider_id"] or "").strip()
+        if not provider_id:
+            return None
+        return provider, provider_id
+
+    homepage_url = (parish["homepage_url"] or "").strip()
+    if not homepage_url:
+        return None
+    return provider, homepage_url
 
 
 # ── HTTP helpers ────────────────────────────────────────────────────────────
@@ -539,14 +557,13 @@ def fetch_bulletins(
     try:
         for parish in parishes:
             slug = parish["slug"]
-            source_type = parish["source_type"]
-            source_provider_id = parish["source_provider_id"]
-
-            if not source_type or not source_provider_id:
+            fetch_source = _resolve_fetch_source(parish)
+            if fetch_source is None:
                 continue
+            bulletin_provider, fetch_provider_id = fetch_source
 
             try:
-                link = _build_bulletin_link(source_type, source_provider_id, page=page)
+                link = _build_bulletin_link(bulletin_provider, fetch_provider_id, page=page)
             except ValueError:
                 LOGGER.warning("Skipping parish %s: no supported source", slug)
                 continue

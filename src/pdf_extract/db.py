@@ -105,11 +105,8 @@ def create_db(db_path: Path = DEFAULT_DB_PATH) -> dict[str, int]:
 
         stats: dict[str, int] = {}
 
-        # 2. Load parishes.csv → website table
-        stats["websites"] = _load_websites(conn)
-
-        # 3. Seed parish rows from websites with supported providers
-        stats["parishes"] = _seed_parishes(conn)
+        # 2. Load parishes.csv → parish table
+        stats["parishes"] = _load_parishes(conn)
 
         # 4. Load bulletins/metadata.json → bulletin table
         stats["bulletins"] = _load_bulletins(conn)
@@ -127,68 +124,28 @@ def create_db(db_path: Path = DEFAULT_DB_PATH) -> dict[str, int]:
         conn.close()
 
 
-def _load_websites(conn) -> int:
+def _load_parishes(conn) -> int:
     from pdf_extract.storage import PARISHES_CSV_PATH
 
     if not PARISHES_CSV_PATH.exists():
-        LOGGER.info("No parishes.csv found, skipping website load")
+        LOGGER.info("No parishes.csv found, skipping parish load")
         return 0
     count = 0
+    now = utc_now_iso()
     with open(PARISHES_CSV_PATH, encoding="utf-8") as f:
         reader = csv.DictReader(f)
         _validate_csv_headers(reader.fieldnames, {"slug", "name", "website"}, "parishes.csv")
         for row in reader:
+            bp = (row.get("bulletin_provider") or "").strip() or None
+            pid = (row.get("provider_id") or "").strip() or None
             conn.execute(
-                "INSERT OR IGNORE INTO website(slug, name, homepage_url) VALUES (?, ?, ?)",
-                (row["slug"], row["name"], row["website"]),
+                """INSERT OR IGNORE INTO parish(
+                    slug, name, homepage_url, bulletin_provider, provider_id, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?)""",
+                (row["slug"], row["name"], row["website"], bp, pid, now),
             )
-            bp = (row.get("bulletin_provider") or "").strip()
-            pid = (row.get("provider_id") or "").strip()
-            if bp:
-                conn.execute(
-                    "UPDATE website SET bulletin_provider = ?, provider_id = ? WHERE slug = ?",
-                    (bp, pid or None, row["slug"]),
-                )
             count += 1
-    LOGGER.info("Loaded %d websites from parishes.csv", count)
-    return count
-
-
-def _seed_parishes(conn) -> int:
-    """Create parish rows from websites with supported bulletin providers."""
-    rows = conn.execute(
-        """SELECT slug, name, homepage_url, bulletin_provider, provider_id
-           FROM website
-           WHERE bulletin_provider IN ('ecatholic', 'parishes_online', 'other')"""
-    ).fetchall()
-
-    count = 0
-    now = utc_now_iso()
-    for row in rows:
-        provider = row["bulletin_provider"]
-        if provider == "ecatholic":
-            source_type = "ecatholic"
-            source_provider_id = row["homepage_url"]
-        elif provider == "parishes_online":
-            source_type = "parishes-online"
-            source_provider_id = row["provider_id"]
-        elif provider == "other":
-            source_type = "other"
-            source_provider_id = row["homepage_url"]
-        else:
-            continue
-
-        if not source_provider_id:
-            LOGGER.warning("Skipping %s: no provider_id", row["slug"])
-            continue
-
-        conn.execute(
-            "INSERT OR IGNORE INTO parish(slug, name, source_type, source_provider_id, created_at) VALUES (?, ?, ?, ?, ?)",
-            (row["slug"], row["name"], source_type, source_provider_id, now),
-        )
-        count += 1
-
-    LOGGER.info("Seeded %d parishes from detect results", count)
+    LOGGER.info("Loaded %d parishes from parishes.csv", count)
     return count
 
 

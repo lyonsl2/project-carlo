@@ -12,8 +12,17 @@ def _setup_test_db(tmp_path: Path) -> Path:
     schema_sql = SCHEMA_PATH.read_text(encoding="utf-8")
     conn.executescript(schema_sql)
     conn.execute(
-        "INSERT INTO parish(slug, name, source_type, source_provider_id, created_at) VALUES (?, ?, ?, ?, ?)",
-        ("test-parish", "Test Parish", "ecatholic", "https://test.org", "2026-01-01T00:00:00Z"),
+        """INSERT INTO parish(
+            slug, name, homepage_url, bulletin_provider, provider_id, created_at
+        ) VALUES (?, ?, ?, ?, ?, ?)""",
+        (
+            "test-parish",
+            "Test Parish",
+            "https://test.org",
+            "ecatholic",
+            None,
+            "2026-01-01T00:00:00Z",
+        ),
     )
     parish_id = conn.execute("SELECT id FROM parish WHERE slug = 'test-parish'").fetchone()["id"]
     conn.execute(
@@ -45,7 +54,7 @@ def test_fetch_stage_is_idempotent(monkeypatch, tmp_path: Path) -> None:
 
     monkeypatch.setattr(
         "pdf_extract.fetch._build_bulletin_link",
-        lambda source_type, source_provider_id, *, page=None: BulletinLink(
+        lambda bulletin_provider, fetch_provider_id, *, page=None: BulletinLink(
             source_url="https://example.org/bulletin.pdf",
             fetch_url="https://example.org/bulletin.pdf",
         ),

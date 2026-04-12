@@ -164,7 +164,10 @@ def run_detection(
     conn = connect_db(db_path)
     try:
         rows = conn.execute(
-            "SELECT slug, homepage_url FROM website WHERE bulletin_provider IS NULL ORDER BY id"
+            """SELECT slug, homepage_url
+               FROM parish
+               WHERE bulletin_provider IS NULL OR TRIM(bulletin_provider) = ''
+               ORDER BY id"""
         ).fetchall()
     finally:
         conn.close()

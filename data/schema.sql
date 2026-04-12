@@ -3,21 +3,13 @@
 
 PRAGMA foreign_keys = ON;
 
-CREATE TABLE IF NOT EXISTS website (
+CREATE TABLE IF NOT EXISTS parish (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     slug TEXT NOT NULL UNIQUE,
     name TEXT NOT NULL,
     homepage_url TEXT NOT NULL UNIQUE,
     bulletin_provider TEXT,
-    provider_id TEXT
-);
-
-CREATE TABLE IF NOT EXISTS parish (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    slug TEXT NOT NULL UNIQUE,
-    name TEXT NOT NULL,
-    source_type TEXT,
-    source_provider_id TEXT,
+    provider_id TEXT,
     created_at TEXT
 );
 
