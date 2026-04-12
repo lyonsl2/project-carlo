@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import type { Marker as LeafletMarker } from "leaflet";
 import L from "leaflet";
-import { DAY_ORDER } from "../constants/days";
+import { DAY_ORDER, type WeekdayKey } from "../constants/days";
 import type { ChurchMapItem, EventSummary } from "../types";
 import {
   formatAddress,
@@ -29,16 +29,16 @@ function compareEvents(a: EventSummary, b: EventSummary): number {
   if (aIsSpecific && !bIsSpecific) return 1;
   if (!aIsSpecific && bIsSpecific) return -1;
 
-  let dayA: string;
-  let dayB: string;
+  let dayA: WeekdayKey;
+  let dayB: WeekdayKey;
   if (a.kind === "weekly" && a.day_of_week) {
-    dayA = a.day_of_week.toLowerCase();
+    dayA = a.day_of_week.toLowerCase() as WeekdayKey;
   } else if (a.date) {
     const d = new Date(a.date + "T12:00:00");
     dayA = DAY_ORDER[d.getDay()];
   } else return 1;
   if (b.kind === "weekly" && b.day_of_week) {
-    dayB = b.day_of_week.toLowerCase();
+    dayB = b.day_of_week.toLowerCase() as WeekdayKey;
   } else if (b.date) {
     const d = new Date(b.date + "T12:00:00");
     dayB = DAY_ORDER[d.getDay()];

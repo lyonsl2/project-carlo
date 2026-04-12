@@ -8,3 +8,5 @@ export const DAY_ORDER = [
   "friday",
   "saturday",
 ] as const;
+
+export type WeekdayKey = (typeof DAY_ORDER)[number];
