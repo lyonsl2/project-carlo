@@ -1,12 +1,20 @@
 """Extract structured schedule data from bulletin PDFs using Gemini."""
 
 import json
+import logging
+import random
+import time
 from typing import Any, Literal
 
 from google import genai
-from google.genai import types
+from google.genai import errors, types
 from pydantic import BaseModel, ConfigDict, Field
 
+LOGGER = logging.getLogger(__name__)
+_RETRYABLE_STATUS_CODES = {429, 500, 502, 503, 504}
+_MAX_API_ATTEMPTS = 5
+_BASE_BACKOFF_SECONDS = 2.0
+_MAX_BACKOFF_SECONDS = 30.0
 
 # ── LLM extraction schema ──────────────────────────────────────────────────
 
@@ -18,6 +26,7 @@ class WeeklySlot(BaseModel):
     day_of_week: str = Field(min_length=1)
     start_time: str = Field(min_length=1)
     end_time: str | None = None
+    page_number: int | None = None
 
 
 class DateSlot(BaseModel):
@@ -27,6 +36,7 @@ class DateSlot(BaseModel):
     date: str = Field(min_length=1)
     start_time: str = Field(min_length=1)
     end_time: str | None = None
+    page_number: int | None = None
 
 
 class WeeklySchedule(BaseModel):
@@ -93,6 +103,7 @@ def _collect_events(
                 if not _valid_str(church_slug) or not _valid_str(start_time) or not _valid_str(date_val):
                     continue
             end_time = item.get("end_time") if isinstance(item.get("end_time"), str) else None
+            page_number = item.get("page_number") if isinstance(item.get("page_number"), int) else None
             events.append({
                 "church_slug": church_slug,
                 "type": event_type,
@@ -102,6 +113,7 @@ def _collect_events(
                 "start_time": start_time,
                 "end_time": end_time,
                 "cancelled": cancelled,
+                "page_number": page_number,
             })
     return events
 
@@ -123,6 +135,43 @@ def reconstruct_events(raw: dict[str, Any]) -> dict[str, Any]:
 
     church_list_needs_review = bool(raw.get("church_list_needs_review", False))
     return {"events": events, "church_list_needs_review": church_list_needs_review}
+
+
+def _is_retryable_api_error(exc: Exception) -> bool:
+    """Return true when the Gemini API error is likely transient."""
+    return isinstance(exc, errors.APIError) and exc.code in _RETRYABLE_STATUS_CODES
+
+
+def _generate_content_with_backoff(
+    client: genai.Client,
+    *,
+    model: str,
+    contents: list[str | types.Part],
+    config: types.GenerateContentConfig,
+):
+    """Call Gemini generate_content with exponential backoff for transient API failures."""
+    for attempt in range(1, _MAX_API_ATTEMPTS + 1):
+        try:
+            return client.models.generate_content(
+                model=model,
+                contents=contents,
+                config=config,
+            )
+        except Exception as exc:
+            is_last_attempt = attempt == _MAX_API_ATTEMPTS
+            if not _is_retryable_api_error(exc) or is_last_attempt:
+                raise
+
+            backoff = min(_MAX_BACKOFF_SECONDS, _BASE_BACKOFF_SECONDS * (2 ** (attempt - 1)))
+            delay = backoff + random.uniform(0, 0.25 * backoff)
+            LOGGER.warning(
+                "Gemini request failed with status %s on attempt %s/%s; retrying in %.1fs",
+                getattr(exc, "code", "unknown"),
+                attempt,
+                _MAX_API_ATTEMPTS,
+                delay,
+            )
+            time.sleep(delay)
 
 
 # ── Verification models ──────────────────────────────────────────────────────
@@ -181,19 +230,19 @@ Each church in the list has a "slug" (stable identifier), "name", and "address".
 Structure your response as follows:
 
 weekly_schedule: Recurring weekly schedule. Each category (masses, confessions, adorations) is an array of entries:
-   - masses: church_slug, day_of_week, start_time (no end_time for Mass)
-   - confessions: church_slug, day_of_week, start_time, end_time (optional, include when provided)
-   - adorations: church_slug, day_of_week, start_time, end_time (optional, include when provided)
+   - masses: church_slug, day_of_week, start_time (no end_time for Mass), page_number
+   - confessions: church_slug, day_of_week, start_time, end_time (optional, include when provided), page_number
+   - adorations: church_slug, day_of_week, start_time, end_time (optional, include when provided), page_number
 
 single_events: One-off or exception dates (e.g. extra Mass on a holiday, special confession times). Same structure as weekly_schedule but use "date" instead of "day_of_week":
-   - masses: church_slug, date, start_time
-   - confessions: church_slug, date, start_time, end_time (optional)
-   - adorations: church_slug, date, start_time, end_time (optional)
+   - masses: church_slug, date, start_time, page_number
+   - confessions: church_slug, date, start_time, end_time (optional), page_number
+   - adorations: church_slug, date, start_time, end_time (optional), page_number
 
 cancellations: Specific dates/times when a regular schedule is cancelled. Same structure as single_events:
-   - masses: church_slug, date, start_time
-   - confessions: church_slug, date, start_time, end_time (optional)
-   - adorations: church_slug, date, start_time, end_time (optional)
+   - masses: church_slug, date, start_time, page_number
+   - confessions: church_slug, date, start_time, end_time (optional), page_number
+   - adorations: church_slug, date, start_time, end_time (optional), page_number
 
 church_list_needs_review: boolean flag
 
@@ -202,6 +251,7 @@ Rules:
 - Format all times as "h:MM AM" or "h:MM PM".
 - For Mass: always include start_time; end_time is omitted.
 - For Confession and Adoration: include end_time when the document provides it.
+- For every entry, include page_number (1-indexed integer for which page of the PDF the event was found on).
 - Put recurring weekly entries in weekly_schedule.
 - Put one-off or exception dates in single_events (e.g. extra Mass on Christmas).
 - Put cancelled times in cancellations (e.g. "No 8am Mass on March 16").
@@ -239,7 +289,8 @@ def extract_events(
     prompt = EVENTS_SYSTEM_PROMPT.format(churches_json=churches_json)
 
     client = genai.Client()
-    response = client.models.generate_content(
+    response = _generate_content_with_backoff(
+        client,
         model=model,
         contents=[
             prompt,
@@ -312,7 +363,8 @@ def extract_verification(
     prompt = VERIFY_SYSTEM_PROMPT.format(churches_json=churches_json)
 
     client = genai.Client()
-    response = client.models.generate_content(
+    response = _generate_content_with_backoff(
+        client,
         model=model,
         contents=[
             prompt,

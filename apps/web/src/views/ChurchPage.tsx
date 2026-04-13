@@ -87,6 +87,18 @@ function formatTimeRun(events: EventSummary[]): string {
     .join("  ·  ");
 }
 
+function PageRef({ event }: { event: EventSummary }) {
+  if (event.page_number == null) return null;
+  return (
+    <span
+      className="ml-1.5 font-serif text-[0.75rem] text-ink-faint"
+      title={`Found on page ${event.page_number} of bulletin`}
+    >
+      (p.{event.page_number})
+    </span>
+  );
+}
+
 export function ChurchPage() {
   const { churchSlug } = useParams();
   const enabled = typeof churchSlug === "string" && churchSlug.length > 0;
@@ -244,6 +256,7 @@ export function ChurchPage() {
                                 </dt>
                                 <dd className="font-serif text-[1.05rem] leading-snug tabular-nums text-ink">
                                   {formatTimeRun(dayEvents)}
+                                  <PageRef event={dayEvents[0]} />
                                 </dd>
                               </div>
                             );
@@ -276,6 +289,7 @@ export function ChurchPage() {
                                         {formatEventDate(event.date)}
                                       </span>
                                     ) : null}
+                                    <PageRef event={event} />
                                   </dd>
                                 </div>
                               ))}

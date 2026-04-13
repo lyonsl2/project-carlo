@@ -283,9 +283,13 @@ def _load_events(conn) -> int:
 
         end_minutes = _time_to_minutes(entry.get("end_time"))
 
+        page_number = entry.get("page_number")
+        if not isinstance(page_number, int):
+            page_number = None
+
         conn.execute(
-            """INSERT INTO event(church_id, bulletin_id, event_type, event_kind, day_of_week, date, start_time, end_time, cancelled)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            """INSERT INTO event(church_id, bulletin_id, event_type, event_kind, day_of_week, date, start_time, end_time, cancelled, page_number)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
             (
                 church_row["id"],
                 bulletin_id,
@@ -296,6 +300,7 @@ def _load_events(conn) -> int:
                 start_minutes,
                 end_minutes,
                 int(entry.get("cancelled", False)),
+                page_number,
             ),
         )
 

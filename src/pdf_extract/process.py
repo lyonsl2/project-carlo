@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
+from typing import Any
 
 from pdf_extract.address import format_address
 from pdf_extract.schedule_extraction import extract_events
@@ -21,6 +22,22 @@ from pdf_extract.storage import (
 LOGGER = logging.getLogger(__name__)
 
 
+def _latest_per_parish(metadata: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Keep only the most recently fetched bulletin for each parish."""
+    latest_by_parish: dict[str, tuple[tuple[str, str, int], dict[str, Any]]] = {}
+    for idx, entry in enumerate(metadata):
+        parish_slug = entry.get("parish_slug")
+        if not isinstance(parish_slug, str):
+            continue
+        fetched_at = str(entry.get("fetched_at") or "")
+        # Use source-order as a final tie-breaker to keep behavior deterministic.
+        rank = (fetched_at, str(entry.get("published_date") or ""), idx)
+        current = latest_by_parish.get(parish_slug)
+        if current is None or rank > current[0]:
+            latest_by_parish[parish_slug] = (rank, entry)
+    return [item[1] for item in latest_by_parish.values()]
+
+
 def process_bulletins(
     *,
     parish_name: str | None = None,
@@ -30,8 +47,10 @@ def process_bulletins(
     metadata = load_json_list(BULLETINS_METADATA_PATH)
     events = load_json_list(EVENTS_PATH)
 
-    # Filter to pending bulletins (not yet processed, have a PDF)
-    pending = [m for m in metadata if m.get("processed_at") is None and m.get("pdf_path")]
+    # Keep only the latest fetched bulletin per parish, then process those still pending.
+    latest = [m for m in metadata if m.get("pdf_path")]
+    latest = _latest_per_parish(latest)
+    pending = [m for m in latest if m.get("processed_at") is None]
 
     conn = connect_db()
     try:
@@ -99,6 +118,7 @@ def process_bulletins(
                     "start_time": str(ev.get("start_time", "")),
                     "end_time": ev.get("end_time") if isinstance(ev.get("end_time"), str) else None,
                     "cancelled": bool(ev.get("cancelled", False)),
+                    "page_number": ev.get("page_number") if isinstance(ev.get("page_number"), int) else None,
                 })
                 inserted_events += 1
 

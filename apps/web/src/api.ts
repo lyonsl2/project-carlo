@@ -37,6 +37,7 @@ interface RawEvent {
   end_time: number | null;
   cancelled: boolean;
   occurrence: string | null;
+  page_number: number | null;
 }
 
 function todayDate(): Date {
@@ -115,7 +116,8 @@ function queryEvents(
   const typePh = effectiveTypes.map(() => "?").join(",");
   const stmt = db.prepare(
     `SELECT id, church_id, event_type, event_kind,
-            day_of_week, date, start_time, end_time, cancelled
+            day_of_week, date, start_time, end_time, cancelled,
+            page_number
      FROM event
      WHERE church_id IN (${churchPh})
        AND event_type IN (${typePh})`,
@@ -137,6 +139,7 @@ function queryEvents(
         end_time: num(row["end_time"]),
         cancelled: Boolean(row["cancelled"]),
         occurrence: null,
+        page_number: num(row["page_number"]),
       };
       ev.occurrence = computeOccurrence(ev);
       results.push(ev);
@@ -158,6 +161,7 @@ function toEventSummary(ev: RawEvent): EventSummary {
     end_time: ev.end_time,
     cancelled: ev.cancelled,
     next_occurrence: ev.occurrence,
+    page_number: ev.page_number,
   };
 }
 

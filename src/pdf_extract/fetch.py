@@ -247,13 +247,13 @@ def _resolve_other_latest_link(
     try:
         today = reference_date or date.today()
         _goto_with_retry(page=page, page_url=provider_id)  # type: ignore[arg-type]
-        page.wait_for_selector("a[href]", timeout=15000)  # type: ignore[union-attr]
+        page.wait_for_selector("a[href]", timeout=15000, state="attached")  # type: ignore[union-attr]
         bulletin_page_url = _find_other_bulletin_page_url(page=page, base_url=provider_id)
         if bulletin_page_url is None:
             raise ValueError(f"No bulletin page link found for other provider at {provider_id}")
 
         _goto_with_retry(page=page, page_url=bulletin_page_url)  # type: ignore[arg-type]
-        page.wait_for_selector("a[href]", timeout=15000)  # type: ignore[union-attr]
+        page.wait_for_selector("a[href]", timeout=15000, state="attached")  # type: ignore[union-attr]
         current_page_url = getattr(page, "url", bulletin_page_url)
         candidates = _collect_other_pdf_candidates(
             page=page, base_url=current_page_url, reference_date=today,
@@ -295,6 +295,8 @@ def _find_other_bulletin_page_url(*, page: Page, base_url: str) -> str | None:
         if not has_in_href and not has_in_text:
             continue
         resolved = urljoin(base_url, href)
+        if resolved.lower().endswith(".pdf"):
+            continue
         if has_in_href and has_in_text:
             both_matches.append(resolved)
         else:

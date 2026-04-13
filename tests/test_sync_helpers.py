@@ -225,7 +225,7 @@ def test_resolve_latest_anchor_link_with_playwright_uses_first_valid_anchor() ->
             assert url == "https://example.org/bulletins"
             assert wait_until == "domcontentloaded"
 
-        def wait_for_selector(self, selector: str, timeout: int) -> None:
+        def wait_for_selector(self, selector: str, timeout: int, state=None) -> None:
             assert selector == "a[href*='bulletins']"
             assert timeout == 15000
 
@@ -361,7 +361,7 @@ def test_resolve_other_latest_link_prefers_latest_parseable_within_plus_minus_we
             assert wait_until == "domcontentloaded"
             self.url = url
 
-        def wait_for_selector(self, selector: str, timeout: int) -> None:
+        def wait_for_selector(self, selector: str, timeout: int, state=None) -> None:
             assert selector == "a[href]"
             assert timeout == 15000
 
@@ -409,7 +409,7 @@ def test_resolve_other_latest_link_falls_back_to_first_pdf_when_no_date_match() 
         def goto(self, url: str, wait_until: str) -> None:
             self.url = url
 
-        def wait_for_selector(self, selector: str, timeout: int) -> None:
+        def wait_for_selector(self, selector: str, timeout: int, state=None) -> None:
             assert selector == "a[href]"
             assert timeout == 15000
 

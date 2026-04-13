@@ -6,7 +6,12 @@ def test_normalize_weekly_schedule() -> None:
     data = {
         "weekly_schedule": {
             "masses": [
-                {"church_slug": "st-mary", "day_of_week": "Sunday", "start_time": "9:00 AM"},
+                {
+                    "church_slug": "st-mary",
+                    "day_of_week": "Sunday",
+                    "start_time": "9:00 AM",
+                    "page_number": 1,
+                },
             ],
         },
         "single_events": {"masses": [], "confessions": [], "adorations": []},
@@ -22,6 +27,7 @@ def test_normalize_weekly_schedule() -> None:
     assert result["events"][0]["date"] is None
     assert result["events"][0]["start_time"] == "9:00 AM"
     assert result["events"][0]["cancelled"] is False
+    assert result["events"][0]["page_number"] == 1
     assert result["church_list_needs_review"] is False
 
 
@@ -151,6 +157,20 @@ def test_normalize_empty_payload() -> None:
     result = reconstruct_events({})
     assert result["events"] == []
     assert result["church_list_needs_review"] is False
+
+
+def test_normalize_events_without_page_fields() -> None:
+    """Events without page_number still work (backward compat)."""
+    data = {
+        "weekly_schedule": {
+            "masses": [
+                {"church_slug": "st-mary", "day_of_week": "Sunday", "start_time": "9:00 AM"},
+            ],
+        },
+    }
+    result = reconstruct_events(data)
+    assert len(result["events"]) == 1
+    assert result["events"][0]["page_number"] is None
 
 
 def test_reconstruct_events_malformed_sections() -> None:
