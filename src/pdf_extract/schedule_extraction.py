@@ -255,6 +255,7 @@ Rules:
 - Put recurring weekly entries in weekly_schedule.
 - Put one-off or exception dates in single_events (e.g. extra Mass on Christmas).
 - Put cancelled times in cancellations (e.g. "No 8am Mass on March 16").
+- For single_events and cancellations, format date as YYYY-MM-DD.
 - Do NOT put a single_events entry if it is identical to an existing weekly_schedule entry.
 - Set church_list_needs_review to true ONLY if:
   - The bulletin clearly shows a church that is NOT in the provided list

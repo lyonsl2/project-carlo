@@ -64,19 +64,28 @@ function nextForWeekly(
 }
 
 function nextForSpecific(eventDate: string, startMinutes: number): Date | null {
+  const parsedDate = parseEventDate(eventDate);
+  if (!parsedDate) return null;
   const hours = Math.floor(startMinutes / 60);
   const minutes = startMinutes % 60;
-  const parts = eventDate.split("-");
-  if (parts.length !== 3) return null;
-  const d = new Date(
-    parseInt(parts[0]),
-    parseInt(parts[1]) - 1,
-    parseInt(parts[2]),
-    hours,
-    minutes,
-  );
+  const d = new Date(parsedDate);
+  d.setHours(hours, minutes, 0, 0);
   if (isNaN(d.getTime())) return null;
   return d;
+}
+
+function parseEventDate(eventDate: string): Date | null {
+  // Prefer explicit YYYY-MM-DD parsing to avoid timezone/date shifts.
+  const isoMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(eventDate.trim());
+  if (isoMatch) {
+    const year = Number.parseInt(isoMatch[1], 10);
+    const month = Number.parseInt(isoMatch[2], 10);
+    const day = Number.parseInt(isoMatch[3], 10);
+    const parsed = new Date(year, month - 1, day);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  }
+  const parsed = new Date(eventDate);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
 function computeOccurrence(event: {
@@ -165,10 +174,8 @@ function toEventSummary(ev: RawEvent): EventSummary {
   };
 }
 
-function eventMatchesFilters(
-  ev: RawEvent,
-  filters: ChurchFilters,
-): boolean {
+function eventMatchesFilters(ev: RawEvent, filters: ChurchFilters): boolean {
+  if (ev.cancelled) return false;
   if (filters.daysOfWeek && filters.daysOfWeek.length > 0) {
     if (ev.event_kind === "weekly" && ev.day_of_week) {
       const dayIdx = DAY_TO_INDEX[ev.day_of_week.toLowerCase()];
@@ -178,17 +185,11 @@ function eventMatchesFilters(
     }
     // For specific_date, check if the date falls on a selected weekday
     if (ev.event_kind === "specific_date" && ev.date) {
-      const parts = ev.date.split("-");
-      if (parts.length === 3) {
-        const d = new Date(
-          parseInt(parts[0]),
-          parseInt(parts[1]) - 1,
-          parseInt(parts[2]),
-        );
-        const jsDay = d.getDay();
-        const dayIdx = jsDay === 0 ? 6 : jsDay - 1;
-        if (!filters.daysOfWeek.includes(dayIdx)) return false;
-      }
+      const d = parseEventDate(ev.date);
+      if (!d) return false;
+      const jsDay = d.getDay();
+      const dayIdx = jsDay === 0 ? 6 : jsDay - 1;
+      if (!filters.daysOfWeek.includes(dayIdx)) return false;
     }
   }
   if (
@@ -248,14 +249,23 @@ export async function fetchChurches(
   }
 
   const EVENING_START_MINUTES = 16 * 60; // 4:00 PM
-  const POPUP_DAY_ORDER = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+  const POPUP_DAY_ORDER = [
+    "sunday",
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "saturday",
+  ];
 
   function popupScheduleSortKey(ev: RawEvent): number {
     if (ev.event_kind !== "weekly" || !ev.day_of_week) return 99999;
     const day = ev.day_of_week.toLowerCase();
     const dayIdx = POPUP_DAY_ORDER.indexOf(day);
     if (dayIdx < 0) return 99999;
-    const isSaturdayEvening = day === "saturday" && ev.start_time >= EVENING_START_MINUTES;
+    const isSaturdayEvening =
+      day === "saturday" && ev.start_time >= EVENING_START_MINUTES;
     if (day === "sunday") return ev.start_time;
     if (isSaturdayEvening) return 2000 + ev.start_time;
     return 3000 + dayIdx * 1000 + ev.start_time;
@@ -304,7 +314,9 @@ export interface ChurchSearchResult {
   longitude: number | null;
 }
 
-export async function fetchAllChurchesForSearch(): Promise<ChurchSearchResult[]> {
+export async function fetchAllChurchesForSearch(): Promise<
+  ChurchSearchResult[]
+> {
   const db = await getDb();
   const stmt = db.prepare(
     `SELECT id, slug, name, latitude, longitude FROM church

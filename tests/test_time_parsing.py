@@ -1,6 +1,6 @@
 """Tests for time parsing."""
 
-from pdf_extract.db import _time_to_minutes
+from pdf_extract.db import _normalize_event_date, _time_to_minutes
 
 
 def test_time_to_minutes_canonical() -> None:
@@ -42,4 +42,23 @@ def test_time_to_minutes_null_empty() -> None:
     assert _time_to_minutes(None) is None
     assert _time_to_minutes("") is None
     assert _time_to_minutes("   ") is None
+
+
+def test_normalize_event_date_accepts_iso() -> None:
+    assert _normalize_event_date("2026-04-15") == "2026-04-15"
+
+
+def test_normalize_event_date_converts_textual_month() -> None:
+    assert _normalize_event_date("April 15, 2026") == "2026-04-15"
+    assert _normalize_event_date("Apr 5, 2026") == "2026-04-05"
+
+
+def test_normalize_event_date_converts_numeric_forms() -> None:
+    assert _normalize_event_date("04/15/2026") == "2026-04-15"
+    assert _normalize_event_date("04/15/26") == "2026-04-15"
+
+
+def test_normalize_event_date_rejects_invalid() -> None:
+    assert _normalize_event_date("not-a-date") is None
+    assert _normalize_event_date("2026-13-99") is None
 

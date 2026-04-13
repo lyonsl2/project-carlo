@@ -5,6 +5,7 @@ from __future__ import annotations
 import csv
 import logging
 import re
+from datetime import datetime
 from pathlib import Path
 
 from pdf_extract.storage import (
@@ -74,6 +75,30 @@ def _time_to_minutes(s: str | None) -> int | None:
         h, mins = int(m[1]), int(m[2])
         if 0 <= h <= 23 and 0 <= mins <= 59:
             return h * 60 + mins
+
+    return None
+
+
+def _normalize_event_date(value: str | None) -> str | None:
+    """Normalize date strings to YYYY-MM-DD for specific-date events."""
+    if not isinstance(value, str):
+        return None
+    raw = value.strip()
+    if not raw:
+        return None
+
+    # Keep canonical ISO dates as-is after validating.
+    if re.match(r"^\d{4}-\d{2}-\d{2}$", raw):
+        try:
+            return datetime.strptime(raw, "%Y-%m-%d").date().isoformat()
+        except ValueError:
+            return None
+
+    for fmt in ("%B %d, %Y", "%b %d, %Y", "%m/%d/%Y", "%m/%d/%y"):
+        try:
+            return datetime.strptime(raw, fmt).date().isoformat()
+        except ValueError:
+            continue
 
     return None
 
@@ -287,6 +312,17 @@ def _load_events(conn) -> int:
         if not isinstance(page_number, int):
             page_number = None
 
+        event_kind = entry.get("event_kind", "")
+        event_date = None
+        if event_kind == "specific_date":
+            event_date = _normalize_event_date(entry.get("date"))
+            if event_date is None:
+                LOGGER.warning(
+                    "Skipping event: unparseable specific_date %r (church=%s)",
+                    entry.get("date"), church_slug,
+                )
+                continue
+
         conn.execute(
             """INSERT INTO event(church_id, bulletin_id, event_type, event_kind, day_of_week, date, start_time, end_time, cancelled, page_number)
                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
@@ -294,9 +330,9 @@ def _load_events(conn) -> int:
                 church_row["id"],
                 bulletin_id,
                 entry.get("event_type", ""),
-                entry.get("event_kind", ""),
+                event_kind,
                 entry.get("day_of_week"),
-                entry.get("date"),
+                event_date,
                 start_minutes,
                 end_minutes,
                 int(entry.get("cancelled", False)),
