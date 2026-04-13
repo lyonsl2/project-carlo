@@ -84,3 +84,53 @@ export function getChurchEvents(
   stmt.free();
   return events;
 }
+
+function runLastModifiedQuery(
+  db: Database,
+  sql: string,
+): Record<string, string | null> {
+  const stmt = db.prepare(sql);
+  const bySlug: Record<string, string | null> = {};
+  while (stmt.step()) {
+    const row = stmt.getAsObject();
+    const slug = row["slug"];
+    const lastModified = row["last_modified"];
+    if (typeof slug === "string") {
+      bySlug[slug] = typeof lastModified === "string" ? lastModified : null;
+    }
+  }
+  stmt.free();
+  return bySlug;
+}
+
+export function getChurchLastModifiedDates(db: Database): Record<string, string | null> {
+  const queries = [
+    `SELECT c.slug AS slug,
+            MAX(
+              COALESCE(
+                NULLIF(b.processed_at, ''),
+                NULLIF(b.fetched_at, ''),
+                NULLIF(b.published_date, ''),
+                NULLIF(c.created_at, '')
+              )
+            ) AS last_modified
+     FROM church c
+     LEFT JOIN bulletin b
+       ON b.parish_id = c.parish_id
+     GROUP BY c.id`,
+    `SELECT c.slug AS slug, c.created_at AS last_modified
+     FROM church c`,
+    `SELECT c.slug AS slug, NULL AS last_modified
+     FROM church c`,
+  ];
+
+  for (const sql of queries) {
+    try {
+      return runLastModifiedQuery(db, sql);
+    } catch {
+      // Some frontend snapshots omit tables/columns; fall through to simpler queries.
+    }
+  }
+
+  return {};
+}

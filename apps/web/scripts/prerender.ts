@@ -3,12 +3,18 @@ import { resolve } from "node:path";
 import { renderToStaticMarkup } from "react-dom/server";
 import { createElement } from "react";
 import initSqlJs from "sql.js";
-import { getAllChurchSlugs, getChurchDetail, getChurchEvents } from "../src/prerender/queries";
+import {
+  getAllChurchSlugs,
+  getChurchDetail,
+  getChurchEvents,
+  getChurchLastModifiedDates,
+} from "../src/prerender/queries";
 import { StaticChurchPage } from "../src/prerender/StaticChurchPage";
 
 const WEB_DIR = resolve(import.meta.dirname, "..");
 const DIST_DIR = resolve(WEB_DIR, "dist");
 const DB_PATH = resolve(WEB_DIR, "public", "frontend.db");
+const SITE_ORIGIN = "https://projectcarlo.com";
 
 /** Font filename prefixes to preload — Latin subsets of the two typefaces used
  *  on church pages (Cardo for display headings, EB Garamond for body text). */
@@ -35,6 +41,87 @@ function discoverAssets(): { cssPath: string; fontPaths: string[] } {
   return { cssPath: `/assets/${cssFile}`, fontPaths };
 }
 
+function getSiteOrigin(): string {
+  return new URL(SITE_ORIGIN).origin;
+}
+
+function escapeXml(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function absoluteUrl(origin: string, pathname: string): string {
+  return new URL(pathname, `${origin}/`).href;
+}
+
+function normalizeLastmodDate(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  const trimmed = raw.trim();
+  if (trimmed.length === 0) return null;
+
+  const isoPrefix = /^(\d{4}-\d{2}-\d{2})/.exec(trimmed);
+  if (isoPrefix) return isoPrefix[1];
+
+  const parsed = new Date(trimmed);
+  if (Number.isNaN(parsed.getTime())) return null;
+  return parsed.toISOString().slice(0, 10);
+}
+
+function maxIsoDate(dates: string[], fallback: string): string {
+  if (dates.length === 0) return fallback;
+  return dates.reduce((latest, current) => (current > latest ? current : latest), dates[0]);
+}
+
+function writeSitemapAndRobots(
+  distDir: string,
+  origin: string,
+  slugs: string[],
+  lastmodBySlug: Record<string, string | null>,
+) {
+  const buildDate = new Date().toISOString().slice(0, 10);
+  const churchUrls = slugs.map((slug) => ({
+    loc: absoluteUrl(origin, `/churches/${encodeURIComponent(slug)}`),
+    lastmod: normalizeLastmodDate(lastmodBySlug[slug]) ?? buildDate,
+  }));
+  const homepageLastmod = maxIsoDate(
+    churchUrls.map((entry) => entry.lastmod),
+    buildDate,
+  );
+  const urls: { loc: string; lastmod: string }[] = [
+    { loc: absoluteUrl(origin, "/"), lastmod: homepageLastmod },
+    ...churchUrls,
+  ];
+
+  const urlEntries = urls
+    .map(
+      (u) => `  <url>
+    <loc>${escapeXml(u.loc)}</loc>
+    <lastmod>${u.lastmod}</lastmod>
+  </url>`,
+    )
+    .join("\n");
+
+  const sitemap =
+    `<?xml version="1.0" encoding="UTF-8"?>\n` +
+    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
+    `${urlEntries}\n` +
+    `</urlset>\n`;
+
+  writeFileSync(resolve(distDir, "sitemap.xml"), sitemap, "utf-8");
+
+  const sitemapUrl = absoluteUrl(origin, "/sitemap.xml");
+  const robots =
+    "User-agent: *\n" +
+    "Allow: /\n" +
+    "\n" +
+    `Sitemap: ${sitemapUrl}\n`;
+
+  writeFileSync(resolve(distDir, "robots.txt"), robots, "utf-8");
+}
+
 async function main() {
   const SQL = await initSqlJs();
   const dbBuffer = readFileSync(DB_PATH);
@@ -42,6 +129,7 @@ async function main() {
 
   const { cssPath, fontPaths } = discoverAssets();
   const slugs = getAllChurchSlugs(db);
+  const lastmodBySlug = getChurchLastModifiedDates(db);
 
   console.log(`Pre-rendering ${slugs.length} church pages...`);
 
@@ -61,6 +149,10 @@ async function main() {
     writeFileSync(resolve(outDir, "index.html"), html, "utf-8");
     count++;
   }
+
+  const origin = getSiteOrigin();
+  writeSitemapAndRobots(DIST_DIR, origin, slugs, lastmodBySlug);
+  console.log(`Wrote sitemap.xml and robots.txt (${slugs.length + 1} URLs).`);
 
   db.close();
   console.log(`Pre-rendered ${count} church pages.`);
