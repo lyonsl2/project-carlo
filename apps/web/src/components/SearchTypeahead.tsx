@@ -80,8 +80,8 @@ export function SearchTypeahead({
     return matches.slice(0, 10).map((m) => m.item);
   }, [fuse, debouncedQuery]);
 
-  const trimmedQuery = debouncedQuery.trim();
-  const showDropdown = isOpen && trimmedQuery.length >= 2;
+  // Open as soon as the input has 2+ chars; debounce only affects Fuse results.
+  const showDropdown = isOpen && query.trim().length >= 2;
   const hasResults = results.length > 0;
 
   const handleSelect = useCallback(
@@ -163,7 +163,7 @@ export function SearchTypeahead({
         <PopoverContent
           align="start"
           sideOffset={10}
-          className="w-[min(32rem,calc(100vw-2rem))] border-rule-strong bg-paper p-0 shadow-missal-popover"
+          className="z-[950] w-[min(32rem,calc(100vw-2rem))] border-rule-strong bg-paper p-0 shadow-missal-popover"
           onOpenAutoFocus={(event) => event.preventDefault()}
         >
           <div className="border-b border-rule-strong px-4 pt-3 pb-2">
