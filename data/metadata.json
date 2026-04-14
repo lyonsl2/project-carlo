@@ -1240,5 +1240,23 @@
     "fetched_at": "2026-04-13T02:01:02Z",
     "processed_at": "2026-04-13T03:07:27Z",
     "published_date": null
+  },
+  {
+    "parish_slug": "sacred-heart-cathedral",
+    "source_url": "https://container.parishesonline.com/bulletins/06/0007/20260412B.pdf",
+    "pdf_path": "data\\bulletins\\sacred-heart-cathedral\\48a4d377fcc8399a6e20b57adccccf255e88cd644de65549f8656d0e08d8f906.pdf",
+    "content_hash": "48a4d377fcc8399a6e20b57adccccf255e88cd644de65549f8656d0e08d8f906",
+    "fetched_at": "2026-04-14T21:30:29Z",
+    "processed_at": "2026-04-14T21:31:36Z",
+    "published_date": null
+  },
+  {
+    "parish_slug": "st-christopher",
+    "source_url": "https://parishesonline.com/publication-page/st-christophers-church?selectedPublication=https://container.parishesonline.com/bulletins/06/0126/20260412B.pdf",
+    "pdf_path": "data\\bulletins\\st-christopher\\9756f8917d25d8639c20992332c54467170b01f560d5698bfeb765b2b117fcde.pdf",
+    "content_hash": "9756f8917d25d8639c20992332c54467170b01f560d5698bfeb765b2b117fcde",
+    "fetched_at": "2026-04-14T21:44:37Z",
+    "processed_at": "2026-04-14T21:45:23Z",
+    "published_date": null
   }
 ]
