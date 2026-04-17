@@ -24,13 +24,24 @@ VERIFY_RESULTS_PATH = DATA_DIR / "verify_results.json"
 GEOCODE_RESULTS_PATH = DATA_DIR / "geocode_results.json"
 EVENTS_PATH = DATA_DIR / "events.json"
 
+# Wait on SQLITE_BUSY before failing (multiple processes / concurrent sessions).
+SQLITE_BUSY_TIMEOUT_MS = 10_000
+
 
 # ── Connection helpers ──────────────────────────────────────────────────────
+def configure_sqlite_connection(conn: sqlite3.Connection) -> None:
+    """Shared PRAGMAs for pipeline DB access: WAL concurrency, lock backoff, FK checks."""
+    conn.execute("PRAGMA foreign_keys = ON")
+    conn.execute("PRAGMA journal_mode=WAL")
+    conn.execute("PRAGMA synchronous=NORMAL")
+    conn.execute(f"PRAGMA busy_timeout={SQLITE_BUSY_TIMEOUT_MS}")
+
+
 def connect_db(db_path: Path = DEFAULT_DB_PATH) -> sqlite3.Connection:
     db_path.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA foreign_keys = ON")
+    configure_sqlite_connection(conn)
     return conn
 
 

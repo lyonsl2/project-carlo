@@ -14,6 +14,7 @@ from pdf_extract.storage import (
     connect_db,
     get_parish_by_name,
     list_churches,
+    load_json_dict,
     save_json_dict,
     utc_now_iso,
 )
@@ -49,7 +50,7 @@ def verify_churches(
     model: str = "gemini-3-flash-preview",
 ) -> dict[str, int]:
     LOGGER.info("Starting verify stage (parish_name=%s, model=%s)", parish_name or "*all*", model)
-    verify_results: dict[str, dict] = {}
+    verify_results = load_json_dict(VERIFY_RESULTS_PATH)
 
     # Build set of parishes where ALL churches are already verified
     already_verified = _find_verified_parishes()

@@ -10,6 +10,8 @@ from __future__ import annotations
 import sqlite3
 from pathlib import Path
 
+from pdf_extract.storage import configure_sqlite_connection
+
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE_DB = ROOT / "data" / "parish_events.db"
 DEST_DB = ROOT / "apps" / "web" / "public" / "frontend.db"
@@ -23,7 +25,9 @@ def extract(source: Path = SOURCE_DB, dest: Path = DEST_DB) -> None:
     dest.unlink(missing_ok=True)
 
     src = sqlite3.connect(source)
+    configure_sqlite_connection(src)
     dst = sqlite3.connect(dest)
+    configure_sqlite_connection(dst)
     try:
         dst.execute(
             """
@@ -72,6 +76,7 @@ def extract(source: Path = SOURCE_DB, dest: Path = DEST_DB) -> None:
                    (SELECT b.source_url FROM bulletin b
                     WHERE b.parish_id = c.parish_id AND b.source_url IS NOT NULL
                     ORDER BY COALESCE(b.published_date, '') DESC,
+                             COALESCE(b.fetched_at, '') DESC,
                              COALESCE(b.processed_at, '') DESC, b.id DESC
                     LIMIT 1)
             FROM church c
@@ -95,6 +100,7 @@ def extract(source: Path = SOURCE_DB, dest: Path = DEST_DB) -> None:
                        ROW_NUMBER() OVER (
                            PARTITION BY parish_id
                            ORDER BY COALESCE(published_date, '') DESC,
+                                    COALESCE(fetched_at, '') DESC,
                                     COALESCE(processed_at, '') DESC,
                                     id DESC
                        ) AS rn
