@@ -234,15 +234,6 @@
     "published_date": null
   },
   {
-    "parish_slug": "st-frances-xavier-cabrini",
-    "source_url": "https://files.ecatholic.com/29120/bulletins/20241124.pdf?t=1732299025000",
-    "pdf_path": "data\\bulletins\\st-frances-xavier-cabrini\\94e19d14d12673fd6f1411e76ece48f4690006c8694258026ceb9215765a0974.pdf",
-    "content_hash": "94e19d14d12673fd6f1411e76ece48f4690006c8694258026ceb9215765a0974",
-    "fetched_at": "2026-03-14T18:05:23Z",
-    "processed_at": "2026-03-17T23:15:58Z",
-    "published_date": null
-  },
-  {
     "parish_slug": "st-john-of-rochester",
     "source_url": "https://files.ecatholic.com/34606/bulletins/20260315.pdf?t=1773175628000",
     "pdf_path": "data\\bulletins\\st-john-of-rochester\\a106e905893f05b3bf5192e3abfbca6c626bab4ef36b3e487036bec7bfeb2614.pdf",
@@ -447,15 +438,6 @@
     "content_hash": "2cda883381d7fde349a6acd69cf6fdccf4301fe594d02a427b1f2a940000d757",
     "fetched_at": "2026-03-22T02:46:02Z",
     "processed_at": null,
-    "published_date": null
-  },
-  {
-    "parish_slug": "holy-apostles",
-    "source_url": "https://www.holyapostleschurchfamily.org/_files/ugd/68527e_bd4b3d33d33b47f182baa7550c91159f.pdf",
-    "pdf_path": "data\\bulletins\\holy-apostles\\9b7bef0c3912a5c7350d8d1cee946fda139267f6357b2be2ab6345891747e0aa.pdf",
-    "content_hash": "9b7bef0c3912a5c7350d8d1cee946fda139267f6357b2be2ab6345891747e0aa",
-    "fetched_at": "2026-03-22T02:46:08Z",
-    "processed_at": "2026-04-13T02:50:06Z",
     "published_date": null
   },
   {
@@ -1257,6 +1239,33 @@
     "content_hash": "9756f8917d25d8639c20992332c54467170b01f560d5698bfeb765b2b117fcde",
     "fetched_at": "2026-04-14T21:44:37Z",
     "processed_at": "2026-04-14T21:45:23Z",
+    "published_date": null
+  },
+  {
+    "parish_slug": "st-charles-borromeo",
+    "source_url": "https://parishesonline.com/publication-page/st-charles-borromeo-church-14616?selectedPublication=https://container.parishesonline.com/bulletins/06/0049/20260419B.pdf",
+    "pdf_path": "data\\bulletins\\st-charles-borromeo\\a8c1bbbbf71cc7d3d015456378d96f986389200e7687e12c2222050545b8d49c.pdf",
+    "content_hash": "a8c1bbbbf71cc7d3d015456378d96f986389200e7687e12c2222050545b8d49c",
+    "fetched_at": "2026-04-17T22:25:05Z",
+    "processed_at": "2026-04-17T22:42:39Z",
+    "published_date": null
+  },
+  {
+    "parish_slug": "st-john-spencerport",
+    "source_url": "https://bulletins.discovermass.com/download.php?bulletin=kk3jnagc%2BEa%2FGiGlGdwCzLozeanaaetZc2CSL5Tr9PghVkyJjmEfHjh7y8Xdr5O4oBxMiesADWH8d6pjhhXzhjK0Tm66z8VpMoBFlQMhOa8%3D",
+    "pdf_path": "data\\bulletins\\st-john-spencerport\\4b7e228f3a751f119ae0f94cbac01d8a6080ba740063d833f3fb3c6462b5afbe.pdf",
+    "content_hash": "4b7e228f3a751f119ae0f94cbac01d8a6080ba740063d833f3fb3c6462b5afbe",
+    "fetched_at": "2026-04-17T22:32:37Z",
+    "processed_at": "2026-04-17T22:41:40Z",
+    "published_date": null
+  },
+  {
+    "parish_slug": "st-louis-pittsford",
+    "source_url": "https://parishesonline.com/publication-page/st-louis-church?selectedPublication=https://container.parishesonline.com/bulletins/06/0026/20260419B.pdf",
+    "pdf_path": "data\\bulletins\\st-louis-pittsford\\df0555ba1db018a47d4a84c159851adb73486425133b8c92b910e8fca1b6c6bf.pdf",
+    "content_hash": "df0555ba1db018a47d4a84c159851adb73486425133b8c92b910e8fca1b6c6bf",
+    "fetched_at": "2026-04-17T22:35:20Z",
+    "processed_at": "2026-04-17T22:42:16Z",
     "published_date": null
   }
 ]

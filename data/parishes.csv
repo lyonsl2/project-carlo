@@ -11,7 +11,7 @@ nativity-seas,Nativity of the Blessed Virgin Mary / Saint Elizabeth Ann Seton,ht
 transfiguration-st-catherine-mendon,Church of the Transfiguration / St. Catherine of Siena,https://www.transfigurationpittsford.org,parishes_online,church-of-the-transfiguration-and-st-catherine-of-siena-church
 st-monica-emmanuel,St. Monica / Emmanuel Church of the Deaf,https://www.stmonicaofrochester.org,other,
 good-shepherd-catholic-community,Good Shepherd Catholic Community,https://thegoodshepherd.cc,parishes_online,good-shepherd-catholic-community
-holy-apostles,Holy Apostles Church,https://holyapostleschurchfamily.org,other,
+holy-apostles,Holy Apostles Church,https://holyapostleschurchfamily.org,no_bulletin,
 our-mother-of-sorrows-holy-cross,Our Mother of Sorrows / Holy Cross,https://moshc.org,parishes_online,our-mother-of-sorrows-church
 holy-family-catholic-community,Holy Family Catholic Community,https://www.hfccwny.org,parishes_online,holy-family-catholic-community-14572
 holy-trinity-webster,Holy Trinity Church,https://holytrinityweb.org,other,
@@ -22,7 +22,7 @@ our-lady-of-lourdes-st-anne,Our Lady of Lourdes + St. Anne,https://ololsa.org,pa
 our-lady-of-peace-geneva,Our Lady of Peace,https://ourladyofpeacegeneva.org,parishes_online,our-lady-of-peace-parish-14456
 our-lady-of-the-lakes,Our Lady of the Lakes Catholic Community,https://ourladyofthelakescc.org,parishes_online,our-lady-of-the-lakes-catholic-community
 our-lady-of-the-valley,Our Lady of the Valley Parish,https://www.olv14843.org,other,
-our-lady-of-victory-st-joseph,Our Lady of Victory / St. Joseph,https://olvsj.org,,
+our-lady-of-victory-st-joseph,Our Lady of Victory / St. Joseph,https://olvsj.org,google_drive,
 our-lady-queen-of-peace-st-thomas-more,Our Lady Queen of Peace and St. Thomas More Catholic Community,https://olqpstm.com,ecatholic,
 parish-of-the-holy-family,The Parish of the Holy Family,https://theparishoftheholyfamily.org,ecatholic,
 most-holy-name-of-jesus,Parish of the Most Holy Name of Jesus,https://elmiracatholic.org,other,
@@ -36,19 +36,19 @@ st-agnes-paul-rose,St. Agnes / St. Paul of the Cross / St. Rose,https://www.sain
 st-benedict-parish,St. Benedict Parish,https://stbenedictonline.org,ecatholic,
 st-benedicts-st-marys-lake,St. Benedict's / St. Mary's of the Lake,https://stmarystben.org,parishes_online,st-marys-on-the-lake-st-benedicts
 st-catherine-of-siena-ithaca,St. Catherine of Siena Church,https://stcathofsiena.org,ecatholic,
-st-charles-borromeo,St. Charles Borromeo,https://stcharlesgreece.org,,
+st-charles-borromeo,St. Charles Borromeo,https://stcharlesgreece.org,parishes_online,st-charles-borromeo-church-14616
 st-christopher,St. Christopher,https://www.stchristophersnchili.org,parishes_online,st-christophers-church,
-st-frances-xavier-cabrini,St. Frances Xavier Cabrini Parish,https://cabriniroc.org,ecatholic,
+st-frances-xavier-cabrini,St. Frances Xavier Cabrini Parish,https://cabriniroc.org,google_drive,
 st-francis-and-st-clare,St. Francis and St. Clare,https://sfscrcc.org,other,
 st-john-of-rochester,St. John of Rochester,https://stjohnfairport.org,ecatholic,
 st-john-greece,St. John the Evangelist (Greece),https://www.stjohngreece.org,other,
-st-john-spencerport,St. John the Evangelist (Spencerport),https://stjohnschurchspencerport.org,ecatholic,
+st-john-spencerport,St. John the Evangelist (Spencerport),https://stjohnschurchspencerport.org,discover_mass,st-john-the-evangelist-spencerport-ny
 st-john-vianney,St. John Vianney,https://sjvbath.org,other,
 st-kateri-tekakwitha,St. Kateri Tekakwitha,https://www.kateriirondequoit.org,parishes_online,st-kateri-tekakwitha-parish-14617
 st-katharine-drexel-st-maximilian-kolbe,St. Katharine Drexel Parish / St. Maximilian Kolbe Parish,https://www.catholicparisheswwc.org,parishes_online,st-maximillian-kolbe-parish
 st-lawrence,St. Lawrence,https://stlawrencegreeceny.org,other,
 st-leo-the-great,St. Leo the Great Catholic Parish,https://stleohilton.org,ecatholic,
-st-louis-pittsford,St. Louis Church,https://stlouischurch.org,ecatholic,
+st-louis-pittsford,St. Louis Church,https://stlouischurch.org,parishes_online,st-louis-church
 st-luke-the-evangelist,St. Luke the Evangelist Parish,https://www.stlukelivingstoncounty.org,parishes_online,st-luke-the-evangelist
 st-marianne-cope,St. Marianne Cope,https://www.smcrcc.org,parishes_online,st-marianne-cope-roman-catholic-parish
 st-marks-greece,St. Mark's,https://www.stmarksgreece.com,parishes_online,st-marks-church-14612
