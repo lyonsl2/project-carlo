@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 
 from pdf_extract.address import format_address
+from pdf_extract.pdf_truncate import ensure_truncated_pdf
 from pdf_extract.schedule_extraction import extract_events
 from pdf_extract.storage import (
     BULLETINS_METADATA_PATH,
@@ -70,9 +71,15 @@ def process_bulletins(
                 continue
 
             try:
-                pdf_bytes = pdf_path.read_bytes()
+                read_path = ensure_truncated_pdf(pdf_path)
+            except Exception:
+                LOGGER.warning("Skipping: failed truncating PDF at %s", pdf_path, exc_info=True)
+                continue
+
+            try:
+                pdf_bytes = read_path.read_bytes()
             except OSError:
-                LOGGER.warning("Skipping: failed reading PDF at %s", pdf_path, exc_info=True)
+                LOGGER.warning("Skipping: failed reading PDF at %s", read_path, exc_info=True)
                 continue
 
             parish_slug = entry["parish_slug"]

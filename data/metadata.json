@@ -1267,5 +1267,14 @@
     "fetched_at": "2026-04-17T22:35:20Z",
     "processed_at": "2026-04-17T22:42:16Z",
     "published_date": null
+  },
+  {
+    "parish_slug": "holy-spirit-st-josephs",
+    "source_url": "https://parishesonline.com/publication-page/st-josephs-catholic-church-and-church-of-the-holy-spirit?selectedPublication=https://container.parishesonline.com/bulletins/06/0030/20260419B.pdf",
+    "pdf_path": "data\\bulletins\\holy-spirit-st-josephs\\17621f5219abb689ccf38c4f30f69bae4b75930fb605178cfc2cdad59f539dd7.pdf",
+    "content_hash": "17621f5219abb689ccf38c4f30f69bae4b75930fb605178cfc2cdad59f539dd7",
+    "fetched_at": "2026-04-17T23:35:43Z",
+    "processed_at": "2026-04-17T23:36:26Z",
+    "published_date": null
   }
 ]

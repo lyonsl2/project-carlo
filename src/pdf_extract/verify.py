@@ -7,6 +7,7 @@ import logging
 from pathlib import Path
 
 from pdf_extract.address import format_address
+from pdf_extract.pdf_truncate import ensure_truncated_pdf
 from pdf_extract.schedule_extraction import extract_verification
 from pdf_extract.storage import (
     CHURCHES_CSV_PATH,
@@ -95,9 +96,15 @@ def verify_churches(
                 continue
 
             try:
-                pdf_bytes = pdf_path.read_bytes()
+                read_path = ensure_truncated_pdf(pdf_path)
+            except Exception:
+                LOGGER.warning("Failed truncating PDF at %s, skipping", pdf_path, exc_info=True)
+                continue
+
+            try:
+                pdf_bytes = read_path.read_bytes()
             except OSError:
-                LOGGER.warning("Failed reading PDF at %s", pdf_path, exc_info=True)
+                LOGGER.warning("Failed reading PDF at %s", read_path, exc_info=True)
                 continue
 
             # Get existing churches

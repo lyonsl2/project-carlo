@@ -45,6 +45,8 @@ def _patch_process_paths(monkeypatch, tmp_path: Path) -> None:
     """Point process data file paths to tmp_path."""
     monkeypatch.setattr("pdf_extract.process.BULLETINS_METADATA_PATH", tmp_path / "metadata.json")
     monkeypatch.setattr("pdf_extract.process.EVENTS_PATH", tmp_path / "events.json")
+    # These tests stub PDFs with non-PDF bytes; skip the pypdf-based truncation helper.
+    monkeypatch.setattr("pdf_extract.process.ensure_truncated_pdf", lambda path, **kwargs: path)
 
 
 def test_fetch_stage_is_idempotent(monkeypatch, tmp_path: Path) -> None:
