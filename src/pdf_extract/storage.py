@@ -95,11 +95,6 @@ def get_parish_by_name(conn: sqlite3.Connection, name: str) -> sqlite3.Row | Non
     ).fetchone()
 
 
-def list_existing_bulletin_urls(conn: sqlite3.Connection, parish_id: int) -> set[str]:
-    rows = conn.execute("SELECT source_url FROM bulletin WHERE parish_id = ?", (parish_id,)).fetchall()
-    return {str(r["source_url"]) for r in rows}
-
-
 def list_churches(conn: sqlite3.Connection, parish_id: int) -> list[sqlite3.Row]:
     return conn.execute(
         "SELECT id, parish_id, slug, name, address_line1, address_line2, city, state, postal_code"

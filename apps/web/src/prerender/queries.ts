@@ -1,15 +1,9 @@
 import type { Database } from "sql.js";
+import { compareSchedule, computeNextOccurrence } from "../lib/schedule";
+import { num, str } from "../lib/sqlRow";
 import type { ChurchDetail, EventSummary, EventType } from "../types";
 
 const ALL_TYPES: EventType[] = ["mass", "confession", "adoration"];
-
-function str(v: unknown): string | null {
-  return typeof v === "string" ? v : null;
-}
-
-function num(v: unknown): number | null {
-  return typeof v === "number" ? v : null;
-}
 
 export function getAllChurchSlugs(db: Database): string[] {
   const result = db.exec("SELECT slug FROM church ORDER BY name");
@@ -68,20 +62,36 @@ export function getChurchEvents(
   const events: EventSummary[] = [];
   while (stmt.step()) {
     const row = stmt.getAsObject();
+    const cancelled = Boolean(row["cancelled"]);
+    const kind = row["event_kind"] as "weekly" | "specific_date";
+    const day_of_week = str(row["day_of_week"]);
+    const date = str(row["date"]);
+    const start_time = row["start_time"] as number;
+    const next_occurrence = computeNextOccurrence({
+      cancelled,
+      event_kind: kind,
+      day_of_week,
+      start_time,
+      date,
+    });
+    // Match the SPA's fetchChurchEvents: hide cancelled events and specific-date
+    // events whose date is already past (occurrence is null for both).
+    if (next_occurrence === null) continue;
     events.push({
       id: row["id"] as number,
       type: row["event_type"] as EventType,
-      kind: row["event_kind"] as "weekly" | "specific_date",
-      day_of_week: str(row["day_of_week"]),
-      date: str(row["date"]),
-      start_time: row["start_time"] as number,
+      kind,
+      day_of_week,
+      date,
+      start_time,
       end_time: num(row["end_time"]),
-      cancelled: Boolean(row["cancelled"]),
-      next_occurrence: null,
+      cancelled,
+      next_occurrence,
       page_number: num(row["page_number"]),
     });
   }
   stmt.free();
+  events.sort((a, b) => compareSchedule(a, b));
   return events;
 }
 

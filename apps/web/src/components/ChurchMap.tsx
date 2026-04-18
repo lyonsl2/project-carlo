@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import type { Marker as LeafletMarker } from "leaflet";
 import L from "leaflet";
-import { DAY_ORDER, type WeekdayKey } from "../constants/days";
+import { compareSchedule } from "../lib/schedule";
 import type { ChurchMapItem, EventSummary } from "../types";
 import {
   formatAddress,
@@ -15,56 +15,6 @@ import { FleuronIcon } from "@/components/icons";
 
 const OSM_ATTRIBUTION =
   '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
-const EVENING_START_MINUTES = 16 * 60; // 4:00 PM
-
-function compareEvents(a: EventSummary, b: EventSummary): number {
-  const aIsSpecific = a.kind === "specific_date" && a.date;
-  const bIsSpecific = b.kind === "specific_date" && b.date;
-
-  if (aIsSpecific && bIsSpecific) {
-    const dateCompare = (a.date ?? "").localeCompare(b.date ?? "");
-    if (dateCompare !== 0) return dateCompare;
-    return a.start_time - b.start_time;
-  }
-  if (aIsSpecific && !bIsSpecific) return 1;
-  if (!aIsSpecific && bIsSpecific) return -1;
-
-  let dayA: WeekdayKey;
-  let dayB: WeekdayKey;
-  if (a.kind === "weekly" && a.day_of_week) {
-    dayA = a.day_of_week.toLowerCase() as WeekdayKey;
-  } else if (a.date) {
-    const d = new Date(a.date + "T12:00:00");
-    dayA = DAY_ORDER[d.getDay()];
-  } else return 1;
-  if (b.kind === "weekly" && b.day_of_week) {
-    dayB = b.day_of_week.toLowerCase() as WeekdayKey;
-  } else if (b.date) {
-    const d = new Date(b.date + "T12:00:00");
-    dayB = DAY_ORDER[d.getDay()];
-  } else return -1;
-
-  const dayIdxA = DAY_ORDER.indexOf(dayA);
-  const dayIdxB = DAY_ORDER.indexOf(dayB);
-  const isSatEveA =
-    dayA === "saturday" && a.start_time >= EVENING_START_MINUTES;
-  const isSatEveB =
-    dayB === "saturday" && b.start_time >= EVENING_START_MINUTES;
-
-  const keyA =
-    dayA === "sunday"
-      ? a.start_time
-      : isSatEveA
-        ? 1000 + a.start_time
-        : 2000 + dayIdxA * 1000 + a.start_time;
-  const keyB =
-    dayB === "sunday"
-      ? b.start_time
-      : isSatEveB
-        ? 1000 + b.start_time
-        : 2000 + dayIdxB * 1000 + b.start_time;
-  return keyA - keyB;
-}
 
 function formatEventDay(event: EventSummary): string {
   if (event.kind === "weekly" && event.day_of_week) {
@@ -171,9 +121,10 @@ const ChurchMarker = memo(function ChurchMarker({
   }, [church.id, openPopupForChurchId]);
 
   const topEvents = useMemo(
-    () => [...church.upcoming_events].sort(compareEvents).slice(0, 3),
+    () => [...church.upcoming_events].sort(compareSchedule).slice(0, 3),
     [church.upcoming_events],
   );
+  const addressLine = formatAddress(church);
 
   return (
     <Marker
@@ -187,9 +138,9 @@ const ChurchMarker = memo(function ChurchMarker({
             <h3 className="font-display text-[1.35rem] leading-[1.1] font-normal text-ink">
               {church.name ?? "Unnamed parish"}
             </h3>
-            {formatAddress(church) ? (
+            {addressLine ? (
               <p className="font-serif text-[0.875rem] leading-snug text-ink-soft">
-                {formatAddress(church)}
+                {addressLine}
               </p>
             ) : null}
           </div>

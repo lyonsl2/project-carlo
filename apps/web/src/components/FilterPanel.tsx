@@ -5,21 +5,12 @@ import {
   MINUTES_PER_DAY,
   type FilterState,
 } from "./filterState";
+import { FILTER_DAY_LABELS } from "../constants/days";
 import { EVENT_TYPE_OPTIONS } from "../constants/eventTypes";
 import { TimeRangeSlider } from "./TimeRangeSlider";
 import { Fleuron } from "./Fleuron";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
-
-const DAY_NAMES = [
-  { full: "Monday", abbr: "Mon" },
-  { full: "Tuesday", abbr: "Tue" },
-  { full: "Wednesday", abbr: "Wed" },
-  { full: "Thursday", abbr: "Thu" },
-  { full: "Friday", abbr: "Fri" },
-  { full: "Saturday", abbr: "Sat" },
-  { full: "Sunday", abbr: "Sun" },
-];
 
 const TIME_STEP_MINUTES = 15;
 
@@ -155,7 +146,7 @@ export function FilterPanel({
             </button>
           </div>
           <div className="flex items-center justify-between gap-1">
-            {DAY_NAMES.map((day, dayIndex) => {
+            {FILTER_DAY_LABELS.map((day, dayIndex) => {
               const isSelected = filters.daysOfWeek.includes(dayIndex);
               return (
                 <button

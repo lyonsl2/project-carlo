@@ -15,6 +15,7 @@ from pdf_extract.storage import configure_sqlite_connection
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE_DB = ROOT / "data" / "parish_events.db"
 DEST_DB = ROOT / "apps" / "web" / "public" / "frontend.db"
+FRONTEND_SCHEMA_PATH = ROOT / "data" / "frontend_schema.sql"
 
 
 def extract(source: Path = SOURCE_DB, dest: Path = DEST_DB) -> None:
@@ -29,44 +30,7 @@ def extract(source: Path = SOURCE_DB, dest: Path = DEST_DB) -> None:
     dst = sqlite3.connect(dest)
     configure_sqlite_connection(dst)
     try:
-        dst.execute(
-            """
-            CREATE TABLE church (
-                id INTEGER PRIMARY KEY,
-                parish_id INTEGER NOT NULL,
-                slug TEXT NOT NULL UNIQUE,
-                name TEXT,
-                address_line1 TEXT,
-                address_line2 TEXT,
-                city TEXT,
-                state TEXT,
-                postal_code TEXT,
-                latitude REAL,
-                longitude REAL,
-                homepage_url TEXT,
-                bulletin_url TEXT
-            )
-            """
-        )
-        dst.execute("CREATE INDEX idx_church_slug ON church(slug)")
-        dst.execute(
-            """
-            CREATE TABLE event (
-                id INTEGER PRIMARY KEY,
-                church_id INTEGER NOT NULL,
-                event_type TEXT NOT NULL,
-                event_kind TEXT NOT NULL,
-                day_of_week TEXT,
-                date TEXT,
-                start_time INTEGER NOT NULL,
-                end_time INTEGER,
-                cancelled INTEGER NOT NULL,
-                page_number INTEGER
-            )
-            """
-        )
-        dst.execute("CREATE INDEX idx_event_church ON event(church_id)")
-        dst.execute("CREATE INDEX idx_event_type ON event(event_type)")
+        dst.executescript(FRONTEND_SCHEMA_PATH.read_text(encoding="utf-8"))
 
         churches = src.execute(
             """

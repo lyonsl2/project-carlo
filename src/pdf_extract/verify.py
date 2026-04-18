@@ -2,15 +2,14 @@
 
 from __future__ import annotations
 
-import csv
 import logging
+import sqlite3
 from pathlib import Path
 
 from pdf_extract.address import format_address
 from pdf_extract.pdf_truncate import ensure_truncated_pdf
 from pdf_extract.schedule_extraction import extract_verification
 from pdf_extract.storage import (
-    CHURCHES_CSV_PATH,
     VERIFY_RESULTS_PATH,
     connect_db,
     get_parish_by_name,
@@ -23,26 +22,26 @@ from pdf_extract.storage import (
 LOGGER = logging.getLogger(__name__)
 
 
-def _find_verified_parishes() -> set[str]:
-    """Read churches.csv to find parishes where all churches are already verified."""
-    if not CHURCHES_CSV_PATH.exists():
-        return set()
+def _find_verified_parishes(conn: sqlite3.Connection) -> set[str]:
+    """Return parish slugs whose churches are all marked verified in the DB.
 
-    parish_status: dict[str, bool] = {}
-    with open(CHURCHES_CSV_PATH, encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            parish_id = row["parish_id"]
-            nv = (row.get("name_verified") or "").strip()
-            av = (row.get("address_verified") or "").strip()
-            church_done = nv != "" and av != ""
-            # A parish is fully verified only if ALL its churches are done
-            if parish_id not in parish_status:
-                parish_status[parish_id] = church_done
-            elif not church_done:
-                parish_status[parish_id] = False
-
-    return {slug for slug, done in parish_status.items() if done}
+    A parish is considered fully verified only when it has at least one church
+    and every church has both name_verified=1 and address_verified=1.
+    """
+    rows = conn.execute(
+        """SELECT p.slug AS slug,
+                  COUNT(c.id) AS total,
+                  SUM(CASE WHEN c.name_verified = 1 AND c.address_verified = 1
+                           THEN 1 ELSE 0 END) AS verified
+           FROM parish p
+           LEFT JOIN church c ON c.parish_id = p.id
+           GROUP BY p.id"""
+    ).fetchall()
+    return {
+        r["slug"]
+        for r in rows
+        if (r["total"] or 0) > 0 and (r["total"] or 0) == (r["verified"] or 0)
+    }
 
 
 def verify_churches(
@@ -53,11 +52,10 @@ def verify_churches(
     LOGGER.info("Starting verify stage (parish_name=%s, model=%s)", parish_name or "*all*", model)
     verify_results = load_json_dict(VERIFY_RESULTS_PATH)
 
-    # Build set of parishes where ALL churches are already verified
-    already_verified = _find_verified_parishes()
-
     conn = connect_db()
     try:
+        already_verified = _find_verified_parishes(conn)
+
         if parish_name:
             parish_row = get_parish_by_name(conn, parish_name)
             if not parish_row:
@@ -125,8 +123,15 @@ def verify_churches(
                 LOGGER.info("No churches for parish %s, skipping", parish_slug)
                 continue
 
-            # Call Gemini for verification
-            result = extract_verification(pdf_bytes, churches=church_list, model=model)
+            try:
+                result = extract_verification(pdf_bytes, churches=church_list, model=model)
+            except Exception:
+                LOGGER.warning(
+                    "Verification extraction failed for parish %s, skipping",
+                    parish_slug,
+                    exc_info=True,
+                )
+                continue
 
             # Save to verify_results.json
             verify_results[parish_slug] = {

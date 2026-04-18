@@ -57,9 +57,11 @@ def process_bulletins(
     try:
         if parish_name:
             parish_row = get_parish_by_name(conn, parish_name)
-            if parish_row:
-                target_slug = parish_row["slug"]
-                pending = [m for m in pending if m["parish_slug"] == target_slug]
+            if not parish_row:
+                LOGGER.warning("Parish not found: %s", parish_name)
+                return {"processed_bulletins": 0, "inserted_events": 0}
+            target_slug = parish_row["slug"]
+            pending = [m for m in pending if m["parish_slug"] == target_slug]
 
         processed_count = 0
         inserted_events = 0

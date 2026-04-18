@@ -1,15 +1,6 @@
+import { FILTER_DAY_LABELS } from "../constants/days";
 import { formatMinutesMissal, titleCase } from "../utils";
 import { MINUTES_PER_DAY, type FilterState } from "./filterState";
-
-const DAY_NAMES = [
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-  "Sunday",
-];
 
 interface FilterPillsProps {
   filters: FilterState;
@@ -32,7 +23,7 @@ export function FilterPills({ filters }: FilterPillsProps) {
 
   if (filters.daysOfWeek.length > 0) {
     if (filters.daysOfWeek.length <= 3) {
-      filters.daysOfWeek.forEach((i) => parts.push(DAY_NAMES[i]));
+      filters.daysOfWeek.forEach((i) => parts.push(FILTER_DAY_LABELS[i].full));
     } else {
       parts.push(`${filters.daysOfWeek.length} days`);
     }

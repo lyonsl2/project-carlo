@@ -137,6 +137,32 @@ def reconstruct_events(raw: dict[str, Any]) -> dict[str, Any]:
     return {"events": events, "church_list_needs_review": church_list_needs_review}
 
 
+def _parse_llm_json(content: str, *, context: str) -> dict[str, Any]:
+    """Parse a Gemini JSON string, warning (not raising) on bad output.
+
+    Gemini is configured with response_mime_type=application/json and a JSON schema,
+    so malformed output or non-dict top-level values indicate an LLM-side problem.
+    We coalesce to {} so downstream normalisation treats it as an empty result,
+    but log enough detail to distinguish this from a genuinely empty bulletin.
+    """
+    snippet = content[:200].replace("\n", " ")
+    try:
+        data = json.loads(content)
+    except json.JSONDecodeError as exc:
+        LOGGER.warning(
+            "%s: failed to parse Gemini JSON (len=%d, err=%s): %r",
+            context, len(content), exc, snippet,
+        )
+        return {}
+    if not isinstance(data, dict):
+        LOGGER.warning(
+            "%s: Gemini JSON top-level is %s, expected object (len=%d): %r",
+            context, type(data).__name__, len(content), snippet,
+        )
+        return {}
+    return data
+
+
 def _is_retryable_api_error(exc: Exception) -> bool:
     """Return true when the Gemini API error is likely transient."""
     return isinstance(exc, errors.APIError) and exc.code in _RETRYABLE_STATUS_CODES
@@ -303,12 +329,7 @@ def extract_events(
         ),
     )
     content = response.text or "{}"
-    try:
-        data = json.loads(content)
-    except json.JSONDecodeError:
-        data = {}
-    if not isinstance(data, dict):
-        data = {}
+    data = _parse_llm_json(content, context="extract_events")
     return reconstruct_events(data)
 
 
@@ -377,12 +398,7 @@ def extract_verification(
         ),
     )
     content = response.text or "{}"
-    try:
-        data = json.loads(content)
-    except json.JSONDecodeError:
-        data = {}
-    if not isinstance(data, dict):
-        data = {}
+    data = _parse_llm_json(content, context="extract_verification")
     return _normalize_verification(data)
 
 

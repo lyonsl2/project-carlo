@@ -1,5 +1,7 @@
-import type { Database, SqlValue } from "sql.js";
+import type { Database } from "sql.js";
 import { getDb } from "./db";
+import { compareSchedule, computeNextOccurrence } from "./lib/schedule";
+import { num, str } from "./lib/sqlRow";
 import type {
   ChurchDetail,
   ChurchMapItem,
@@ -40,42 +42,8 @@ interface RawEvent {
   page_number: number | null;
 }
 
-function todayDate(): Date {
-  const now = new Date();
-  return new Date(now.getFullYear(), now.getMonth(), now.getDate());
-}
-
-function nextForWeekly(
-  dayOfWeek: string,
-  startMinutes: number,
-  today: Date,
-): Date | null {
-  const dayIdx = DAY_TO_INDEX[dayOfWeek.toLowerCase()];
-  if (dayIdx === undefined) return null;
-  const hours = Math.floor(startMinutes / 60);
-  const minutes = startMinutes % 60;
-  const jsDay = (dayIdx + 1) % 7; // Python: Monday=0; JS: Sunday=0
-  const currentDay = today.getDay();
-  const daysAhead = (jsDay - currentDay + 7) % 7;
-  const target = new Date(today);
-  target.setDate(target.getDate() + daysAhead);
-  target.setHours(hours, minutes, 0, 0);
-  return target;
-}
-
-function nextForSpecific(eventDate: string, startMinutes: number): Date | null {
-  const parsedDate = parseEventDate(eventDate);
-  if (!parsedDate) return null;
-  const hours = Math.floor(startMinutes / 60);
-  const minutes = startMinutes % 60;
-  const d = new Date(parsedDate);
-  d.setHours(hours, minutes, 0, 0);
-  if (isNaN(d.getTime())) return null;
-  return d;
-}
-
-function parseEventDate(eventDate: string): Date | null {
-  // Prefer explicit YYYY-MM-DD parsing to avoid timezone/date shifts.
+function parseEventDateForFilter(eventDate: string): Date | null {
+  // Date-only filter check; accepts ISO and other parseable strings.
   const isoMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(eventDate.trim());
   if (isoMatch) {
     const year = Number.parseInt(isoMatch[1], 10);
@@ -86,32 +54,6 @@ function parseEventDate(eventDate: string): Date | null {
   }
   const parsed = new Date(eventDate);
   return Number.isNaN(parsed.getTime()) ? null : parsed;
-}
-
-function computeOccurrence(event: {
-  cancelled: boolean;
-  event_kind: string;
-  day_of_week: string | null;
-  start_time: number;
-  date: string | null;
-}): string | null {
-  if (event.cancelled) return null;
-  const today = todayDate();
-  let occ: Date | null = null;
-  if (event.event_kind === "weekly" && event.day_of_week) {
-    occ = nextForWeekly(event.day_of_week, event.start_time, today);
-  } else if (event.event_kind === "specific_date" && event.date) {
-    occ = nextForSpecific(event.date, event.start_time);
-  }
-  return occ ? occ.toISOString() : null;
-}
-
-function str(v: SqlValue): string | null {
-  return typeof v === "string" ? v : null;
-}
-
-function num(v: SqlValue): number | null {
-  return typeof v === "number" ? v : null;
 }
 
 function queryEvents(
@@ -150,7 +92,7 @@ function queryEvents(
         occurrence: null,
         page_number: num(row["page_number"]),
       };
-      ev.occurrence = computeOccurrence(ev);
+      ev.occurrence = computeNextOccurrence(ev);
       results.push(ev);
     }
     return results;
@@ -185,7 +127,7 @@ function eventMatchesFilters(ev: RawEvent, filters: ChurchFilters): boolean {
     }
     // For specific_date, check if the date falls on a selected weekday
     if (ev.event_kind === "specific_date" && ev.date) {
-      const d = parseEventDate(ev.date);
+      const d = parseEventDateForFilter(ev.date);
       if (!d) return false;
       const jsDay = d.getDay();
       const dayIdx = jsDay === 0 ? 6 : jsDay - 1;
@@ -248,35 +190,15 @@ export async function fetchChurches(
     list.push(ev);
   }
 
-  const EVENING_START_MINUTES = 16 * 60; // 4:00 PM
-  const POPUP_DAY_ORDER = [
-    "sunday",
-    "monday",
-    "tuesday",
-    "wednesday",
-    "thursday",
-    "friday",
-    "saturday",
-  ];
-
-  function popupScheduleSortKey(ev: RawEvent): number {
-    if (ev.event_kind !== "weekly" || !ev.day_of_week) return 99999;
-    const day = ev.day_of_week.toLowerCase();
-    const dayIdx = POPUP_DAY_ORDER.indexOf(day);
-    if (dayIdx < 0) return 99999;
-    const isSaturdayEvening =
-      day === "saturday" && ev.start_time >= EVENING_START_MINUTES;
-    if (day === "sunday") return ev.start_time;
-    if (isSaturdayEvening) return 2000 + ev.start_time;
-    return 3000 + dayIdx * 1000 + ev.start_time;
-  }
-
   return churches
     .map((c) => {
       const churchEvents = grouped.get(c.id) ?? [];
       const weeklyEvents = churchEvents.filter(
         (e) => e.event_kind === "weekly" && e.day_of_week && !e.cancelled,
       );
+      // Dedup repeated weekly slots (same weekday + start time) that occasionally
+      // appear across bulletins. Prefer weekly events for the popup; if the parish
+      // has only specific-date events, fall back to the five soonest occurrences.
       const seen = new Set<string>();
       let popupSchedule = weeklyEvents
         .filter((e) => {
@@ -285,8 +207,8 @@ export async function fetchChurches(
           seen.add(key);
           return true;
         })
-        .sort((a, b) => popupScheduleSortKey(a) - popupScheduleSortKey(b))
-        .map(toEventSummary);
+        .map(toEventSummary)
+        .sort((a, b) => compareSchedule(a, b));
       if (popupSchedule.length === 0) {
         popupSchedule = churchEvents
           .filter((e) => e.occurrence !== null)
@@ -388,6 +310,6 @@ export async function fetchChurchEvents(
   const events = queryEvents(db, [churchId], types);
   return events
     .filter((e) => e.occurrence !== null)
-    .sort((a, b) => a.occurrence!.localeCompare(b.occurrence!))
-    .map(toEventSummary);
+    .map(toEventSummary)
+    .sort((a, b) => compareSchedule(a, b));
 }

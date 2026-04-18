@@ -8,7 +8,7 @@ import logging
 import re
 from collections.abc import Callable
 from dataclasses import dataclass
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 from pathlib import Path
 from typing import TYPE_CHECKING
 from urllib.error import HTTPError, URLError
@@ -35,9 +35,6 @@ DISCOVER_MASS_TYPE = "discover_mass"
 OTHER_TYPE = "other"
 SUPPORTED_BULLETIN_PROVIDERS = {"ecatholic", PARISHES_ONLINE_TYPE, DISCOVER_MASS_TYPE, OTHER_TYPE}
 PARISHES_ONLINE_ORG_URL_TEMPLATE = "https://parishesonline.com/organization/{provider_id}"
-PARISHES_ONLINE_PUBLICATION_URL_PREFIX = (
-    "https://parishesonline.com/publication-page/{provider_id}?selectedPublication="
-)
 DISCOVER_MASS_BULLETIN_URL_TEMPLATE = "https://discovermass.com/church/{provider_id}/"
 LOGGER = logging.getLogger(__name__)
 
@@ -53,14 +50,6 @@ class _OtherPdfCandidate:
     source_url: str
     fetch_url: str
     parsed_date: date | None
-
-
-def _first_sunday_on_or_after(d: date) -> date:
-    return d + timedelta(days=(6 - d.weekday()) % 7)
-
-
-def _next_sunday_after(d: date) -> date:
-    return _first_sunday_on_or_after(d + timedelta(days=1))
 
 
 # ── eCatholic bulletin resolution ───────────────────────────────────────────

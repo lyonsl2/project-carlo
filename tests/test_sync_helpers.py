@@ -20,7 +20,6 @@ from pdf_extract.fetch import (
     _parse_relaxed_date,
     _resolve_fetch_source,
     _resolve_other_latest_link,
-    _next_sunday_after,
     _resolve_latest_anchor_link_with_playwright,
     build_latest_discover_mass_bulletin_links,
     build_latest_ecatholic_bulletin_links,
@@ -257,11 +256,6 @@ def test_resolve_latest_anchor_link_with_playwright_uses_first_valid_anchor() ->
     assert seen_hrefs == ["/ignore-this", "/good.pdf"]
     assert source_url == "https://example.org/source"
     assert fetch_url == "https://example.org/good.pdf"
-
-
-def test_next_sunday_after() -> None:
-    assert _next_sunday_after(date(2026, 2, 19)) == date(2026, 2, 22)  # Thursday -> same-week Sunday
-    assert _next_sunday_after(date(2026, 2, 22)) == date(2026, 3, 1)   # Sunday -> next Sunday
 
 
 def test_build_bulletin_link_ecatholic(monkeypatch) -> None:
