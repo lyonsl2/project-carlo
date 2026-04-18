@@ -1,11 +1,12 @@
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { fetchChurch, fetchChurchEvents } from "../api";
+import { ChurchNotFoundError, fetchChurch, fetchChurchEvents } from "../api";
 import { EVENT_TYPE_ORDER } from "../constants/eventTypes";
 import { ArrowLeftIcon } from "@/components/icons";
 import { InlineQueryError } from "@/components/InlineQueryError";
 import { Masthead } from "@/components/Masthead";
 import { ChurchPageContent } from "@/components/ChurchPageContent";
+import { NotFoundPage } from "./NotFoundPage";
 
 export function ChurchPage() {
   const { churchSlug } = useParams();
@@ -15,11 +16,15 @@ export function ChurchPage() {
     queryKey: ["church", churchSlug],
     queryFn: () => fetchChurch(churchSlug!),
     enabled,
+    retry: (_failureCount, error) =>
+      !(error instanceof ChurchNotFoundError),
   });
   const eventsQuery = useQuery({
     queryKey: ["church-events", churchSlug],
     queryFn: () => fetchChurchEvents(churchSlug!, [...EVENT_TYPE_ORDER]),
     enabled,
+    retry: (_failureCount, error) =>
+      !(error instanceof ChurchNotFoundError),
   });
 
   const events = eventsQuery.data;
@@ -27,15 +32,22 @@ export function ChurchPage() {
 
   if (!enabled) {
     return (
-      <main className="flex min-h-svh flex-col items-center justify-center gap-4 bg-paper px-4 py-8 text-center">
-        <p className="font-serif text-base text-ink-soft">
-          We couldn&apos;t find that parish.
-        </p>
-        <Link to="/" className="rubric-link smallcaps text-[0.875rem]">
-          <ArrowLeftIcon className="size-3" />
-          Back to map
-        </Link>
-      </main>
+      <NotFoundPage
+        title="Parish not found"
+        message="We couldn't find that parish."
+      />
+    );
+  }
+
+  if (
+    churchQuery.error instanceof ChurchNotFoundError ||
+    eventsQuery.error instanceof ChurchNotFoundError
+  ) {
+    return (
+      <NotFoundPage
+        title="Parish not found"
+        message="We couldn't find that parish."
+      />
     );
   }
 

@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import { createBrowserRouter } from "react-router-dom";
 import { HomePage } from "./views/HomePage";
+import { NotFoundPage } from "./views/NotFoundPage";
 
 const ChurchPage = lazy(() =>
   import("./views/ChurchPage").then((m) => ({ default: m.ChurchPage })),
@@ -24,5 +25,9 @@ export const router = createBrowserRouter([
         <ChurchPage />
       </Suspense>
     ),
+  },
+  {
+    path: "*",
+    element: <NotFoundPage />,
   },
 ]);

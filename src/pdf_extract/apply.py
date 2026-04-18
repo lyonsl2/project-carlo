@@ -95,7 +95,7 @@ def apply_verify_results() -> dict[str, int]:
     for i, row in enumerate(rows):
         slug_to_idx[row["slug"]] = i
 
-    corrections = 0
+    corrected_slugs: set[str] = set()
     new_added = 0
 
     for parish_slug, result in verify_results.items():
@@ -112,7 +112,7 @@ def apply_verify_results() -> dict[str, int]:
             if name_status == "incorrect" and church_v.get("corrected_name"):
                 row["name"] = church_v["corrected_name"]
                 row["name_verified"] = "true"
-                corrections += 1
+                corrected_slugs.add(church_slug)
             else:
                 row["name_verified"] = _verification_flag(name_status)
 
@@ -126,7 +126,7 @@ def apply_verify_results() -> dict[str, int]:
                     row["state"] = addr.get("state") or ""
                     row["postal_code"] = addr.get("postal_code") or ""
                     row["address_verified"] = "true"
-                    corrections += 1
+                    corrected_slugs.add(church_slug)
                 else:
                     row["address_verified"] = _verification_flag(address_status)
             else:
@@ -169,11 +169,12 @@ def apply_verify_results() -> dict[str, int]:
 
     _write_csv(CHURCHES_CSV_PATH, _CHURCHES_FIELDNAMES, rows)
     VERIFY_RESULTS_PATH.unlink()
+    corrections_applied = len(corrected_slugs)
     LOGGER.info(
         "Applied verify results to churches.csv: %d corrections, %d new churches",
-        corrections, new_added,
+        corrections_applied, new_added,
     )
-    return {"corrections_applied": corrections, "new_churches_added": new_added}
+    return {"corrections_applied": corrections_applied, "new_churches_added": new_added}
 
 
 def apply_geocode_results() -> dict[str, int]:

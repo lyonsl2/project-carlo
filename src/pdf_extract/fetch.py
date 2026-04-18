@@ -36,6 +36,16 @@ OTHER_TYPE = "other"
 SUPPORTED_BULLETIN_PROVIDERS = {"ecatholic", PARISHES_ONLINE_TYPE, DISCOVER_MASS_TYPE, OTHER_TYPE}
 PARISHES_ONLINE_ORG_URL_TEMPLATE = "https://parishesonline.com/organization/{provider_id}"
 DISCOVER_MASS_BULLETIN_URL_TEMPLATE = "https://discovermass.com/church/{provider_id}/"
+
+# Playwright waits for a matching selector to appear on a page before we scrape
+# anchor hrefs from it.
+PLAYWRIGHT_SELECTOR_TIMEOUT_MS = 15000
+# Short delay between retries when Playwright aborts a navigation because the
+# page initiated another one while we were waiting.
+PLAYWRIGHT_NAV_RETRY_DELAY_MS = 250
+# Per-request timeout for direct PDF downloads over HTTP.
+HTTP_DOWNLOAD_TIMEOUT_SECONDS = 60
+
 LOGGER = logging.getLogger(__name__)
 
 
@@ -130,10 +140,14 @@ def _resolve_latest_anchor_link_with_playwright(
         LOGGER.info("Visiting page URL: %s", page_url)
         _goto_with_retry(page=page, page_url=page_url)  # type: ignore[arg-type]
         if wait_for_state is None:
-            page.wait_for_selector(anchor_selector, timeout=15000)  # type: ignore[union-attr]
+            page.wait_for_selector(  # type: ignore[union-attr]
+                anchor_selector, timeout=PLAYWRIGHT_SELECTOR_TIMEOUT_MS,
+            )
         else:
             page.wait_for_selector(  # type: ignore[union-attr]
-                anchor_selector, timeout=15000, state=wait_for_state
+                anchor_selector,
+                timeout=PLAYWRIGHT_SELECTOR_TIMEOUT_MS,
+                state=wait_for_state,
             )
         anchors = page.query_selector_all(anchor_selector)  # type: ignore[union-attr]
         for anchor in anchors:
@@ -236,13 +250,17 @@ def _resolve_other_latest_link(
     try:
         today = reference_date or date.today()
         _goto_with_retry(page=page, page_url=provider_id)  # type: ignore[arg-type]
-        page.wait_for_selector("a[href]", timeout=15000, state="attached")  # type: ignore[union-attr]
+        page.wait_for_selector(  # type: ignore[union-attr]
+            "a[href]", timeout=PLAYWRIGHT_SELECTOR_TIMEOUT_MS, state="attached",
+        )
         bulletin_page_url = _find_other_bulletin_page_url(page=page, base_url=provider_id)
         if bulletin_page_url is None:
             raise ValueError(f"No bulletin page link found for other provider at {provider_id}")
 
         _goto_with_retry(page=page, page_url=bulletin_page_url)  # type: ignore[arg-type]
-        page.wait_for_selector("a[href]", timeout=15000, state="attached")  # type: ignore[union-attr]
+        page.wait_for_selector(  # type: ignore[union-attr]
+            "a[href]", timeout=PLAYWRIGHT_SELECTOR_TIMEOUT_MS, state="attached",
+        )
         current_page_url = getattr(page, "url", bulletin_page_url)
         candidates = _collect_other_pdf_candidates(
             page=page, base_url=current_page_url, reference_date=today,
@@ -259,7 +277,9 @@ def _resolve_other_latest_link(
             if post_url is None:
                 raise ValueError(f"No PDF links found on bulletin page: {bulletin_page_url}")
             _goto_with_retry(page=page, page_url=post_url)  # type: ignore[arg-type]
-            page.wait_for_selector("a[href]", timeout=15000, state="attached")  # type: ignore[union-attr]
+            page.wait_for_selector(  # type: ignore[union-attr]
+                "a[href]", timeout=PLAYWRIGHT_SELECTOR_TIMEOUT_MS, state="attached",
+            )
             current_page_url = getattr(page, "url", post_url)
             candidates = _collect_other_pdf_candidates(
                 page=page, base_url=current_page_url, reference_date=today,
@@ -612,7 +632,9 @@ def _resolve_fetch_source(parish) -> tuple[str, str] | None:
 
 # ── HTTP helpers ────────────────────────────────────────────────────────────
 
-def _http_get_bytes(url: str, *, referer: str | None = None, timeout: int = 60) -> bytes:
+def _http_get_bytes(
+    url: str, *, referer: str | None = None, timeout: int = HTTP_DOWNLOAD_TIMEOUT_SECONDS,
+) -> bytes:
     request_url = _normalize_url_for_request(url)
     headers = {
         "User-Agent": (
@@ -656,17 +678,21 @@ def _goto_with_retry(*, page: Page, page_url: str, max_attempts: int = 3) -> Non
                 "Navigation interrupted for %s (attempt %d/%d), retrying",
                 page_url, attempt, max_attempts,
             )
-            page.wait_for_timeout(250)
+            page.wait_for_timeout(PLAYWRIGHT_NAV_RETRY_DELAY_MS)
 
 
 def _download_pdf(*, fetch_url: str, source_url: str) -> bytes:
     referer = source_url
     try:
         LOGGER.info("Attempting primary fetch URL: %s", fetch_url)
-        return _http_get_bytes(fetch_url, referer=referer, timeout=60)
+        return _http_get_bytes(
+            fetch_url, referer=referer, timeout=HTTP_DOWNLOAD_TIMEOUT_SECONDS,
+        )
     except (HTTPError, URLError, OSError) as exc:
         LOGGER.warning("Primary fetch failed (%s), falling back to source URL: %s", exc, source_url)
-        return _http_get_bytes(source_url, referer=referer, timeout=60)
+        return _http_get_bytes(
+            source_url, referer=referer, timeout=HTTP_DOWNLOAD_TIMEOUT_SECONDS,
+        )
 
 
 # ── Pipeline: fetch ─────────────────────────────────────────────────────────

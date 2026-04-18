@@ -239,14 +239,14 @@ export function ChurchPageContent({ church, events }: ChurchPageContentProps) {
         </section>
 
         {events.length === 0 ? (
-          <p className="mx-auto max-w-2xl text-center font-serif text-sm text-ink-soft">
+          <p className="mx-auto mt-6 max-w-2xl text-center font-serif text-sm text-ink-soft md:mt-8">
             No Mass, Confession, or Adoration times are listed for this
             parish yet.
           </p>
         ) : null}
 
         {events.length > 0 ? (
-          <div className="mx-auto max-w-4xl">
+          <div className="mx-auto mt-6 max-w-4xl md:mt-8">
             <div className="rise-in space-y-12" style={{ animationDelay: "80ms" }}>
               {EVENT_TYPE_ORDER.map((eventType) => {
                 const section = byType[eventType];

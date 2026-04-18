@@ -7,10 +7,13 @@ so Vite can serve it as a static asset.
 
 from __future__ import annotations
 
+import logging
 import sqlite3
 from pathlib import Path
 
 from pdf_extract.storage import configure_sqlite_connection
+
+LOGGER = logging.getLogger(__name__)
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE_DB = ROOT / "data" / "parish_events.db"
@@ -28,7 +31,8 @@ def extract(source: Path = SOURCE_DB, dest: Path = DEST_DB) -> None:
     src = sqlite3.connect(source)
     configure_sqlite_connection(src)
     dst = sqlite3.connect(dest)
-    configure_sqlite_connection(dst)
+    dst.execute("PRAGMA journal_mode=DELETE")
+    dst.execute("PRAGMA foreign_keys = ON")
     try:
         dst.executescript(FRONTEND_SCHEMA_PATH.read_text(encoding="utf-8"))
 
@@ -81,13 +85,15 @@ def extract(source: Path = SOURCE_DB, dest: Path = DEST_DB) -> None:
 
         church_count = dst.execute("SELECT count(*) FROM church").fetchone()[0]
         event_count = dst.execute("SELECT count(*) FROM event").fetchone()[0]
-        size_kb = dest.stat().st_size / 1024
-        print(
-            f"frontend.db: {church_count} churches, {event_count} events, {size_kb:.1f} KB"
-        )
     finally:
         src.close()
         dst.close()
+
+    size_kb = dest.stat().st_size / 1024
+    LOGGER.info(
+        "frontend.db: %d churches, %d events, %.1f KB",
+        church_count, event_count, size_kb,
+    )
 
 
 if __name__ == "__main__":

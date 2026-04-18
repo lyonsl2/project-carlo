@@ -11,6 +11,15 @@ import type {
 
 const ALL_TYPES: EventType[] = ["mass", "confession", "adoration"];
 
+export class ChurchNotFoundError extends Error {
+  readonly slug: string;
+  constructor(slug: string) {
+    super(`Church not found: ${slug}`);
+    this.name = "ChurchNotFoundError";
+    this.slug = slug;
+  }
+}
+
 const DAY_TO_INDEX: Record<string, number> = {
   monday: 0,
   tuesday: 1,
@@ -275,7 +284,7 @@ export async function fetchChurch(slug: string): Promise<ChurchDetail> {
   try {
     stmt.bind([slug]);
     if (!stmt.step()) {
-      throw new Error("Church not found");
+      throw new ChurchNotFoundError(slug);
     }
     const row = stmt.getAsObject();
     return {
@@ -306,7 +315,7 @@ export async function fetchChurchEvents(
 
   const idResult = db.exec("SELECT id FROM church WHERE slug = ?", [slug]);
   if (idResult.length === 0 || idResult[0].values.length === 0) {
-    throw new Error("Church not found");
+    throw new ChurchNotFoundError(slug);
   }
   const churchId = idResult[0].values[0][0] as number;
 

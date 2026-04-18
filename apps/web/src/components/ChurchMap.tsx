@@ -59,7 +59,12 @@ const markerIcon = L.divIcon({
 
 interface ChurchMapProps {
   churches: ChurchMapItem[];
-  centerOn?: { lat: number; lng: number; churchId?: number } | null;
+  centerOn?: {
+    lat: number;
+    lng: number;
+    churchId?: number;
+    requestId?: number;
+  } | null;
 }
 
 /**
@@ -98,27 +103,33 @@ function PopupPaneElevator() {
   return null;
 }
 
-function ChangeView({ center }: { center: { lat: number; lng: number } }) {
+function ChangeView({
+  center,
+}: {
+  center: { lat: number; lng: number; requestId?: number };
+}) {
   const map = useMap();
   useEffect(() => {
     map.panTo([center.lat, center.lng]);
-  }, [map, center.lat, center.lng]);
+  }, [map, center.lat, center.lng, center.requestId]);
   return null;
 }
 
 const ChurchMarker = memo(function ChurchMarker({
   church,
   openPopupForChurchId,
+  openPopupRequestId,
 }: {
   church: ChurchMapItem;
   openPopupForChurchId: number | undefined;
+  openPopupRequestId: number | undefined;
 }) {
   const markerRef = useRef<LeafletMarker | null>(null);
   useEffect(() => {
     if (openPopupForChurchId === church.id && markerRef.current) {
       markerRef.current.openPopup();
     }
-  }, [church.id, openPopupForChurchId]);
+  }, [church.id, openPopupForChurchId, openPopupRequestId]);
 
   const topEvents = useMemo(
     () => [...church.upcoming_events].sort(compareSchedule).slice(0, 3),
@@ -232,6 +243,7 @@ export const ChurchMap = memo(function ChurchMap({
           key={church.id}
           church={church}
           openPopupForChurchId={centerOn?.churchId}
+          openPopupRequestId={centerOn?.requestId}
         />
       ))}
     </MapContainer>

@@ -185,7 +185,7 @@ def _load_bulletins(conn) -> int:
         parish_row = conn.execute("SELECT id FROM parish WHERE slug = ?", (entry["parish_slug"],)).fetchone()
         if not parish_row:
             continue
-        conn.execute(
+        cursor = conn.execute(
             """INSERT OR IGNORE INTO bulletin(parish_id, source_url, pdf_path, published_date, fetched_at, processed_at, content_hash)
                VALUES (?, ?, ?, ?, ?, ?, ?)""",
             (
@@ -198,7 +198,8 @@ def _load_bulletins(conn) -> int:
                 entry.get("content_hash"),
             ),
         )
-        count += 1
+        if cursor.rowcount > 0:
+            count += 1
 
     LOGGER.info("Loaded %d bulletins from metadata.json", count)
     return count

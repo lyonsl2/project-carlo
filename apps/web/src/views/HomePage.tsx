@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useRef, useState, useCallback } from "react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { fetchChurches, type ChurchSearchResult } from "../api";
 import { ChurchMap } from "../components/ChurchMap";
@@ -24,7 +24,12 @@ export function HomePage() {
     lat: number;
     lng: number;
     churchId: number;
+    requestId: number;
   } | null>(null);
+  // Monotonic id bumped on every church selection so that re-selecting the
+  // same church still produces a distinct `centerOn` value, which the map
+  // uses to re-pan and re-open the popup without a timer-based reset.
+  const centerRequestIdRef = useRef(0);
   const apiFilters = useMemo(() => {
     const { from, to } = getTimeRange(appliedFilters);
     return {
@@ -62,13 +67,13 @@ export function HomePage() {
 
   const handleChurchSelect = useCallback((church: ChurchSearchResult) => {
     if (church.latitude != null && church.longitude != null) {
+      centerRequestIdRef.current += 1;
       setCenterOn({
         lat: church.latitude,
         lng: church.longitude,
         churchId: church.id,
+        requestId: centerRequestIdRef.current,
       });
-      // Clear after pan so selecting the same church again re-centers
-      setTimeout(() => setCenterOn(null), 1000);
     }
   }, []);
 
