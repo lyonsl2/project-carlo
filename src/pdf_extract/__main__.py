@@ -49,6 +49,10 @@ def _build_parser() -> argparse.ArgumentParser:
     process_parser = subparsers.add_parser("process", help="Process fetched PDFs with Gemini")
     process_parser.add_argument("--parish", help="Parish name (omit to run for all)")
     process_parser.add_argument("--model", default="gemini-3-flash-preview", help="Gemini model (default: gemini-3-flash-preview)")
+    process_parser.add_argument(
+        "--concurrency", type=int, default=5,
+        help="Number of parallel Gemini calls (default: 5)",
+    )
     _add_common_args(process_parser)
 
     # -- detect --
@@ -123,7 +127,9 @@ def main(argv: list[str] | None = None) -> int:
         elif args.command == "process":
             _ensure_db()
             from pdf_extract.process import process_bulletins
-            result = process_bulletins(parish_name=args.parish, model=args.model)
+            result = process_bulletins(
+                parish_name=args.parish, model=args.model, concurrency=args.concurrency,
+            )
 
         elif args.command == "detect":
             if args.detect_command == "run":

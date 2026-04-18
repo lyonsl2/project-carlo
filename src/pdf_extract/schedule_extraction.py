@@ -22,60 +22,99 @@ _MAX_BACKOFF_SECONDS = 30.0
 
 
 class WeeklySlot(BaseModel):
+    """One recurring weekly time slot at a church (Mass, Confession, or Adoration)."""
+
     model_config = ConfigDict(extra="forbid")
 
-    church_slug: str = Field(min_length=1)
-    day_of_week: str = Field(min_length=1)
-    start_time: str = Field(min_length=1)
-    end_time: str | None = None
-    page_number: int | None = None
-    note: str | None = None
+    church_slug: str = Field(min_length=1, description="Must exactly match a `slug` from the provided known-churches list.")
+    day_of_week: str = Field(min_length=1, description="Full English weekday name, e.g. `Monday`.")
+    start_time: str = Field(min_length=1, description="Formatted as `h:MM AM` or `h:MM PM`.")
+    end_time: str | None = Field(default=None, description="For Mass, leave null. For Confession and Adoration, include when available.")
+    page_number: int | None = Field(default=None, description="1-indexed PDF page where this entry was found.")
+    note: str | None = Field(default=None, description="Short phrase only when there is genuinely special context (language, season, location nuance, benediction, etc.).")
 
 
 class DateSlot(BaseModel):
+    """One calendar-dated time slot at a church (Mass, Confession, or Adoration)."""
+
     model_config = ConfigDict(extra="forbid")
 
-    church_slug: str = Field(min_length=1)
-    date: str = Field(min_length=1)
-    start_time: str = Field(min_length=1)
-    end_time: str | None = None
-    page_number: int | None = None
-    note: str | None = None
+    church_slug: str = Field(min_length=1, description="Must exactly match a `slug` from the provided known-churches list.")
+    date: str = Field(min_length=1, description="Specific calendar date formatted as `YYYY-MM-DD`.")
+    start_time: str = Field(min_length=1, description="Formatted as `h:MM AM` or `h:MM PM`.")
+    end_time: str | None = Field(default=None, description="For Mass, leave null. For Confession and Adoration, include when available.")
+    page_number: int | None = Field(default=None, description="1-indexed PDF page where this entry was found.")
+    note: str | None = Field(default=None, description="Short phrase only when there is genuinely special context (language, season, location nuance, benediction, etc.).")
 
 
 class WeeklySchedule(BaseModel):
+    """Recurring weekly lines grouped by Mass, Confession, and Adoration."""
+
     model_config = ConfigDict(extra="forbid")
 
-    masses: list[WeeklySlot] = []
-    confessions: list[WeeklySlot] = []
-    adorations: list[WeeklySlot] = []
+    masses: list[WeeklySlot] = Field(default_factory=list)
+    confessions: list[WeeklySlot] = Field(default_factory=list)
+    adorations: list[WeeklySlot] = Field(default_factory=list)
 
 
 class SingleEvents(BaseModel):
+    """One-off or extra dated occurrences not already covered by `WeeklySchedule`."""
+
     model_config = ConfigDict(extra="forbid")
 
-    masses: list[DateSlot] = []
-    confessions: list[DateSlot] = []
-    adorations: list[DateSlot] = []
+    masses: list[DateSlot] = Field(default_factory=list)
+    confessions: list[DateSlot] = Field(default_factory=list)
+    adorations: list[DateSlot] = Field(default_factory=list)
 
 
 class Cancellations(BaseModel):
+    """Dated occurrences the bulletin marks as cancelled."""
+
     model_config = ConfigDict(extra="forbid")
 
-    masses: list[DateSlot] = []
-    confessions: list[DateSlot] = []
-    adorations: list[DateSlot] = []
+    masses: list[DateSlot] = Field(default_factory=list)
+    confessions: list[DateSlot] = Field(default_factory=list)
+    adorations: list[DateSlot] = Field(default_factory=list)
 
 
 class SchedulePayload(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    weekly_schedule: WeeklySchedule = Field(default_factory=WeeklySchedule)
-    single_events: SingleEvents = Field(default_factory=SingleEvents)
-    cancellations: Cancellations = Field(default_factory=Cancellations)
-    church_list_needs_review: bool = False
-    published_date: str | None = None
-    wrong_bulletin: bool = False
+    weekly_schedule: WeeklySchedule = Field(
+        default_factory=WeeklySchedule,
+        description="Recurring weekly Mass, Confession, and Adoration entries.",
+    )
+    single_events: SingleEvents = Field(
+        default_factory=SingleEvents,
+        description=(
+            "One-off or extra dates. Do not include an entry that duplicates an existing `weekly_schedule` slot."
+        ),
+    )
+    cancellations: Cancellations = Field(
+        default_factory=Cancellations,
+        description=(
+            "Include cancelled events here."
+        ),
+    )
+    church_list_needs_review: bool = Field(
+        default=False,
+        description=(
+            "True only if (a) the bulletin clearly shows a church in the parish that has events but is not in the provided list, "
+            "or (b) a provided church name/address is obviously wrong."
+        ),
+    )
+    published_date: str | None = Field(
+        default=None,
+        description=(
+            "The bulletin's issue date as `YYYY-MM-DD`."
+        ),
+    )
+    wrong_bulletin: bool = Field(
+        default=False,
+        description=(
+            "True only if this is clearly not the correct bulletin (not a bulletin at all, not the correct parish, from a different year, etc.)"
+        ),
+    )
 
 
 def _valid_str(s: Any) -> bool:
@@ -275,74 +314,35 @@ class VerificationPayload(BaseModel):
 
 
 EVENTS_SYSTEM_PROMPT = """\
-You are a precise assistant that extracts only Mass, Confession, and Adoration schedule information from a Catholic parish bulletin PDF.
+# Role
 
-Extract ONLY these three types: Mass, Confession, and Adoration.
+Extract Mass, Confession, and Adoration schedule information from the attached Catholic parish bulletin PDF.
 
-You are given:
-1) A parish bulletin PDF
-2) Known churches for this parish: {churches_json}
-3) Today's date: {today_iso} ({today_day_of_week})
+# Known churches for this parish
 
-Each church in the list has a "slug" (stable identifier), "name", and "address". Map each event to one of the known churches.
+```json
+{churches_json}
+```
 
-Structure your response as follows:
+# Today's date
 
-weekly_schedule: Recurring weekly schedule. Each category (masses, confessions, adorations) is an array of entries:
-   - masses: church_slug, day_of_week, start_time (no end_time for Mass), page_number, note (optional)
-   - confessions: church_slug, day_of_week, start_time, end_time (optional, include when provided), page_number, note (optional)
-   - adorations: church_slug, day_of_week, start_time, end_time (optional, include when provided), page_number, note (optional)
+{today_iso} ({today_day_of_week})
 
-single_events: One-off or exception dates (e.g. extra Mass on a holiday, special confession times). Same structure as weekly_schedule but use "date" instead of "day_of_week":
-   - masses: church_slug, date, start_time, page_number, note (optional)
-   - confessions: church_slug, date, start_time, end_time (optional), page_number, note (optional)
-   - adorations: church_slug, date, start_time, end_time (optional), page_number, note (optional)
+# Instructions
 
-cancellations: Specific dates/times when a regular schedule is cancelled. Same structure as single_events:
-   - masses: church_slug, date, start_time, page_number, note (optional)
-   - confessions: church_slug, date, start_time, end_time (optional), page_number, note (optional)
-   - adorations: church_slug, date, start_time, end_time (optional), page_number, note (optional)
+- Only extract Mass, Confession, and Adoration events. Ignore every other kind of event or activity in the bulletin.
+- Attach every event to one of the churches in the known-churches list using its exact `slug`.
+- Sort each event into exactly one bucket:
+  - `weekly_schedule` for recurring weekly times.
+  - `single_events` for one-off or extra occurrences on a specific date that are not already covered by a weekly entry.
+  - `cancellations` for events that the bulletin explicitly says are cancelled, moved, or will not take place on a specific date.
+- Never duplicate a weekly slot as a single event just because the bulletin also mentions it in a specific week.
+- Only add a `note` when there is genuinely special context worth surfacing (language, season, alternate location, benediction, etc.). No need to specify 'Vigil Mass'.
+- Identify the bulletin's own issue date and report it as `published_date`.
+- Set `wrong_bulletin` to true only if the attached PDF is clearly not a current bulletin for this parish (wrong parish, wrong year, not a bulletin at all, etc.). In that case you may return empty event lists.
 
-church_list_needs_review: boolean flag
-published_date: the bulletin's issue date as YYYY-MM-DD, or null if not visible anywhere in the PDF
-wrong_bulletin: boolean flag — see rules below
-
-Rules:
-- Every entry must use a church_slug that exactly matches one of the provided churches.
-- Format all times as "h:MM AM" or "h:MM PM".
-- For Mass: always include start_time; end_time is omitted.
-- For Confession and Adoration: include end_time when the document provides it.
-- For every entry, include page_number (1-indexed integer for which page of the PDF the event was found on).
-- Put recurring weekly entries in weekly_schedule.
-- Put one-off or exception dates in single_events (e.g. extra Mass on Christmas).
-- Put cancelled times in cancellations (e.g. "No 8am Mass on March 16").
-- For single_events and cancellations, format date as YYYY-MM-DD.
-- Do NOT put a single_events entry if it is identical to an existing weekly_schedule entry.
-- Set church_list_needs_review to true ONLY if:
-  - The bulletin clearly shows a church that is NOT in the provided list
-  - A provided church name/address is obviously wrong
-
-note (per entry):
-- Use ONLY when there is special context a reader should know. Examples:
-  * Mass only during certain months of the year (e.g. "Summer only (June–August)")
-  * Benediction follows adoration (e.g. "Benediction follows")
-  * Language of the Mass (e.g. "Spanish", "Latin (TLM)", "Vietnamese")
-  * Location nuance (e.g. "In the chapel", "Outdoor Mass")
-  * Any other genuinely special condition
-- Keep it short (a phrase, not a sentence). Omit or use null when the event is routine — do NOT repeat generic info like day/time/end_time.
-
-published_date:
-- The issue/publication date for this bulletin. Look for phrases like "Week of...", a Sunday date on the cover, "Bulletin Date", masthead dates, etc.
-- Format as YYYY-MM-DD. If no issue date is visible anywhere in the PDF, return null.
-
-wrong_bulletin:
-- Set to true ONLY if you can tell this PDF is NOT the correct current bulletin for this parish. Specifically:
-  * The bulletin clearly belongs to a different parish (different parish name / churches, not one of the provided ones), OR
-  * The bulletin's published_date is more than ~7 days before or ~7 days after today ({today_iso}). A bulletin from the current week or the immediately surrounding week is fine; a bulletin from months ago or months in the future is not.
-- If there's no published_date visible AND the content otherwise matches the provided parish, leave wrong_bulletin = false.
-- If in doubt, return false.
-
-Return output that matches the provided JSON schema exactly."""
+Carefully find the events listed in the bulletin.
+"""
 
 
 def extract_events(

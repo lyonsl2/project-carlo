@@ -1292,8 +1292,8 @@
     "pdf_path": "data\\bulletins\\all-saints-corning\\00f91a349e181e385689a0f73f9b082483a6f686735b98b8553a47aa50a705e4.pdf",
     "content_hash": "00f91a349e181e385689a0f73f9b082483a6f686735b98b8553a47aa50a705e4",
     "fetched_at": "2026-04-18T03:36:04Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:36:13Z",
+    "published_date": "2026-04-18"
   },
   {
     "parish_slug": "net-catholic",
@@ -1301,8 +1301,8 @@
     "pdf_path": "data\\bulletins\\net-catholic\\ea13d70ad878460c66672d71d106f0e7284902154dbf4c1eae7e56d0b5c56cd4.pdf",
     "content_hash": "ea13d70ad878460c66672d71d106f0e7284902154dbf4c1eae7e56d0b5c56cd4",
     "fetched_at": "2026-04-18T03:36:06Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:36:13Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "southeast-rochester-catholic-community",
@@ -1310,8 +1310,8 @@
     "pdf_path": "data\\bulletins\\southeast-rochester-catholic-community\\9a35ea6ff249ac5cfebc7a155311cf752f4c4c175550afbd5ceb4dd5a4fa1f98.pdf",
     "content_hash": "9a35ea6ff249ac5cfebc7a155311cf752f4c4c175550afbd5ceb4dd5a4fa1f98",
     "fetched_at": "2026-04-18T03:36:09Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:36:21Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "catholic-parishes-eastern-wayne-county",
@@ -1319,8 +1319,8 @@
     "pdf_path": "data\\bulletins\\catholic-parishes-eastern-wayne-county\\3bd67abb86828e33f725f1f443e09cce8ac969b4cdbf2f322a6506602cac3956.pdf",
     "content_hash": "3bd67abb86828e33f725f1f443e09cce8ac969b4cdbf2f322a6506602cac3956",
     "fetched_at": "2026-04-18T03:36:20Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:36:29Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "assumption-resurrection",
@@ -1328,8 +1328,8 @@
     "pdf_path": "data\\bulletins\\assumption-resurrection\\7068b3976e521a8ac2fd1dbf157c92e912aef4e9e25a7ce023b91a7d3cf327d9.pdf",
     "content_hash": "7068b3976e521a8ac2fd1dbf157c92e912aef4e9e25a7ce023b91a7d3cf327d9",
     "fetched_at": "2026-04-18T03:36:23Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:36:18Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "nativity-seas",
@@ -1337,8 +1337,8 @@
     "pdf_path": "data\\bulletins\\nativity-seas\\49fa573661cc7fda212ac735d555f05b9b5d1a30c74c38ee4710cf05aa36a63e.pdf",
     "content_hash": "49fa573661cc7fda212ac735d555f05b9b5d1a30c74c38ee4710cf05aa36a63e",
     "fetched_at": "2026-04-18T03:36:28Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:37:13Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "transfiguration-st-catherine-mendon",
@@ -1346,8 +1346,8 @@
     "pdf_path": "data\\bulletins\\transfiguration-st-catherine-mendon\\cdfaecbd1df78e00ed0bb550b77fd8bcb66eb69c8899f312a7014372e81c0319.pdf",
     "content_hash": "cdfaecbd1df78e00ed0bb550b77fd8bcb66eb69c8899f312a7014372e81c0319",
     "fetched_at": "2026-04-18T03:36:30Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:37:04Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "good-shepherd-catholic-community",
@@ -1355,8 +1355,8 @@
     "pdf_path": "data\\bulletins\\good-shepherd-catholic-community\\08bc900b6188d9573ff2c977ca49f97ac8796748f9af4fe2703872b978a7ee28.pdf",
     "content_hash": "08bc900b6188d9573ff2c977ca49f97ac8796748f9af4fe2703872b978a7ee28",
     "fetched_at": "2026-04-18T03:36:38Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:37:20Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "our-mother-of-sorrows-holy-cross",
@@ -1364,8 +1364,8 @@
     "pdf_path": "data\\bulletins\\our-mother-of-sorrows-holy-cross\\a4d75d23540dfa8acba75130f583a999dad342b922e5c68b35d70d1c14e72f8b.pdf",
     "content_hash": "a4d75d23540dfa8acba75130f583a999dad342b922e5c68b35d70d1c14e72f8b",
     "fetched_at": "2026-04-18T03:36:40Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:37:32Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "holy-family-catholic-community",
@@ -1373,8 +1373,8 @@
     "pdf_path": "data\\bulletins\\holy-family-catholic-community\\e7c1dac2168699b10cdf04f6beca3c165706377695f99d01ba4adc3094ac005e.pdf",
     "content_hash": "e7c1dac2168699b10cdf04f6beca3c165706377695f99d01ba4adc3094ac005e",
     "fetched_at": "2026-04-18T03:36:42Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:37:05Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "holy-trinity-webster",
@@ -1382,8 +1382,8 @@
     "pdf_path": "data\\bulletins\\holy-trinity-webster\\93b94d65266c8e6a520cfa7fa7a46f630994f82be4ea9effc84049ff8215c4d7.pdf",
     "content_hash": "93b94d65266c8e6a520cfa7fa7a46f630994f82be4ea9effc84049ff8215c4d7",
     "fetched_at": "2026-04-18T03:36:45Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:40:36Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "immaculate-conception-st-bridgets",
@@ -1391,8 +1391,8 @@
     "pdf_path": "data\\bulletins\\immaculate-conception-st-bridgets\\2d21d49e45740db92324197f2e9dd9278a8c120c6107b19ddd9050cabef77ab9.pdf",
     "content_hash": "2d21d49e45740db92324197f2e9dd9278a8c120c6107b19ddd9050cabef77ab9",
     "fetched_at": "2026-04-18T03:37:00Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:40:36Z",
+    "published_date": "2021-04-01"
   },
   {
     "parish_slug": "mary-mother-of-mercy",
@@ -1400,8 +1400,8 @@
     "pdf_path": "data\\bulletins\\mary-mother-of-mercy\\a8d194e89d5d13c07554881e93e193d9fd01b25d796e2e94306f73dee781ad49.pdf",
     "content_hash": "a8d194e89d5d13c07554881e93e193d9fd01b25d796e2e94306f73dee781ad49",
     "fetched_at": "2026-04-18T03:37:04Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:42:10Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "our-lady-of-lourdes-st-anne",
@@ -1409,8 +1409,8 @@
     "pdf_path": "data\\bulletins\\our-lady-of-lourdes-st-anne\\fadaf2d4e555f08e1fc9da4fdc8d149359499bee4336094b409e59e8dba3b97a.pdf",
     "content_hash": "fadaf2d4e555f08e1fc9da4fdc8d149359499bee4336094b409e59e8dba3b97a",
     "fetched_at": "2026-04-18T03:37:07Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:37:38Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "our-lady-of-peace-geneva",
@@ -1418,8 +1418,8 @@
     "pdf_path": "data\\bulletins\\our-lady-of-peace-geneva\\e0e2df6053f3ff901c53a747d5c8e23811391fdbd595ec1dd1f8ef6975ef4b9f.pdf",
     "content_hash": "e0e2df6053f3ff901c53a747d5c8e23811391fdbd595ec1dd1f8ef6975ef4b9f",
     "fetched_at": "2026-04-18T03:37:09Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:37:59Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "our-lady-of-the-lakes",
@@ -1427,8 +1427,8 @@
     "pdf_path": "data\\bulletins\\our-lady-of-the-lakes\\dcd3799276850ae60be5ac187251a4665e8d9e4f678c4da7af7d20582e6d4941.pdf",
     "content_hash": "dcd3799276850ae60be5ac187251a4665e8d9e4f678c4da7af7d20582e6d4941",
     "fetched_at": "2026-04-18T03:37:11Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:38:24Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "our-lady-of-the-valley",
@@ -1436,8 +1436,8 @@
     "pdf_path": "data\\bulletins\\our-lady-of-the-valley\\8bcda1403b43ed65c700403b3840195bf4d82325c4fdfb567527dc283a0f4ca5.pdf",
     "content_hash": "8bcda1403b43ed65c700403b3840195bf4d82325c4fdfb567527dc283a0f4ca5",
     "fetched_at": "2026-04-18T03:37:21Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:41:06Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "our-lady-queen-of-peace-st-thomas-more",
@@ -1445,8 +1445,8 @@
     "pdf_path": "data\\bulletins\\our-lady-queen-of-peace-st-thomas-more\\06db513a7d0fc8f62bfd43fcb9c09ec5ed6e7e5efb020eda1411277e4690ca2b.pdf",
     "content_hash": "06db513a7d0fc8f62bfd43fcb9c09ec5ed6e7e5efb020eda1411277e4690ca2b",
     "fetched_at": "2026-04-18T03:37:23Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:38:04Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "parish-of-the-holy-family",
@@ -1454,8 +1454,8 @@
     "pdf_path": "data\\bulletins\\parish-of-the-holy-family\\d9b0933a673917b9cdce41ab1a0fcdde6cac91998aa34eaa991d83474839b6c3.pdf",
     "content_hash": "d9b0933a673917b9cdce41ab1a0fcdde6cac91998aa34eaa991d83474839b6c3",
     "fetched_at": "2026-04-18T03:37:25Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:38:22Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "peace-of-christ",
@@ -1463,8 +1463,8 @@
     "pdf_path": "data\\bulletins\\peace-of-christ\\ff5dfc71feafe6504c264bf565d1d3048acebf01c877a52f2287a14c3070536d.pdf",
     "content_hash": "ff5dfc71feafe6504c264bf565d1d3048acebf01c877a52f2287a14c3070536d",
     "fetched_at": "2026-04-18T03:37:34Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:42:20Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "sacred-heart-auburn-cluster",
@@ -1472,8 +1472,8 @@
     "pdf_path": "data\\bulletins\\sacred-heart-auburn-cluster\\1cbbb330c6dadbd8518c31944973f289b5167a941c1adfba46eab2fb842860f1.pdf",
     "content_hash": "1cbbb330c6dadbd8518c31944973f289b5167a941c1adfba46eab2fb842860f1",
     "fetched_at": "2026-04-18T03:37:38Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:42:47Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "saint-rita-webster",
@@ -1481,8 +1481,8 @@
     "pdf_path": "data\\bulletins\\saint-rita-webster\\127add858aba5856d61406deff8e6f6948f34752a6c33700b380a6daef05d122.pdf",
     "content_hash": "127add858aba5856d61406deff8e6f6948f34752a6c33700b380a6daef05d122",
     "fetched_at": "2026-04-18T03:37:46Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:41:42Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "ss-isidore-maria-torribia",
@@ -1490,8 +1490,8 @@
     "pdf_path": "data\\bulletins\\ss-isidore-maria-torribia\\2941da84338bf046edee9c9f67893ba7ed745d08ecf238f819daff2ac87e836a.pdf",
     "content_hash": "2941da84338bf046edee9c9f67893ba7ed745d08ecf238f819daff2ac87e836a",
     "fetched_at": "2026-04-18T03:37:48Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:38:02Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "our-lady-of-the-snow-saints-mary-and-martha",
@@ -1499,8 +1499,8 @@
     "pdf_path": "data\\bulletins\\our-lady-of-the-snow-saints-mary-and-martha\\d9e53019651854a05bc1fec92a5beef66ac0e6b94b59f7ef6d2ad711d8bca177.pdf",
     "content_hash": "d9e53019651854a05bc1fec92a5beef66ac0e6b94b59f7ef6d2ad711d8bca177",
     "fetched_at": "2026-04-18T03:37:51Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:38:48Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "st-agnes-paul-rose",
@@ -1508,8 +1508,8 @@
     "pdf_path": "data\\bulletins\\st-agnes-paul-rose\\73da73cb550323f179f96c378b1b49955efe5c6ea9eba33e2c83eb3c656aac5e.pdf",
     "content_hash": "73da73cb550323f179f96c378b1b49955efe5c6ea9eba33e2c83eb3c656aac5e",
     "fetched_at": "2026-04-18T03:37:53Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:38:32Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "st-benedict-parish",
@@ -1517,8 +1517,8 @@
     "pdf_path": "data\\bulletins\\st-benedict-parish\\3c8415479c17efdf342b1c4a92fd3da67c47ed1f8c6bd3cef2cf91c946f72496.pdf",
     "content_hash": "3c8415479c17efdf342b1c4a92fd3da67c47ed1f8c6bd3cef2cf91c946f72496",
     "fetched_at": "2026-04-18T03:37:56Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:38:44Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "st-benedicts-st-marys-lake",
@@ -1526,8 +1526,8 @@
     "pdf_path": "data\\bulletins\\st-benedicts-st-marys-lake\\818ffa191fa58a759908f278fb88010b5a5b7029b9f0ed456de6b1858fc99e92.pdf",
     "content_hash": "818ffa191fa58a759908f278fb88010b5a5b7029b9f0ed456de6b1858fc99e92",
     "fetched_at": "2026-04-18T03:37:59Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:38:52Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "st-catherine-of-siena-ithaca",
@@ -1535,8 +1535,8 @@
     "pdf_path": "data\\bulletins\\st-catherine-of-siena-ithaca\\1a7eccd03b8c0c5281cbb6563c37751f77f52caa734b648732ef00681d8a74ce.pdf",
     "content_hash": "1a7eccd03b8c0c5281cbb6563c37751f77f52caa734b648732ef00681d8a74ce",
     "fetched_at": "2026-04-18T03:38:02Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:38:50Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "st-christopher",
@@ -1544,8 +1544,8 @@
     "pdf_path": "data\\bulletins\\st-christopher\\e0af1a170738ed1535b91298b9edb07e6cf0d735ed08cc39e35a1281b87a353d.pdf",
     "content_hash": "e0af1a170738ed1535b91298b9edb07e6cf0d735ed08cc39e35a1281b87a353d",
     "fetched_at": "2026-04-18T03:38:05Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:42:53Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "st-francis-and-st-clare",
@@ -1553,8 +1553,8 @@
     "pdf_path": "data\\bulletins\\st-francis-and-st-clare\\5fcf089cf005b220a4c10e9cd1a4a8fe7d12ae27a212c84b5eb491eb2fe94de7.pdf",
     "content_hash": "5fcf089cf005b220a4c10e9cd1a4a8fe7d12ae27a212c84b5eb491eb2fe94de7",
     "fetched_at": "2026-04-18T03:38:09Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:41:26Z",
+    "published_date": "2026-04-18"
   },
   {
     "parish_slug": "st-john-of-rochester",
@@ -1562,8 +1562,8 @@
     "pdf_path": "data\\bulletins\\st-john-of-rochester\\0ddad0ea1cc043b715c607db6a43d211565ef8c4d09328a89ab134b88f9fcb9a.pdf",
     "content_hash": "0ddad0ea1cc043b715c607db6a43d211565ef8c4d09328a89ab134b88f9fcb9a",
     "fetched_at": "2026-04-18T03:38:10Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:39:38Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "st-john-greece",
@@ -1571,8 +1571,8 @@
     "pdf_path": "data\\bulletins\\st-john-greece\\56045a3ce1a588ed49344f7cff38ef62fa92f97278ca3ea03f21686bfd3cd065.pdf",
     "content_hash": "56045a3ce1a588ed49344f7cff38ef62fa92f97278ca3ea03f21686bfd3cd065",
     "fetched_at": "2026-04-18T03:38:18Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:41:19Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "st-john-spencerport",
@@ -1580,8 +1580,8 @@
     "pdf_path": "data\\bulletins\\st-john-spencerport\\4b7e228f3a751f119ae0f94cbac01d8a6080ba740063d833f3fb3c6462b5afbe.pdf",
     "content_hash": "4b7e228f3a751f119ae0f94cbac01d8a6080ba740063d833f3fb3c6462b5afbe",
     "fetched_at": "2026-04-18T03:38:21Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:39:32Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "st-john-vianney",
@@ -1589,8 +1589,8 @@
     "pdf_path": "data\\bulletins\\st-john-vianney\\0774decc49c00bf87145e7431c1a9c95284a1ff18b9f349f1967904bca82cbc0.pdf",
     "content_hash": "0774decc49c00bf87145e7431c1a9c95284a1ff18b9f349f1967904bca82cbc0",
     "fetched_at": "2026-04-18T03:38:26Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:43:07Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "st-kateri-tekakwitha",
@@ -1598,8 +1598,8 @@
     "pdf_path": "data\\bulletins\\st-kateri-tekakwitha\\ddfb9f92544000daa456945c2bc5e472c4edbf467c28356c9898f7b12d4b02a9.pdf",
     "content_hash": "ddfb9f92544000daa456945c2bc5e472c4edbf467c28356c9898f7b12d4b02a9",
     "fetched_at": "2026-04-18T03:38:29Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:39:43Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "st-katharine-drexel-st-maximilian-kolbe",
@@ -1607,8 +1607,8 @@
     "pdf_path": "data\\bulletins\\st-katharine-drexel-st-maximilian-kolbe\\a8434a6ea83b24bace7812e1b60fcf30216cd7bd688b0f798800341c85ed4137.pdf",
     "content_hash": "a8434a6ea83b24bace7812e1b60fcf30216cd7bd688b0f798800341c85ed4137",
     "fetched_at": "2026-04-18T03:38:32Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:39:58Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "st-lawrence",
@@ -1616,8 +1616,8 @@
     "pdf_path": "data\\bulletins\\st-lawrence\\e4a22d462f0ca617312c72b197e43f249025585d7905d3324190b393a08fbd7f.pdf",
     "content_hash": "e4a22d462f0ca617312c72b197e43f249025585d7905d3324190b393a08fbd7f",
     "fetched_at": "2026-04-18T03:38:43Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:41:15Z",
+    "published_date": "2026-04-05"
   },
   {
     "parish_slug": "st-leo-the-great",
@@ -1625,8 +1625,8 @@
     "pdf_path": "data\\bulletins\\st-leo-the-great\\6324e9b5cabe4ed16ddc543cc902a597a85d319aa81dbce3ca426ef003de040c.pdf",
     "content_hash": "6324e9b5cabe4ed16ddc543cc902a597a85d319aa81dbce3ca426ef003de040c",
     "fetched_at": "2026-04-18T03:38:44Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:39:55Z",
+    "published_date": "2025-11-09"
   },
   {
     "parish_slug": "st-luke-the-evangelist",
@@ -1634,8 +1634,8 @@
     "pdf_path": "data\\bulletins\\st-luke-the-evangelist\\9cd93de27ef3fb539f89ba7b640ea974bde1fbb8d51e066520f0bb87cf95d0e0.pdf",
     "content_hash": "9cd93de27ef3fb539f89ba7b640ea974bde1fbb8d51e066520f0bb87cf95d0e0",
     "fetched_at": "2026-04-18T03:38:48Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:40:02Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "st-marianne-cope",
@@ -1643,8 +1643,8 @@
     "pdf_path": "data\\bulletins\\st-marianne-cope\\5df5c4ccc86cf5e24dacaae0ed4273da3614cd8fabe164a79508bb27b14db43e.pdf",
     "content_hash": "5df5c4ccc86cf5e24dacaae0ed4273da3614cd8fabe164a79508bb27b14db43e",
     "fetched_at": "2026-04-18T03:38:51Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:40:02Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "st-marks-greece",
@@ -1652,8 +1652,8 @@
     "pdf_path": "data\\bulletins\\st-marks-greece\\19e02d1605dc8643f1ec3c2591505b7b73b2af61c447950474c6961cc4fa5e48.pdf",
     "content_hash": "19e02d1605dc8643f1ec3c2591505b7b73b2af61c447950474c6961cc4fa5e48",
     "fetched_at": "2026-04-18T03:38:53Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:40:12Z",
+    "published_date": "2026-04-18"
   },
   {
     "parish_slug": "st-martin-de-porres",
@@ -1661,8 +1661,8 @@
     "pdf_path": "data\\bulletins\\st-martin-de-porres\\061768b73ecf730de46e6d418102d12df5873215785eaefe8180698b33e22ba1.pdf",
     "content_hash": "061768b73ecf730de46e6d418102d12df5873215785eaefe8180698b33e22ba1",
     "fetched_at": "2026-04-18T03:38:55Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:40:25Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "st-mary-our-mother",
@@ -1670,8 +1670,8 @@
     "pdf_path": "data\\bulletins\\st-mary-our-mother\\4de97e5e066f0b1403d6c091a1f461d730f09159185cbe021211de9afe06f783.pdf",
     "content_hash": "4de97e5e066f0b1403d6c091a1f461d730f09159185cbe021211de9afe06f783",
     "fetched_at": "2026-04-18T03:39:05Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:42:33Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "st-marys-st-matthew",
@@ -1679,8 +1679,8 @@
     "pdf_path": "data\\bulletins\\st-marys-st-matthew\\f4de1373fec4de3a83e2d2c1ab5b35cfb7fb217490a0426dc63cc559b5b87634.pdf",
     "content_hash": "f4de1373fec4de3a83e2d2c1ab5b35cfb7fb217490a0426dc63cc559b5b87634",
     "fetched_at": "2026-04-18T03:39:09Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:41:42Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "st-patricks-victor",
@@ -1688,8 +1688,8 @@
     "pdf_path": "data\\bulletins\\st-patricks-victor\\572a9a1e0872aa0e7146d99c953edc675798db6e0352f276dddf845ddb321c36.pdf",
     "content_hash": "572a9a1e0872aa0e7146d99c953edc675798db6e0352f276dddf845ddb321c36",
     "fetched_at": "2026-04-18T03:39:21Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:42:34Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "st-pauls-webster",
@@ -1697,8 +1697,8 @@
     "pdf_path": "data\\bulletins\\st-pauls-webster\\eec9e82f0890a1f129bee5d1bda80974d1c4782370cc0b8009c6284ca65e632c.pdf",
     "content_hash": "eec9e82f0890a1f129bee5d1bda80974d1c4782370cc0b8009c6284ca65e632c",
     "fetched_at": "2026-04-18T03:39:27Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:42:39Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "st-peters-ontario-county",
@@ -1706,8 +1706,8 @@
     "pdf_path": "data\\bulletins\\st-peters-ontario-county\\7596a478063a36a387963e8c411c5f9d0cc1b9ba0b59ef99680377108d20bccb.pdf",
     "content_hash": "7596a478063a36a387963e8c411c5f9d0cc1b9ba0b59ef99680377108d20bccb",
     "fetched_at": "2026-04-18T03:39:31Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:42:01Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "st-pius-x-chili",
@@ -1715,8 +1715,8 @@
     "pdf_path": "data\\bulletins\\st-pius-x-chili\\d5d091beba411824ed468f5794ad247898424af834657e2ffe941506919ca08b.pdf",
     "content_hash": "d5d091beba411824ed468f5794ad247898424af834657e2ffe941506919ca08b",
     "fetched_at": "2026-04-18T03:39:35Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:40:45Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "st-stanislaus-kostka",
@@ -1724,8 +1724,8 @@
     "pdf_path": "data\\bulletins\\st-stanislaus-kostka\\8179d02a0ee4bdf4ffcbc82afc7ce32efdfcc2b85cc9f4fdaef9520f8896b7ea.pdf",
     "content_hash": "8179d02a0ee4bdf4ffcbc82afc7ce32efdfcc2b85cc9f4fdaef9520f8896b7ea",
     "fetched_at": "2026-04-18T03:39:38Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:40:42Z",
+    "published_date": "2026-04-19"
   },
   {
     "parish_slug": "st-theodores-gates",
@@ -1733,7 +1733,7 @@
     "pdf_path": "data\\bulletins\\st-theodores-gates\\393d55d5685486ee43b1f514883bf719ddfacc36ef22d05253737883f2e2f86c.pdf",
     "content_hash": "393d55d5685486ee43b1f514883bf719ddfacc36ef22d05253737883f2e2f86c",
     "fetched_at": "2026-04-18T03:39:40Z",
-    "processed_at": null,
-    "published_date": null
+    "processed_at": "2026-04-18T04:40:36Z",
+    "published_date": "2026-04-19"
   }
 ]
