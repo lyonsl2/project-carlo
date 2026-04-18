@@ -1,3 +1,5 @@
+import json
+import logging
 from pathlib import Path
 
 from pdf_extract.fetch import BulletinLink, fetch_bulletins
@@ -100,7 +102,7 @@ def test_process_stage_is_idempotent(monkeypatch, tmp_path: Path) -> None:
 
     monkeypatch.setattr(
         "pdf_extract.process.extract_events",
-        lambda pdf_bytes, *, churches, model="gemini-3-flash-preview": {
+        lambda pdf_bytes, *, churches, model="gemini-3-flash-preview", today=None: {
             "events": [
                 {
                     "church_slug": "st-mary-anytown",
@@ -112,9 +114,12 @@ def test_process_stage_is_idempotent(monkeypatch, tmp_path: Path) -> None:
                     "end_time": None,
                     "cancelled": False,
                     "page_number": 1,
+                    "note": None,
                 }
             ],
             "church_list_needs_review": False,
+            "published_date": None,
+            "wrong_bulletin": False,
         },
     )
 
@@ -160,7 +165,7 @@ def test_process_only_latest_fetched_unprocessed_per_parish(monkeypatch, tmp_pat
 
     processed_urls: list[str] = []
 
-    def _extract_events(pdf_bytes, *, churches, model="gemini-3-flash-preview"):
+    def _extract_events(pdf_bytes, *, churches, model="gemini-3-flash-preview", today=None):
         if pdf_bytes == b"older":
             processed_urls.append("https://example.org/older.pdf")
         elif pdf_bytes == b"latest":
@@ -177,9 +182,12 @@ def test_process_only_latest_fetched_unprocessed_per_parish(monkeypatch, tmp_pat
                     "end_time": None,
                     "cancelled": False,
                     "page_number": 1,
+                    "note": None,
                 }
             ],
             "church_list_needs_review": False,
+            "published_date": None,
+            "wrong_bulletin": False,
         }
 
     monkeypatch.setattr("pdf_extract.process.extract_events", _extract_events)
@@ -224,7 +232,7 @@ def test_process_skips_older_when_latest_already_processed(monkeypatch, tmp_path
 
     monkeypatch.setattr(
         "pdf_extract.process.extract_events",
-        lambda pdf_bytes, *, churches, model="gemini-3-flash-preview": {
+        lambda pdf_bytes, *, churches, model="gemini-3-flash-preview", today=None: {
             "events": [
                 {
                     "church_slug": "st-mary-anytown",
@@ -236,9 +244,12 @@ def test_process_skips_older_when_latest_already_processed(monkeypatch, tmp_path
                     "end_time": None,
                     "cancelled": False,
                     "page_number": 1,
+                    "note": None,
                 }
             ],
             "church_list_needs_review": False,
+            "published_date": None,
+            "wrong_bulletin": False,
         },
     )
 
@@ -246,3 +257,124 @@ def test_process_skips_older_when_latest_already_processed(monkeypatch, tmp_path
 
     assert result["processed_bulletins"] == 0
     assert result["inserted_events"] == 0
+
+
+def test_process_skips_events_when_wrong_bulletin_flag_is_set(
+    monkeypatch, tmp_path: Path, caplog,
+) -> None:
+    db_path = _setup_test_db(tmp_path)
+    _patch_process_paths(monkeypatch, tmp_path)
+    monkeypatch.setattr("pdf_extract.process.connect_db", lambda: connect_db(db_path))
+
+    pdf_path = tmp_path / "wrong.pdf"
+    pdf_path.write_bytes(b"fake")
+
+    save_json_list(tmp_path / "metadata.json", [
+        {
+            "parish_slug": "test-parish",
+            "source_url": "https://example.org/wrong.pdf",
+            "pdf_path": str(pdf_path),
+            "content_hash": "abc",
+            "fetched_at": "2026-01-01T00:00:00Z",
+            "processed_at": None,
+            "published_date": None,
+        }
+    ])
+
+    monkeypatch.setattr(
+        "pdf_extract.process.extract_events",
+        lambda pdf_bytes, *, churches, model="gemini-3-flash-preview", today=None: {
+            "events": [
+                {
+                    "church_slug": "st-mary-anytown",
+                    "type": "mass",
+                    "kind": "weekly",
+                    "day_of_week": "Sunday",
+                    "date": None,
+                    "start_time": "9:00 AM",
+                    "end_time": None,
+                    "cancelled": False,
+                    "page_number": 1,
+                    "note": None,
+                }
+            ],
+            "church_list_needs_review": False,
+            "published_date": "2025-01-15",
+            "wrong_bulletin": True,
+        },
+    )
+
+    caplog.set_level(logging.WARNING, logger="pdf_extract.process")
+    result = process_bulletins(parish_name="Test Parish")
+
+    assert result["processed_bulletins"] == 1
+    assert result["inserted_events"] == 0
+    assert any(
+        "flagged as wrong PDF" in rec.message for rec in caplog.records
+    )
+
+    metadata = json.loads((tmp_path / "metadata.json").read_text(encoding="utf-8"))
+    entry = metadata[0]
+    assert entry["processed_at"] is not None
+    assert entry["published_date"] == "2025-01-15"
+
+    events = json.loads((tmp_path / "events.json").read_text(encoding="utf-8"))
+    assert events == []
+
+
+def test_process_writes_published_date_and_note_into_metadata(
+    monkeypatch, tmp_path: Path,
+) -> None:
+    db_path = _setup_test_db(tmp_path)
+    _patch_process_paths(monkeypatch, tmp_path)
+    monkeypatch.setattr("pdf_extract.process.connect_db", lambda: connect_db(db_path))
+
+    pdf_path = tmp_path / "good.pdf"
+    pdf_path.write_bytes(b"fake")
+
+    save_json_list(tmp_path / "metadata.json", [
+        {
+            "parish_slug": "test-parish",
+            "source_url": "https://example.org/good.pdf",
+            "pdf_path": str(pdf_path),
+            "content_hash": "xyz",
+            "fetched_at": "2026-04-15T00:00:00Z",
+            "processed_at": None,
+            "published_date": None,
+        }
+    ])
+
+    monkeypatch.setattr(
+        "pdf_extract.process.extract_events",
+        lambda pdf_bytes, *, churches, model="gemini-3-flash-preview", today=None: {
+            "events": [
+                {
+                    "church_slug": "st-mary-anytown",
+                    "type": "mass",
+                    "kind": "weekly",
+                    "day_of_week": "Sunday",
+                    "date": None,
+                    "start_time": "11:00 AM",
+                    "end_time": None,
+                    "cancelled": False,
+                    "page_number": 2,
+                    "note": "Spanish",
+                }
+            ],
+            "church_list_needs_review": False,
+            "published_date": "2026-04-12",
+            "wrong_bulletin": False,
+        },
+    )
+
+    result = process_bulletins(parish_name="Test Parish")
+
+    assert result["processed_bulletins"] == 1
+    assert result["inserted_events"] == 1
+
+    metadata = json.loads((tmp_path / "metadata.json").read_text(encoding="utf-8"))
+    assert metadata[0]["published_date"] == "2026-04-12"
+
+    events = json.loads((tmp_path / "events.json").read_text(encoding="utf-8"))
+    assert len(events) == 1
+    assert events[0]["note"] == "Spanish"

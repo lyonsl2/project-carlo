@@ -40,6 +40,7 @@ interface RawEvent {
   cancelled: boolean;
   occurrence: string | null;
   page_number: number | null;
+  note: string | null;
 }
 
 function parseEventDateForFilter(eventDate: string): Date | null {
@@ -68,7 +69,7 @@ function queryEvents(
   const stmt = db.prepare(
     `SELECT id, church_id, event_type, event_kind,
             day_of_week, date, start_time, end_time, cancelled,
-            page_number
+            page_number, note
      FROM event
      WHERE church_id IN (${churchPh})
        AND event_type IN (${typePh})`,
@@ -91,6 +92,7 @@ function queryEvents(
         cancelled: Boolean(row["cancelled"]),
         occurrence: null,
         page_number: num(row["page_number"]),
+        note: str(row["note"]),
       };
       ev.occurrence = computeNextOccurrence(ev);
       results.push(ev);
@@ -113,6 +115,7 @@ function toEventSummary(ev: RawEvent): EventSummary {
     cancelled: ev.cancelled,
     next_occurrence: ev.occurrence,
     page_number: ev.page_number,
+    note: ev.note,
   };
 }
 

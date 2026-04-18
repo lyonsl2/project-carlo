@@ -59,7 +59,8 @@ CREATE TABLE IF NOT EXISTS event (
     start_time INTEGER NOT NULL CHECK (start_time BETWEEN 0 AND 1439),
     end_time INTEGER CHECK (end_time IS NULL OR end_time BETWEEN 0 AND 1439),
     cancelled INTEGER NOT NULL DEFAULT 0 CHECK (cancelled IN (0, 1)),
-    page_number INTEGER               -- 1-indexed page of source PDF
+    page_number INTEGER,              -- 1-indexed page of source PDF
+    note TEXT                         -- optional special context (e.g. language, seasonal)
 );
 
 CREATE INDEX IF NOT EXISTS idx_event_bulletin ON event(bulletin_id);

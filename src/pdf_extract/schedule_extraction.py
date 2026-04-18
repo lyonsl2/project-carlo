@@ -3,7 +3,9 @@
 import json
 import logging
 import random
+import re
 import time
+from datetime import date
 from typing import Any, Literal
 
 from google import genai
@@ -27,6 +29,7 @@ class WeeklySlot(BaseModel):
     start_time: str = Field(min_length=1)
     end_time: str | None = None
     page_number: int | None = None
+    note: str | None = None
 
 
 class DateSlot(BaseModel):
@@ -37,6 +40,7 @@ class DateSlot(BaseModel):
     start_time: str = Field(min_length=1)
     end_time: str | None = None
     page_number: int | None = None
+    note: str | None = None
 
 
 class WeeklySchedule(BaseModel):
@@ -70,6 +74,8 @@ class SchedulePayload(BaseModel):
     single_events: SingleEvents = Field(default_factory=SingleEvents)
     cancellations: Cancellations = Field(default_factory=Cancellations)
     church_list_needs_review: bool = False
+    published_date: str | None = None
+    wrong_bulletin: bool = False
 
 
 def _valid_str(s: Any) -> bool:
@@ -104,6 +110,8 @@ def _collect_events(
                     continue
             end_time = item.get("end_time") if isinstance(item.get("end_time"), str) else None
             page_number = item.get("page_number") if isinstance(item.get("page_number"), int) else None
+            note_raw = item.get("note")
+            note = note_raw.strip() if isinstance(note_raw, str) and note_raw.strip() else None
             events.append({
                 "church_slug": church_slug,
                 "type": event_type,
@@ -114,15 +122,32 @@ def _collect_events(
                 "end_time": end_time,
                 "cancelled": cancelled,
                 "page_number": page_number,
+                "note": note,
             })
     return events
+
+
+_ISO_DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+
+def _normalize_published_date(raw: Any) -> str | None:
+    """Accept a YYYY-MM-DD string from the LLM, or None."""
+    if not isinstance(raw, str):
+        return None
+    value = raw.strip()
+    if not value:
+        return None
+    if not _ISO_DATE_RE.match(value):
+        return None
+    return value
 
 
 def reconstruct_events(raw: dict[str, Any]) -> dict[str, Any]:
     """Convert structured schema to flat events format.
 
     Returns:
-        Dict with "events" (list of flat event dicts) and "church_list_needs_review" (bool).
+        Dict with "events" (list of flat event dicts), "church_list_needs_review" (bool),
+        "published_date" (str | None, YYYY-MM-DD), and "wrong_bulletin" (bool).
     """
     ws = raw.get("weekly_schedule") or {}
     se = raw.get("single_events") or {}
@@ -134,7 +159,14 @@ def reconstruct_events(raw: dict[str, Any]) -> dict[str, Any]:
     events.extend(_collect_events(can, kind="specific_date", cancelled=True))
 
     church_list_needs_review = bool(raw.get("church_list_needs_review", False))
-    return {"events": events, "church_list_needs_review": church_list_needs_review}
+    published_date = _normalize_published_date(raw.get("published_date"))
+    wrong_bulletin = bool(raw.get("wrong_bulletin", False))
+    return {
+        "events": events,
+        "church_list_needs_review": church_list_needs_review,
+        "published_date": published_date,
+        "wrong_bulletin": wrong_bulletin,
+    }
 
 
 def _parse_llm_json(content: str, *, context: str) -> dict[str, Any]:
@@ -250,27 +282,30 @@ Extract ONLY these three types: Mass, Confession, and Adoration.
 You are given:
 1) A parish bulletin PDF
 2) Known churches for this parish: {churches_json}
+3) Today's date: {today_iso} ({today_day_of_week})
 
 Each church in the list has a "slug" (stable identifier), "name", and "address". Map each event to one of the known churches.
 
 Structure your response as follows:
 
 weekly_schedule: Recurring weekly schedule. Each category (masses, confessions, adorations) is an array of entries:
-   - masses: church_slug, day_of_week, start_time (no end_time for Mass), page_number
-   - confessions: church_slug, day_of_week, start_time, end_time (optional, include when provided), page_number
-   - adorations: church_slug, day_of_week, start_time, end_time (optional, include when provided), page_number
+   - masses: church_slug, day_of_week, start_time (no end_time for Mass), page_number, note (optional)
+   - confessions: church_slug, day_of_week, start_time, end_time (optional, include when provided), page_number, note (optional)
+   - adorations: church_slug, day_of_week, start_time, end_time (optional, include when provided), page_number, note (optional)
 
 single_events: One-off or exception dates (e.g. extra Mass on a holiday, special confession times). Same structure as weekly_schedule but use "date" instead of "day_of_week":
-   - masses: church_slug, date, start_time, page_number
-   - confessions: church_slug, date, start_time, end_time (optional), page_number
-   - adorations: church_slug, date, start_time, end_time (optional), page_number
+   - masses: church_slug, date, start_time, page_number, note (optional)
+   - confessions: church_slug, date, start_time, end_time (optional), page_number, note (optional)
+   - adorations: church_slug, date, start_time, end_time (optional), page_number, note (optional)
 
 cancellations: Specific dates/times when a regular schedule is cancelled. Same structure as single_events:
-   - masses: church_slug, date, start_time, page_number
-   - confessions: church_slug, date, start_time, end_time (optional), page_number
-   - adorations: church_slug, date, start_time, end_time (optional), page_number
+   - masses: church_slug, date, start_time, page_number, note (optional)
+   - confessions: church_slug, date, start_time, end_time (optional), page_number, note (optional)
+   - adorations: church_slug, date, start_time, end_time (optional), page_number, note (optional)
 
 church_list_needs_review: boolean flag
+published_date: the bulletin's issue date as YYYY-MM-DD, or null if not visible anywhere in the PDF
+wrong_bulletin: boolean flag — see rules below
 
 Rules:
 - Every entry must use a church_slug that exactly matches one of the provided churches.
@@ -287,6 +322,26 @@ Rules:
   - The bulletin clearly shows a church that is NOT in the provided list
   - A provided church name/address is obviously wrong
 
+note (per entry):
+- Use ONLY when there is special context a reader should know. Examples:
+  * Mass only during certain months of the year (e.g. "Summer only (June–August)")
+  * Benediction follows adoration (e.g. "Benediction follows")
+  * Language of the Mass (e.g. "Spanish", "Latin (TLM)", "Vietnamese")
+  * Location nuance (e.g. "In the chapel", "Outdoor Mass")
+  * Any other genuinely special condition
+- Keep it short (a phrase, not a sentence). Omit or use null when the event is routine — do NOT repeat generic info like day/time/end_time.
+
+published_date:
+- The issue/publication date for this bulletin. Look for phrases like "Week of...", a Sunday date on the cover, "Bulletin Date", masthead dates, etc.
+- Format as YYYY-MM-DD. If no issue date is visible anywhere in the PDF, return null.
+
+wrong_bulletin:
+- Set to true ONLY if you can tell this PDF is NOT the correct current bulletin for this parish. Specifically:
+  * The bulletin clearly belongs to a different parish (different parish name / churches, not one of the provided ones), OR
+  * The bulletin's published_date is more than ~7 days before or ~7 days after today ({today_iso}). A bulletin from the current week or the immediately surrounding week is fine; a bulletin from months ago or months in the future is not.
+- If there's no published_date visible AND the content otherwise matches the provided parish, leave wrong_bulletin = false.
+- If in doubt, return false.
+
 Return output that matches the provided JSON schema exactly."""
 
 
@@ -295,6 +350,7 @@ def extract_events(
     *,
     churches: list[dict],
     model: str = "gemini-3-flash-preview",
+    today: date | None = None,
 ) -> dict[str, Any]:
     """Use Gemini to extract Mass, Confession, and Adoration schedule from a PDF.
 
@@ -302,18 +358,29 @@ def extract_events(
         pdf_bytes: Raw PDF bytes to analyze.
         churches: List of known churches [{name, address}, ...].
         model: Gemini model to use.
+        today: Reference date used to help the LLM judge whether the bulletin is
+            stale/misrouted. Defaults to today's local date.
 
     Returns:
         Dict with:
-        - "events": list of event dicts (each with church_slug, type, kind, etc.)
+        - "events": list of event dicts (each with church_slug, type, kind, etc., including note)
         - "church_list_needs_review": bool
+        - "published_date": str | None (YYYY-MM-DD)
+        - "wrong_bulletin": bool
 
     """
     if not pdf_bytes:
         return reconstruct_events({})
 
+    if today is None:
+        today = date.today()
+
     churches_json = json.dumps(churches, ensure_ascii=False)
-    prompt = EVENTS_SYSTEM_PROMPT.format(churches_json=churches_json)
+    prompt = EVENTS_SYSTEM_PROMPT.format(
+        churches_json=churches_json,
+        today_iso=today.isoformat(),
+        today_day_of_week=today.strftime("%A"),
+    )
 
     client = genai.Client()
     response = _generate_content_with_backoff(

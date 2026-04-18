@@ -11,6 +11,7 @@ export interface EventSummary {
   cancelled: boolean;
   next_occurrence: string | null;
   page_number: number | null;
+  note: string | null;
 }
 
 export interface ChurchMapItem {

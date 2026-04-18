@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from datetime import date
 from pathlib import Path
 from typing import Any
 
@@ -107,29 +108,44 @@ def process_bulletins(
                 for r in church_rows
             ]
 
-            extracted = extract_events(pdf_bytes, churches=church_list, model=model)
+            extracted = extract_events(
+                pdf_bytes, churches=church_list, model=model, today=date.today()
+            )
 
-            # Process events
-            for ev in extracted.get("events", []):
-                if not isinstance(ev, dict):
-                    continue
-                church_slug = ev.get("church_slug")
-                if not isinstance(church_slug, str):
-                    continue
+            published_date = extracted.get("published_date")
+            if isinstance(published_date, str) and published_date.strip():
+                entry["published_date"] = published_date
 
-                events.append({
-                    "church_slug": church_slug,
-                    "bulletin_source_url": entry["source_url"],
-                    "event_type": str(ev.get("type", "")),
-                    "event_kind": str(ev.get("kind", "")),
-                    "day_of_week": ev.get("day_of_week") if isinstance(ev.get("day_of_week"), str) else None,
-                    "date": ev.get("date") if isinstance(ev.get("date"), str) else None,
-                    "start_time": str(ev.get("start_time", "")),
-                    "end_time": ev.get("end_time") if isinstance(ev.get("end_time"), str) else None,
-                    "cancelled": bool(ev.get("cancelled", False)),
-                    "page_number": ev.get("page_number") if isinstance(ev.get("page_number"), int) else None,
-                })
-                inserted_events += 1
+            if extracted.get("wrong_bulletin"):
+                LOGGER.warning(
+                    "Bulletin flagged as wrong PDF for parish %s (source=%s); skipping events",
+                    parish_slug, entry.get("source_url"),
+                )
+            else:
+                for ev in extracted.get("events", []):
+                    if not isinstance(ev, dict):
+                        continue
+                    church_slug = ev.get("church_slug")
+                    if not isinstance(church_slug, str):
+                        continue
+
+                    note_raw = ev.get("note")
+                    note = note_raw.strip() if isinstance(note_raw, str) and note_raw.strip() else None
+
+                    events.append({
+                        "church_slug": church_slug,
+                        "bulletin_source_url": entry["source_url"],
+                        "event_type": str(ev.get("type", "")),
+                        "event_kind": str(ev.get("kind", "")),
+                        "day_of_week": ev.get("day_of_week") if isinstance(ev.get("day_of_week"), str) else None,
+                        "date": ev.get("date") if isinstance(ev.get("date"), str) else None,
+                        "start_time": str(ev.get("start_time", "")),
+                        "end_time": ev.get("end_time") if isinstance(ev.get("end_time"), str) else None,
+                        "cancelled": bool(ev.get("cancelled", False)),
+                        "page_number": ev.get("page_number") if isinstance(ev.get("page_number"), int) else None,
+                        "note": note,
+                    })
+                    inserted_events += 1
 
             if extracted.get("church_list_needs_review"):
                 LOGGER.warning(

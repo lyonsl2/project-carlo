@@ -68,27 +68,109 @@ function formatDayLabel(day: string): string {
   return d.charAt(0).toUpperCase() + d.slice(1) + "s";
 }
 
-function formatTimeRun(events: EventSummary[]): string {
-  if (events.length === 0) return "";
-  return events
-    .map((e) => {
-      const main = formatMinutesMissal(e.start_time);
-      if (e.end_time != null) {
-        return `${main} – ${formatMinutesMissal(e.end_time)}`;
-      }
-      return main;
-    })
-    .join("  ·  ");
+function formatTimeValue(event: EventSummary): string {
+  const main = formatMinutesMissal(event.start_time);
+  if (event.end_time != null) {
+    return `${main} – ${formatMinutesMissal(event.end_time)}`;
+  }
+  return main;
 }
 
-function PageRef({ event }: { event: EventSummary }) {
+function collectSectionEvents(section: EventsByType): EventSummary[] {
+  const all: EventSummary[] = [];
+  for (const day of DAY_ORDER) {
+    const list = section.weeklyByDay[day];
+    if (list) all.push(...list);
+  }
+  all.push(...section.specificDate);
+  return all;
+}
+
+function mostCommonPageNumber(events: EventSummary[]): number | null {
+  const counts = new Map<number, number>();
+  let bestPage: number | null = null;
+  let bestCount = 0;
+  for (const e of events) {
+    if (e.page_number == null) continue;
+    const next = (counts.get(e.page_number) ?? 0) + 1;
+    counts.set(e.page_number, next);
+    if (next > bestCount) {
+      bestCount = next;
+      bestPage = e.page_number;
+    }
+  }
+  return bestPage;
+}
+
+function SectionPageRef({
+  pageNumber,
+  bulletinUrl,
+}: {
+  pageNumber: number;
+  bulletinUrl: string | null;
+}) {
+  const label = `Found on bulletin page ${pageNumber}`;
+  const title = `Open bulletin at page ${pageNumber}`;
+  const baseClass =
+    "ml-3 font-serif text-[1rem] italic";
+  if (bulletinUrl) {
+    return (
+      <a
+        href={`${bulletinUrl}#page=${pageNumber}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        title={title}
+        className={`${baseClass} text-rubric underline decoration-rubric/40 decoration-from-font underline-offset-[3px] transition-colors hover:text-rubric-deep hover:decoration-rubric-deep`}
+      >
+        {label}
+      </a>
+    );
+  }
+  return (
+    <span className={`${baseClass} text-ink-soft`} title={title}>
+      {label}
+    </span>
+  );
+}
+
+function EventNote({ note }: { note: string | null }) {
+  if (!note) return null;
+  return (
+    <span className="ml-2 font-serif text-[0.85rem] italic text-ink-faint">
+      {note}
+    </span>
+  );
+}
+
+function PageRef({
+  event,
+  bulletinUrl,
+}: {
+  event: EventSummary;
+  bulletinUrl: string | null;
+}) {
   if (event.page_number == null) return null;
+  const label = `page ${event.page_number}`;
+  const title = `Open bulletin at page ${event.page_number}`;
+  if (bulletinUrl) {
+    return (
+      <a
+        href={`${bulletinUrl}#page=${event.page_number}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        title={title}
+        className="ml-2.5 font-serif text-[0.9rem] italic text-rubric underline decoration-rubric/40 decoration-from-font underline-offset-[3px] transition-colors hover:text-rubric-deep hover:decoration-rubric-deep"
+      >
+        {label}
+      </a>
+    );
+  }
   return (
     <span
-      className="ml-1.5 font-serif text-[0.75rem] text-ink-faint"
-      title={`Found on page ${event.page_number} of bulletin`}
+      className="ml-2.5 font-serif text-[0.9rem] italic text-ink-soft"
+      title={title}
     >
-      (p.{event.page_number})
+      {label}
     </span>
   );
 }
@@ -167,19 +249,29 @@ export function ChurchPageContent({ church, events }: ChurchPageContentProps) {
           <div className="mx-auto max-w-4xl">
             <div className="rise-in space-y-12" style={{ animationDelay: "80ms" }}>
               {EVENT_TYPE_ORDER.map((eventType) => {
-                const { weeklyByDay, specificDate } = byType[eventType];
+                const section = byType[eventType];
+                const { weeklyByDay, specificDate } = section;
                 const hasWeekly = DAY_ORDER.some(
                   (d) => (weeklyByDay[d]?.length ?? 0) > 0,
                 );
                 const hasAny = hasWeekly || specificDate.length > 0;
                 if (!hasAny) return null;
 
+                const sectionEvents = collectSectionEvents(section);
+                const sectionPage = mostCommonPageNumber(sectionEvents);
+
                 return (
                   <section key={eventType}>
-                    <div className="mb-5">
+                    <div className="mb-5 flex flex-wrap items-baseline">
                       <h3 className="font-display text-[1.75rem] leading-none font-normal text-ink">
                         {EVENT_TYPE_LABELS[eventType]}
                       </h3>
+                      {sectionPage != null ? (
+                        <SectionPageRef
+                          pageNumber={sectionPage}
+                          bulletinUrl={church.bulletin_url}
+                        />
+                      ) : null}
                     </div>
 
                     <dl className="divide-y divide-rule">
@@ -195,9 +287,26 @@ export function ChurchPageContent({ church, events }: ChurchPageContentProps) {
                             <dt className="smallcaps text-[0.875rem] text-ink-soft">
                               {formatDayLabel(day)}
                             </dt>
-                            <dd className="font-serif text-[1.05rem] leading-snug tabular-nums text-ink">
-                              {formatTimeRun(dayEvents)}
-                              <PageRef event={dayEvents[0]} />
+                            <dd className="font-serif text-[1.05rem] leading-snug text-ink">
+                              {dayEvents.map((event, idx) => (
+                                <span key={event.id}>
+                                  {idx > 0 ? (
+                                    <span className="mx-2 text-ink-faint">
+                                      ·
+                                    </span>
+                                  ) : null}
+                                  <span className="tabular-nums">
+                                    {formatTimeValue(event)}
+                                  </span>
+                                  <EventNote note={event.note} />
+                                  {event.page_number !== sectionPage ? (
+                                    <PageRef
+                                      event={event}
+                                      bulletinUrl={church.bulletin_url}
+                                    />
+                                  ) : null}
+                                </span>
+                              ))}
                             </dd>
                           </div>
                         );
@@ -230,7 +339,13 @@ export function ChurchPageContent({ church, events }: ChurchPageContentProps) {
                                     {formatEventDate(event.date)}
                                   </span>
                                 ) : null}
-                                <PageRef event={event} />
+                                <EventNote note={event.note} />
+                                {event.page_number !== sectionPage ? (
+                                  <PageRef
+                                    event={event}
+                                    bulletinUrl={church.bulletin_url}
+                                  />
+                                ) : null}
                               </dd>
                             </div>
                           ))}

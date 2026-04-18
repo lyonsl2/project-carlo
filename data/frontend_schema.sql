@@ -35,7 +35,8 @@ CREATE TABLE event (
     start_time INTEGER NOT NULL,
     end_time INTEGER,
     cancelled INTEGER NOT NULL,
-    page_number INTEGER
+    page_number INTEGER,
+    note TEXT
 );
 
 CREATE INDEX idx_event_church ON event(church_id);

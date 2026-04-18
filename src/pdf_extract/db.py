@@ -312,6 +312,9 @@ def _load_events(conn) -> int:
         if not isinstance(page_number, int):
             page_number = None
 
+        note_raw = entry.get("note")
+        note = note_raw.strip() if isinstance(note_raw, str) and note_raw.strip() else None
+
         event_kind = entry.get("event_kind", "")
         event_date = None
         if event_kind == "specific_date":
@@ -324,8 +327,8 @@ def _load_events(conn) -> int:
                 continue
 
         conn.execute(
-            """INSERT INTO event(church_id, bulletin_id, event_type, event_kind, day_of_week, date, start_time, end_time, cancelled, page_number)
-               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+            """INSERT INTO event(church_id, bulletin_id, event_type, event_kind, day_of_week, date, start_time, end_time, cancelled, page_number, note)
+               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
             (
                 church_row["id"],
                 bulletin_id,
@@ -337,6 +340,7 @@ def _load_events(conn) -> int:
                 end_minutes,
                 int(entry.get("cancelled", False)),
                 page_number,
+                note,
             ),
         )
 

@@ -53,7 +53,7 @@ export function getChurchEvents(
 
   const typePlaceholders = types.map(() => "?").join(",");
   const stmt = db.prepare(
-    `SELECT id, event_type, event_kind, day_of_week, date, start_time, end_time, cancelled, page_number
+    `SELECT id, event_type, event_kind, day_of_week, date, start_time, end_time, cancelled, page_number, note
      FROM event
      WHERE church_id = ? AND event_type IN (${typePlaceholders})`,
   );
@@ -88,6 +88,7 @@ export function getChurchEvents(
       cancelled,
       next_occurrence,
       page_number: num(row["page_number"]),
+      note: str(row["note"]),
     });
   }
   stmt.free();
