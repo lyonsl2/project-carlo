@@ -258,8 +258,25 @@ def _resolve_other_latest_link(
         candidates = _collect_other_pdf_candidates(
             page=page, base_url=current_page_url, reference_date=today,
         )
+
+        # Some sites (e.g. WordPress parish blogs) list each weekly bulletin as a
+        # dated post that wraps the actual PDF, rather than linking to the PDF
+        # directly. If we found no PDFs on the listing page, descend once into
+        # the latest dated "bulletin" post and collect PDFs from there.
         if not candidates:
-            raise ValueError(f"No PDF links found on bulletin page: {bulletin_page_url}")
+            post_url = _find_latest_other_bulletin_post_url(
+                page=page, base_url=current_page_url, reference_date=today,
+            )
+            if post_url is None:
+                raise ValueError(f"No PDF links found on bulletin page: {bulletin_page_url}")
+            _goto_with_retry(page=page, page_url=post_url)  # type: ignore[arg-type]
+            page.wait_for_selector("a[href]", timeout=15000, state="attached")  # type: ignore[union-attr]
+            current_page_url = getattr(page, "url", post_url)
+            candidates = _collect_other_pdf_candidates(
+                page=page, base_url=current_page_url, reference_date=today,
+            )
+            if not candidates:
+                raise ValueError(f"No PDF links found on bulletin post page: {post_url}")
 
         dated_candidates = [
             c for c in candidates
@@ -309,6 +326,40 @@ def _find_other_bulletin_page_url(*, page: Page, base_url: str) -> str | None:
     return None
 
 
+def _find_latest_other_bulletin_post_url(
+    *, page: Page, base_url: str, reference_date: date,
+) -> str | None:
+    """Find the latest dated non-PDF anchor that looks like a weekly bulletin post.
+
+    Used when a bulletin listing page links to per-week post pages (which wrap
+    the actual PDF) instead of linking to PDFs directly.
+    """
+    anchors = page.query_selector_all("a[href]")
+    dated: list[tuple[date, str]] = []
+    base_normalized = base_url.rstrip("/").lower()
+    for anchor in anchors:
+        href = anchor.get_attribute("href")
+        if not isinstance(href, str):
+            continue
+        resolved = urljoin(base_url, href)
+        resolved_lower = resolved.lower()
+        if resolved_lower.endswith(".pdf"):
+            continue
+        if resolved_lower.rstrip("/") == base_normalized:
+            continue
+        text = _anchor_text(anchor)
+        if "bulletin" not in href.lower() and "bulletin" not in text.lower():
+            continue
+        parsed_date = _parse_relaxed_date_from_texts([text, href, resolved], reference_date)
+        if parsed_date is None:
+            continue
+        dated.append((parsed_date, resolved))
+
+    if not dated:
+        return None
+    return max(dated, key=lambda pair: pair[0])[1]
+
+
 def _collect_other_pdf_candidates(
     *, page: Page, base_url: str, reference_date: date,
 ) -> list[_OtherPdfCandidate]:
@@ -319,8 +370,7 @@ def _collect_other_pdf_candidates(
         if not isinstance(href, str):
             continue
         absolute_href = urljoin(base_url, href)
-        href_lower = absolute_href.lower()
-        if ".pdf" not in href_lower:
+        if ".pdf" not in absolute_href.lower():
             continue
         text = _anchor_text(anchor)
         parsed_date = _parse_relaxed_date_from_texts([text, href, absolute_href], reference_date)
@@ -328,6 +378,53 @@ def _collect_other_pdf_candidates(
             _OtherPdfCandidate(
                 source_url=absolute_href,
                 fetch_url=absolute_href,
+                parsed_date=parsed_date,
+            )
+        )
+    if candidates:
+        return candidates
+
+    # Fallback: some WordPress parish sites embed PDFs through script-based
+    # viewers (e.g. the DFlip / 3D FlipBook plugin on elmiracatholic.org) which
+    # inject the PDF URL as JSON inside a <script> tag rather than a plain
+    # <a href="..pdf">. Scan the rendered HTML as a last resort.
+    return _collect_pdf_urls_from_html(
+        page=page, base_url=base_url, reference_date=reference_date,
+    )
+
+
+_HTML_PDF_URL_PATTERN = re.compile(r'https?://[^\s"\'<>]+?\.pdf', flags=re.IGNORECASE)
+
+
+def _collect_pdf_urls_from_html(
+    *, page: Page, base_url: str, reference_date: date,
+) -> list[_OtherPdfCandidate]:
+    content_method = getattr(page, "content", None)
+    if not callable(content_method):
+        return []
+    try:
+        html = content_method()
+    except Exception:
+        return []
+    if not isinstance(html, str) or not html:
+        return []
+
+    # Unescape JSON-escaped slashes so URLs like "https:\/\/site\/file.pdf"
+    # (as embedded by flipbook/PDF-viewer plugins) match a plain URL regex.
+    normalized = html.replace("\\/", "/")
+
+    candidates: list[_OtherPdfCandidate] = []
+    seen: set[str] = set()
+    for raw in _HTML_PDF_URL_PATTERN.findall(normalized):
+        absolute_url = urljoin(base_url, raw)
+        if absolute_url in seen:
+            continue
+        seen.add(absolute_url)
+        parsed_date = _parse_relaxed_date_from_texts([absolute_url], reference_date)
+        candidates.append(
+            _OtherPdfCandidate(
+                source_url=absolute_url,
+                fetch_url=absolute_url,
                 parsed_date=parsed_date,
             )
         )

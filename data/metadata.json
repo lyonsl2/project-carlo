@@ -1276,5 +1276,14 @@
     "fetched_at": "2026-04-17T23:35:43Z",
     "processed_at": "2026-04-17T23:36:26Z",
     "published_date": null
+  },
+  {
+    "parish_slug": "most-holy-name-of-jesus",
+    "source_url": "https://www.elmiracatholic.org/wp-content/uploads/2026/04/ElmiraCatholicChurchesBulletin-4-19-2026.pdf",
+    "pdf_path": "data\\bulletins\\most-holy-name-of-jesus\\c892908935bd75a95fcb9d709736dafb4dbc2ef084f49c2e6eef7f04796ad245.pdf",
+    "content_hash": "c892908935bd75a95fcb9d709736dafb4dbc2ef084f49c2e6eef7f04796ad245",
+    "fetched_at": "2026-04-18T00:06:47Z",
+    "processed_at": "2026-04-18T00:09:12Z",
+    "published_date": null
   }
 ]

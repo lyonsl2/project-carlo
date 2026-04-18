@@ -56,8 +56,8 @@ our-lady-of-victory-st-joseph,our-lady-of-victory-st-joseph,Our Lady of Victory 
 our-lady-queen-of-peace-st-thomas-more,our-lady-queen-of-peace,Our Lady Queen of Peace,601 Edgewood Avenue,,Rochester,NY,14618,true,true,43.1073079,-77.5643953
 our-lady-queen-of-peace-st-thomas-more,st-thomas-more,St. Thomas More,2617 East Avenue,,Rochester,NY,14610,true,true,43.1333922,-77.5385498
 parish-of-the-holy-family,holy-family,The Parish of the Holy Family,4100 Lyell Road,,Rochester,NY,14606,,,43.1661799,-77.7382788
-most-holy-name-of-jesus,st-marys-elmira,St. Mary's Church,224 Franklin Street,,Elmira,NY,14904,,,42.0770325,-76.8058297
-most-holy-name-of-jesus,st-patricks-elmira,St. Patrick's Church,604 Park Place,,Elmira,NY,14901,,,42.0942788,-76.8109284
+most-holy-name-of-jesus,st-marys-elmira,St. Mary's Church,224 Franklin Street,,Elmira,NY,14904,true,true,42.0770325,-76.8058297
+most-holy-name-of-jesus,st-patricks-elmira,St. Patrick's Church,604 Park Place,,Elmira,NY,14901,true,true,42.0942788,-76.8109284
 peace-of-christ,st-ambrose,St. Ambrose Church,25 Empire Boulevard,,Rochester,NY,14609,,,43.1761023,-77.5564105
 peace-of-christ,st-james-rochester,St. James Church,130 Brett Road,,Rochester,NY,14609,,,43.1675864,-77.5489999
 peace-of-christ,st-john-evangelist-humboldt,St. John the Evangelist Church,553 Humboldt Street,,Rochester,NY,14610,,,43.1528288,-77.5533171
@@ -128,5 +128,6 @@ st-peters-ontario-county,st-francis,St. Francis,12 Church Street,,Phelps,NY,1453
 st-pius-x-chili,st-pius-x,St. Pius X Church,3010 Chili Avenue,,Rochester,NY,14624,,,43.1141813,-77.7347367
 st-stanislaus-kostka,st-stanislaus-kostka,St. Stanislaus Kostka Church,34 St. Stanislaus Street,,Rochester,NY,14621,,,43.1862465,-77.5985159
 st-theodores-gates,st-theodores,St. Theodore's Catholic Church,168 Spencerport Road,,Rochester,NY,14606,,,43.1684008,-77.6952206
-our-lady-of-the-snow-saints-mary-and-martha,st-marys-auburn,St. Mary's Church,15 Clark Street,,Auburn,NY,13021,,,,
-sacred-heart-auburn-cluster,holy-family-auburn,Holy Family Church,85 North St.,,Auburn,NY,13021,,,,
+our-lady-of-the-snow-saints-mary-and-martha,st-marys-auburn,St. Mary's Church,15 Clark Street,,Auburn,NY,13021,,,42.9316058,-76.5696618
+sacred-heart-auburn-cluster,holy-family-auburn,Holy Family Church,85 North St.,,Auburn,NY,13021,,,42.9359435,-76.5669228
+most-holy-name-of-jesus,eucharistic-adoration-chapel-elmira,Eucharistic Adoration Chapel,1012 Davis St.,,Elmira,NY,14901,,,42.101813,-76.8210736

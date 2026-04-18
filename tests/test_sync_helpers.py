@@ -431,6 +431,143 @@ def test_resolve_other_latest_link_falls_back_to_first_pdf_when_no_date_match() 
     assert fetch_url == "https://example.org/pdfs/no-date-1.pdf"
 
 
+def test_resolve_other_latest_link_finds_pdf_embedded_in_script_on_post_page() -> None:
+    """Mirrors the elmiracatholic.org layout: the per-week post page does not
+    expose the bulletin PDF as an <a> or <iframe>; it is embedded as a JSON
+    string (JSON-escaped slashes) inside a WordPress dflip / 3D FlipBook script.
+    The resolver should still pick it up via the rendered HTML.
+    """
+
+    class FakeAnchor:
+        def __init__(self, href: str, text: str):
+            self._href = href
+            self._text = text
+
+        def get_attribute(self, name: str):
+            if name == "href":
+                return self._href
+            return None
+
+        def inner_text(self):
+            return self._text
+
+    listing_url = "https://elmiracatholic.org/news-bulletins/"
+    latest_post_url = "https://elmiracatholic.org/2026/04/16/april-19-2026-bulletin/"
+    expected_pdf_url = (
+        "https://elmiracatholic.org/wp-content/uploads/2026/04/"
+        "ElmiraCatholicChurchesBulletin-4-19-2026.pdf"
+    )
+    dflip_script = (
+        '<div class="_df_book" id="df_10896"></div>'
+        '<script class="df-shortcode-script" type="application/javascript">'
+        'window.option_df_10896 = {"source":'
+        '"https:\\/\\/elmiracatholic.org\\/wp-content\\/uploads\\/2026\\/04\\/'
+        'ElmiraCatholicChurchesBulletin-4-19-2026.pdf","wpOptions":"true"};'
+        '</script>'
+    )
+
+    class FakePage:
+        def __init__(self):
+            self.url = ""
+
+        def goto(self, url: str, wait_until: str) -> None:
+            assert wait_until == "domcontentloaded"
+            self.url = url
+
+        def wait_for_selector(self, selector: str, timeout: int, state=None) -> None:
+            assert selector == "a[href]"
+            assert timeout == 15000
+
+        def query_selector_all(self, selector: str):
+            assert selector == "a[href]"
+            if self.url == "https://elmiracatholic.org":
+                return [FakeAnchor("/news-bulletins/", "News/Bulletins")]
+            if self.url == listing_url:
+                return [
+                    FakeAnchor(latest_post_url, "April 19, 2026 Bulletin"),
+                ]
+            assert self.url == latest_post_url
+            return [FakeAnchor("https://elmiracatholic.org/", "Home")]
+
+        def content(self) -> str:
+            if self.url == latest_post_url:
+                return f"<html><body>{dflip_script}</body></html>"
+            return "<html><body></body></html>"
+
+    source_url, fetch_url = _resolve_other_latest_link(
+        provider_id="https://elmiracatholic.org",
+        reference_date=date(2026, 4, 17),
+        page=FakePage(),
+    )
+    assert source_url == expected_pdf_url
+    assert fetch_url == expected_pdf_url
+
+
+def test_resolve_other_latest_link_descends_into_latest_bulletin_post_when_no_pdfs() -> None:
+    """Listing pages that link to dated bulletin *posts* (not PDFs) should resolve
+    by navigating into the latest-dated post and collecting the PDF there.
+
+    Mirrors the elmiracatholic.org WordPress-style layout where /news-bulletins/
+    lists permalink posts like /2026/04/16/april-192026-bulletin/ which wrap
+    the actual PDF.
+    """
+
+    class FakeAnchor:
+        def __init__(self, href: str, text: str):
+            self._href = href
+            self._text = text
+
+        def get_attribute(self, name: str):
+            if name == "href":
+                return self._href
+            return None
+
+        def inner_text(self):
+            return self._text
+
+    listing_url = "https://elmiracatholic.org/news-bulletins/"
+    latest_post_url = "https://elmiracatholic.org/2026/04/16/april-19-2026-bulletin/"
+    older_post_url = "https://elmiracatholic.org/2026/04/09/april-12-2026-bulletin/"
+    latest_pdf_url = (
+        "https://elmiracatholic.org/wp-content/uploads/2026/04/"
+        "ElmiraCatholicChurchesBulletin-4-19-2026.pdf"
+    )
+
+    class FakePage:
+        def __init__(self):
+            self.url = ""
+
+        def goto(self, url: str, wait_until: str) -> None:
+            assert wait_until == "domcontentloaded"
+            self.url = url
+
+        def wait_for_selector(self, selector: str, timeout: int, state=None) -> None:
+            assert selector == "a[href]"
+            assert timeout == 15000
+
+        def query_selector_all(self, selector: str):
+            assert selector == "a[href]"
+            if self.url == "https://elmiracatholic.org":
+                return [FakeAnchor("/news-bulletins/", "News/Bulletins")]
+            if self.url == listing_url:
+                return [
+                    FakeAnchor(listing_url, "News/Bulletins"),
+                    FakeAnchor(latest_post_url, "April 19, 2026 Bulletin"),
+                    FakeAnchor(older_post_url, "April 12, 2026 Bulletin"),
+                    FakeAnchor("/category/bulletin/", "Bulletin"),
+                ]
+            assert self.url == latest_post_url
+            return [FakeAnchor(latest_pdf_url, "Download Bulletin")]
+
+    source_url, fetch_url = _resolve_other_latest_link(
+        provider_id="https://elmiracatholic.org",
+        reference_date=date(2026, 4, 17),
+        page=FakePage(),
+    )
+    assert source_url == latest_pdf_url
+    assert fetch_url == latest_pdf_url
+
+
 def test_build_bulletin_link_other(monkeypatch) -> None:
     def fake_build(*, provider_id, reference_date=None, page=None):
         assert provider_id == "https://example.org"
