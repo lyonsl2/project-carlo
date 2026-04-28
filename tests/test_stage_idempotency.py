@@ -1,5 +1,6 @@
 import json
 import logging
+import threading
 from pathlib import Path
 
 from pdf_extract.fetch import BulletinLink, fetch_bulletins
@@ -257,6 +258,64 @@ def test_process_skips_older_when_latest_already_processed(monkeypatch, tmp_path
 
     assert result["processed_bulletins"] == 0
     assert result["inserted_events"] == 0
+
+
+def test_process_bounds_prepared_pdfs_to_concurrency(monkeypatch, tmp_path: Path) -> None:
+    db_path = _setup_test_db(tmp_path)
+    _patch_process_paths(monkeypatch, tmp_path)
+    monkeypatch.setattr("pdf_extract.process.connect_db", lambda: connect_db(db_path))
+
+    entries = []
+    for idx in range(3):
+        pdf_path = tmp_path / f"bulletin-{idx}.pdf"
+        pdf_path.write_bytes(f"pdf-{idx}".encode())
+        entries.append(
+            {
+                "parish_slug": "test-parish",
+                "source_url": f"https://example.org/bulletin-{idx}.pdf",
+                "pdf_path": str(pdf_path),
+                "content_hash": f"hash-{idx}",
+                "fetched_at": f"2026-01-0{idx + 1}T00:00:00Z",
+                "processed_at": None,
+                "published_date": None,
+            }
+        )
+    save_json_list(tmp_path / "metadata.json", entries)
+
+    started = threading.Event()
+    extract_calls = 0
+    prepare_calls = 0
+
+    original_prepare = __import__(
+        "pdf_extract.process", fromlist=["_prepare_work_item"],
+    )._prepare_work_item
+
+    def _prepare_work_item(entry, conn):
+        nonlocal prepare_calls
+        prepare_calls += 1
+        if prepare_calls == 2:
+            assert started.wait(timeout=1), "second PDF prepared before extraction started"
+        return original_prepare(entry, conn)
+
+    def _extract_events(pdf_bytes, *, churches, model="gemini-3-flash-preview", today=None):
+        nonlocal extract_calls
+        extract_calls += 1
+        started.set()
+        return {
+            "events": [],
+            "church_list_needs_review": False,
+            "published_date": None,
+            "wrong_bulletin": False,
+        }
+
+    monkeypatch.setattr("pdf_extract.process._prepare_work_item", _prepare_work_item)
+    monkeypatch.setattr("pdf_extract.process.extract_events", _extract_events)
+
+    result = process_bulletins(parish_name="Test Parish", concurrency=1)
+
+    assert result["processed_bulletins"] == 3
+    assert result["inserted_events"] == 0
+    assert extract_calls == 3
 
 
 def test_process_skips_events_when_wrong_bulletin_flag_is_set(
