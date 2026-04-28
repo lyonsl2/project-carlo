@@ -265,13 +265,52 @@ def test_process_bounds_prepared_pdfs_to_concurrency(monkeypatch, tmp_path: Path
     _patch_process_paths(monkeypatch, tmp_path)
     monkeypatch.setattr("pdf_extract.process.connect_db", lambda: connect_db(db_path))
 
+    conn = connect_db(db_path)
+    try:
+        for idx in range(1, 3):
+            parish_slug = f"test-parish-{idx}"
+            conn.execute(
+                """INSERT INTO parish(
+                    slug, name, homepage_url, bulletin_provider, provider_id, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?)""",
+                (
+                    parish_slug,
+                    f"Test Parish {idx}",
+                    f"https://test-{idx}.org",
+                    "ecatholic",
+                    None,
+                    "2026-01-01T00:00:00Z",
+                ),
+            )
+            parish_id = conn.execute(
+                "SELECT id FROM parish WHERE slug = ?", (parish_slug,),
+            ).fetchone()["id"]
+            conn.execute(
+                "INSERT INTO church(parish_id, slug, name, address_line1, city, state, postal_code, created_at)"
+                " VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                (
+                    parish_id,
+                    f"st-mary-anytown-{idx}",
+                    "St. Mary",
+                    "123 Main St",
+                    "Anytown",
+                    "NY",
+                    "14000",
+                    "2026-01-01T00:00:00Z",
+                ),
+            )
+        conn.commit()
+    finally:
+        conn.close()
+
+    parish_slugs = ["test-parish", "test-parish-1", "test-parish-2"]
     entries = []
-    for idx in range(3):
+    for idx, parish_slug in enumerate(parish_slugs):
         pdf_path = tmp_path / f"bulletin-{idx}.pdf"
         pdf_path.write_bytes(f"pdf-{idx}".encode())
         entries.append(
             {
-                "parish_slug": "test-parish",
+                "parish_slug": parish_slug,
                 "source_url": f"https://example.org/bulletin-{idx}.pdf",
                 "pdf_path": str(pdf_path),
                 "content_hash": f"hash-{idx}",
@@ -311,7 +350,7 @@ def test_process_bounds_prepared_pdfs_to_concurrency(monkeypatch, tmp_path: Path
     monkeypatch.setattr("pdf_extract.process._prepare_work_item", _prepare_work_item)
     monkeypatch.setattr("pdf_extract.process.extract_events", _extract_events)
 
-    result = process_bulletins(parish_name="Test Parish", concurrency=1)
+    result = process_bulletins(concurrency=1)
 
     assert result["processed_bulletins"] == 3
     assert result["inserted_events"] == 0
