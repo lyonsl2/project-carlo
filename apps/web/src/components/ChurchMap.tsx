@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
 import type { Marker as LeafletMarker } from "leaflet";
 import L from "leaflet";
-import { compareSchedule } from "../lib/schedule";
 import type { ChurchMapItem, EventSummary } from "../types";
 import {
   formatAddress,
@@ -131,10 +130,8 @@ const ChurchMarker = memo(function ChurchMarker({
     }
   }, [church.id, openPopupForChurchId, openPopupRequestId]);
 
-  const topEvents = useMemo(
-    () => [...church.upcoming_events].sort(compareSchedule).slice(0, 3),
-    [church.upcoming_events],
-  );
+  // upcoming_events arrives pre-sorted from fetchChurches, so just take the head.
+  const topEvents = church.upcoming_events.slice(0, 3);
   const addressLine = formatAddress(church);
 
   return (

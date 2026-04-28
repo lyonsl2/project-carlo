@@ -52,6 +52,14 @@ interface RawEvent {
   note: string | null;
 }
 
+type ChurchBase = Omit<ChurchMapItem, "event_types" | "upcoming_events">;
+
+// frontend.db is loaded once and never mutated, so the church and event
+// tables can be read into memory once and reused for every filter change.
+// This keeps the slider drag → map update path JS-only after the first call.
+let allChurchesPromise: Promise<ChurchBase[]> | null = null;
+let allEventsPromise: Promise<RawEvent[]> | null = null;
+
 function parseEventDateForFilter(eventDate: string): Date | null {
   // Date-only filter check; accepts ISO and other parseable strings.
   const isoMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(eventDate.trim());
@@ -112,6 +120,69 @@ function queryEvents(
   }
 }
 
+function loadAllChurches(db: Database): ChurchBase[] {
+  const stmt = db.prepare(
+    `SELECT id, parish_id, slug, name, address_line1, address_line2, city, state, postal_code,
+            latitude, longitude FROM church ORDER BY name`,
+  );
+  const churches: ChurchBase[] = [];
+  try {
+    while (stmt.step()) {
+      const row = stmt.getAsObject();
+      churches.push({
+        id: row["id"] as number,
+        parish_id: row["parish_id"] as number,
+        slug: row["slug"] as string,
+        name: str(row["name"]),
+        address_line1: str(row["address_line1"]),
+        address_line2: str(row["address_line2"]),
+        city: str(row["city"]),
+        state: str(row["state"]),
+        postal_code: str(row["postal_code"]),
+        latitude: num(row["latitude"]),
+        longitude: num(row["longitude"]),
+      });
+    }
+  } finally {
+    stmt.free();
+  }
+  return churches;
+}
+
+function loadAllEvents(db: Database): RawEvent[] {
+  const stmt = db.prepare(
+    `SELECT id, church_id, event_type, event_kind,
+            day_of_week, date, start_time, end_time, cancelled,
+            page_number, note
+     FROM event`,
+  );
+  const results: RawEvent[] = [];
+  try {
+    while (stmt.step()) {
+      const row = stmt.getAsObject();
+      const ev: RawEvent = {
+        id: row["id"] as number,
+        church_id: row["church_id"] as number,
+        event_type: row["event_type"] as EventType,
+        event_kind: row["event_kind"] as "weekly" | "specific_date",
+        day_of_week: str(row["day_of_week"]),
+        date: str(row["date"]),
+        start_time: row["start_time"] as number,
+        end_time: num(row["end_time"]),
+        cancelled: Boolean(row["cancelled"]),
+        occurrence: null,
+        page_number: num(row["page_number"]),
+        note: str(row["note"]),
+      };
+      ev.occurrence = computeNextOccurrence(ev);
+      results.push(ev);
+    }
+  } finally {
+    stmt.free();
+  }
+  return results;
+}
+
 function toEventSummary(ev: RawEvent): EventSummary {
   return {
     id: ev.id,
@@ -161,38 +232,18 @@ export async function fetchChurches(
 ): Promise<ChurchMapItem[]> {
   const db = await getDb();
   const types = filters.types.length > 0 ? filters.types : ALL_TYPES;
+  const typeSet = new Set<EventType>(types);
 
-  const stmt = db.prepare(
-    `SELECT id, parish_id, slug, name, address_line1, address_line2, city, state, postal_code,
-            latitude, longitude FROM church ORDER BY name`,
-  );
-  const churches: Omit<ChurchMapItem, "event_types" | "upcoming_events">[] = [];
-  try {
-    while (stmt.step()) {
-      const row = stmt.getAsObject();
-      churches.push({
-        id: row["id"] as number,
-        parish_id: row["parish_id"] as number,
-        slug: row["slug"] as string,
-        name: str(row["name"]),
-        address_line1: str(row["address_line1"]),
-        address_line2: str(row["address_line2"]),
-        city: str(row["city"]),
-        state: str(row["state"]),
-        postal_code: str(row["postal_code"]),
-        latitude: num(row["latitude"]),
-        longitude: num(row["longitude"]),
-      });
-    }
-  } finally {
-    stmt.free();
-  }
-
-  const churchIds = churches.map((c) => c.id);
-  const events = queryEvents(db, churchIds, types);
+  const churches = await (allChurchesPromise ??= Promise.resolve(
+    loadAllChurches(db),
+  ));
+  const allEvents = await (allEventsPromise ??= Promise.resolve(
+    loadAllEvents(db),
+  ));
 
   const grouped = new Map<number, RawEvent[]>();
-  for (const ev of events) {
+  for (const ev of allEvents) {
+    if (!typeSet.has(ev.event_type)) continue;
     if (!eventMatchesFilters(ev, filters)) continue;
     let list = grouped.get(ev.church_id);
     if (!list) {

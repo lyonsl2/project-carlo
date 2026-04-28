@@ -1,4 +1,11 @@
-import { useMemo, useRef, useState, useCallback } from "react";
+import {
+  startTransition,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useCallback,
+} from "react";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { fetchChurches, type ChurchSearchResult } from "../api";
 import { ChurchMap } from "../components/ChurchMap";
@@ -7,17 +14,48 @@ import { FilterPills } from "../components/FilterPills";
 import { SearchTypeahead } from "../components/SearchTypeahead";
 import { Masthead } from "../components/Masthead";
 import {
-  DEFAULT_FILTER_STATE,
+  filtersEqual,
   getTimeRange,
   type FilterState,
 } from "../components/filterState";
 import { InlineQueryError } from "../components/InlineQueryError";
 import { useMinWidth } from "../hooks/useMinWidth";
+import { useFilterUrlState } from "../hooks/useFilterUrlState";
 
 export function HomePage() {
-  const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTER_STATE);
-  const [appliedFilters, setAppliedFilters] =
-    useState<FilterState>(DEFAULT_FILTER_STATE);
+  const [urlFilters, setUrlFilters] = useFilterUrlState();
+  const [appliedFilters, setAppliedFilters] = useState<FilterState>(
+    () => urlFilters,
+  );
+  const [filters, setFilters] = useState<FilterState>(() => urlFilters);
+
+  // Track the last value we wrote into (or read from) the URL so we can
+  // distinguish our own echoed URL updates from genuine external ones
+  // (back/forward, hand-edited URL). This avoids a render whip-back when
+  // our own debounced write returns through useSearchParams.
+  const lastSyncedRef = useRef<FilterState>(urlFilters);
+
+  // External URL changes → in-memory state.
+  useEffect(() => {
+    if (filtersEqual(urlFilters, lastSyncedRef.current)) return;
+    lastSyncedRef.current = urlFilters;
+    setAppliedFilters(urlFilters);
+    setFilters(urlFilters);
+  }, [urlFilters]);
+
+  // In-memory changes → URL after a long quiet period. The URL is for
+  // refresh/share durability, not realtime sync, so a generous debounce
+  // keeps history.replaceState (and any browser-side side effects like
+  // favicon refetches) from running during continuous interaction.
+  useEffect(() => {
+    if (filtersEqual(appliedFilters, lastSyncedRef.current)) return;
+    const id = window.setTimeout(() => {
+      lastSyncedRef.current = appliedFilters;
+      setUrlFilters(appliedFilters);
+    }, 800);
+    return () => window.clearTimeout(id);
+  }, [appliedFilters, setUrlFilters]);
+
   const [filterPanelOpen, setFilterPanelOpen] = useState(false);
   const isDesktop = useMinWidth(768);
   const [centerOn, setCenterOn] = useState<{
@@ -53,16 +91,19 @@ export function HomePage() {
   const handleApplyFilters = useCallback(() => {
     setAppliedFilters(filters);
     setFilterPanelOpen(false);
-  }, [filters]);
+  }, [filters, setAppliedFilters]);
 
   const handleFiltersChange = useCallback(
     (next: FilterState) => {
+      // Slider thumb / button highlight stays urgent so the input feels
+      // pinned to the cursor; the downstream query + map rerender is a
+      // transition, which lets newer drag values pre-empt in-flight work.
       setFilters(next);
       if (isDesktop) {
-        setAppliedFilters(next);
+        startTransition(() => setAppliedFilters(next));
       }
     },
-    [isDesktop],
+    [isDesktop, setAppliedFilters],
   );
 
   const handleChurchSelect = useCallback((church: ChurchSearchResult) => {
