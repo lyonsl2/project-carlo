@@ -181,40 +181,20 @@ def process_bulletins(
             target_slug = parish_row["slug"]
             pending = [m for m in pending if m["parish_slug"] == target_slug]
 
-        # Phase 1: prepare work items serially so the sqlite connection stays
-        # on the main thread.
-        work_items: list[_WorkItem] = []
-        for entry in pending:
-            prepared = _prepare_work_item(entry, conn)
-            if prepared is not None:
-                work_items.append(prepared)
-
         processed_count = 0
         inserted_events = 0
 
-        if not work_items:
-            result = {"processed_bulletins": 0, "inserted_events": 0}
-            LOGGER.info("Process stage finished: %s", result)
-            return result
-
-        # Phase 2: call extract_events in parallel via a thread pool.
-        # Phase 3 (result merging + JSON writes) runs back on the main thread
-        # as each future completes, so no locking is needed.
+        # Prepare work on the main thread, but only keep up to `concurrency`
+        # PDFs resident/in-flight at once. Some bulletins are large enough that
+        # preloading the whole corpus can exhaust memory before extraction starts.
         today = date.today()
-        max_workers = max(1, min(concurrency, len(work_items)))
+        max_workers = max(1, concurrency)
         with ThreadPoolExecutor(max_workers=max_workers) as pool:
-            futures = {
-                pool.submit(
-                    extract_events,
-                    item.pdf_bytes,
-                    churches=item.church_list,
-                    model=model,
-                    today=today,
-                ): item
-                for item in work_items
-            }
-            for fut in as_completed(futures):
-                item = futures[fut]
+            futures = {}
+
+            def consume_completed(fut) -> None:
+                nonlocal inserted_events, processed_count
+                item = futures.pop(fut)
                 try:
                     extracted = fut.result()
                 except Exception:
@@ -223,12 +203,30 @@ def process_bulletins(
                         item.entry.get("source_url"),
                         exc_info=True,
                     )
-                    continue
+                    return
 
                 inserted_events += _merge_extracted(item.entry, extracted, events)
                 processed_count += 1
                 save_json_list(BULLETINS_METADATA_PATH, metadata)
                 save_json_list(EVENTS_PATH, events)
+
+            for entry in pending:
+                prepared = _prepare_work_item(entry, conn)
+                if prepared is None:
+                    continue
+                fut = pool.submit(
+                    extract_events,
+                    prepared.pdf_bytes,
+                    churches=prepared.church_list,
+                    model=model,
+                    today=today,
+                )
+                futures[fut] = prepared
+                if len(futures) >= max_workers:
+                    consume_completed(next(as_completed(futures)))
+
+            while futures:
+                consume_completed(next(as_completed(futures)))
     finally:
         conn.close()
 
