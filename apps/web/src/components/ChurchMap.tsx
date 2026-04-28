@@ -56,12 +56,37 @@ const markerIcon = L.divIcon({
   popupAnchor: [0, -34],
 });
 
+const placeMarkerSvg = `
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="42" viewBox="0 0 32 42" fill="none" aria-hidden="true">
+  <defs>
+    <filter id="place-marker-shadow" x="-30%" y="-10%" width="160%" height="130%">
+      <feDropShadow dx="0" dy="2" stdDeviation="1.8" flood-color="#161210" flood-opacity="0.32"/>
+    </filter>
+  </defs>
+  <g filter="url(#place-marker-shadow)">
+    <path d="M16 2C8.82 2 3 7.82 3 15c0 4.02 2.22 7.95 4.87 11.4 2.35 3.06 5.38 6.18 6.92 10.9a1.27 1.27 0 0 0 2.42 0c1.54-4.72 4.57-7.84 6.92-10.9C26.78 22.95 29 19.02 29 15 29 7.82 23.18 2 16 2Z"
+          fill="var(--rubric)" stroke="var(--paper)" stroke-width="1.6" />
+    <circle cx="16" cy="15" r="5.2" fill="var(--paper)" stroke="var(--brass)" stroke-width="1.2" />
+  </g>
+</svg>`;
+
+const placeMarkerIcon = L.divIcon({
+  html: placeMarkerSvg,
+  className: "searched-place-marker",
+  iconSize: [32, 42],
+  iconAnchor: [16, 40],
+  popupAnchor: [0, -34],
+});
+
 interface ChurchMapProps {
   churches: ChurchMapItem[];
   centerOn?: {
     lat: number;
     lng: number;
     churchId?: number;
+    placeTitle?: string;
+    placeSubtitle?: string | null;
+    zoom?: number;
     requestId?: number;
   } | null;
 }
@@ -105,12 +130,16 @@ function PopupPaneElevator() {
 function ChangeView({
   center,
 }: {
-  center: { lat: number; lng: number; requestId?: number };
+  center: { lat: number; lng: number; zoom?: number; requestId?: number };
 }) {
   const map = useMap();
   useEffect(() => {
-    map.panTo([center.lat, center.lng]);
-  }, [map, center.lat, center.lng, center.requestId]);
+    if (center.zoom != null) {
+      map.flyTo([center.lat, center.lng], center.zoom, { duration: 0.8 });
+    } else {
+      map.panTo([center.lat, center.lng]);
+    }
+  }, [map, center.lat, center.lng, center.zoom, center.requestId]);
   return null;
 }
 
@@ -207,6 +236,48 @@ const ChurchMarker = memo(function ChurchMarker({
   );
 });
 
+const SearchPlaceMarker = memo(function SearchPlaceMarker({
+  place,
+}: {
+  place: {
+    lat: number;
+    lng: number;
+    title: string;
+    subtitle?: string | null;
+    requestId?: number;
+  };
+}) {
+  const markerRef = useRef<LeafletMarker | null>(null);
+  useEffect(() => {
+    markerRef.current?.openPopup();
+  }, [place.requestId]);
+
+  return (
+    <Marker
+      ref={markerRef}
+      icon={placeMarkerIcon}
+      position={[place.lat, place.lng]}
+      zIndexOffset={1000}
+    >
+      <Popup minWidth={210} maxWidth={260}>
+        <div className="space-y-1.5">
+          <div className="smallcaps text-[0.75rem] text-ink-faint">
+            Searched place
+          </div>
+          <h3 className="font-display text-[1.25rem] leading-[1.1] font-normal text-ink">
+            {place.title}
+          </h3>
+          {place.subtitle ? (
+            <p className="font-serif text-[0.875rem] leading-snug text-ink-soft">
+              {place.subtitle}
+            </p>
+          ) : null}
+        </div>
+      </Popup>
+    </Marker>
+  );
+});
+
 export const ChurchMap = memo(function ChurchMap({
   churches,
   centerOn,
@@ -243,6 +314,17 @@ export const ChurchMap = memo(function ChurchMap({
           openPopupRequestId={centerOn?.requestId}
         />
       ))}
+      {centerOn?.placeTitle ? (
+        <SearchPlaceMarker
+          place={{
+            lat: centerOn.lat,
+            lng: centerOn.lng,
+            title: centerOn.placeTitle,
+            subtitle: centerOn.placeSubtitle,
+            requestId: centerOn.requestId,
+          }}
+        />
+      ) : null}
     </MapContainer>
   );
 });

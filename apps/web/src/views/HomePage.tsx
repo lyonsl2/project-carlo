@@ -21,6 +21,7 @@ import {
 import { InlineQueryError } from "../components/InlineQueryError";
 import { useMinWidth } from "../hooks/useMinWidth";
 import { useFilterUrlState } from "../hooks/useFilterUrlState";
+import { PLACE_SEARCH_ZOOM, type PlaceSearchResult } from "../placeSearch";
 
 export function HomePage() {
   const [urlFilters, setUrlFilters] = useFilterUrlState();
@@ -61,7 +62,10 @@ export function HomePage() {
   const [centerOn, setCenterOn] = useState<{
     lat: number;
     lng: number;
-    churchId: number;
+    churchId?: number;
+    placeTitle?: string;
+    placeSubtitle?: string | null;
+    zoom?: number;
     requestId: number;
   } | null>(null);
   // Monotonic id bumped on every church selection so that re-selecting the
@@ -118,6 +122,18 @@ export function HomePage() {
     }
   }, []);
 
+  const handlePlaceSelect = useCallback((place: PlaceSearchResult) => {
+    centerRequestIdRef.current += 1;
+    setCenterOn({
+      lat: place.lat,
+      lng: place.lng,
+      placeTitle: place.title,
+      placeSubtitle: place.subtitle,
+      zoom: PLACE_SEARCH_ZOOM,
+      requestId: centerRequestIdRef.current,
+    });
+  }, []);
+
   return (
     <main className="relative flex min-h-svh flex-col overflow-hidden bg-paper">
       {/* Full-bleed map — no z-index so it doesn't create a stacking context;
@@ -161,7 +177,8 @@ export function HomePage() {
             <Masthead />
             <div className="mt-5">
               <SearchTypeahead
-                onSelect={handleChurchSelect}
+                onChurchSelect={handleChurchSelect}
+                onPlaceSelect={handlePlaceSelect}
                 filterButton={
                   <button
                     type="button"
