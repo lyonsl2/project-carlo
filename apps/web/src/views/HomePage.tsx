@@ -35,10 +35,17 @@ export function HomePage() {
   // (back/forward, hand-edited URL). This avoids a render whip-back when
   // our own debounced write returns through useSearchParams.
   const lastSyncedRef = useRef<FilterState>(urlFilters);
+  const appliedFiltersRef = useRef<FilterState>(appliedFilters);
+  appliedFiltersRef.current = appliedFilters;
 
   // External URL changes → in-memory state.
   useEffect(() => {
-    if (filtersEqual(urlFilters, lastSyncedRef.current)) return;
+    if (
+      filtersEqual(urlFilters, lastSyncedRef.current) &&
+      filtersEqual(appliedFiltersRef.current, lastSyncedRef.current)
+    ) {
+      return;
+    }
     lastSyncedRef.current = urlFilters;
     setAppliedFilters(urlFilters);
     setFilters(urlFilters);
