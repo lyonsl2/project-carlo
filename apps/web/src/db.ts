@@ -3,7 +3,7 @@ import initSqlJs, { type Database } from "sql.js";
 let dbPromise: Promise<Database> | null = null;
 
 async function loadSnapshot(): Promise<ArrayBuffer> {
-  const response = await fetch("/frontend.snapshot");
+  const response = await fetch("/frontend.snapshot", { cache: "no-cache" });
   if (!response.ok) {
     throw new Error(`Failed to fetch frontend snapshot: ${response.status}`);
   }
