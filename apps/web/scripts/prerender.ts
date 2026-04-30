@@ -1,3 +1,4 @@
+import { gunzipSync } from "node:zlib";
 import { readFileSync, mkdirSync, writeFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -13,7 +14,7 @@ import { StaticChurchPage } from "../src/prerender/StaticChurchPage";
 
 const WEB_DIR = resolve(import.meta.dirname, "..");
 const DIST_DIR = resolve(WEB_DIR, "dist");
-const DB_PATH = resolve(WEB_DIR, "public", "frontend.db");
+const DB_PATH = resolve(WEB_DIR, "public", "frontend.snapshot");
 const SITE_ORIGIN = "https://projectcarlo.com";
 
 /** Font filename prefixes to preload — Latin subsets of the two typefaces used
@@ -124,7 +125,7 @@ function writeSitemapAndRobots(
 
 async function main() {
   const SQL = await initSqlJs();
-  const dbBuffer = readFileSync(DB_PATH);
+  const dbBuffer = gunzipSync(readFileSync(DB_PATH));
   const db = new SQL.Database(dbBuffer);
 
   const { cssPath, fontPaths } = discoverAssets();

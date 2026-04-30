@@ -54,7 +54,7 @@ interface RawEvent {
 
 type ChurchBase = Omit<ChurchMapItem, "event_types" | "upcoming_events">;
 
-// frontend.db is loaded once and never mutated, so the church and event
+// frontend.snapshot is loaded once and never mutated, so the church and event
 // tables can be read into memory once and reused for every filter change.
 // This keeps the slider drag → map update path JS-only after the first call.
 let allChurchesPromise: Promise<ChurchBase[]> | null = null;
