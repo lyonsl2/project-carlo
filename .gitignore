@@ -47,7 +47,7 @@ data/bulletins/**/*.pdf
 data/*.db
 
 # Generated frontend assets
-# apps/web/public/frontend.db
+# apps/web/public/frontend.snapshot
 apps/web/public/*.wasm
 
 # Claude Code

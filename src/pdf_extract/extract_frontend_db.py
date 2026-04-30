@@ -1,14 +1,16 @@
-"""Extract a minimal SQLite database for the frontend from parish_events.db.
+"""Extract a minimal SQLite database snapshot for the frontend from parish_events.db.
 
 Only the church and event tables are copied, with columns stripped down to what
-the web app actually needs.  The output is written to apps/web/public/frontend.db
-so Vite can serve it as a static asset.
+the web app actually needs. The SQLite output is gzip-compressed and written to
+apps/web/public/frontend.snapshot so Vite can serve it as an opaque static asset.
 """
 
 from __future__ import annotations
 
+import gzip
 import logging
 import sqlite3
+import tempfile
 from pathlib import Path
 
 from pdf_extract.storage import configure_sqlite_connection
@@ -17,7 +19,7 @@ LOGGER = logging.getLogger(__name__)
 
 ROOT = Path(__file__).resolve().parents[2]
 SOURCE_DB = ROOT / "data" / "parish_events.db"
-DEST_DB = ROOT / "apps" / "web" / "public" / "frontend.db"
+DEST_DB = ROOT / "apps" / "web" / "public" / "frontend.snapshot"
 FRONTEND_SCHEMA_PATH = ROOT / "data" / "frontend_schema.sql"
 
 
@@ -27,10 +29,16 @@ def extract(source: Path = SOURCE_DB, dest: Path = DEST_DB) -> None:
 
     dest.parent.mkdir(parents=True, exist_ok=True)
     dest.unlink(missing_ok=True)
+    legacy_dest = dest.with_suffix(".db")
+    legacy_dest.unlink(missing_ok=True)
+
+    temp_file = tempfile.NamedTemporaryFile(suffix=".db", delete=False)
+    temp_path = Path(temp_file.name)
+    temp_file.close()
 
     src = sqlite3.connect(source)
     configure_sqlite_connection(src)
-    dst = sqlite3.connect(dest)
+    dst = sqlite3.connect(temp_path)
     dst.execute("PRAGMA journal_mode=DELETE")
     dst.execute("PRAGMA foreign_keys = ON")
     try:
@@ -89,10 +97,21 @@ def extract(source: Path = SOURCE_DB, dest: Path = DEST_DB) -> None:
         src.close()
         dst.close()
 
-    size_kb = dest.stat().st_size / 1024
+    raw_size_kb = temp_path.stat().st_size / 1024
+    with temp_path.open("rb") as raw, dest.open("wb") as out:
+        with gzip.GzipFile(
+            filename="", mode="wb", fileobj=out, compresslevel=9, mtime=0
+        ) as compressed:
+            compressed.write(raw.read())
+    temp_path.unlink(missing_ok=True)
+
+    compressed_size_kb = dest.stat().st_size / 1024
     LOGGER.info(
-        "frontend.db: %d churches, %d events, %.1f KB",
-        church_count, event_count, size_kb,
+        "frontend.snapshot: %d churches, %d events, %.1f KB compressed from %.1f KB",
+        church_count,
+        event_count,
+        compressed_size_kb,
+        raw_size_kb,
     )
 
 

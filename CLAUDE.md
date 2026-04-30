@@ -46,7 +46,7 @@ pnpm lint:web                   # ESLint
 ```bash
 pnpm dev:web       # Dev server on localhost:5173
 pnpm build:web     # Production build
-pnpm extract:web   # Build frontend.db snapshot from main DB
+pnpm extract:web   # Build compressed frontend.snapshot from main DB
 ```
 
 ## Architecture
@@ -75,7 +75,7 @@ parishes.csv → [detect.py] Playwright → detect_results.json
                                             ↓
                        [db.py] create_db() → parish_events.db
                                             ↓
-                       [extract_frontend_db.py] → frontend.db (minimal subset)
+                       [extract_frontend_db.py] → frontend.snapshot (compressed minimal subset)
 ```
 
 Key modules:
@@ -94,13 +94,13 @@ Key modules:
 
 - Schema source of truth: `data/schema.sql`
 - Main DB: `data/parish_events.db`
-- Frontend DB: `apps/web/public/frontend.db` (subset for browser WASM SQLite)
+- Frontend snapshot: `apps/web/public/frontend.snapshot` (compressed subset for browser WASM SQLite)
 - Tables: parish, church, bulletin, event
 
 ### Web Frontend (`apps/web/`)
 
 - React 19 + TypeScript + Vite
-- sql.js for in-browser SQLite (loads frontend.db via WASM)
+- sql.js for in-browser SQLite (loads compressed frontend.snapshot via WASM)
 - Leaflet/react-leaflet for map rendering
 - TanStack Query for data fetching
 - Deploys to Cloudflare Workers

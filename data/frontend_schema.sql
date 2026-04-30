@@ -1,4 +1,4 @@
--- Minimal SQLite schema for the web frontend snapshot (apps/web/public/frontend.db).
+-- Minimal SQLite schema for the web frontend snapshot (apps/web/public/frontend.snapshot).
 -- Built by: python -m pdf_extract.extract_frontend_db
 --
 -- This is a denormalised subset of data/schema.sql designed for the browser:
