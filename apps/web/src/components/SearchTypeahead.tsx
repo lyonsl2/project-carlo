@@ -237,7 +237,9 @@ export function SearchTypeahead({
         </PopoverAnchor>
         <PopoverContent
           align="start"
+          side="bottom"
           sideOffset={10}
+          avoidCollisions={false}
           className="z-[950] w-[min(32rem,calc(100vw-2rem))] border-rule-strong bg-paper p-0 shadow-missal-popover"
           onOpenAutoFocus={(event) => event.preventDefault()}
         >
