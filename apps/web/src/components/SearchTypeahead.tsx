@@ -32,6 +32,7 @@ import {
 
 const DEBOUNCE_MS = 200;
 type SearchMode = "place" | "parish";
+type LocationStatus = "idle" | "requesting" | "error";
 
 interface SearchTypeaheadProps {
   onChurchSelect: (church: ChurchSearchResult) => void;
@@ -49,6 +50,9 @@ export function SearchTypeahead({
   const [isOpen, setIsOpen] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const [searchMode, setSearchMode] = useState<SearchMode>("place");
+  const [locationStatus, setLocationStatus] =
+    useState<LocationStatus>("idle");
+  const [locationError, setLocationError] = useState<string | null>(null);
 
   useEffect(() => {
     const t = setTimeout(() => setDebouncedQuery(query), DEBOUNCE_MS);
@@ -109,9 +113,14 @@ export function SearchTypeahead({
     return matches.slice(0, 10).map((m) => m.item);
   }, [fuse, searchMode, trimmedDebouncedQuery]);
 
-  // Open as soon as the input has 2+ chars; debounce controls result fetching.
-  const showDropdown = isOpen && query.trim().length >= 2;
   const isPlaceMode = searchMode === "place";
+  const showCurrentLocationOption = isPlaceMode;
+  const hasTypedQuery = query.trim().length > 0;
+  // Place mode opens immediately so the current-location suggestion is the
+  // default; parish mode still waits for enough text to search.
+  const showDropdown =
+    isOpen && (showCurrentLocationOption || query.trim().length >= 2);
+  const showSearchStatus = !isPlaceMode || hasTypedQuery;
   const activeResults = isPlaceMode ? placeResults : parishResults;
   const hasResults = activeResults.length > 0;
   const isLoading = isPlaceMode ? placesLoading : churchesLoading;
@@ -148,12 +157,50 @@ export function SearchTypeahead({
     [clearQuery, onPlaceSelect],
   );
 
+  const handleCurrentLocationSelect = useCallback(() => {
+    if (!navigator.geolocation) {
+      setLocationStatus("error");
+      setLocationError("Location is not available in this browser.");
+      return;
+    }
+
+    setLocationStatus("requesting");
+    setLocationError(null);
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        onPlaceSelect({
+          id: `current-location-${position.coords.latitude}-${position.coords.longitude}`,
+          title: "Your current location",
+          subtitle: "From your browser",
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+          resultType: "unknown",
+        });
+        setLocationStatus("idle");
+        clearQuery();
+      },
+      (error) => {
+        setLocationStatus("error");
+        setLocationError(
+          error.code === error.PERMISSION_DENIED
+            ? "Location permission was denied."
+            : "Couldn't get your current location.",
+        );
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 60000,
+      },
+    );
+  }, [clearQuery, onPlaceSelect]);
+
   const handleModeToggle = useCallback(
     () => {
       setSearchMode((current) => (current === "place" ? "parish" : "place"));
-      setIsOpen(query.trim().length >= 2);
+      setIsOpen(true);
     },
-    [query],
+    [],
   );
 
   return (
@@ -247,56 +294,79 @@ export function SearchTypeahead({
             </span>
           </div>
           <CommandList className="max-h-80 px-2 py-2">
-            {isLoading ? (
-              <div className="px-3 py-4 font-serif text-sm text-ink-faint">
-                {isPlaceMode ? "Searching places…" : "Loading parishes…"}
-              </div>
-            ) : placeSearchNotConfigured ? (
-              <CommandEmpty className="px-3 py-4 text-center font-serif text-sm text-ink-faint">
-                Place search needs a Geoapify API key.
-              </CommandEmpty>
-            ) : isPlaceMode && placeError ? (
-              <CommandEmpty className="px-3 py-4 text-center font-serif text-sm text-ink-faint">
-                Place search failed. Try again.
-              </CommandEmpty>
-            ) : hasResults ? (
+            {showCurrentLocationOption ? (
               <CommandGroup className="[&_[cmdk-group-heading]]:hidden">
-                {isPlaceMode
-                  ? placeResults.map((place) => (
-                      <CommandItem
-                        key={place.id}
-                        value={`${place.title} ${place.subtitle ?? ""}`}
-                        onSelect={() => handlePlaceSelect(place)}
-                        className="group relative cursor-pointer gap-0 rounded-none border-l-2 border-transparent px-3 py-2.5 font-serif text-base text-ink data-[selected=true]:border-rubric data-[selected=true]:bg-paper-deep/60 data-[selected=true]:text-ink"
-                      >
-                        <div className="min-w-0">
-                          <div className="truncate">{place.title}</div>
-                          {place.subtitle ? (
-                            <div className="mt-0.5 truncate text-sm text-ink-faint">
-                              {place.subtitle}
-                            </div>
-                          ) : null}
-                        </div>
-                      </CommandItem>
-                    ))
-                  : parishResults.map((church) => (
-                      <CommandItem
-                        key={church.id}
-                        value={church.name ?? `church-${church.id}`}
-                        onSelect={() => handleChurchSelect(church)}
-                        className="group relative cursor-pointer gap-0 rounded-none border-l-2 border-transparent px-3 py-2.5 font-serif text-base text-ink data-[selected=true]:border-rubric data-[selected=true]:bg-paper-deep/60 data-[selected=true]:text-ink"
-                      >
-                        <span className="truncate">
-                          {church.name ?? "Unnamed parish"}
-                        </span>
-                      </CommandItem>
-                    ))}
+                <CommandItem
+                  value="Use your current location"
+                  onSelect={handleCurrentLocationSelect}
+                  disabled={locationStatus === "requesting"}
+                  className="group relative cursor-pointer gap-0 rounded-none border-l-2 border-transparent px-3 py-2.5 font-serif text-base text-ink data-[disabled=true]:pointer-events-none data-[selected=true]:border-rubric data-[selected=true]:bg-paper-deep/60 data-[selected=true]:text-ink"
+                >
+                  <div className="min-w-0">
+                    <div className="truncate">
+                      {locationStatus === "requesting"
+                        ? "Requesting your location…"
+                        : "Use your current location"}
+                    </div>
+                    <div className="mt-0.5 truncate text-sm text-ink-faint">
+                      {locationError ?? "Center the map where you are"}
+                    </div>
+                  </div>
+                </CommandItem>
               </CommandGroup>
-            ) : (
-              <CommandEmpty className="px-3 py-4 text-center font-serif text-sm text-ink-faint">
-                {emptyMessage}
-              </CommandEmpty>
-            )}
+            ) : null}
+            {showSearchStatus ? (
+              isLoading ? (
+                <div className="px-3 py-4 font-serif text-sm text-ink-faint">
+                  {isPlaceMode ? "Searching places…" : "Loading parishes…"}
+                </div>
+              ) : placeSearchNotConfigured ? (
+                <CommandEmpty className="px-3 py-4 text-center font-serif text-sm text-ink-faint">
+                  Place search needs a Geoapify API key.
+                </CommandEmpty>
+              ) : isPlaceMode && placeError ? (
+                <CommandEmpty className="px-3 py-4 text-center font-serif text-sm text-ink-faint">
+                  Place search failed. Try again.
+                </CommandEmpty>
+              ) : hasResults ? (
+                <CommandGroup className="[&_[cmdk-group-heading]]:hidden">
+                  {isPlaceMode
+                    ? placeResults.map((place) => (
+                        <CommandItem
+                          key={place.id}
+                          value={`${place.title} ${place.subtitle ?? ""}`}
+                          onSelect={() => handlePlaceSelect(place)}
+                          className="group relative cursor-pointer gap-0 rounded-none border-l-2 border-transparent px-3 py-2.5 font-serif text-base text-ink data-[selected=true]:border-rubric data-[selected=true]:bg-paper-deep/60 data-[selected=true]:text-ink"
+                        >
+                          <div className="min-w-0">
+                            <div className="truncate">{place.title}</div>
+                            {place.subtitle ? (
+                              <div className="mt-0.5 truncate text-sm text-ink-faint">
+                                {place.subtitle}
+                              </div>
+                            ) : null}
+                          </div>
+                        </CommandItem>
+                      ))
+                    : parishResults.map((church) => (
+                        <CommandItem
+                          key={church.id}
+                          value={church.name ?? `church-${church.id}`}
+                          onSelect={() => handleChurchSelect(church)}
+                          className="group relative cursor-pointer gap-0 rounded-none border-l-2 border-transparent px-3 py-2.5 font-serif text-base text-ink data-[selected=true]:border-rubric data-[selected=true]:bg-paper-deep/60 data-[selected=true]:text-ink"
+                        >
+                          <span className="truncate">
+                            {church.name ?? "Unnamed parish"}
+                          </span>
+                        </CommandItem>
+                      ))}
+                </CommandGroup>
+              ) : (
+                <CommandEmpty className="px-3 py-4 text-center font-serif text-sm text-ink-faint">
+                  {emptyMessage}
+                </CommandEmpty>
+              )
+            ) : null}
           </CommandList>
           {isPlaceMode ? (
             <div className="border-t border-rule-strong px-4 py-2 text-right font-serif text-xs text-ink-faint">
