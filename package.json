@@ -16,7 +16,7 @@
     "geocode:apply": "uv run python -m pdf_extract geocode apply",
     "test": "uv run pytest",
     "lint": "uv run ruff check .",
-    "extract:web": "uv run python -m pdf_extract.extract_frontend_db",
+    "extract:web": "pnpm run db:create && uv run python -m pdf_extract.extract_frontend_db",
     "install:web": "pnpm install",
     "dev:web": "pnpm --filter web dev",
     "build:web": "pnpm --filter web build",
