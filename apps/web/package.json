@@ -6,7 +6,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build && tsx --tsconfig tsconfig.app.json scripts/prerender.ts",
+    "build": "pnpm run build:ts && pnpm run build:vite && pnpm run build:prerender",
+    "build:ts": "tsc -b",
+    "build:vite": "vite build",
+    "build:prerender": "tsx --tsconfig tsconfig.app.json scripts/prerender.ts",
     "preview": "pnpm run build && wrangler dev",
     "lint": "eslint .",
     "check": "tsc --noEmit",
