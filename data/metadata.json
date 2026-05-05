@@ -36,7 +36,7 @@
     "published_date": null
   },
   {
-    "parish_slug": "saint-jerome",
+    "parish_slug": "st-jerome",
     "source_url": "https://files.ecatholic.com/22370/bulletins/20260308.pdf?t=1772716740000",
     "pdf_path": "data\\bulletins\\saint-jerome\\bfb426a8e8acb739c9c501e436aa0e16b3f5505bac64f16c0e3d9bac43a2125f.pdf",
     "content_hash": "bfb426a8e8acb739c9c501e436aa0e16b3f5505bac64f16c0e3d9bac43a2125f",
@@ -180,7 +180,7 @@
     "published_date": null
   },
   {
-    "parish_slug": "ss-isidore-maria-torribia",
+    "parish_slug": "sts-isidore-maria-torribia",
     "source_url": "https://parishesonline.com/publication-page/sts-isidore-maria-torribia-parish?selectedPublication=https://container.parishesonline.com/bulletins/04/0677/20260315B.pdf",
     "pdf_path": "data\\bulletins\\ss-isidore-maria-torribia\\72b9945363706b77d3a973c87db5bc7d121c72a3df58418c3645f381d507fbd0.pdf",
     "content_hash": "72b9945363706b77d3a973c87db5bc7d121c72a3df58418c3645f381d507fbd0",
@@ -387,7 +387,7 @@
     "published_date": null
   },
   {
-    "parish_slug": "saint-jerome",
+    "parish_slug": "st-jerome",
     "source_url": "https://files.ecatholic.com/22370/bulletins/20260322.pdf?t=1773922067000",
     "pdf_path": "data\\bulletins\\saint-jerome\\784eb5851c21c63d3e8424adf85bc878be738b357fcf91fde441645ce3faefa6.pdf",
     "content_hash": "784eb5851c21c63d3e8424adf85bc878be738b357fcf91fde441645ce3faefa6",
@@ -531,7 +531,7 @@
     "published_date": null
   },
   {
-    "parish_slug": "saint-rita-webster",
+    "parish_slug": "st-rita-webster",
     "source_url": "https://s3-us-west-2.amazonaws.com/classrooms.stritawebster.org/Bulletins/2026/March 22.pdf",
     "pdf_path": "data\\bulletins\\saint-rita-webster\\48903721832052070ec4ca09add8a84c483b3a93ad81e14a29f3b74072ea99a5.pdf",
     "content_hash": "48903721832052070ec4ca09add8a84c483b3a93ad81e14a29f3b74072ea99a5",
@@ -540,7 +540,7 @@
     "published_date": null
   },
   {
-    "parish_slug": "ss-isidore-maria-torribia",
+    "parish_slug": "sts-isidore-maria-torribia",
     "source_url": "https://parishesonline.com/publication-page/sts-isidore-maria-torribia-parish?selectedPublication=https://container.parishesonline.com/bulletins/04/0677/20260322B.pdf",
     "pdf_path": "data\\bulletins\\ss-isidore-maria-torribia\\390afe4202d60d1dd3dff6ed7c316833eb5077176e82b8589b93b8b1ec43c817.pdf",
     "content_hash": "390afe4202d60d1dd3dff6ed7c316833eb5077176e82b8589b93b8b1ec43c817",
@@ -774,7 +774,7 @@
     "published_date": null
   },
   {
-    "parish_slug": "saint-jerome",
+    "parish_slug": "st-jerome",
     "source_url": "https://files.ecatholic.com/22370/bulletins/20260405.pdf?t=1775132401000",
     "pdf_path": "data\\bulletins\\saint-jerome\\2c0bde4d039e739905f3c3ae42159b6e89bce2790f26c1dbeb3065eb9f25083a.pdf",
     "content_hash": "2c0bde4d039e739905f3c3ae42159b6e89bce2790f26c1dbeb3065eb9f25083a",
@@ -918,7 +918,7 @@
     "published_date": null
   },
   {
-    "parish_slug": "saint-rita-webster",
+    "parish_slug": "st-rita-webster",
     "source_url": "https://s3-us-west-2.amazonaws.com/classrooms.stritawebster.org/Bulletins/2026/April 12.pdf",
     "pdf_path": "data\\bulletins\\saint-rita-webster\\2c9b69ce8b58ff78c93da3e32b38427fcf0b25c1150fe1fdd5a20f61ba378416.pdf",
     "content_hash": "2c9b69ce8b58ff78c93da3e32b38427fcf0b25c1150fe1fdd5a20f61ba378416",
@@ -927,7 +927,7 @@
     "published_date": null
   },
   {
-    "parish_slug": "ss-isidore-maria-torribia",
+    "parish_slug": "sts-isidore-maria-torribia",
     "source_url": "https://parishesonline.com/publication-page/sts-isidore-maria-torribia-parish?selectedPublication=https://container.parishesonline.com/bulletins/04/0677/20260412B.pdf",
     "pdf_path": "data\\bulletins\\ss-isidore-maria-torribia\\a8b6ed03b025b1920d107c21d077425732cc39baa7e9afd65cc674af289beccb.pdf",
     "content_hash": "a8b6ed03b025b1920d107c21d077425732cc39baa7e9afd65cc674af289beccb",
@@ -1476,7 +1476,7 @@
     "published_date": "2026-04-19"
   },
   {
-    "parish_slug": "saint-rita-webster",
+    "parish_slug": "st-rita-webster",
     "source_url": "https://s3-us-west-2.amazonaws.com/classrooms.stritawebster.org/Bulletins/2026/April 19.pdf",
     "pdf_path": "data\\bulletins\\saint-rita-webster\\127add858aba5856d61406deff8e6f6948f34752a6c33700b380a6daef05d122.pdf",
     "content_hash": "127add858aba5856d61406deff8e6f6948f34752a6c33700b380a6daef05d122",
@@ -1485,7 +1485,7 @@
     "published_date": "2026-04-19"
   },
   {
-    "parish_slug": "ss-isidore-maria-torribia",
+    "parish_slug": "sts-isidore-maria-torribia",
     "source_url": "https://parishesonline.com/publication-page/sts-isidore-maria-torribia-parish?selectedPublication=https://container.parishesonline.com/bulletins/04/0677/20260419B.pdf",
     "pdf_path": "data\\bulletins\\ss-isidore-maria-torribia\\2941da84338bf046edee9c9f67893ba7ed745d08ecf238f819daff2ac87e836a.pdf",
     "content_hash": "2941da84338bf046edee9c9f67893ba7ed745d08ecf238f819daff2ac87e836a",
@@ -1782,7 +1782,7 @@
     "published_date": "2026-05-03"
   },
   {
-    "parish_slug": "saint-jerome",
+    "parish_slug": "st-jerome",
     "source_url": "https://files.ecatholic.com/22370/bulletins/20260503.pdf?t=1777495541000",
     "pdf_path": "data\\bulletins\\saint-jerome\\453959307d9e0e87147e8c06a18e36469c9d0afc58a3c2b9cd526bc6bbf4b504.pdf",
     "content_hash": "453959307d9e0e87147e8c06a18e36469c9d0afc58a3c2b9cd526bc6bbf4b504",
@@ -1980,7 +1980,7 @@
     "published_date": "2026-05-03"
   },
   {
-    "parish_slug": "saint-rita-webster",
+    "parish_slug": "st-rita-webster",
     "source_url": "https://s3-us-west-2.amazonaws.com/classrooms.stritawebster.org/Bulletins/2026/May 3.pdf",
     "pdf_path": "data\\bulletins\\saint-rita-webster\\cc81f22cf9db840ca3a79d39116314f020d09b139d3acb1403f53c0c5a827094.pdf",
     "content_hash": "cc81f22cf9db840ca3a79d39116314f020d09b139d3acb1403f53c0c5a827094",
@@ -1989,7 +1989,7 @@
     "published_date": "2026-05-03"
   },
   {
-    "parish_slug": "ss-isidore-maria-torribia",
+    "parish_slug": "sts-isidore-maria-torribia",
     "source_url": "https://parishesonline.com/publication-page/sts-isidore-maria-torribia-parish?selectedPublication=https://container.parishesonline.com/bulletins/04/0677/20260503B.pdf",
     "pdf_path": "data\\bulletins\\ss-isidore-maria-torribia\\fde61cc4195051eb33fcb6078f9aa269d82b4b064faa7fd6a3f9dcc9fd9ba533.pdf",
     "content_hash": "fde61cc4195051eb33fcb6078f9aa269d82b4b064faa7fd6a3f9dcc9fd9ba533",
