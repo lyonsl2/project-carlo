@@ -2,7 +2,7 @@ parish_id,slug,name,line1,line2,city,state,postal_code,name_verified,address_ver
 all-saints-corning,st-marys-corning,St. Mary's Catholic Church,158 State Street,,Corning,NY,14830,true,true,42.1422899,-77.0609656
 net-catholic,all-saints,All Saints Church,347 Ridge Road,,Lansing,NY,14882,true,true,42.5424254,-76.5388303
 net-catholic,holy-cross-freeville,Holy Cross Church,375 George Road,,Freeville,NY,13068,true,true,42.5110535,-76.335304
-net-catholic,saint-anthonys,Saint Anthony's Church,312 Locke Road,,Groton,NY,13073,true,true,42.6039734,-76.3725574
+net-catholic,st-anthonys,Saint Anthony's Church,312 Locke Road,,Groton,NY,13073,true,true,42.6039734,-76.3725574
 southeast-rochester-catholic-community,blessed-sacrament,Blessed Sacrament Church,534 Oxford St.,,Rochester,NY,14607,true,true,43.1448098,-77.5884847
 southeast-rochester-catholic-community,st-boniface,St. Boniface Church,330 Gregory Street,,Rochester,NY,14620,true,true,43.1427736,-77.6027498
 southeast-rochester-catholic-community,st-marys-rochester,St. Mary's Church,15 St. Mary's Place,,Rochester,NY,14607,true,true,43.1532543,-77.6060634
@@ -13,19 +13,19 @@ blessed-trinity-st-patrick,st-patrick-owego,St. Patrick Church,300 Main Street,,
 catholic-parishes-eastern-wayne-county,st-mary-magdalene,St. Mary Magdalene,15 Northup Avenue,,Wolcott,NY,14590,true,false,43.2197692,-76.8162833
 catholic-parishes-eastern-wayne-county,st-thomas,St. Thomas Church,6927 Main Street,,Red Creek,NY,13143,true,false,43.250928,-76.7221072
 catholic-parishes-eastern-wayne-county,st-jude,St. Jude Church,580 Main Street,,Fair Haven,NY,13064,true,false,43.316239,-76.7019125
-saint-jerome,saint-jeromes,Church of St. Jerome,207 Garfield Street,,East Rochester,NY,14445,true,true,43.1140815,-77.4878701
+st-jerome,st-jerome,Church of St. Jerome,207 Garfield Street,,East Rochester,NY,14445,true,true,43.1140815,-77.4878701
 assumption-resurrection,assumption,Church of the Assumption,20 East Avenue,,Fairport,NY,14450,true,true,43.1051388,-77.4403658
 assumption-resurrection,resurrection,Church of the Resurrection,63 Mason Road,,Fairport,NY,14450,true,true,43.0776551,-77.4106996
 holy-spirit-st-josephs,holy-spirit,Holy Spirit Church,1355 Hatch Road,,Webster,NY,14580,true,true,43.1829688,-77.4854109
 holy-spirit-st-josephs,st-josephs,St. Joseph's Church,43 Gebhardt Road,,Penfield,NY,14526,true,true,43.1357481,-77.4778718
 nativity-seas,nativity-of-blessed-virgin-mary,Church of the Nativity of the Blessed Virgin Mary,152 Main Street,,Brockport,NY,14420,,,43.2128494,-77.9399647
-nativity-seas,saint-elizabeth-ann-seton,Saint Elizabeth Ann Seton Church,3747 Brick Schoolhouse Road,,Hamlin,NY,14464,,,43.31289,-77.9227876
+nativity-seas,st-elizabeth-ann-seton,Saint Elizabeth Ann Seton Church,3747 Brick Schoolhouse Road,,Hamlin,NY,14464,,,43.31289,-77.9227876
 transfiguration-st-catherine-mendon,transfiguration,Church of the Transfiguration,50 West Bloomfield Road,,Pittsford,NY,14534,,,43.0575106,-77.5212237
 transfiguration-st-catherine-mendon,st-catherine-of-siena-mendon,St. Catherine of Siena Church,26 Mendon-Ionia Road,,Mendon,NY,14506,,,42.996167,-77.5042105
 st-monica-emmanuel,st-monica,St. Monica Church,34 Monica Street,,Rochester,NY,14619,,,43.1340859,-77.6370623
 good-shepherd-catholic-community,st-patricks-moravia,St. Patrick's Church,51 Grove Street,,Moravia,NY,13118,true,false,42.7094458,-76.424062
 good-shepherd-catholic-community,st-patricks-aurora,St. Patrick's Church,303 Main Street,,Aurora,NY,13026,true,false,42.7094458,-76.424062
-good-shepherd-catholic-community,our-lady-of-lake,Our Lady of the Lake,8695 State Route 90,,King Ferry,NY,13081,true,false,,
+good-shepherd-catholic-community,our-lady-of-the-lake,Our Lady of the Lake,8695 State Route 90,,King Ferry,NY,13081,true,false,,
 good-shepherd-catholic-community,st-michaels,St. Michael's Church,162 Cayuga Street,,Union Springs,NY,13160,true,false,42.842092,-76.691891
 holy-apostles,holy-apostles,Holy Apostles Church,530 Lyell Avenue,,Rochester,NY,14606,,,43.1650075,-77.6436876
 our-mother-of-sorrows-holy-cross,our-mother-of-sorrows,Our Mother of Sorrows,5000 Mount Read Boulevard,,Rochester,NY,14612,true,true,43.2516358,-77.6590211
@@ -41,13 +41,13 @@ mary-mother-of-mercy,holy-cross-ovid,Holy Cross Church,7231 Main Street,,Ovid,NY
 mary-mother-of-mercy,st-francis-solanus,St. Francis Solanus Church,3660 Orchard Street,,Interlaken,NY,14847,,,42.616053,-76.7233476
 mary-mother-of-mercy,st-james-apostle,St. James the Apostle,17 Whig Street,,Trumansburg,NY,14886,,,42.5399821,-76.6594573
 our-lady-of-lourdes-st-anne,our-lady-of-lourdes,Our Lady of Lourdes Church,150 Varinna Drive,,Rochester,NY,14618,true,true,43.1323508,-77.564642
-our-lady-of-lourdes-st-anne,saint-anne,Saint Anne Church,1600 Mount Hope Avenue,,Rochester,NY,14620,true,true,43.1185396,-77.6196083
+our-lady-of-lourdes-st-anne,st-anne,Saint Anne Church,1600 Mount Hope Avenue,,Rochester,NY,14620,true,true,43.1185396,-77.6196083
 our-lady-of-peace-geneva,st-francis-desales,St. Francis deSales Church,130 Exchange Street,,Geneva,NY,14456,true,true,42.8734405,-76.9796252
 our-lady-of-peace-geneva,st-stephen,St. Stephen Church,48 Pulteney Street,,Geneva,NY,14456,true,true,42.8675775,-76.9884883
 our-lady-of-peace-geneva,st-johns-chapel,St. John's Chapel,630 South Main Street,,Geneva,NY,14456,true,true,42.859155,-76.9826513
-our-lady-of-the-lakes,saint-michaels,Saint Michael's Church,312 Liberty Street,,Penn Yan,NY,14527,,,42.6611295,-77.0571805
-our-lady-of-the-lakes,saint-januarius,Saint Januarius' Church,180 North Main Street,,Naples,NY,14512,,,42.623984,-77.396913
-our-lady-of-the-lakes,saint-patricks,Saint Patrick's Church,47 North Main Street,,Prattsburgh,NY,14873,,,42.527322,-77.2869487
+our-lady-of-the-lakes,st-michaels-penn-yan,Saint Michael's Church,312 Liberty Street,,Penn Yan,NY,14527,,,42.6611295,-77.0571805
+our-lady-of-the-lakes,st-januarius,Saint Januarius' Church,180 North Main Street,,Naples,NY,14512,,,42.623984,-77.396913
+our-lady-of-the-lakes,st-patricks,Saint Patrick's Church,47 North Main Street,,Prattsburgh,NY,14873,,,42.527322,-77.2869487
 our-lady-of-the-snow-saints-mary-and-martha,st-joseph-weedsport,St. Joseph Church,8831 South Seneca Street,,Weedsport,NY,13166,true,true,43.044883,-76.5640385
 our-lady-of-the-snow-saints-mary-and-martha,st-patrick-cato,St. Patrick Church,2576 East Mechanic Street,,Cato,NY,13033,true,true,43.170008,-76.5692612
 our-lady-of-the-valley,st-anns,St. Ann's Church,27 Erie Avenue,,Hornell,NY,14843,,,42.324705,-77.6580579
@@ -65,14 +65,14 @@ sacred-heart-auburn-cluster,sacred-heart,Sacred Heart,90 Melrose Road,,Auburn,NY
 sacred-heart-auburn-cluster,st-alphonsus,St. Alphonsus,85 East Genesee Street,,Auburn,NY,13021,true,true,42.934288,-76.5552786
 sacred-heart-auburn-cluster,st-ann,St. Ann,4890 Twelve Corners Road,,Auburn,NY,13021,true,true,42.8546945,-76.4637386
 sacred-heart-cathedral,sacred-heart-cathedral,Sacred Heart Cathedral,296 Flower City Park,,Rochester,NY,14615,,,43.1930378,-77.6329244
-saint-rita-webster,st-rita,St. Rita Roman Catholic Church,1008 Maple Drive,,Webster,NY,14580,,,43.2068797,-77.5048691
-ss-isidore-maria-torribia,st-catherine-of-siena-addison,St. Catherine of Siena,51 Maple Street,,Addison,NY,14801,,,42.110317,-77.2260116
-ss-isidore-maria-torribia,st-stanislaus-bishop-martyr,St. Stanislaus Bishop & Martyr,7646 Whitehead Hill Road,,Bradford,NY,14815,,,42.371739,-77.1092941
-ss-isidore-maria-torribia,st-joseph-carpenter,St. Joseph the Carpenter,8508 Main Street,,Campbell,NY,14821,,,42.231852,-77.1957491
+st-rita-webster,st-rita,St. Rita Roman Catholic Church,1008 Maple Drive,,Webster,NY,14580,,,43.2068797,-77.5048691
+sts-isidore-maria-torribia,st-catherine-of-siena-addison,St. Catherine of Siena,51 Maple Street,,Addison,NY,14801,,,42.110317,-77.2260116
+sts-isidore-maria-torribia,st-stanislaus-bishop-martyr,St. Stanislaus Bishop & Martyr,7646 Whitehead Hill Road,,Bradford,NY,14815,,,42.371739,-77.1092941
+sts-isidore-maria-torribia,st-joseph-carpenter,St. Joseph the Carpenter,8508 Main Street,,Campbell,NY,14821,,,42.231852,-77.1957491
 our-lady-of-the-snow-saints-mary-and-martha,st-francis-of-assisi,St. Francis of Assisi Church,303 Clark Street,,Auburn,NY,13021,true,true,42.932652,-76.5872628
 our-lady-of-the-snow-saints-mary-and-martha,st-hyacinth,St. Hyacinth Church,63 Pulaski Street,,Auburn,NY,13021,true,true,42.9413431,-76.576642
 st-agnes-paul-rose,st-agnes,St. Agnes Church,96 Prospect Street,,Avon,NY,14414,,,42.9134936,-77.7454914
-st-agnes-paul-rose,st-paul-of-cross,St. Paul of the Cross,31 Monroe Street,,Honeoye Falls,NY,14472,,,42.954789,-77.5932223
+st-agnes-paul-rose,st-paul-of-the-cross,St. Paul of the Cross,31 Monroe Street,,Honeoye Falls,NY,14472,,,42.954789,-77.5932223
 st-agnes-paul-rose,st-rose,St. Rose Church,1985 Lake Avenue,,Lima,NY,14485,,,42.9018893,-77.6114996
 st-benedict-parish,st-bridgets,St. Bridget's Church,15 Church Street,,Bloomfield,NY,14469,,,42.8999745,-77.4328218
 st-benedict-parish,st-marys-canandaigua,St. Mary's Church,95 North Main Street,,Canandaigua,NY,14424,,,42.8910195,-77.2828984
@@ -83,7 +83,7 @@ st-charles-borromeo,st-charles-borromeo,St. Charles Borromeo,3003 Dewey Avenue,,
 st-christopher,st-christophers,St. Christopher's Church,3350 Union Street,,North Chili,NY,14514,,,43.1138202,-77.8027178
 st-frances-xavier-cabrini,annunciation,Annunciation,1760 Norton Street,,Rochester,NY,14609,,,43.1879387,-77.5746931
 st-frances-xavier-cabrini,corpus-christi,Corpus Christi,864 East Main Street,,Rochester,NY,14605,,,43.160979,-77.589501
-st-frances-xavier-cabrini,saint-michael,Saint Michael,869 North Clinton Avenue,,Rochester,NY,14605,,,43.1744135,-77.6130002
+st-frances-xavier-cabrini,st-michael,Saint Michael,869 North Clinton Avenue,,Rochester,NY,14605,,,43.1744135,-77.6130002
 st-francis-and-st-clare,st-marys-waterloo,St. Mary's Church,35 Center Street,,Waterloo,NY,13165,,,42.909473,-76.8653883
 st-francis-and-st-clare,st-patricks-seneca-falls,St. Patrick's Church,97 West Bayard Street,,Seneca Falls,NY,13148,,,42.907756,-76.806193
 st-john-of-rochester,st-john-of-rochester,St. John of Rochester,8 Wickford Way,,Fairport,NY,14450,,,43.0758604,-77.4758017
@@ -104,7 +104,7 @@ st-katharine-drexel-st-maximilian-kolbe,st-marys-of-lake-ontario,St. Mary's of t
 st-katharine-drexel-st-maximilian-kolbe,epiphany,Church of the Epiphany,105 West Main Street,,Sodus,NY,14551,,,43.2359575,-77.0705842
 st-katharine-drexel-st-maximilian-kolbe,st-mary-star-of-sea,St. Mary Star of the Sea,7502 South Fitzhugh Street,,Sodus Point,NY,14555,,,43.27011,-76.988706
 st-lawrence,st-lawrence,St. Lawrence Church,1000 North Greece Road,,Rochester,NY,14626,true,true,43.2264615,-77.732552
-st-leo-the-great,st-leo-great,St. Leo the Great Catholic Parish,110 Old Hojack Lane,,Hilton,NY,14468,true,true,43.2918531,-77.7957304
+st-leo-the-great,st-leo-the-great,St. Leo the Great Catholic Parish,110 Old Hojack Lane,,Hilton,NY,14468,true,true,43.2918531,-77.7957304
 st-louis-pittsford,st-louis,St. Louis Church,64 South Main Street,,Pittsford,NY,14534,,,43.0877672,-77.5162028
 st-luke-the-evangelist,st-mary-geneseo,St. Mary,13 North Street,,Geneseo,NY,14454,,,42.8001888,-77.8148369
 st-luke-the-evangelist,st-patrick-mount-morris,St. Patrick,46 Stanley Street,,Mount Morris,NY,14510,,,42.7237235,-77.8764829

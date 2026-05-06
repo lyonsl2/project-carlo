@@ -295,6 +295,11 @@ export interface ChurchSearchResult {
   id: number;
   slug: string;
   name: string | null;
+  address_line1: string | null;
+  address_line2: string | null;
+  city: string | null;
+  state: string | null;
+  postal_code: string | null;
   latitude: number | null;
   longitude: number | null;
 }
@@ -304,7 +309,8 @@ export async function fetchAllChurchesForSearch(): Promise<
 > {
   const db = await getDb();
   const stmt = db.prepare(
-    `SELECT id, slug, name, latitude, longitude FROM church
+    `SELECT id, slug, name, address_line1, address_line2, city, state, postal_code,
+            latitude, longitude FROM church
      WHERE latitude IS NOT NULL AND longitude IS NOT NULL
      ORDER BY name`,
   );
@@ -316,6 +322,11 @@ export async function fetchAllChurchesForSearch(): Promise<
         id: row["id"] as number,
         slug: row["slug"] as string,
         name: str(row["name"]),
+        address_line1: str(row["address_line1"]),
+        address_line2: str(row["address_line2"]),
+        city: str(row["city"]),
+        state: str(row["state"]),
+        postal_code: str(row["postal_code"]),
         latitude: num(row["latitude"]),
         longitude: num(row["longitude"]),
       });

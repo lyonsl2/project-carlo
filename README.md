@@ -48,7 +48,7 @@ pnpm dev:web
 Run each stage independently:
 
 ```bash
-pnpm fetch [-- --parish "..."]
+pnpm run fetch [-- --parish "..."]
 pnpm process [-- --parish "..." --model gemini-3-flash-preview]
 pnpm detect [-- --dry-run --limit N --pause-seconds 0.5]
 pnpm geocode [-- --dry-run --limit N --email "you@example.com"]

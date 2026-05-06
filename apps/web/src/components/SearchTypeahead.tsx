@@ -10,6 +10,7 @@ import { Command as CommandPrimitive } from "cmdk";
 import { useQuery } from "@tanstack/react-query";
 import type FuseType from "fuse.js";
 import { fetchAllChurchesForSearch, type ChurchSearchResult } from "../api";
+import { formatAddress } from "../utils";
 import {
   canSearchPlaces,
   PlaceSearchConfigurationError,
@@ -98,7 +99,14 @@ export function SearchTypeahead({
     return new FuseRef.current(
       allChurches.filter((c) => c.name),
       {
-        keys: ["name"],
+        keys: [
+          { name: "name", weight: 0.62 },
+          { name: "city", weight: 0.13 },
+          { name: "state", weight: 0.08 },
+          { name: "postal_code", weight: 0.08 },
+          { name: "address_line1", weight: 0.07 },
+          { name: "address_line2", weight: 0.02 },
+        ],
         threshold: 0.4,
         includeScore: true,
       },
@@ -195,6 +203,13 @@ export function SearchTypeahead({
     );
   }, [clearQuery, onPlaceSelect]);
 
+  const getChurchLocationText = useCallback((church: ChurchSearchResult) => {
+    const address = formatAddress(church);
+    if (address) return address;
+    const stateZip = [church.state, church.postal_code].filter(Boolean).join(" ");
+    return [church.city, stateZip].filter(Boolean).join(", ");
+  }, []);
+
   const handleModeToggle = useCallback(
     () => {
       setSearchMode((current) => (current === "place" ? "parish" : "place"));
@@ -284,7 +299,9 @@ export function SearchTypeahead({
         </PopoverAnchor>
         <PopoverContent
           align="start"
+          side="bottom"
           sideOffset={10}
+          avoidCollisions={false}
           className="z-[950] w-[min(32rem,calc(100vw-2rem))] border-rule-strong bg-paper p-0 shadow-missal-popover"
           onOpenAutoFocus={(event) => event.preventDefault()}
         >
@@ -348,18 +365,28 @@ export function SearchTypeahead({
                           </div>
                         </CommandItem>
                       ))
-                    : parishResults.map((church) => (
-                        <CommandItem
-                          key={church.id}
-                          value={church.name ?? `church-${church.id}`}
-                          onSelect={() => handleChurchSelect(church)}
-                          className="group relative cursor-pointer gap-0 rounded-none border-l-2 border-transparent px-3 py-2.5 font-serif text-base text-ink data-[selected=true]:border-rubric data-[selected=true]:bg-paper-deep/60 data-[selected=true]:text-ink"
-                        >
-                          <span className="truncate">
-                            {church.name ?? "Unnamed parish"}
-                          </span>
-                        </CommandItem>
-                      ))}
+                    : parishResults.map((church) => {
+                        const locationText = getChurchLocationText(church);
+                        return (
+                          <CommandItem
+                            key={church.id}
+                            value={`${church.name ?? `church-${church.id}`} ${locationText}`}
+                            onSelect={() => handleChurchSelect(church)}
+                            className="group relative cursor-pointer gap-0 rounded-none border-l-2 border-transparent px-3 py-2.5 font-serif text-base text-ink data-[selected=true]:border-rubric data-[selected=true]:bg-paper-deep/60 data-[selected=true]:text-ink"
+                          >
+                            <div className="min-w-0">
+                              <div className="truncate">
+                                {church.name ?? "Unnamed parish"}
+                              </div>
+                              {locationText ? (
+                                <div className="mt-0.5 truncate text-sm text-ink-faint">
+                                  {locationText}
+                                </div>
+                              ) : null}
+                            </div>
+                          </CommandItem>
+                        );
+                      })}
                 </CommandGroup>
               ) : (
                 <CommandEmpty className="px-3 py-4 text-center font-serif text-sm text-ink-faint">
