@@ -54,6 +54,7 @@ export function SearchTypeahead({
   const [locationStatus, setLocationStatus] =
     useState<LocationStatus>("idle");
   const [locationError, setLocationError] = useState<string | null>(null);
+  const searchAnchorRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const t = setTimeout(() => setDebouncedQuery(query), DEBOUNCE_MS);
@@ -225,7 +226,7 @@ export function SearchTypeahead({
     >
       <Popover open={showDropdown} onOpenChange={setIsOpen}>
         <PopoverAnchor asChild>
-          <div className="relative w-full">
+          <div ref={searchAnchorRef} className="relative w-full">
             <div
               className="group flex w-full items-center gap-2 border-b pb-1.5 transition-colors"
               style={{
@@ -304,6 +305,15 @@ export function SearchTypeahead({
           avoidCollisions={false}
           className="z-[950] w-[min(32rem,calc(100vw-2rem))] border-rule-strong bg-paper p-0 shadow-missal-popover"
           onOpenAutoFocus={(event) => event.preventDefault()}
+          onInteractOutside={(event) => {
+            const target = event.target;
+            if (
+              target instanceof Node &&
+              searchAnchorRef.current?.contains(target)
+            ) {
+              event.preventDefault();
+            }
+          }}
         >
           <div className="border-b border-rule-strong px-4 pt-3 pb-2">
             <span className="smallcaps text-[0.8125rem] text-ink-faint">
