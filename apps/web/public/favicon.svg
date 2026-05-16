@@ -11,19 +11,19 @@
   />
   <path
     fill="none"
-    stroke="#C6A04D"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-    stroke-width="3"
-    d="M32 15v10M27.5 20H36.5"
-  />
-  <path fill="#6D241E" d="M28.5 34.5a3.5 3.5 0 0 1 7 0v10h-7v-10Z" />
-  <path
-    fill="none"
     stroke="#6D241E"
     stroke-linecap="round"
     stroke-linejoin="round"
     stroke-width="2.5"
     d="m21.5 30.4 10.5-9 10.5 9"
+  />
+  <path fill="#6D241E" d="M28.5 34.5a3.5 3.5 0 0 1 7 0v10h-7v-10Z" />
+  <path
+    fill="none"
+    stroke="#C6A04D"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="3"
+    d="M32 15v10M27.5 20H36.5"
   />
 </svg>
