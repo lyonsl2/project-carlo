@@ -37,6 +37,7 @@ export function StaticChurchPage({
         <meta name="description" content={description} />
         <meta name="theme-color" content="#F3ECD8" />
         <meta name="color-scheme" content="light" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <link rel="canonical" href={canonicalUrl} />
         <title>{title}</title>
         {fontPaths.map((fp) => (

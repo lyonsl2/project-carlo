@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">Project Carlo</title>
+  <rect width="64" height="64" rx="14" fill="#F3ECD8" />
+  <path
+    fill="#9B2F25"
+    d="M32 7c-10.8 0-19.5 8.7-19.5 19.5C12.5 40.1 32 57 32 57s19.5-16.9 19.5-30.5C51.5 15.7 42.8 7 32 7Z"
+  />
+  <path
+    fill="#F3ECD8"
+    d="m21.5 30.4 10.5-9 10.5 9V43c0 .8-.7 1.5-1.5 1.5H23c-.8 0-1.5-.7-1.5-1.5V30.4Z"
+  />
+  <path
+    fill="none"
+    stroke="#C6A04D"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="3"
+    d="M32 15v10M27.5 20H36.5"
+  />
+  <path fill="#6D241E" d="M28.5 34.5a3.5 3.5 0 0 1 7 0v10h-7v-10Z" />
+  <path
+    fill="none"
+    stroke="#6D241E"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    stroke-width="2.5"
+    d="m21.5 30.4 10.5-9 10.5 9"
+  />
+</svg>
