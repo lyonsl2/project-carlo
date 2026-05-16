@@ -8,6 +8,7 @@ interface StaticChurchPageProps {
   events: EventSummary[];
   cssPath: string;
   fontPaths: string[];
+  canonicalUrl: string;
 }
 
 export function StaticChurchPage({
@@ -15,6 +16,7 @@ export function StaticChurchPage({
   events,
   cssPath,
   fontPaths,
+  canonicalUrl,
 }: StaticChurchPageProps) {
   const title = church.name
     ? `${church.name} · Project Carlo`
@@ -35,6 +37,7 @@ export function StaticChurchPage({
         <meta name="description" content={description} />
         <meta name="theme-color" content="#F3ECD8" />
         <meta name="color-scheme" content="light" />
+        <link rel="canonical" href={canonicalUrl} />
         <title>{title}</title>
         {fontPaths.map((fp) => (
           <link

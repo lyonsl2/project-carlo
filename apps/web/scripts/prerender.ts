@@ -58,6 +58,14 @@ function absoluteUrl(origin: string, pathname: string): string {
   return new URL(pathname, `${origin}/`).href;
 }
 
+function canonicalPathForChurchSlug(slug: string): string {
+  return `/churches/${encodeURIComponent(slug)}`;
+}
+
+function canonicalUrlForChurchSlug(origin: string, slug: string): string {
+  return absoluteUrl(origin, canonicalPathForChurchSlug(slug));
+}
+
 function normalizeLastmodDate(raw: string | null | undefined): string | null {
   if (!raw) return null;
   const trimmed = raw.trim();
@@ -89,7 +97,7 @@ function writeSitemapAndRobots(
 ) {
   const buildDate = new Date().toISOString().slice(0, 10);
   const churchUrls = slugs.map((slug) => ({
-    loc: absoluteUrl(origin, `/churches/${encodeURIComponent(slug)}`),
+    loc: canonicalUrlForChurchSlug(origin, slug),
     lastmod: normalizeLastmodDate(lastmodBySlug[slug]) ?? buildDate,
   }));
   const homepageLastmod = maxIsoDate(
@@ -139,6 +147,7 @@ async function main() {
   const { cssPath, fontPaths } = discoverAssets();
   const slugs = getAllChurchSlugs(db);
   const lastmodBySlug = getChurchLastModifiedDates(db);
+  const origin = getSiteOrigin();
 
   console.log(`Pre-rendering ${slugs.length} church pages...`);
 
@@ -150,7 +159,13 @@ async function main() {
     const html =
       "<!DOCTYPE html>" +
       renderToStaticMarkup(
-        createElement(StaticChurchPage, { church, events, cssPath, fontPaths }),
+        createElement(StaticChurchPage, {
+          church,
+          events,
+          cssPath,
+          fontPaths,
+          canonicalUrl: canonicalUrlForChurchSlug(origin, slug),
+        }),
       );
 
     const outDir = resolve(DIST_DIR, "churches", slug);
@@ -159,7 +174,6 @@ async function main() {
     count++;
   }
 
-  const origin = getSiteOrigin();
   writeSitemapAndRobots(DIST_DIR, origin, slugs, lastmodBySlug);
   console.log(`Wrote sitemap.xml and robots.txt (${slugs.length + 1} URLs).`);
 
