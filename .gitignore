@@ -22,6 +22,7 @@ eggs/
 .env
 .env.*
 !apps/web/.env.production
+!apps/web/.env.development
 *.log
 
 # IDE
