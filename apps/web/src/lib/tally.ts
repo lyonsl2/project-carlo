@@ -61,7 +61,13 @@ function loadTallyWidget(): Promise<void> {
 
 /** Published Tally form ID from Share → popup/embed URLs. */
 export function getTallyFormId(): string | undefined {
-  const id = import.meta.env.VITE_TALLY_FORM_ID?.trim();
+  // `import.meta.env` is injected by Vite for the client bundle but is
+  // undefined under the tsx-driven prerender, so fall back to process.env there.
+  const fromVite = (import.meta as ImportMeta & { env?: ImportMetaEnv }).env
+    ?.VITE_TALLY_FORM_ID;
+  const fromNode =
+    typeof process !== "undefined" ? process.env?.VITE_TALLY_FORM_ID : undefined;
+  const id = (fromVite ?? fromNode)?.trim();
   return id || undefined;
 }
 
