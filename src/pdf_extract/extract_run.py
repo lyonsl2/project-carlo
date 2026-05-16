@@ -15,6 +15,7 @@ from __future__ import annotations
 import json
 import logging
 import time
+from hashlib import sha256
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date
 from pathlib import Path
@@ -43,12 +44,28 @@ def run_dir(classifier_name: str) -> Path:
     return RUNS_DIR / classifier_name
 
 
-def cache_path(classifier_name: str, content_hash: str) -> Path:
-    return run_dir(classifier_name) / "cache" / f"{content_hash}.json"
+def _cache_version_component(classifier_version: str) -> str:
+    raw = classifier_version.strip() or "unknown"
+    readable = "".join(ch if ch.isalnum() or ch in "._-" else "_" for ch in raw)
+    digest = sha256(raw.encode("utf-8")).hexdigest()[:12]
+    return f"{readable[:80]}-{digest}"
+
+
+def cache_path(classifier_name: str, classifier_version: str, content_hash: str) -> Path:
+    return (
+        run_dir(classifier_name)
+        / "cache"
+        / _cache_version_component(classifier_version)
+        / f"{content_hash}.json"
+    )
 
 
 def events_path(classifier_name: str) -> Path:
     return run_dir(classifier_name) / "events.json"
+
+
+def bulletins_path(classifier_name: str) -> Path:
+    return run_dir(classifier_name) / "bulletins.json"
 
 
 def run_summary_path(classifier_name: str) -> Path:
@@ -71,8 +88,10 @@ def _latest_per_parish(metadata: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 
 # ── Cache I/O ───────────────────────────────────────────────────────────────
-def _load_cached(classifier_name: str, content_hash: str) -> dict[str, Any] | None:
-    path = cache_path(classifier_name, content_hash)
+def _load_cached(
+    classifier_name: str, classifier_version: str, content_hash: str
+) -> dict[str, Any] | None:
+    path = cache_path(classifier_name, classifier_version, content_hash)
     if not path.exists():
         return None
     try:
@@ -83,9 +102,9 @@ def _load_cached(classifier_name: str, content_hash: str) -> dict[str, Any] | No
 
 
 def _store_cached(
-    classifier_name: str, content_hash: str, payload: dict[str, Any]
+    classifier_name: str, classifier_version: str, content_hash: str, payload: dict[str, Any]
 ) -> None:
-    path = cache_path(classifier_name, content_hash)
+    path = cache_path(classifier_name, classifier_version, content_hash)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
@@ -107,19 +126,25 @@ def _flatten(entry: dict[str, Any], extracted: dict[str, Any]) -> list[dict[str,
         note_raw = ev.get("note")
         note = note_raw.strip() if isinstance(note_raw, str) and note_raw.strip() else None
 
-        out.append({
-            "church_slug": church_slug,
-            "bulletin_source_url": entry["source_url"],
-            "event_type": str(ev.get("type", "")),
-            "event_kind": str(ev.get("kind", "")),
-            "day_of_week": ev.get("day_of_week") if isinstance(ev.get("day_of_week"), str) else None,
-            "date": ev.get("date") if isinstance(ev.get("date"), str) else None,
-            "start_time": str(ev.get("start_time", "")),
-            "end_time": ev.get("end_time") if isinstance(ev.get("end_time"), str) else None,
-            "cancelled": bool(ev.get("cancelled", False)),
-            "page_number": ev.get("page_number") if isinstance(ev.get("page_number"), int) else None,
-            "note": note,
-        })
+        out.append(
+            {
+                "church_slug": church_slug,
+                "bulletin_source_url": entry["source_url"],
+                "event_type": str(ev.get("type", "")),
+                "event_kind": str(ev.get("kind", "")),
+                "day_of_week": ev.get("day_of_week")
+                if isinstance(ev.get("day_of_week"), str)
+                else None,
+                "date": ev.get("date") if isinstance(ev.get("date"), str) else None,
+                "start_time": str(ev.get("start_time", "")),
+                "end_time": ev.get("end_time") if isinstance(ev.get("end_time"), str) else None,
+                "cancelled": bool(ev.get("cancelled", False)),
+                "page_number": ev.get("page_number")
+                if isinstance(ev.get("page_number"), int)
+                else None,
+                "note": note,
+            }
+        )
     return out
 
 
@@ -138,7 +163,10 @@ def run(
     classifier = get_classifier(classifier_name)
     LOGGER.info(
         "Starting extract run (classifier=%s version=%s parish=%s concurrency=%s)",
-        classifier.name, classifier.version, parish_name or "*all*", concurrency,
+        classifier.name,
+        classifier.version,
+        parish_name or "*all*",
+        concurrency,
     )
 
     metadata = load_json_list(BULLETINS_METADATA_PATH)
@@ -168,11 +196,12 @@ def run(
             content_hash = entry.get("content_hash")
             if not isinstance(content_hash, str) or not content_hash:
                 LOGGER.warning(
-                    "Skipping bulletin without content_hash: %s", entry.get("source_url"),
+                    "Skipping bulletin without content_hash: %s",
+                    entry.get("source_url"),
                 )
                 skipped += 1
                 continue
-            cached = _load_cached(classifier.name, content_hash)
+            cached = _load_cached(classifier.name, classifier.version, content_hash)
             if cached is not None:
                 cached_results[entry["source_url"]] = cached
                 cache_hits += 1
@@ -193,15 +222,23 @@ def run(
                 except Exception as exc:
                     LOGGER.warning(
                         "Classifier %s failed for %s",
-                        classifier.name, item.entry.get("source_url"),
+                        classifier.name,
+                        item.entry.get("source_url"),
                         exc_info=True,
                     )
-                    errors.append({
-                        "source_url": str(item.entry.get("source_url")),
-                        "error": repr(exc),
-                    })
+                    errors.append(
+                        {
+                            "source_url": str(item.entry.get("source_url")),
+                            "error": repr(exc),
+                        }
+                    )
                     return
-                _store_cached(classifier.name, item.entry["content_hash"], extracted)
+                _store_cached(
+                    classifier.name,
+                    classifier.version,
+                    item.entry["content_hash"],
+                    extracted,
+                )
                 cached_results[item.entry["source_url"]] = extracted
                 cache_misses += 1
 
@@ -227,13 +264,34 @@ def run(
 
     # Rebuild events.json from the (now-current) cache for every served bulletin.
     events: list[dict[str, Any]] = []
+    served_bulletins: list[dict[str, Any]] = []
     for entry in candidates:
         result = cached_results.get(entry["source_url"])
         if result is None:
             continue
-        events.extend(_flatten(entry, result))
+        rows = _flatten(entry, result)
+        events.extend(rows)
+        served_bulletins.append(
+            {
+                "bulletin_source_url": entry["source_url"],
+                "pdf_path": entry.get("pdf_path")
+                if isinstance(entry.get("pdf_path"), str)
+                else None,
+                "parish_slug": entry.get("parish_slug")
+                if isinstance(entry.get("parish_slug"), str)
+                else None,
+                "published_date": (
+                    entry.get("published_date")
+                    if isinstance(entry.get("published_date"), str)
+                    else None
+                ),
+                "event_count": len(rows),
+                "wrong_bulletin": bool(result.get("wrong_bulletin")),
+            }
+        )
 
     save_json_list(events_path(classifier.name), events)
+    save_json_list(bulletins_path(classifier.name), served_bulletins)
 
     summary = {
         "classifier": classifier.name,
@@ -252,7 +310,8 @@ def run(
     summary_path = run_summary_path(classifier.name)
     summary_path.parent.mkdir(parents=True, exist_ok=True)
     summary_path.write_text(
-        json.dumps(summary, indent=2, ensure_ascii=False) + "\n", encoding="utf-8",
+        json.dumps(summary, indent=2, ensure_ascii=False) + "\n",
+        encoding="utf-8",
     )
 
     LOGGER.info("Extract run finished: %s", summary)

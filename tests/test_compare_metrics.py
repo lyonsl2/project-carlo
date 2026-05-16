@@ -40,17 +40,37 @@ def test_event_key_distinguishes_start_time():
     assert compare.event_key(a) != compare.event_key(b)
 
 
-def _write_run(tmp_path: Path, name: str, events: list[dict]) -> None:
+def _write_run(
+    tmp_path: Path,
+    name: str,
+    events: list[dict],
+    bulletins: list[str] | None = None,
+) -> None:
     run_dir = tmp_path / "runs" / name
     (run_dir / "cache").mkdir(parents=True, exist_ok=True)
     (run_dir / "events.json").write_text(
-        json.dumps(events, indent=2) + "\n", encoding="utf-8",
+        json.dumps(events, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    urls = (
+        bulletins
+        if bulletins is not None
+        else sorted({row["bulletin_source_url"] for row in events})
+    )
+    (run_dir / "bulletins.json").write_text(
+        json.dumps(
+            [{"bulletin_source_url": url, "event_count": 0} for url in urls],
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
     )
 
 
 def _write_metadata(tmp_path: Path, rows: list[dict]) -> None:
     (tmp_path / "metadata.json").write_text(
-        json.dumps(rows, indent=2) + "\n", encoding="utf-8",
+        json.dumps(rows, indent=2) + "\n",
+        encoding="utf-8",
     )
 
 
@@ -86,9 +106,9 @@ def test_pairwise_partial_agreement_jaccard(patched_runs):
         _ev(start_time="5:00 PM"),
     ]
     b_events = [
-        _ev(start_time="9:00 AM"),     # match
-        _ev(start_time="11:30 AM"),    # disagree (a had 11:00)
-        _ev(start_time="5:00 PM"),     # match
+        _ev(start_time="9:00 AM"),  # match
+        _ev(start_time="11:30 AM"),  # disagree (a had 11:00)
+        _ev(start_time="5:00 PM"),  # match
     ]
     _write_run(tmp, "a", a_events)
     _write_run(tmp, "b", b_events)
@@ -104,12 +124,17 @@ def test_pairwise_partial_agreement_jaccard(patched_runs):
 def test_pairwise_details_show_same_and_model_differences(patched_runs):
     tmp = patched_runs
     source_url = "https://example.org/b.pdf"
-    _write_metadata(tmp, [{
-        "source_url": source_url,
-        "pdf_path": "data/bulletins/example.pdf",
-        "parish_slug": "st-mary-parish",
-        "published_date": "2026-05-03",
-    }])
+    _write_metadata(
+        tmp,
+        [
+            {
+                "source_url": source_url,
+                "pdf_path": "data/bulletins/example.pdf",
+                "parish_slug": "st-mary-parish",
+                "published_date": "2026-05-03",
+            }
+        ],
+    )
     a_events = [
         _ev(start_time="9:00 AM", page_number=1, note="A note"),
         _ev(start_time="11:00 AM"),
@@ -141,12 +166,17 @@ def test_pairwise_details_show_same_and_model_differences(patched_runs):
 def test_compare_writes_side_by_side_markdown(patched_runs):
     tmp = patched_runs
     source_url = "https://example.org/b.pdf"
-    _write_metadata(tmp, [{
-        "source_url": source_url,
-        "pdf_path": "data/bulletins/example.pdf",
-        "parish_slug": "st-mary-parish",
-        "published_date": "2026-05-03",
-    }])
+    _write_metadata(
+        tmp,
+        [
+            {
+                "source_url": source_url,
+                "pdf_path": "data/bulletins/example.pdf",
+                "parish_slug": "st-mary-parish",
+                "published_date": "2026-05-03",
+            }
+        ],
+    )
     _write_run(tmp, "a", [_ev(start_time="9:00 AM")])
     _write_run(tmp, "b", [_ev(start_time="9:30 AM")])
 
@@ -172,6 +202,36 @@ def test_bulletins_only_in_each_classifier_are_counted(patched_runs):
     assert pair["bulletins_in_both"] == 0
     assert pair["bulletins_only_in_a"] == 1
     assert pair["bulletins_only_in_b"] == 1
+
+
+def test_zero_event_bulletins_are_included_in_pairwise_metrics(patched_runs):
+    tmp = patched_runs
+    source_url = "https://example.org/zero.pdf"
+    _write_run(tmp, "a", [], bulletins=[source_url])
+    _write_run(tmp, "b", [_ev(bulletin_source_url=source_url)], bulletins=[source_url])
+
+    report = compare.compare(["a", "b"], out_path=tmp / "report.json")
+
+    assert report["per_classifier"][0]["bulletins"] == 1
+    assert report["per_classifier"][0]["events_total"] == 0
+    assert report["per_classifier"][1]["bulletins"] == 1
+    assert report["per_classifier"][1]["events_total"] == 1
+
+    pair = report["pairwise"][0]
+    assert pair["bulletins_in_both"] == 1
+    assert pair["events_total_a"] == 0
+    assert pair["events_total_b"] == 1
+    assert pair["events_in_both"] == 0
+    assert pair["events_in_union"] == 1
+    assert pair["micro_jaccard"] == 0.0
+    assert pair["mean_jaccard"] == 0.0
+    assert pair["one_sided_zero_event_bulletins"] == [
+        {
+            "bulletin_source_url": source_url,
+            "a_event_count": 0,
+            "b_event_count": 1,
+        }
+    ]
 
 
 def test_compare_requires_two_classifiers(patched_runs):

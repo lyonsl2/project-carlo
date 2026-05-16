@@ -23,17 +23,29 @@ def _setup_test_db(tmp_path: Path) -> Path:
         """INSERT INTO parish(
             slug, name, homepage_url, bulletin_provider, provider_id, created_at
         ) VALUES (?, ?, ?, ?, ?, ?)""",
-        ("test-parish", "Test Parish", "https://test.org", "ecatholic", None,
-         "2026-01-01T00:00:00Z"),
+        (
+            "test-parish",
+            "Test Parish",
+            "https://test.org",
+            "ecatholic",
+            None,
+            "2026-01-01T00:00:00Z",
+        ),
     )
-    parish_id = conn.execute(
-        "SELECT id FROM parish WHERE slug = 'test-parish'"
-    ).fetchone()["id"]
+    parish_id = conn.execute("SELECT id FROM parish WHERE slug = 'test-parish'").fetchone()["id"]
     conn.execute(
         "INSERT INTO church(parish_id, slug, name, address_line1, city, state, postal_code,"
         " created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-        (parish_id, "st-mary-anytown", "St. Mary", "123 Main St", "Anytown", "NY",
-         "14000", "2026-01-01T00:00:00Z"),
+        (
+            parish_id,
+            "st-mary-anytown",
+            "St. Mary",
+            "123 Main St",
+            "Anytown",
+            "NY",
+            "14000",
+            "2026-01-01T00:00:00Z",
+        ),
     )
     conn.commit()
     conn.close()
@@ -82,8 +94,7 @@ def _patch_paths(monkeypatch, tmp_path: Path, classifier: _CountingClassifier) -
     monkeypatch.setattr(extract_run, "DATA_DIR", tmp_path)
     monkeypatch.setattr(extract_run, "RUNS_DIR", tmp_path / "runs")
     # Skip the pypdf truncation helper for these stub PDFs.
-    monkeypatch.setattr("pdf_extract.storage.ensure_truncated_pdf",
-                        lambda path, **kwargs: path)
+    monkeypatch.setattr("pdf_extract.storage.ensure_truncated_pdf", lambda path, **kwargs: path)
     monkeypatch.setitem(REGISTRY, classifier.name, lambda: classifier)
 
 
@@ -96,17 +107,20 @@ def seeded_run(tmp_path, monkeypatch):
     pdf_path = tmp_path / "sample.pdf"
     pdf_path.write_bytes(b"fake")
 
-    save_json_list(tmp_path / "metadata.json", [
-        {
-            "parish_slug": "test-parish",
-            "source_url": "https://example.org/parsed.pdf",
-            "pdf_path": str(pdf_path),
-            "content_hash": "hash-abc",
-            "fetched_at": "2026-01-01T00:00:00Z",
-            "processed_at": None,
-            "published_date": None,
-        }
-    ])
+    save_json_list(
+        tmp_path / "metadata.json",
+        [
+            {
+                "parish_slug": "test-parish",
+                "source_url": "https://example.org/parsed.pdf",
+                "pdf_path": str(pdf_path),
+                "content_hash": "hash-abc",
+                "fetched_at": "2026-01-01T00:00:00Z",
+                "processed_at": None,
+                "published_date": None,
+            }
+        ],
+    )
 
     classifier = _CountingClassifier(_payload_one_event())
     _patch_paths(monkeypatch, tmp_path, classifier)
@@ -123,10 +137,23 @@ def test_first_run_calls_classifier_and_writes_outputs(seeded_run):
     assert summary["cache_misses"] == 1
     assert summary["events_written"] == 1
 
-    cache_file = tmp_path / "runs" / "counting" / "cache" / "hash-abc.json"
+    cache_file = extract_run.cache_path("counting", "v1", "hash-abc")
     assert cache_file.exists()
     cached = json.loads(cache_file.read_text(encoding="utf-8"))
     assert cached["events"][0]["church_slug"] == "st-mary-anytown"
+
+    bulletins_file = extract_run.bulletins_path("counting")
+    bulletins = json.loads(bulletins_file.read_text(encoding="utf-8"))
+    assert bulletins == [
+        {
+            "bulletin_source_url": "https://example.org/parsed.pdf",
+            "pdf_path": str(tmp_path / "sample.pdf"),
+            "parish_slug": "test-parish",
+            "published_date": None,
+            "event_count": 1,
+            "wrong_bulletin": False,
+        }
+    ]
 
     events_file = tmp_path / "runs" / "counting" / "events.json"
     events = json.loads(events_file.read_text(encoding="utf-8"))
@@ -145,6 +172,21 @@ def test_second_run_serves_from_cache_without_calling_classifier(seeded_run):
     assert summary["cache_hits"] == 1
     assert summary["cache_misses"] == 0
     assert summary["events_written"] == 1
+
+
+def test_cache_miss_after_classifier_version_changes(seeded_run):
+    _, classifier = seeded_run
+
+    extract_run.run(classifier_name="counting", concurrency=1)
+    assert classifier.call_count == 1
+
+    classifier.version = "v2"
+    summary = extract_run.run(classifier_name="counting", concurrency=1)
+
+    assert classifier.call_count == 2
+    assert summary["cache_hits"] == 0
+    assert summary["cache_misses"] == 1
+    assert extract_run.cache_path("counting", "v2", "hash-abc").exists()
 
 
 def test_run_does_not_touch_metadata_processed_at(seeded_run):

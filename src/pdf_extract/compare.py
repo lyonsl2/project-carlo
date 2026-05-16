@@ -19,7 +19,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from pdf_extract.extract_run import RUNS_DIR, events_path, run_summary_path
+from pdf_extract.extract_run import RUNS_DIR, bulletins_path, events_path, run_summary_path
 from pdf_extract.storage import BULLETINS_METADATA_PATH, load_json_list, utc_now_iso
 
 LOGGER = logging.getLogger(__name__)
@@ -58,9 +58,23 @@ def _load_run(classifier_name: str) -> tuple[EventsByBulletin, dict[str, Any]]:
             f"No events.json for classifier {classifier_name!r} at {ev_path}. "
             f"Run `pnpm extract --classifier {classifier_name}` first."
         )
-    rows = json.loads(ev_path.read_text(encoding="utf-8"))
-
     grouped: dict[str, list[dict[str, Any]]] = defaultdict(list)
+
+    manifest_path = bulletins_path(classifier_name)
+    if manifest_path.exists():
+        try:
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError:
+            LOGGER.warning("Could not parse %s; ignoring", manifest_path, exc_info=True)
+        else:
+            for row in manifest:
+                if not isinstance(row, dict):
+                    continue
+                url = row.get("bulletin_source_url") or row.get("source_url")
+                if isinstance(url, str):
+                    grouped.setdefault(url, [])
+
+    rows = json.loads(ev_path.read_text(encoding="utf-8"))
     for row in rows:
         if not isinstance(row, dict):
             continue
@@ -92,7 +106,9 @@ def _load_bulletin_metadata() -> dict[str, dict[str, Any]]:
         metadata[source_url] = {
             "bulletin_source_url": source_url,
             "pdf_path": entry.get("pdf_path") if isinstance(entry.get("pdf_path"), str) else None,
-            "parish_slug": entry.get("parish_slug") if isinstance(entry.get("parish_slug"), str) else None,
+            "parish_slug": entry.get("parish_slug")
+            if isinstance(entry.get("parish_slug"), str)
+            else None,
             "published_date": (
                 entry.get("published_date")
                 if isinstance(entry.get("published_date"), str)
@@ -167,20 +183,20 @@ def _pairwise_metrics(
         else:
             per_bulletin_jaccards.append(1.0)  # both empty: agree trivially
         if (len(a_set) == 0) != (len(b_set) == 0):
-            one_sided_zero.append({
-                "bulletin_source_url": url,
-                f"{name_a}_event_count": len(a_set),
-                f"{name_b}_event_count": len(b_set),
-            })
+            one_sided_zero.append(
+                {
+                    "bulletin_source_url": url,
+                    f"{name_a}_event_count": len(a_set),
+                    f"{name_b}_event_count": len(b_set),
+                }
+            )
 
     micro_jaccard = (total_intersect / total_union) if total_union else None
     mean_jaccard = (
-        round(statistics.fmean(per_bulletin_jaccards), 4)
-        if per_bulletin_jaccards else None
+        round(statistics.fmean(per_bulletin_jaccards), 4) if per_bulletin_jaccards else None
     )
     median_jaccard = (
-        round(statistics.median(per_bulletin_jaccards), 4)
-        if per_bulletin_jaccards else None
+        round(statistics.median(per_bulletin_jaccards), 4) if per_bulletin_jaccards else None
     )
 
     return {
@@ -198,7 +214,11 @@ def _pairwise_metrics(
         "median_jaccard": median_jaccard,
         "one_sided_zero_event_bulletins": one_sided_zero,
         "per_bulletin": _pairwise_bulletin_details(
-            name_a, grouped_a, name_b, grouped_b, metadata,
+            name_a,
+            grouped_a,
+            name_b,
+            grouped_b,
+            metadata,
         ),
     }
 
@@ -225,31 +245,29 @@ def _pairwise_bulletin_details(
         jaccard = (len(same_keys) / union_count) if union_count else 1.0
 
         info = metadata.get(url, {"bulletin_source_url": url})
-        details.append({
-            "bulletin_source_url": url,
-            "pdf_path": info.get("pdf_path"),
-            "parish_slug": info.get("parish_slug"),
-            "published_date": info.get("published_date"),
-            f"{name_a}_event_count": len(a_keys),
-            f"{name_b}_event_count": len(b_keys),
-            "same_count": len(same_keys),
-            f"only_in_{name_a}_count": len(only_a_keys),
-            f"only_in_{name_b}_count": len(only_b_keys),
-            "jaccard": round(jaccard, 4),
-            "same": [
-                {
-                    name_a: _event_for_report(a_by_key[key]),
-                    name_b: _event_for_report(b_by_key[key]),
-                }
-                for key in same_keys
-            ],
-            f"only_in_{name_a}": [
-                _event_for_report(a_by_key[key]) for key in only_a_keys
-            ],
-            f"only_in_{name_b}": [
-                _event_for_report(b_by_key[key]) for key in only_b_keys
-            ],
-        })
+        details.append(
+            {
+                "bulletin_source_url": url,
+                "pdf_path": info.get("pdf_path"),
+                "parish_slug": info.get("parish_slug"),
+                "published_date": info.get("published_date"),
+                f"{name_a}_event_count": len(a_keys),
+                f"{name_b}_event_count": len(b_keys),
+                "same_count": len(same_keys),
+                f"only_in_{name_a}_count": len(only_a_keys),
+                f"only_in_{name_b}_count": len(only_b_keys),
+                "jaccard": round(jaccard, 4),
+                "same": [
+                    {
+                        name_a: _event_for_report(a_by_key[key]),
+                        name_b: _event_for_report(b_by_key[key]),
+                    }
+                    for key in same_keys
+                ],
+                f"only_in_{name_a}": [_event_for_report(a_by_key[key]) for key in only_a_keys],
+                f"only_in_{name_b}": [_event_for_report(b_by_key[key]) for key in only_b_keys],
+            }
+        )
 
     return sorted(
         details,
@@ -293,8 +311,7 @@ def compare(
     metadata = _load_bulletin_metadata()
 
     per_classifier = [
-        _classifier_stats(name, grouped, summary)
-        for name, (grouped, summary) in runs.items()
+        _classifier_stats(name, grouped, summary) for name, (grouped, summary) in runs.items()
     ]
 
     pairwise = [
@@ -319,7 +336,8 @@ def compare(
     report["markdown_report_path"] = str(markdown_path)
     out_path.write_text(json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
     markdown_path.write_text(
-        format_side_by_side_markdown(report) + "\n", encoding="utf-8",
+        format_side_by_side_markdown(report) + "\n",
+        encoding="utf-8",
     )
     print(format_markdown(report))
     print(f"\nFull JSON report: {out_path}")
@@ -332,7 +350,9 @@ def format_markdown(report: dict[str, Any]) -> str:
     lines: list[str] = []
     lines.append("## Per-classifier")
     lines.append("")
-    lines.append("| Classifier | Version | Bulletins | Events | Mean/bulletin | Cache hits/misses | Wall (s) | Errors |")
+    lines.append(
+        "| Classifier | Version | Bulletins | Events | Mean/bulletin | Cache hits/misses | Wall (s) | Errors |"
+    )
     lines.append("|---|---|---:|---:|---:|---|---:|---:|")
     for c in report["per_classifier"]:
         cache = f"{c.get('cache_hits') or 0}/{c.get('cache_misses') or 0}"
@@ -344,7 +364,9 @@ def format_markdown(report: dict[str, Any]) -> str:
     lines.append("")
     lines.append("## Pairwise agreement (exact tuple match)")
     lines.append("")
-    lines.append("| A | B | Bulletins shared | Events ∩ | Events ∪ | Micro-Jaccard | Mean Jaccard | One-sided-zero |")
+    lines.append(
+        "| A | B | Bulletins shared | Events ∩ | Events ∪ | Micro-Jaccard | Mean Jaccard | One-sided-zero |"
+    )
     lines.append("|---|---|---:|---:|---:|---:|---:|---:|")
     for p in report["pairwise"]:
         lines.append(
@@ -375,7 +397,9 @@ def format_side_by_side_markdown(report: dict[str, Any]) -> str:
 
 
 def _format_bulletin_detail(
-    bulletin: dict[str, Any], name_a: str, name_b: str,
+    bulletin: dict[str, Any],
+    name_a: str,
+    name_b: str,
 ) -> list[str]:
     title_bits = [
         str(value)
@@ -417,9 +441,7 @@ def _format_bulletin_detail(
 
 def _format_event_line(event: dict[str, Any]) -> str:
     type_bits = [
-        str(value)
-        for value in (event.get("event_type"), event.get("event_kind"))
-        if value
+        str(value) for value in (event.get("event_type"), event.get("event_kind")) if value
     ]
     when = event.get("date") or event.get("day_of_week") or ""
     time_bits = [str(event.get("start_time") or "")]
