@@ -77,6 +77,17 @@ process_result = process_bulletins(parish_name="Southeast Rochester Catholic Com
 - `GEMINI_API_KEY`: automatically picked up by the Gemini client.
 - `GOOGLE_API_KEY`: also supported by the SDK as an alternative.
 
+### Web app (`apps/web`)
+
+- `VITE_GEOAPIFY_API_KEY`: place search on the map (see `apps/web/.env.production`).
+- `VITE_TALLY_FORM_ID`: Tally form ID for user feedback (e.g. `Me65rA` from `https://tally.so/r/Me65rA`). Set in `apps/web/.env.development` (dev) and `apps/web/.env.production` (build). When unset, feedback links are hidden.
+
+## User feedback
+
+Comments and corrections are collected with [Tally](https://tally.so). The form should include hidden fields named `page_path`, `full_url`, `church_slug`, and `church_name` (the app prefills these when someone opens the popup).
+
+Review submissions in the Tally dashboard for your form → **Submissions**. Export CSV when batching data fixes.
+
 ## Database workflow
 
 The database is rebuilt from flat files (`data/schema.sql`, CSVs, and JSONs):

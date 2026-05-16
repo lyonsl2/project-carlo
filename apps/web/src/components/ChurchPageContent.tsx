@@ -12,7 +12,9 @@ import {
   ExternalLinkIcon,
   FileTextIcon,
   MapPinIcon,
+  PencilIcon,
 } from "@/components/icons";
+import { FeedbackTrigger } from "@/components/FeedbackTrigger";
 import { Fleuron } from "@/components/Fleuron";
 import { Masthead } from "@/components/Masthead";
 
@@ -210,32 +212,36 @@ export function ChurchPageContent({ church, events }: ChurchPageContentProps) {
 
           <Fleuron className="my-7" />
 
-          {(church.homepage_url || church.bulletin_url) ? (
-            <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
-              {church.homepage_url ? (
-                <a
-                  href={church.homepage_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="rubric-link smallcaps inline-flex items-center gap-2 text-[0.875rem]"
-                >
-                  <ExternalLinkIcon className="size-3" />
-                  Visit the parish website
-                </a>
-              ) : null}
-              {church.bulletin_url ? (
-                <a
-                  href={church.bulletin_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="rubric-link smallcaps inline-flex items-center gap-2 text-[0.875rem]"
-                >
-                  <FileTextIcon className="size-3" />
-                  Latest parish bulletin (PDF)
-                </a>
-              ) : null}
-            </div>
-          ) : null}
+          <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
+            {church.homepage_url ? (
+              <a
+                href={church.homepage_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rubric-link smallcaps inline-flex items-center gap-2 text-[0.875rem]"
+              >
+                <ExternalLinkIcon className="size-3" />
+                Visit the parish website
+              </a>
+            ) : null}
+            {church.bulletin_url ? (
+              <a
+                href={church.bulletin_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rubric-link smallcaps inline-flex items-center gap-2 text-[0.875rem]"
+              >
+                <FileTextIcon className="size-3" />
+                Latest parish bulletin (PDF)
+              </a>
+            ) : null}
+            <FeedbackTrigger
+              church={church}
+              label="Suggest an edit"
+              variant="pill"
+              icon={<PencilIcon className="size-3" />}
+            />
+          </div>
         </section>
 
         {events.length === 0 ? (

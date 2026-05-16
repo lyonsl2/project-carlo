@@ -8,6 +8,7 @@ import {
 import { FILTER_DAY_LABELS } from "../constants/days";
 import { EVENT_TYPE_OPTIONS } from "../constants/eventTypes";
 import { TimeRangeSlider } from "./TimeRangeSlider";
+import { FeedbackTrigger } from "./FeedbackTrigger";
 import { Fleuron } from "./Fleuron";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -210,13 +211,17 @@ export function FilterPanel({
         <button
           type="button"
           onClick={handleClear}
-          className="rubric-link smallcaps text-[0.875rem]"
+          className="rubric-link smallcaps text-[0.875rem] text-rubric hover:text-rubric-deep"
         >
           Reset
         </button>
+        <div className="flex-1" />
+        <FeedbackTrigger
+          label="Share feedback"
+          className="text-[0.875rem] text-rubric hover:text-rubric-deep"
+        />
         {!isDesktop ? (
           <>
-            <div className="flex-1" />
             <button
               type="button"
               onClick={handleApply}
