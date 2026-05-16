@@ -39,12 +39,18 @@ interface SearchTypeaheadProps {
   onChurchSelect: (church: ChurchSearchResult) => void;
   onPlaceSelect: (place: PlaceSearchResult) => void;
   filterButton: ReactNode;
+  /** Hide the inline place/parish mode toggle. Defaults to false. */
+  hideModeToggle?: boolean;
+  /** Input/icon sizing variant. `md` (default) matches the map header; `lg` renders the hero size used on the landing page. */
+  size?: "md" | "lg";
 }
 
 export function SearchTypeahead({
   onChurchSelect,
   onPlaceSelect,
   filterButton,
+  hideModeToggle = false,
+  size = "md",
 }: SearchTypeaheadProps) {
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
@@ -237,9 +243,9 @@ export function SearchTypeahead({
               }}
             >
               <SearchIcon
-                className={`size-4 shrink-0 transition-colors ${
-                  isFocused ? "text-rubric" : "text-ink-faint"
-                }`}
+                className={`shrink-0 transition-colors ${
+                  size === "lg" ? "size-[22px]" : "size-4"
+                } ${isFocused ? "text-rubric" : "text-ink-faint"}`}
               />
               <CommandPrimitive.Input
                 value={query}
@@ -268,7 +274,9 @@ export function SearchTypeahead({
                     : "Search for parish by name"
                 }
                 autoComplete="off"
-                className="min-w-0 flex-1 bg-transparent font-serif text-[1.0625rem] text-ink outline-none placeholder:text-ink-faint placeholder:italic"
+                className={`min-w-0 flex-1 bg-transparent font-serif text-ink outline-none placeholder:text-ink-faint placeholder:italic ${
+                  size === "lg" ? "text-[1.375rem]" : "text-[1.0625rem]"
+                }`}
               />
               {query.length > 0 ? (
                 <button
@@ -280,22 +288,26 @@ export function SearchTypeahead({
                   <XIcon className="size-3.5" />
                 </button>
               ) : null}
+              {hideModeToggle ? null : (
+                <button
+                  type="button"
+                  onClick={handleModeToggle}
+                  className="rubric-link smallcaps ml-1 hidden whitespace-nowrap text-[0.8125rem] sm:inline-flex"
+                >
+                  {modeButtonLabel}
+                </button>
+              )}
+              <div className="shrink-0">{filterButton}</div>
+            </div>
+            {hideModeToggle ? null : (
               <button
                 type="button"
                 onClick={handleModeToggle}
-                className="rubric-link smallcaps ml-1 hidden whitespace-nowrap text-[0.8125rem] sm:inline-flex"
+                className="rubric-link smallcaps mt-2 text-[0.8125rem] sm:hidden"
               >
                 {modeButtonLabel}
               </button>
-              <div className="shrink-0">{filterButton}</div>
-            </div>
-            <button
-              type="button"
-              onClick={handleModeToggle}
-              className="rubric-link smallcaps mt-2 text-[0.8125rem] sm:hidden"
-            >
-              {modeButtonLabel}
-            </button>
+            )}
           </div>
         </PopoverAnchor>
         <PopoverContent

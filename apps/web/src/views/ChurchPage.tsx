@@ -59,7 +59,7 @@ export function ChurchPage() {
     <main className="min-h-svh bg-paper">
       <header className="sticky top-0 z-40 border-b border-rule-strong bg-paper/95 backdrop-blur supports-[backdrop-filter]:bg-paper/85">
         <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-6 pt-[calc(0.85rem+var(--safe-area-inset-top))] pb-3">
-          <Link to="/" className="rubric-link smallcaps text-[0.875rem]">
+          <Link to="/map" className="rubric-link smallcaps text-[0.875rem]">
             <ArrowLeftIcon className="size-3" />
             Back to map
           </Link>

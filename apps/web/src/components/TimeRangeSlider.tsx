@@ -6,6 +6,8 @@ interface TimeRangeSliderProps {
   step?: number;
   value: [number, number];
   onValueChange: (value: [number, number]) => void;
+  /** Compact variant for narrow contexts: smaller digit row, no tick row, tighter gap. */
+  compact?: boolean;
 }
 
 function getPercent(value: number, min: number, max: number): number {
@@ -19,6 +21,7 @@ export function TimeRangeSlider({
   step = 1,
   value,
   onValueChange,
+  compact = false,
 }: TimeRangeSliderProps) {
   const [start, end] = value;
   const startPercent = getPercent(start, min, max);
@@ -27,8 +30,12 @@ export function TimeRangeSlider({
     formatMinutesMissal(Math.min(minutes, max - 1));
 
   return (
-    <div className="space-y-5">
-      <div className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-baseline gap-4 font-serif text-base text-ink">
+    <div className={compact ? "space-y-3" : "space-y-5"}>
+      <div
+        className={`grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-baseline gap-4 font-serif text-ink ${
+          compact ? "text-[15px]" : "text-base"
+        }`}
+      >
         <span className="justify-self-start tabular-nums">{formatValue(start)}</span>
         <span className="smallcaps text-[0.8125rem] text-ink-faint">
           through
@@ -75,13 +82,15 @@ export function TimeRangeSlider({
         />
       </div>
 
-      <div className="flex items-center justify-between font-serif text-[0.8125rem] tabular-nums text-ink-faint">
-        <span>12a</span>
-        <span>6a</span>
-        <span>12p</span>
-        <span>6p</span>
-        <span>12a</span>
-      </div>
+      {compact ? null : (
+        <div className="flex items-center justify-between font-serif text-[0.8125rem] tabular-nums text-ink-faint">
+          <span>12a</span>
+          <span>6a</span>
+          <span>12p</span>
+          <span>6p</span>
+          <span>12a</span>
+        </div>
+      )}
     </div>
   );
 }

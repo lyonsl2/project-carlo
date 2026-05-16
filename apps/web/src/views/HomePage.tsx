@@ -6,7 +6,7 @@ import {
   useState,
   useCallback,
 } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { fetchChurches, type ChurchSearchResult } from "../api";
 import { ChurchMap } from "../components/ChurchMap";
@@ -26,6 +26,20 @@ import { PLACE_SEARCH_ZOOM, type PlaceSearchResult } from "../placeSearch";
 import { isAboutPageEnabled } from "../lib/featureFlags";
 
 const aboutPageEnabled = isAboutPageEnabled();
+
+/** Map-centering payload accepted on navigation (e.g. via router state from the landing page). */
+export interface HomeMapCenter {
+  lat: number;
+  lng: number;
+  churchId?: number;
+  placeTitle?: string;
+  placeSubtitle?: string | null;
+  zoom?: number;
+}
+
+interface HomeNavState {
+  centerOn?: HomeMapCenter;
+}
 
 export function HomePage() {
   const [urlFilters, setUrlFilters] = useFilterUrlState();
@@ -83,6 +97,26 @@ export function HomePage() {
   // same church still produces a distinct `centerOn` value, which the map
   // uses to re-pan and re-open the popup without a timer-based reset.
   const centerRequestIdRef = useRef(0);
+
+  // Hydrate initial centering from router state (e.g. landing page navigation),
+  // then clear the state via history.replaceState so a hard refresh of /map
+  // doesn't re-apply stale centering.
+  const location = useLocation();
+  const hydratedFromStateRef = useRef(false);
+  useEffect(() => {
+    if (hydratedFromStateRef.current) return;
+    hydratedFromStateRef.current = true;
+    const incoming = (location.state as HomeNavState | null)?.centerOn;
+    if (!incoming) return;
+    centerRequestIdRef.current += 1;
+    setCenterOn({ ...incoming, requestId: centerRequestIdRef.current });
+    window.history.replaceState(
+      null,
+      "",
+      location.pathname + location.search,
+    );
+  }, [location.pathname, location.search, location.state]);
+
   const apiFilters = useMemo(() => {
     const { from, to } = getTimeRange(appliedFilters);
     return {
