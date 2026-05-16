@@ -49,7 +49,8 @@ def _patch_process_paths(monkeypatch, tmp_path: Path) -> None:
     monkeypatch.setattr("pdf_extract.process.BULLETINS_METADATA_PATH", tmp_path / "metadata.json")
     monkeypatch.setattr("pdf_extract.process.EVENTS_PATH", tmp_path / "events.json")
     # These tests stub PDFs with non-PDF bytes; skip the pypdf-based truncation helper.
-    monkeypatch.setattr("pdf_extract.process.ensure_truncated_pdf", lambda path, **kwargs: path)
+    # Patched on storage where load_bulletin_work_item now lives.
+    monkeypatch.setattr("pdf_extract.storage.ensure_truncated_pdf", lambda path, **kwargs: path)
 
 
 def test_fetch_stage_is_idempotent(monkeypatch, tmp_path: Path) -> None:
@@ -326,10 +327,10 @@ def test_process_bounds_prepared_pdfs_to_concurrency(monkeypatch, tmp_path: Path
     prepare_calls = 0
 
     original_prepare = __import__(
-        "pdf_extract.process", fromlist=["_prepare_work_item"],
-    )._prepare_work_item
+        "pdf_extract.process", fromlist=["load_bulletin_work_item"],
+    ).load_bulletin_work_item
 
-    def _prepare_work_item(entry, conn):
+    def _load_bulletin_work_item(entry, conn):
         nonlocal prepare_calls
         prepare_calls += 1
         if prepare_calls == 2:
@@ -347,7 +348,7 @@ def test_process_bounds_prepared_pdfs_to_concurrency(monkeypatch, tmp_path: Path
             "wrong_bulletin": False,
         }
 
-    monkeypatch.setattr("pdf_extract.process._prepare_work_item", _prepare_work_item)
+    monkeypatch.setattr("pdf_extract.process.load_bulletin_work_item", _load_bulletin_work_item)
     monkeypatch.setattr("pdf_extract.process.extract_events", _extract_events)
 
     result = process_bulletins(concurrency=1)

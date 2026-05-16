@@ -5,9 +5,13 @@ from __future__ import annotations
 import json
 import logging
 import sqlite3
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
+
+from pdf_extract.address import format_address
+from pdf_extract.pdf_truncate import ensure_truncated_pdf
 
 LOGGER = logging.getLogger(__name__)
 
@@ -101,3 +105,64 @@ def list_churches(conn: sqlite3.Connection, parish_id: int) -> list[sqlite3.Row]
         " FROM church WHERE parish_id = ? ORDER BY id",
         (parish_id,),
     ).fetchall()
+
+
+# ── Bulletin work-item loading ──────────────────────────────────────────────
+@dataclass
+class BulletinWorkItem:
+    """A bulletin loaded from disk and ready to hand to a classifier."""
+
+    entry: dict[str, Any]
+    pdf_bytes: bytes
+    church_list: list[dict[str, Any]]
+
+
+def load_bulletin_work_item(
+    entry: dict[str, Any], conn: sqlite3.Connection
+) -> BulletinWorkItem | None:
+    """Load PDF bytes and known-church list for a bulletin metadata entry.
+
+    Returns None (with a logged warning) if the bulletin should be skipped:
+    PDF missing, truncation failed, read failed, or parish not in DB.
+
+    Runs on the caller's thread; the sqlite connection must stay single-threaded.
+    """
+    pdf_path = Path(entry["pdf_path"])
+    if not pdf_path.exists():
+        LOGGER.warning("Skipping: PDF missing at %s", pdf_path)
+        return None
+
+    try:
+        read_path = ensure_truncated_pdf(pdf_path)
+    except Exception:
+        LOGGER.warning("Skipping: failed truncating PDF at %s", pdf_path, exc_info=True)
+        return None
+
+    try:
+        pdf_bytes = read_path.read_bytes()
+    except OSError:
+        LOGGER.warning("Skipping: failed reading PDF at %s", read_path, exc_info=True)
+        return None
+
+    parish_slug = entry["parish_slug"]
+    parish_row = conn.execute(
+        "SELECT id FROM parish WHERE slug = ?", (parish_slug,)
+    ).fetchone()
+    if not parish_row:
+        LOGGER.warning("Skipping: parish %s not found in DB", parish_slug)
+        return None
+
+    church_rows = list_churches(conn, parish_row["id"])
+    church_list = [
+        {
+            "slug": r["slug"],
+            "name": r["name"],
+            "address": format_address(
+                r["address_line1"], r["address_line2"],
+                r["city"], r["state"], r["postal_code"],
+            ),
+        }
+        for r in church_rows
+    ]
+
+    return BulletinWorkItem(entry=entry, pdf_bytes=pdf_bytes, church_list=church_list)

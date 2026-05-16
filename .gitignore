@@ -45,6 +45,7 @@ dist/
 # Data
 data/bulletins/**/*.pdf
 data/*.db
+data/runs/
 
 # Generated frontend assets
 # apps/web/public/frontend.snapshot

@@ -4,33 +4,22 @@ from __future__ import annotations
 
 import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from dataclasses import dataclass
 from datetime import date
-from pathlib import Path
 from typing import Any
 
-from pdf_extract.address import format_address
-from pdf_extract.pdf_truncate import ensure_truncated_pdf
 from pdf_extract.schedule_extraction import extract_events
 from pdf_extract.storage import (
     BULLETINS_METADATA_PATH,
     EVENTS_PATH,
     connect_db,
     get_parish_by_name,
-    list_churches,
+    load_bulletin_work_item,
     load_json_list,
     save_json_list,
     utc_now_iso,
 )
 
 LOGGER = logging.getLogger(__name__)
-
-
-@dataclass
-class _WorkItem:
-    entry: dict[str, Any]
-    pdf_bytes: bytes
-    church_list: list[dict[str, Any]]
 
 
 def _latest_per_parish(metadata: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -47,53 +36,6 @@ def _latest_per_parish(metadata: list[dict[str, Any]]) -> list[dict[str, Any]]:
         if current is None or rank > current[0]:
             latest_by_parish[parish_slug] = (rank, entry)
     return [item[1] for item in latest_by_parish.values()]
-
-
-def _prepare_work_item(entry: dict[str, Any], conn) -> _WorkItem | None:
-    """Load PDF bytes and churches for a bulletin entry.
-
-    Returns None (and logs a warning) if the bulletin should be skipped.
-    Runs on the main thread so the sqlite connection stays single-threaded.
-    """
-    pdf_path = Path(entry["pdf_path"])
-    if not pdf_path.exists():
-        LOGGER.warning("Skipping: PDF missing at %s", pdf_path)
-        return None
-
-    try:
-        read_path = ensure_truncated_pdf(pdf_path)
-    except Exception:
-        LOGGER.warning("Skipping: failed truncating PDF at %s", pdf_path, exc_info=True)
-        return None
-
-    try:
-        pdf_bytes = read_path.read_bytes()
-    except OSError:
-        LOGGER.warning("Skipping: failed reading PDF at %s", read_path, exc_info=True)
-        return None
-
-    parish_slug = entry["parish_slug"]
-    parish_row = conn.execute(
-        "SELECT id FROM parish WHERE slug = ?", (parish_slug,)
-    ).fetchone()
-    if not parish_row:
-        LOGGER.warning("Skipping: parish %s not found in DB", parish_slug)
-        return None
-
-    church_rows = list_churches(conn, parish_row["id"])
-    church_list = [
-        {
-            "slug": r["slug"],
-            "name": r["name"],
-            "address": format_address(
-                r["address_line1"], r["address_line2"],
-                r["city"], r["state"], r["postal_code"],
-            ),
-        }
-        for r in church_rows
-    ]
-
-    return _WorkItem(entry=entry, pdf_bytes=pdf_bytes, church_list=church_list)
 
 
 def _merge_extracted(
@@ -211,7 +153,7 @@ def process_bulletins(
                 save_json_list(EVENTS_PATH, events)
 
             for entry in pending:
-                prepared = _prepare_work_item(entry, conn)
+                prepared = load_bulletin_work_item(entry, conn)
                 if prepared is None:
                     continue
                 fut = pool.submit(

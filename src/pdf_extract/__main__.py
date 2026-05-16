@@ -55,6 +55,37 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     _add_common_args(process_parser)
 
+    # -- extract (experimental: run a registered classifier into data/runs/) --
+    extract_parser = subparsers.add_parser(
+        "extract",
+        help="Run an experimental classifier and write to data/runs/<name>/",
+    )
+    extract_parser.add_argument(
+        "--classifier", required=True,
+        help="Name of the registered classifier (see pdf_extract.classifiers.REGISTRY)",
+    )
+    extract_parser.add_argument("--parish", help="Parish name (omit to run for all)")
+    extract_parser.add_argument(
+        "--concurrency", type=int, default=5,
+        help="Number of parallel classifier calls (default: 5)",
+    )
+    _add_common_args(extract_parser)
+
+    # -- compare (experimental: pairwise metrics over previous extract runs) --
+    compare_parser = subparsers.add_parser(
+        "compare",
+        help="Compare two or more classifier runs from data/runs/",
+    )
+    compare_parser.add_argument(
+        "classifiers", nargs="+",
+        help="Two or more classifier names to compare (must each have a run dir)",
+    )
+    compare_parser.add_argument(
+        "--out", type=str, default=None,
+        help="Optional path for the JSON report (default: data/runs/compare/compare_<ts>.json)",
+    )
+    _add_common_args(compare_parser)
+
     # -- detect --
     detect_parser = subparsers.add_parser("detect", help="Detect bulletin provider for parish websites")
     detect_subparsers = detect_parser.add_subparsers(dest="detect_command")
@@ -129,6 +160,23 @@ def main(argv: list[str] | None = None) -> int:
             from pdf_extract.process import process_bulletins
             result = process_bulletins(
                 parish_name=args.parish, model=args.model, concurrency=args.concurrency,
+            )
+
+        elif args.command == "extract":
+            _ensure_db()
+            from pdf_extract.extract_run import run as run_extract
+            result = run_extract(
+                classifier_name=args.classifier,
+                parish_name=args.parish,
+                concurrency=args.concurrency,
+            )
+
+        elif args.command == "compare":
+            from pathlib import Path as _Path
+            from pdf_extract.compare import compare as run_compare
+            result = run_compare(
+                args.classifiers,
+                out_path=_Path(args.out) if args.out else None,
             )
 
         elif args.command == "detect":

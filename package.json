@@ -10,6 +10,8 @@
     "detect:apply": "uv run python -m pdf_extract detect apply",
     "fetch": "uv run python -m pdf_extract fetch",
     "process": "uv run --env-file .env python -m pdf_extract process",
+    "extract": "uv run --env-file .env python -m pdf_extract extract",
+    "compare": "uv run python -m pdf_extract compare",
     "verify": "uv run --env-file .env python -m pdf_extract verify run",
     "verify:apply": "uv run python -m pdf_extract verify apply",
     "geocode": "uv run python -m pdf_extract geocode run",
