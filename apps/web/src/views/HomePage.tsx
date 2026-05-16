@@ -6,6 +6,7 @@ import {
   useState,
   useCallback,
 } from "react";
+import { Link } from "react-router-dom";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { fetchChurches, type ChurchSearchResult } from "../api";
 import { ChurchMap } from "../components/ChurchMap";
@@ -22,6 +23,9 @@ import { InlineQueryError } from "../components/InlineQueryError";
 import { useMinWidth } from "../hooks/useMinWidth";
 import { useFilterUrlState } from "../hooks/useFilterUrlState";
 import { PLACE_SEARCH_ZOOM, type PlaceSearchResult } from "../placeSearch";
+import { isAboutPageEnabled } from "../lib/featureFlags";
+
+const aboutPageEnabled = isAboutPageEnabled();
 
 export function HomePage() {
   const [urlFilters, setUrlFilters] = useFilterUrlState();
@@ -181,7 +185,17 @@ export function HomePage() {
       <div className="pointer-events-none absolute inset-x-0 top-0 bottom-0 z-[900] flex justify-center px-4 pt-[calc(1rem+var(--safe-area-inset-top))] pb-[calc(1rem+var(--safe-area-inset-bottom))] md:justify-start md:px-6 md:pt-6 md:pb-6">
         <div className="pointer-events-none flex w-full max-w-[28rem] flex-col gap-4">
           <div className="pointer-events-auto rise-in shrink-0 border border-rule-strong bg-paper/96 px-6 pt-5 pb-4 shadow-missal-floating backdrop-blur-sm">
-            <Masthead />
+            <div className="flex items-start justify-between gap-4">
+              <Masthead />
+              {aboutPageEnabled ? (
+                <Link
+                  to="/about"
+                  className="rubric-link smallcaps mt-1 shrink-0 text-[0.75rem]"
+                >
+                  About
+                </Link>
+              ) : null}
+            </div>
             <div className="mt-5">
               <SearchTypeahead
                 onChurchSelect={handleChurchSelect}

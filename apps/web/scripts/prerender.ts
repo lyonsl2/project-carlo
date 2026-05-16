@@ -76,6 +76,11 @@ function maxIsoDate(dates: string[], fallback: string): string {
   return dates.reduce((latest, current) => (current > latest ? current : latest), dates[0]);
 }
 
+function isAboutPageEnabledAtBuild(): boolean {
+  const v = process.env.VITE_ABOUT_PAGE_ENABLED?.trim().toLowerCase();
+  return v === "true" || v === "1";
+}
+
 function writeSitemapAndRobots(
   distDir: string,
   origin: string,
@@ -95,6 +100,9 @@ function writeSitemapAndRobots(
     { loc: absoluteUrl(origin, "/"), lastmod: homepageLastmod },
     ...churchUrls,
   ];
+  if (isAboutPageEnabledAtBuild()) {
+    urls.push({ loc: absoluteUrl(origin, "/about"), lastmod: buildDate });
+  }
 
   const urlEntries = urls
     .map(
