@@ -56,7 +56,7 @@ export function LandingPage() {
   const goToMap = useCallback(
     (centerOn?: HomeMapCenter) => {
       navigate(
-        { pathname: "/map", search: filterSearch },
+        { pathname: "/", search: filterSearch },
         centerOn ? { state: { centerOn } } : undefined,
       );
     },

@@ -99,7 +99,7 @@ export function HomePage() {
   const centerRequestIdRef = useRef(0);
 
   // Hydrate initial centering from router state (e.g. landing page navigation),
-  // then clear the state via history.replaceState so a hard refresh of /map
+  // then clear the state via history.replaceState so a hard refresh
   // doesn't re-apply stale centering.
   const location = useLocation();
   const hydratedFromStateRef = useRef(false);
