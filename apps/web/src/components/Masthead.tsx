@@ -10,7 +10,7 @@ interface MastheadProps {
 }
 
 /** Site title block — wordmark and optional tagline. The wordmark links
- *  back to the landing page at `/`. */
+ *  back to the map at `/`. */
 export function Masthead({
   tagline = "Mass, Confession & Adoration times near you",
   compact = false,

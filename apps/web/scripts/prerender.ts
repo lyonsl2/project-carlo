@@ -106,6 +106,7 @@ function writeSitemapAndRobots(
   );
   const urls: { loc: string; lastmod: string }[] = [
     { loc: absoluteUrl(origin, "/"), lastmod: homepageLastmod },
+    { loc: absoluteUrl(origin, "/landing"), lastmod: buildDate },
     ...churchUrls,
   ];
   if (isAboutPageEnabledAtBuild()) {
@@ -175,7 +176,7 @@ async function main() {
   }
 
   writeSitemapAndRobots(DIST_DIR, origin, slugs, lastmodBySlug);
-  console.log(`Wrote sitemap.xml and robots.txt (${slugs.length + 1} URLs).`);
+  console.log(`Wrote sitemap.xml and robots.txt (${slugs.length + 2} URLs).`);
 
   db.close();
   console.log(`Pre-rendered ${count} church pages.`);

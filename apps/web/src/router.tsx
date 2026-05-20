@@ -1,5 +1,9 @@
 import { lazy, Suspense } from "react";
-import { createBrowserRouter, type RouteObject } from "react-router-dom";
+import {
+  createBrowserRouter,
+  Navigate,
+  type RouteObject,
+} from "react-router-dom";
 import { LandingPage } from "./views/LandingPage";
 import { NotFoundPage } from "./views/NotFoundPage";
 import { isAboutPageEnabled } from "./lib/featureFlags";
@@ -25,15 +29,19 @@ const lazyPageFallback = (
 const routes: RouteObject[] = [
   {
     path: "/",
-    element: <LandingPage />,
-  },
-  {
-    path: "/map",
     element: (
       <Suspense fallback={lazyPageFallback}>
         <HomePage />
       </Suspense>
     ),
+  },
+  {
+    path: "/landing",
+    element: <LandingPage />,
+  },
+  {
+    path: "/map",
+    element: <Navigate to="/" replace />,
   },
   {
     path: "/churches/:churchSlug",

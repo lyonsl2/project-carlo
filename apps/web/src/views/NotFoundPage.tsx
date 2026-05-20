@@ -16,7 +16,7 @@ export function NotFoundPage({
         {title}
       </h1>
       <p className="max-w-md font-serif text-base text-ink-soft">{message}</p>
-      <Link to="/map" className="rubric-link smallcaps text-[0.875rem]">
+      <Link to="/" className="rubric-link smallcaps text-[0.875rem]">
         <ArrowLeftIcon className="size-3" />
         Back to map
       </Link>

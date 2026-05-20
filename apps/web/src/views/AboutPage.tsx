@@ -7,7 +7,7 @@ export function AboutPage() {
     <main className="min-h-svh bg-paper px-4 py-8 sm:py-12">
       <div className="mx-auto flex w-full max-w-[40rem] flex-col gap-8">
         <header className="space-y-4">
-          <Link to="/map" className="rubric-link smallcaps text-[0.875rem]">
+          <Link to="/" className="rubric-link smallcaps text-[0.875rem]">
             <ArrowLeftIcon className="size-3" />
             Back to map
           </Link>
