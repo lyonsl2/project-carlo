@@ -50,6 +50,7 @@ data/runs/
 
 # Generated frontend assets
 # apps/web/public/frontend.snapshot
+apps/web/public/frontend.snapshot.previous
 apps/web/public/*.wasm
 
 # Claude Code

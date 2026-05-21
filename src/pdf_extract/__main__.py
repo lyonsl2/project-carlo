@@ -135,6 +135,13 @@ def _build_parser() -> argparse.ArgumentParser:
     db_drop_parser = db_subparsers.add_parser("drop", help="Delete the SQLite DB file")
     _add_common_args(db_drop_parser)
 
+    # -- verify frontend snapshot --
+    verify_frontend_snapshot_parser = subparsers.add_parser(
+        "verify-frontend-snapshot",
+        help="Verify frontend snapshot similarity against frontend.snapshot.previous",
+    )
+    _add_common_args(verify_frontend_snapshot_parser)
+
     return parser
 
 
@@ -150,6 +157,7 @@ def main(argv: list[str] | None = None) -> int:
     _configure_logging(args.log_level)
 
     try:
+        fail_on_verification_error = False
         if args.command == "fetch":
             _ensure_db()
             from pdf_extract.fetch import fetch_bulletins
@@ -236,12 +244,18 @@ def main(argv: list[str] | None = None) -> int:
             else:
                 parser.parse_args([args.command, "--help"])
                 return 1
+        elif args.command == "verify-frontend-snapshot":
+            from pdf_extract.verify_frontend_snapshot import verify_frontend_snapshot
+            result = verify_frontend_snapshot()
+            fail_on_verification_error = True
         else:
             parser.print_help()
             return 1
 
         LOGGER.info("Command completed: %s", result)
         print(json.dumps(result, indent=2))
+        if fail_on_verification_error and not result.get("passed", False):
+            return 1
         return 0
     except Exception as e:
         LOGGER.exception("Command failed")

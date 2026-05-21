@@ -28,7 +28,10 @@ def extract(source: Path = SOURCE_DB, dest: Path = DEST_DB) -> None:
         raise FileNotFoundError(f"Source database not found: {source}")
 
     dest.parent.mkdir(parents=True, exist_ok=True)
-    dest.unlink(missing_ok=True)
+    previous_dest = dest.with_name(f"{dest.name}.previous")
+    if dest.exists():
+        previous_dest.unlink(missing_ok=True)
+        dest.replace(previous_dest)
     legacy_dest = dest.with_suffix(".db")
     legacy_dest.unlink(missing_ok=True)
 
