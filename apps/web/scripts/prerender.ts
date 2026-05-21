@@ -59,7 +59,7 @@ function absoluteUrl(origin: string, pathname: string): string {
 }
 
 function canonicalPathForChurchSlug(slug: string): string {
-  return `/churches/${encodeURIComponent(slug)}`;
+  return `/churches/${encodeURIComponent(slug)}/`;
 }
 
 function canonicalUrlForChurchSlug(origin: string, slug: string): string {

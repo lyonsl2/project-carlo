@@ -1,6 +1,6 @@
-# Keep crawlable church URLs aligned with the canonical no-trailing-slash form.
-/churches/:slug/ /churches/:slug 301
-/churches/:slug/index.html /churches/:slug 301
+# Keep crawlable church URLs aligned with the prerendered directory form.
+/churches/:slug /churches/:slug/ 301
+/churches/:slug/index.html /churches/:slug/ 301
 
 # Cloudflare Workers static asset redirects do not support domain-level rules.
 # Keep http -> https and www -> apex redirects configured at the Cloudflare zone.

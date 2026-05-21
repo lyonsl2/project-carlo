@@ -224,7 +224,7 @@ const ChurchMarker = memo(function ChurchMarker({
 
           <div className="mt-4 border-t border-rule-strong pt-3">
             <Link
-              to={`/churches/${church.slug}`}
+              to={`/churches/${church.slug}/`}
               className="rubric-link smallcaps text-[0.8125rem]"
             >
               Full schedule →
