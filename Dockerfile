@@ -21,6 +21,7 @@ WORKDIR /workspace
 
 # Copy lockfiles and package manifests first for better dependency caching.
 COPY pyproject.toml uv.lock ./
+COPY README.md ./
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/web/package.json apps/web/package.json
 
