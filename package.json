@@ -20,6 +20,7 @@
     "lint": "uv run ruff check .",
     "extract:web": "pnpm run db:create && uv run python -m pdf_extract.extract_frontend_db",
     "verify:frontend-snapshot": "uv run python -m pdf_extract verify-frontend-snapshot",
+    "weekly:run": "pnpm fetch && pnpm process && pnpm extract:web && pnpm verify:frontend-snapshot && pnpm build:web",
     "install:web": "pnpm install",
     "dev:web": "pnpm --filter web dev",
     "build:web": "pnpm --filter web build",

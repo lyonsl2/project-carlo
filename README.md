@@ -41,6 +41,80 @@ Start the web app:
 pnpm dev:web
 ```
 
+## Weekly Docker workflow
+
+Use the included Docker setup to run the weekly pipeline in one repeatable environment:
+
+`fetch -> process -> extract:web -> verify:frontend-snapshot -> build:web`
+
+The pipeline updates `data/metadata.json`, `data/events.json`, and `apps/web/public/frontend.snapshot`.
+Downloaded PDFs and local SQLite/build artifacts stay untracked.
+
+### First-time setup
+
+1. Make sure you have `GEMINI_API_KEY` available in your shell.
+2. Build the image:
+
+```bash
+docker compose build weekly-job
+```
+
+### Local weekly run
+
+```bash
+export GEMINI_API_KEY=...
+docker compose run --rm -e GEMINI_API_KEY weekly-job
+```
+
+This runs `pnpm weekly:run`. It does not create commits; GitHub Actions owns the
+scheduled commit step. Compose does not pass your repo `.env` file into the
+container; pass only the specific variables you want with `-e`.
+
+The Docker image runs Playwright in headed mode under `xvfb` when no display is
+available. This avoids true headless mode while still working on GitHub-hosted
+runners. For debugging, set `PLAYWRIGHT_HEADLESS=1` to force headless mode or
+`PLAYWRIGHT_BROWSER_CHANNEL=chrome` to use a locally installed Chrome channel.
+
+### GitHub Actions weekly run
+
+The scheduled workflow lives at `.github/workflows/weekly-docker.yml`.
+
+Required repository secrets:
+
+- `GEMINI_API_KEY`
+
+The workflow:
+
+- runs on `workflow_dispatch` and Sundays at `08:17` UTC;
+- builds the Docker image with Buildx and GitHub Actions layer cache;
+- runs the weekly pipeline inside the container;
+- copies back only `data/metadata.json`, `data/events.json`, and `apps/web/public/frontend.snapshot`;
+- commits and pushes generated changes with the GitHub Actions bot when there is a diff.
+
+GitHub scheduled workflows run on the default branch and use UTC. The `17` minute offset avoids the highest-load top-of-hour window.
+
+### Scheduler examples
+
+Linux cron (every Sunday at 03:00):
+
+```cron
+0 3 * * 0 cd /path/to/project-carlo && docker compose run --rm -e GEMINI_API_KEY weekly-job
+```
+
+Windows Task Scheduler action:
+
+- Program/script: `docker`
+- Arguments: `compose run --rm -e GEMINI_API_KEY weekly-job`
+- Start in: path to the repository root
+
+### Troubleshooting
+
+- **Missing API keys**: pass `GEMINI_API_KEY` with `docker compose run -e`, or set it as a repository secret for GitHub Actions.
+- **No commit created in GitHub Actions**: expected when the generated outputs did not change.
+- **Verification failed**: `verify:frontend-snapshot` exits non-zero and stops build/commit by design.
+- **Dependency changes not reflected locally**: rebuild the image with `docker compose build weekly-job`.
+- **Browser behavior differs**: Docker defaults to headed Chromium under `xvfb`; set `PLAYWRIGHT_HEADLESS=1` only when you specifically want true headless mode.
+
 ## Usage
 
 ### Command line
@@ -75,7 +149,6 @@ process_result = process_bulletins(parish_name="Southeast Rochester Catholic Com
 ## Environment Variables
 
 - `GEMINI_API_KEY`: automatically picked up by the Gemini client.
-- `GOOGLE_API_KEY`: also supported by the SDK as an alternative.
 
 ### Web app (`apps/web`)
 

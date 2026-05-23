@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import importlib
 import logging
+import os
 import re
 from collections.abc import Callable
 from dataclasses import dataclass
@@ -47,6 +48,13 @@ PLAYWRIGHT_NAV_RETRY_DELAY_MS = 250
 HTTP_DOWNLOAD_TIMEOUT_SECONDS = 60
 
 LOGGER = logging.getLogger(__name__)
+
+
+def _env_bool(name: str, default: bool) -> bool:
+    raw = os.getenv(name)
+    if raw is None:
+        return default
+    return raw.strip().lower() in {"1", "true", "yes", "on"}
 
 
 @dataclass(frozen=True)
@@ -111,9 +119,14 @@ def _launch_browser() -> tuple[Playwright, Browser, Page]:
     sync_playwright = getattr(playwright_module, "sync_playwright")
     stealth_cls = getattr(importlib.import_module("playwright_stealth"), "Stealth")
     stealth = stealth_cls()
+    headless = _env_bool("PLAYWRIGHT_HEADLESS", False)
+    channel = os.getenv("PLAYWRIGHT_BROWSER_CHANNEL")
+    launch_kwargs: dict[str, object] = {"headless": headless}
+    if channel:
+        launch_kwargs["channel"] = channel
 
     pw = sync_playwright().start()
-    browser = pw.chromium.launch(headless=False, channel="chrome")
+    browser = pw.chromium.launch(**launch_kwargs)
     context = browser.new_context()
     stealth.apply_stealth_sync(context)
     page = context.new_page()

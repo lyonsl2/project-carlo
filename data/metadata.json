@@ -2779,5 +2779,77 @@
     "fetched_at": "2026-05-13T00:49:44Z",
     "processed_at": "2026-05-13T01:00:20Z",
     "published_date": "2026-05-10"
+  },
+  {
+    "parish_slug": "all-saints-corning",
+    "source_url": "https://parishesonline.com/publication-page/all-saints-parish?selectedPublication=https://container.parishesonline.com/bulletins/06/0144/20260524B.pdf",
+    "pdf_path": "data\\bulletins\\all-saints-corning\\f375b85d8450c421182cc1f7230abe75d70c6d98e977282cee1915eb982cadb3.pdf",
+    "content_hash": "f375b85d8450c421182cc1f7230abe75d70c6d98e977282cee1915eb982cadb3",
+    "fetched_at": "2026-05-23T21:49:30Z",
+    "processed_at": null,
+    "published_date": null
+  },
+  {
+    "parish_slug": "net-catholic",
+    "source_url": "https://files.ecatholic.com/20434/bulletins/20260524.pdf?t=1779388041000",
+    "pdf_path": "data\\bulletins\\net-catholic\\fd259e5a606f2ef3ebe4e79b72aef336e816c8fe6c13b2114d716a00f82a5e57.pdf",
+    "content_hash": "fd259e5a606f2ef3ebe4e79b72aef336e816c8fe6c13b2114d716a00f82a5e57",
+    "fetched_at": "2026-05-23T21:49:33Z",
+    "processed_at": null,
+    "published_date": null
+  },
+  {
+    "parish_slug": "southeast-rochester-catholic-community",
+    "source_url": "https://files.ecatholic.com/19887/bulletins/20260524.pdf?t=1779282905000",
+    "pdf_path": "data\\bulletins\\southeast-rochester-catholic-community\\bbab94b109eb70428f495e7bff16974b8d27cc85092e1df373392fbe01a35b42.pdf",
+    "content_hash": "bbab94b109eb70428f495e7bff16974b8d27cc85092e1df373392fbe01a35b42",
+    "fetched_at": "2026-05-23T21:49:35Z",
+    "processed_at": null,
+    "published_date": null
+  },
+  {
+    "parish_slug": "blessed-trinity-st-patrick",
+    "source_url": "https://blessed-trinity-parish.org/wp-content/parish_specific/bulletins/2026-05-24.pdf",
+    "pdf_path": "data\\bulletins\\blessed-trinity-st-patrick\\783d83f63779e3c1a8bd2eb2e9933ee3d32530e622e2c80ed9258cb64f530485.pdf",
+    "content_hash": "783d83f63779e3c1a8bd2eb2e9933ee3d32530e622e2c80ed9258cb64f530485",
+    "fetched_at": "2026-05-23T21:49:43Z",
+    "processed_at": null,
+    "published_date": null
+  },
+  {
+    "parish_slug": "catholic-parishes-eastern-wayne-county",
+    "source_url": "https://parishesonline.com/publication-page/st-michael-s-church-st-joseph-the-worker-and-blessed-trinity-catholic-church?selectedPublication=https://container.parishesonline.com/bulletins/06/0326/20260524B.pdf",
+    "pdf_path": "data\\bulletins\\catholic-parishes-eastern-wayne-county\\34df91136eafec7057689ae60e173bc8e7ae760219db31e130f410c2f47ec63e.pdf",
+    "content_hash": "34df91136eafec7057689ae60e173bc8e7ae760219db31e130f410c2f47ec63e",
+    "fetched_at": "2026-05-23T21:49:46Z",
+    "processed_at": null,
+    "published_date": null
+  },
+  {
+    "parish_slug": "st-jerome",
+    "source_url": "https://files.ecatholic.com/22370/bulletins/20260524.pdf?t=1779159613000",
+    "pdf_path": "data\\bulletins\\st-jerome\\a54df8a4e07ab32ee8d8c30354e5739add2519de4fe819bc033c62ecc7d85a7f.pdf",
+    "content_hash": "a54df8a4e07ab32ee8d8c30354e5739add2519de4fe819bc033c62ecc7d85a7f",
+    "fetched_at": "2026-05-23T21:49:49Z",
+    "processed_at": null,
+    "published_date": null
+  },
+  {
+    "parish_slug": "assumption-resurrection",
+    "source_url": "https://files.ecatholic.com/1021/bulletins/20260524.pdf?t=1779376498000",
+    "pdf_path": "data\\bulletins\\assumption-resurrection\\efc8ce541a834cdb1e9c99de6e1a59188fe1daad6de6f7681a04b24a82d32cb5.pdf",
+    "content_hash": "efc8ce541a834cdb1e9c99de6e1a59188fe1daad6de6f7681a04b24a82d32cb5",
+    "fetched_at": "2026-05-23T21:49:51Z",
+    "processed_at": null,
+    "published_date": null
+  },
+  {
+    "parish_slug": "holy-spirit-st-josephs",
+    "source_url": "https://parishesonline.com/publication-page/st-josephs-catholic-church-and-church-of-the-holy-spirit?selectedPublication=https://container.parishesonline.com/bulletins/06/0030/20260524B.pdf",
+    "pdf_path": "data\\bulletins\\holy-spirit-st-josephs\\e27ce53ddee54c83495d872aab773cba8a9e2f6e81e2b1006e58801ad396637c.pdf",
+    "content_hash": "e27ce53ddee54c83495d872aab773cba8a9e2f6e81e2b1006e58801ad396637c",
+    "fetched_at": "2026-05-23T21:49:55Z",
+    "processed_at": null,
+    "published_date": null
   }
 ]

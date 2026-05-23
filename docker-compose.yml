@@ -1,0 +1,10 @@
+services:
+  weekly-job:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /workspace
+    volumes:
+      - ./data:/workspace/data
+      - ./apps/web/public:/workspace/apps/web/public
+    command: ["bash", "docker/weekly-run.sh"]
