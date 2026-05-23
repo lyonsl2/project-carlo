@@ -14,7 +14,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 LOGGER = logging.getLogger(__name__)
 _RETRYABLE_STATUS_CODES = {429, 500, 502, 503, 504}
-_MAX_API_ATTEMPTS = 5
+_MAX_API_ATTEMPTS = 8
 _BASE_BACKOFF_SECONDS = 2.0
 _MAX_BACKOFF_SECONDS = 30.0
 

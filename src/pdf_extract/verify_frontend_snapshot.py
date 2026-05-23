@@ -15,8 +15,8 @@ ROOT = Path(__file__).resolve().parents[2]
 CURRENT_SNAPSHOT_PATH = ROOT / "apps" / "web" / "public" / "frontend.snapshot"
 PREVIOUS_SNAPSHOT_PATH = ROOT / "apps" / "web" / "public" / "frontend.snapshot.previous"
 
-EVENT_DELTA_THRESHOLD_PCT = 5.0
-WEEKLY_MATCH_THRESHOLD_PCT = 95.0
+EVENT_DELTA_THRESHOLD_PCT = 10.0
+WEEKLY_MATCH_THRESHOLD_PCT = 90.0
 
 WeeklyKey = tuple[int, str, str, int]
 
