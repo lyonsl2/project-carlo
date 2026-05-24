@@ -24,7 +24,7 @@ export function Masthead({
           aria-label="Project Carlo — home"
           className="font-display text-lg leading-none font-normal tracking-tight text-ink"
         >
-          Project <span className="italic text-rubric">Carlo</span>
+          Project <span className="italic text-rubric">Carlo 2</span>
         </Link>
       </div>
     );
