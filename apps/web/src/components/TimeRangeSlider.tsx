@@ -43,14 +43,14 @@ export function TimeRangeSlider({
         }`}
       >
         <span className="justify-self-start tabular-nums">{formatValue(start)}</span>
-        <span className="smallcaps text-[0.8125rem] text-ink-faint">
+        <span className="smallcaps text-[0.8125rem] text-ink-soft">
           through
         </span>
         <span className="justify-self-end tabular-nums">{formatValue(end)}</span>
       </div>
 
       <div className="relative h-6 px-1">
-        <div className="pointer-events-none absolute top-1/2 left-1 right-1 h-px -translate-y-1/2 bg-rule-strong" />
+        <div className="pointer-events-none absolute top-1/2 left-1 right-1 h-[2px] -translate-y-1/2 bg-rule-strong" />
         {TIME_TICKS.map(({ pct, offsetRem }) => (
           <div
             key={pct}
@@ -59,7 +59,7 @@ export function TimeRangeSlider({
           />
         ))}
         <div
-          className="pointer-events-none absolute top-1/2 h-[2px] -translate-y-1/2 bg-rubric"
+          className="pointer-events-none absolute top-1/2 h-[3px] -translate-y-1/2 bg-rubric"
           style={{
             left: `calc(${startPercent}% + 0.25rem)`,
             width: `calc(${Math.max(endPercent - startPercent, 0)}% - 0.5rem * ${
@@ -74,7 +74,7 @@ export function TimeRangeSlider({
           step={step}
           value={start}
           aria-label="Start time"
-          className="time-range-slider absolute inset-0 h-6 w-full"
+          className="time-range-slider missal-focus absolute inset-0 h-6 w-full"
           onChange={(event) => {
             const nextStart = Math.min(Number(event.target.value), end);
             onValueChange([nextStart, end]);
@@ -87,7 +87,7 @@ export function TimeRangeSlider({
           step={step}
           value={end}
           aria-label="End time"
-          className="time-range-slider absolute inset-0 h-6 w-full"
+          className="time-range-slider missal-focus absolute inset-0 h-6 w-full"
           onChange={(event) => {
             const nextEnd = Math.max(Number(event.target.value), start);
             onValueChange([start, nextEnd]);
@@ -96,7 +96,7 @@ export function TimeRangeSlider({
       </div>
 
       {compact ? null : (
-        <div className="relative h-5 px-1 font-serif text-[0.8125rem] tabular-nums text-ink-faint">
+        <div className="relative h-5 px-1 font-serif text-[0.8125rem] tabular-nums text-ink-soft">
           {TIME_TICKS.map(({ pct, label, offsetRem }) => (
             <span
               key={pct}

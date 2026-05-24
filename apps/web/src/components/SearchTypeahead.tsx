@@ -234,7 +234,7 @@ export function SearchTypeahead({
         <PopoverAnchor asChild>
           <div ref={searchAnchorRef} className="relative w-full">
             <div
-              className="group flex w-full items-center gap-2 border-b pb-1.5 transition-colors"
+              className="missal-search-field group flex w-full items-center gap-2 rounded-sm border-b pb-1.5 transition-colors"
               style={{
                 borderBottomColor: isFocused
                   ? "var(--rubric)"
@@ -245,7 +245,7 @@ export function SearchTypeahead({
               <SearchIcon
                 className={`shrink-0 transition-colors ${
                   size === "lg" ? "size-[22px]" : "size-4"
-                } ${isFocused ? "text-rubric" : "text-ink-faint"}`}
+                } ${isFocused ? "text-rubric" : "text-ink-soft"}`}
               />
               <CommandPrimitive.Input
                 value={query}
@@ -274,7 +274,7 @@ export function SearchTypeahead({
                     : "Search for parish by name"
                 }
                 autoComplete="off"
-                className={`min-w-0 flex-1 bg-transparent font-serif text-ink outline-none placeholder:text-ink-faint placeholder:italic ${
+                className={`min-w-0 flex-1 bg-transparent font-serif text-ink outline-none placeholder:text-ink-soft placeholder:italic ${
                   size === "lg" ? "text-[1.375rem]" : "text-[1.0625rem]"
                 }`}
               />
@@ -283,7 +283,7 @@ export function SearchTypeahead({
                   type="button"
                   onClick={clearQuery}
                   aria-label="Clear search"
-                  className="flex size-6 shrink-0 items-center justify-center text-ink-faint transition-colors hover:text-rubric"
+                  className="missal-focus flex size-6 shrink-0 items-center justify-center text-ink-soft transition-colors hover:text-rubric"
                 >
                   <XIcon className="size-3.5" />
                 </button>
@@ -328,7 +328,7 @@ export function SearchTypeahead({
           }}
         >
           <div className="border-b border-rule-strong px-4 pt-3 pb-2">
-            <span className="smallcaps text-[0.8125rem] text-ink-faint">
+            <span className="smallcaps text-[0.8125rem] text-ink-soft">
               {heading}
             </span>
           </div>
@@ -347,7 +347,7 @@ export function SearchTypeahead({
                         ? "Requesting your location…"
                         : "Use your current location"}
                     </div>
-                    <div className="mt-0.5 truncate text-sm text-ink-faint">
+                    <div className="mt-0.5 truncate text-sm text-ink-soft">
                       {locationError ?? "Center the map where you are"}
                     </div>
                   </div>
@@ -356,15 +356,15 @@ export function SearchTypeahead({
             ) : null}
             {showSearchStatus ? (
               isLoading ? (
-                <div className="px-3 py-4 font-serif text-sm text-ink-faint">
+                <div className="px-3 py-4 font-serif text-sm text-ink-soft">
                   {isPlaceMode ? "Searching places…" : "Loading parishes…"}
                 </div>
               ) : placeSearchNotConfigured ? (
-                <CommandEmpty className="px-3 py-4 text-center font-serif text-sm text-ink-faint">
+                <CommandEmpty className="px-3 py-4 text-center font-serif text-sm text-ink-soft">
                   Place search needs a Geoapify API key.
                 </CommandEmpty>
               ) : isPlaceMode && placeError ? (
-                <CommandEmpty className="px-3 py-4 text-center font-serif text-sm text-ink-faint">
+                <CommandEmpty className="px-3 py-4 text-center font-serif text-sm text-ink-soft">
                   Place search failed. Try again.
                 </CommandEmpty>
               ) : hasResults ? (
@@ -380,7 +380,7 @@ export function SearchTypeahead({
                           <div className="min-w-0">
                             <div className="truncate">{place.title}</div>
                             {place.subtitle ? (
-                              <div className="mt-0.5 truncate text-sm text-ink-faint">
+                              <div className="mt-0.5 truncate text-sm text-ink-soft">
                                 {place.subtitle}
                               </div>
                             ) : null}
@@ -401,7 +401,7 @@ export function SearchTypeahead({
                                 {church.name ?? "Unnamed parish"}
                               </div>
                               {locationText ? (
-                                <div className="mt-0.5 truncate text-sm text-ink-faint">
+                                <div className="mt-0.5 truncate text-sm text-ink-soft">
                                   {locationText}
                                 </div>
                               ) : null}
@@ -411,14 +411,14 @@ export function SearchTypeahead({
                       })}
                 </CommandGroup>
               ) : (
-                <CommandEmpty className="px-3 py-4 text-center font-serif text-sm text-ink-faint">
+                <CommandEmpty className="px-3 py-4 text-center font-serif text-sm text-ink-soft">
                   {emptyMessage}
                 </CommandEmpty>
               )
             ) : null}
           </CommandList>
           {isPlaceMode ? (
-            <div className="border-t border-rule-strong px-4 py-2 text-right font-serif text-xs text-ink-faint">
+            <div className="border-t border-rule-strong px-4 py-2 text-right font-serif text-xs text-ink-soft">
               Powered by Geoapify
             </div>
           ) : null}

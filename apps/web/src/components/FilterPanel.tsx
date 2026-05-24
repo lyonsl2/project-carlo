@@ -107,7 +107,7 @@ export function FilterPanel({
         {/* Event type — Variant F chips */}
         <section>
           <div className="mb-3 flex items-baseline justify-between">
-            <h3 className="smallcaps text-[0.875rem] text-ink-faint">
+            <h3 className="smallcaps text-[0.875rem] text-ink-soft">
               Service type
             </h3>
           </div>
@@ -120,7 +120,7 @@ export function FilterPanel({
                   type="button"
                   aria-pressed={isSelected}
                   onClick={() => selectEventType(option.id)}
-                  className={`min-w-0 flex-1 basis-0 border px-2 py-2.5 text-center font-display text-[0.95rem] transition-colors sm:text-[1.05rem] ${
+                  className={`missal-focus min-w-0 flex-1 basis-0 border px-2 py-2.5 text-center font-display text-[0.95rem] transition-colors sm:text-[1.05rem] ${
                     isSelected
                       ? "border-rubric bg-rubric/5 text-rubric"
                       : "border-rule-strong bg-transparent text-ink-soft hover:bg-paper-deep/40 hover:text-ink"
@@ -136,7 +136,7 @@ export function FilterPanel({
         {/* Day of week — Variant F connected single-letter strip */}
         <section>
           <div className="mb-3 flex min-h-[1.125rem] items-baseline justify-between gap-3">
-            <h3 className="smallcaps text-[0.875rem] text-ink-faint">
+            <h3 className="smallcaps text-[0.875rem] text-ink-soft">
               Day of week
             </h3>
             <button
@@ -144,7 +144,7 @@ export function FilterPanel({
               onClick={resetDays}
               aria-hidden={isDaysDefault}
               tabIndex={isDaysDefault ? -1 : 0}
-              className={`smallcaps text-[0.8125rem] text-ink-soft transition-colors hover:text-rubric ${
+              className={`missal-focus smallcaps text-[0.8125rem] text-ink-soft transition-colors hover:text-rubric ${
                 isDaysDefault ? "invisible" : ""
               }`}
             >
@@ -163,7 +163,7 @@ export function FilterPanel({
                   aria-pressed={isSelected}
                   aria-label={day.full}
                   onClick={() => selectDay(dayIndex)}
-                  className={`smallcaps py-2.5 text-center text-[0.8125rem] transition-colors ${
+                  className={`missal-focus smallcaps py-2.5 text-center text-[0.8125rem] transition-colors ${
                     isLast ? "" : "border-r border-rule"
                   } ${
                     isSelected
@@ -181,7 +181,7 @@ export function FilterPanel({
         {/* Time range */}
         <section>
           <div className="mb-3 flex min-h-[1.125rem] items-baseline justify-between gap-3">
-            <h3 className="smallcaps text-[0.875rem] text-ink-faint">
+            <h3 className="smallcaps text-[0.875rem] text-ink-soft">
               Time of day
             </h3>
             <button
@@ -189,7 +189,7 @@ export function FilterPanel({
               onClick={resetTime}
               aria-hidden={isTimeDefault}
               tabIndex={isTimeDefault ? -1 : 0}
-              className={`smallcaps text-[0.8125rem] text-ink-soft transition-colors hover:text-rubric ${
+              className={`missal-focus smallcaps text-[0.8125rem] text-ink-soft transition-colors hover:text-rubric ${
                 isTimeDefault ? "invisible" : ""
               }`}
             >
@@ -226,21 +226,20 @@ export function FilterPanel({
           </button>
         ) : null}
         <div className="flex-1" />
-        <FeedbackTrigger
-          label="Share feedback"
-          className="text-[0.875rem] text-rubric hover:text-rubric-deep"
-        />
-        {!isDesktop ? (
-          <>
-            <button
-              type="button"
-              onClick={handleApply}
-              className="smallcaps bg-rubric px-6 py-3 text-[0.875rem] text-paper transition-colors hover:bg-rubric-deep"
-            >
-              Apply filters
-            </button>
-          </>
-        ) : null}
+        {isDesktop ? (
+          <FeedbackTrigger
+            label="Share feedback"
+            className="text-[0.875rem] text-rubric hover:text-rubric-deep"
+          />
+        ) : (
+          <button
+            type="button"
+            onClick={handleApply}
+            className="missal-focus smallcaps bg-rubric px-6 py-3 text-[0.875rem] text-paper transition-colors hover:bg-rubric-deep"
+          >
+            Apply filters
+          </button>
+        )}
       </div>
     </div>
   );

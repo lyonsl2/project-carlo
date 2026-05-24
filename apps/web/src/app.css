@@ -26,7 +26,7 @@
   --paper-edge: oklch(0.88 0.03 82);
   --ink: oklch(0.2 0.015 50);
   --ink-soft: oklch(0.4 0.018 50);
-  --ink-faint: oklch(0.55 0.02 50);
+  --ink-faint: oklch(0.5 0.02 50);
   --rubric: oklch(0.46 0.165 28);
   --rubric-deep: oklch(0.36 0.155 28);
   --brass: oklch(0.66 0.095 75);
@@ -173,8 +173,21 @@
     --rubric-underline: 1;
     color: var(--rubric-deep);
   }
+  .rubric-link:focus-visible {
+    outline: 2px solid color-mix(in oklch, var(--rubric) 76%, transparent);
+    outline-offset: 4px;
+  }
   .rubric-link[data-active="true"] {
     --rubric-underline: 1;
+  }
+
+  .missal-focus:focus-visible {
+    outline: 2px solid color-mix(in oklch, var(--rubric) 76%, transparent);
+    outline-offset: 3px;
+  }
+  .missal-search-field:focus-within {
+    outline: 2px solid color-mix(in oklch, var(--rubric) 76%, transparent);
+    outline-offset: 5px;
   }
 
   /* A hairline rule used everywhere instead of box borders. */
@@ -238,13 +251,13 @@
 
   /* OSM tiles: muted to match the missal card UI (ChurchMap). */
   .leaflet-container.church-map .leaflet-tile-pane {
-    filter: saturate(0.6) brightness(1.03) contrast(1.05) hue-rotate(-14deg);
+    filter: saturate(0.78) brightness(1.02) contrast(1.08) hue-rotate(-8deg);
   }
 
   .leaflet-control-attribution {
     background: color-mix(in oklch, var(--paper) 82%, transparent) !important;
     color: var(--ink-soft) !important;
-    font-size: 11px !important;
+    font-size: 12px !important;
     padding: 2px 6px !important;
     font-family: var(--font-sans) !important;
   }
@@ -338,6 +351,22 @@
       transform: translateY(-2px) scale(1.06);
     }
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+      transition-duration: 0.01ms !important;
+    }
+
+    .rise-in {
+      opacity: 1;
+      transform: none;
+    }
+  }
 }
 
 /* ---- Time range slider (missal rubric styling) --------------------------- */
@@ -377,6 +406,11 @@
   background: var(--rubric);
   transform: scale(1.1);
 }
+.time-range-slider:focus-visible::-webkit-slider-thumb {
+  box-shadow:
+    0 1px 2px rgb(22 18 16 / 0.2),
+    0 0 0 4px color-mix(in oklch, var(--rubric) 24%, transparent);
+}
 
 .time-range-slider::-moz-range-thumb {
   pointer-events: auto;
@@ -390,6 +424,11 @@
 }
 .time-range-slider::-moz-range-thumb:hover {
   background: var(--rubric);
+}
+.time-range-slider:focus-visible::-moz-range-thumb {
+  box-shadow:
+    0 1px 2px rgb(22 18 16 / 0.2),
+    0 0 0 4px color-mix(in oklch, var(--rubric) 24%, transparent);
 }
 
 @theme inline {

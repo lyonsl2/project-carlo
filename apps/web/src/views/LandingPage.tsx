@@ -166,8 +166,8 @@ export function LandingPage() {
             className={cn(
               "smallcaps m-0 text-ink-soft leading-[1.4]",
               open
-                ? "text-[11px] md:text-[15px]"
-                : "text-[12px] md:text-[15px]",
+                ? "text-[12px] md:text-[15px]"
+                : "text-[13px] md:text-[15px]",
             )}
           >
             Mass, Confession &amp; Adoration{" "}
@@ -287,7 +287,7 @@ function RefineSection({
       <Fleuron size={fleuronSize} className="w-full" />
 
       <section className="flex flex-col gap-[10px] md:gap-[14px]">
-        <h3 className="smallcaps m-0 text-[12px] text-ink-faint md:text-center md:text-[13px]">
+        <h3 className="smallcaps m-0 text-[12px] text-ink-soft md:text-center md:text-[13px]">
           Service type
         </h3>
         {isDesktop ? (
@@ -305,7 +305,7 @@ function RefineSection({
 
       <section className="flex flex-col gap-[10px] md:gap-[14px]">
         <div className="flex items-baseline justify-between gap-3">
-          <h3 className="smallcaps m-0 text-[12px] text-ink-faint md:text-[13px]">
+          <h3 className="smallcaps m-0 text-[12px] text-ink-soft md:text-[13px]">
             Day of week
           </h3>
           <button
@@ -313,7 +313,7 @@ function RefineSection({
             onClick={() => onChange({ ...filters, daysOfWeek: [] })}
             className={cn(
               "smallcaps cursor-pointer border-0 bg-transparent",
-              "text-[11px] md:text-[12px]",
+              "text-[12px]",
               filters.daysOfWeek.length === 0
                 ? "text-rubric"
                 : "text-ink-soft hover:text-rubric-deep",
@@ -333,7 +333,7 @@ function RefineSection({
       </section>
 
       <section className="flex flex-col gap-[10px] md:gap-[14px]">
-        <h3 className="smallcaps m-0 text-[12px] text-ink-faint md:text-[13px]">
+        <h3 className="smallcaps m-0 text-[12px] text-ink-soft md:text-[13px]">
           Time of day
         </h3>
         <TimeRangeSlider
@@ -364,7 +364,7 @@ function RefineSection({
         <button
           type="button"
           onClick={onSubmit}
-          className="smallcaps inline-flex w-full items-center justify-center gap-[10px] bg-rubric px-6 py-[14px] text-[14px] tracking-[0.14em] text-paper transition-colors hover:bg-rubric-deep active:translate-y-px md:w-auto md:px-6"
+          className="missal-focus smallcaps inline-flex w-full items-center justify-center gap-[10px] bg-rubric px-6 py-[14px] text-[14px] tracking-[0.14em] text-paper transition-colors hover:bg-rubric-deep active:translate-y-px md:w-auto md:px-6"
         >
           <span>Show on map</span>
           <ArrowRightIcon className="size-[14px]" />
@@ -392,7 +392,7 @@ function ServiceSegmented({ value, onChange }: ServiceSegmentedProps) {
             aria-pressed={isActive}
             onClick={() => onChange(option.id)}
             className={cn(
-              "flex min-w-0 flex-1 basis-0 flex-col items-center gap-[6px] px-2 py-3 text-center transition-colors",
+              "missal-focus flex min-w-0 flex-1 basis-0 flex-col items-center gap-[6px] px-2 py-3 text-center transition-colors",
               isActive ? "bg-paper-deep/80" : "hover:bg-paper-deep/40",
             )}
           >
@@ -434,7 +434,7 @@ function ServiceChips({ value, onChange }: ServiceChipsProps) {
             aria-pressed={isActive}
             onClick={() => onChange(option.id)}
             className={cn(
-              "inline-flex items-center gap-2 rounded-sm border px-3 py-[6px] transition-colors",
+              "missal-focus inline-flex items-center gap-2 rounded-sm border px-3 py-[6px] transition-colors",
               isActive
                 ? "border-rubric bg-rubric/[0.06]"
                 : "border-rule-strong hover:border-ink-faint",
@@ -485,7 +485,7 @@ function DayPills({ value, onChange }: DayPillsProps) {
             aria-pressed={isActive}
             aria-label={day.full}
             onClick={() => toggle(dayIndex)}
-            className="group relative flex-1 py-2 text-center"
+            className="missal-focus group relative flex-1 py-2 text-center"
           >
             <span
               className={cn(
