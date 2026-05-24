@@ -3301,5 +3301,41 @@
     "fetched_at": "2026-05-23T22:55:00Z",
     "processed_at": "2026-05-23T22:59:58Z",
     "published_date": "2026-05-24"
+  },
+  {
+    "parish_slug": "immaculate-conception-st-bridgets",
+    "source_url": "https://www.immaculateconceptionrochester.org/_files/ugd/309cee_9273100d3cc744738ca643baa76ca5ca.pdf",
+    "pdf_path": "data/bulletins/immaculate-conception-st-bridgets/19e88a1f296c3d87a8d396f51b4173f3966d7719f6620ac2b9e81b87cffd6b4e.pdf",
+    "content_hash": "19e88a1f296c3d87a8d396f51b4173f3966d7719f6620ac2b9e81b87cffd6b4e",
+    "fetched_at": "2026-05-24T10:13:27Z",
+    "processed_at": "2026-05-24T10:15:46Z",
+    "published_date": "2022-05-29"
+  },
+  {
+    "parish_slug": "peace-of-christ",
+    "source_url": "https://bulletins.discovermass.com/download.php?bulletin=P%2F3v6UpoNcsngquEV4QHZiv8prZibAtf6IQX624N32ACK0DEM3YTEd3u4XTL3hqnVkRSlYw5LT9ARu5JGVKV7BJO6GlOVW%2F6DsK%2BoLheEW8%3D",
+    "pdf_path": "data/bulletins/peace-of-christ/bdc1375b21b818c8cadef8cab6603f0264a08ba20b61a21587f83bd0183fc945.pdf",
+    "content_hash": "bdc1375b21b818c8cadef8cab6603f0264a08ba20b61a21587f83bd0183fc945",
+    "fetched_at": "2026-05-24T10:13:52Z",
+    "processed_at": "2026-05-24T10:16:09Z",
+    "published_date": "2026-05-24"
+  },
+  {
+    "parish_slug": "st-john-spencerport",
+    "source_url": "https://bulletins.discovermass.com/download.php?bulletin=5maVwmRS%2FyBrREC4frEYOLFC2Nx1nAbQbfQg4yk6uJ630zXOqvIEhyU62TIZkS8hwFwdkbMRXv43Fqhw3ff0iEzdnJMMMHG7OgsVT9apziQ%3D",
+    "pdf_path": "data/bulletins/st-john-spencerport/2df4dd78314150498bb042177a36610c97786b18f5c60ecd03a2d0564d04c0ad.pdf",
+    "content_hash": "2df4dd78314150498bb042177a36610c97786b18f5c60ecd03a2d0564d04c0ad",
+    "fetched_at": "2026-05-24T10:14:28Z",
+    "processed_at": "2026-05-24T10:15:41Z",
+    "published_date": "2026-05-24"
+  },
+  {
+    "parish_slug": "st-patricks-victor",
+    "source_url": "https://bulletins.discovermass.com/download.php?bulletin=22shcw2UJ9CJlycDcJOW5iqihHsOyRzu4oRJ0TuH1TAOiWfkfI5%2BATA%2B4X85N%2B%2FZ5tzzHy2Sj%2BikNRG4f4LTjJTt2nBvEQJUgI8JCprbBy4%3D",
+    "pdf_path": "data/bulletins/st-patricks-victor/d3f8a2aada2c60564903ce051941fa0d2271bebf11f09da88f8a0dcb67ba04b3.pdf",
+    "content_hash": "d3f8a2aada2c60564903ce051941fa0d2271bebf11f09da88f8a0dcb67ba04b3",
+    "fetched_at": "2026-05-24T10:15:05Z",
+    "processed_at": "2026-05-24T10:17:48Z",
+    "published_date": "2026-05-23"
   }
 ]
