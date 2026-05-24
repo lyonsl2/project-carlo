@@ -17,6 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 120
     permissions:
+      actions: write
       contents: write
 
     steps:
@@ -54,11 +55,13 @@ jobs:
           docker rm project-carlo-weekly
 
       - name: Commit generated changes
+        id: commit
         run: |
           git add -- data/metadata.json data/events.json apps/web/public/frontend.snapshot
 
           if git diff --cached --quiet; then
             echo "No generated changes to commit."
+            echo "committed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
@@ -67,3 +70,12 @@ jobs:
             -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
             commit -m "chore: weekly data refresh ${commit_date}"
           git push
+          echo "committed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Trigger deploy workflow
+        if: steps.commit.outputs.committed == 'true' && github.ref_name == github.event.repository.default_branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # Pushes made with GITHUB_TOKEN do not trigger other workflows, so dispatch deploy explicitly.
+          gh workflow run deploy-web.yml --ref "$GITHUB_REF_NAME" -f mode=deploy
