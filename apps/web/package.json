@@ -13,7 +13,9 @@
     "preview": "pnpm run build && wrangler dev",
     "lint": "eslint .",
     "check": "tsc --noEmit",
-    "deploy": "pnpm run build && wrangler deploy"
+    "deploy": "pnpm run build && wrangler deploy",
+    "test:e2e": "playwright test",
+    "test:e2e:install": "playwright install --with-deps chromium"
   },
   "dependencies": {
     "@fontsource-variable/eb-garamond": "^5.2.7",
@@ -38,6 +40,7 @@
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.26.1",
     "@eslint/js": "^9.38.0",
+    "@playwright/test": "^1.60.0",
     "@tailwindcss/vite": "^4.2.2",
     "@types/leaflet": "^1.9.21",
     "@types/node": "^24.7.2",

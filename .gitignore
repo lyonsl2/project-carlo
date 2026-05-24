@@ -43,6 +43,11 @@ dist/
 # Cloudflare Wrangler
 .wrangler/
 
+# Playwright
+apps/web/playwright-report/
+apps/web/test-results/
+apps/web/.playwright/
+
 # Data
 data/bulletins/**/*.pdf
 data/*.db
