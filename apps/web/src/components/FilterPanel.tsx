@@ -139,15 +139,17 @@ export function FilterPanel({
             <h3 className="smallcaps text-[0.875rem] text-ink-faint">
               Day of week
             </h3>
-            {!isDaysDefault ? (
-              <button
-                type="button"
-                onClick={resetDays}
-                className="smallcaps text-[0.8125rem] text-ink-soft transition-colors hover:text-rubric"
-              >
-                Reset
-              </button>
-            ) : null}
+            <button
+              type="button"
+              onClick={resetDays}
+              aria-hidden={isDaysDefault}
+              tabIndex={isDaysDefault ? -1 : 0}
+              className={`smallcaps text-[0.8125rem] text-ink-soft transition-colors hover:text-rubric ${
+                isDaysDefault ? "invisible" : ""
+              }`}
+            >
+              Reset
+            </button>
           </div>
           <div className="grid grid-cols-7 border border-rule-strong">
             {DAY_DISPLAY_ORDER.map((dayIndex, position) => {
@@ -182,15 +184,17 @@ export function FilterPanel({
             <h3 className="smallcaps text-[0.875rem] text-ink-faint">
               Time of day
             </h3>
-            {!isTimeDefault ? (
-              <button
-                type="button"
-                onClick={resetTime}
-                className="smallcaps text-[0.8125rem] text-ink-soft transition-colors hover:text-rubric"
-              >
-                Reset
-              </button>
-            ) : null}
+            <button
+              type="button"
+              onClick={resetTime}
+              aria-hidden={isTimeDefault}
+              tabIndex={isTimeDefault ? -1 : 0}
+              className={`smallcaps text-[0.8125rem] text-ink-soft transition-colors hover:text-rubric ${
+                isTimeDefault ? "invisible" : ""
+              }`}
+            >
+              Reset
+            </button>
           </div>
           <TimeRangeSlider
             min={0}

@@ -15,6 +15,12 @@ function getPercent(value: number, min: number, max: number): number {
   return ((value - min) / (max - min)) * 100;
 }
 
+const TIME_TICKS = [
+  { pct: 25, label: "6 a.m.", offsetRem: 0.25 },
+  { pct: 50, label: "noon", offsetRem: 0 },
+  { pct: 75, label: "6 p.m.", offsetRem: -0.25 },
+];
+
 export function TimeRangeSlider({
   min,
   max,
@@ -45,6 +51,13 @@ export function TimeRangeSlider({
 
       <div className="relative h-6 px-1">
         <div className="pointer-events-none absolute top-1/2 left-1 right-1 h-px -translate-y-1/2 bg-rule-strong" />
+        {TIME_TICKS.map(({ pct, offsetRem }) => (
+          <div
+            key={pct}
+            className="pointer-events-none absolute top-1/2 h-3 w-px -translate-x-1/2 -translate-y-1/2 bg-rule-strong"
+            style={{ left: `calc(${pct}% + ${offsetRem}rem)` }}
+          />
+        ))}
         <div
           className="pointer-events-none absolute top-1/2 h-[2px] -translate-y-1/2 bg-rubric"
           style={{
@@ -83,12 +96,16 @@ export function TimeRangeSlider({
       </div>
 
       {compact ? null : (
-        <div className="flex items-center justify-between font-serif text-[0.8125rem] tabular-nums text-ink-faint">
-          <span>12a</span>
-          <span>6a</span>
-          <span>12p</span>
-          <span>6p</span>
-          <span>12a</span>
+        <div className="relative h-5 px-1 font-serif text-[0.8125rem] tabular-nums text-ink-faint">
+          {TIME_TICKS.map(({ pct, label, offsetRem }) => (
+            <span
+              key={pct}
+              className="absolute top-0 -translate-x-1/2"
+              style={{ left: `calc(${pct}% + ${offsetRem}rem)` }}
+            >
+              {label}
+            </span>
+          ))}
         </div>
       )}
     </div>
