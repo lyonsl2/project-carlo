@@ -232,6 +232,7 @@ export function HomePage() {
             </div>
             <div className="mt-5">
               <SearchTypeahead
+                hideModeToggle
                 onChurchSelect={handleChurchSelect}
                 onPlaceSelect={handlePlaceSelect}
                 filterButton={
