@@ -9,11 +9,15 @@ import { FILTER_DAY_LABELS } from "../constants/days";
 import { EVENT_TYPE_OPTIONS } from "../constants/eventTypes";
 import { TimeRangeSlider } from "./TimeRangeSlider";
 import { FeedbackTrigger } from "./FeedbackTrigger";
-import { Fleuron } from "./Fleuron";
 import { Sheet, SheetContent, SheetTitle } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 const TIME_STEP_MINUTES = 15;
+
+// Display order for the day strip: Sunday first. Values are indices into
+// FILTER_DAY_LABELS, which is Monday-first (0=Mon..6=Sun) — keeping that
+// underlying indexing avoids touching URL state or filter wire format.
+const DAY_DISPLAY_ORDER: readonly number[] = [6, 0, 1, 2, 3, 4, 5];
 
 interface FilterPanelProps {
   isOpen: boolean;
@@ -32,11 +36,13 @@ export function FilterPanel({
   onChange,
   onApply,
 }: FilterPanelProps) {
-  const isAnyDaySelected = filters.daysOfWeek.length === 0;
-
-  const selectAnyDay = useCallback(() => {
-    onChange({ ...filters, daysOfWeek: [] });
-  }, [filters, onChange]);
+  const isDaysDefault = filters.daysOfWeek.length === 0;
+  const isTimeDefault =
+    filters.timeFrom === DEFAULT_FILTER_STATE.timeFrom &&
+    filters.timeTo === DEFAULT_FILTER_STATE.timeTo;
+  const isEventTypeDefault =
+    filters.eventType === DEFAULT_FILTER_STATE.eventType;
+  const isAllDefault = isEventTypeDefault && isDaysDefault && isTimeDefault;
 
   const selectDay = useCallback(
     (dayIndex: number) => {
@@ -72,6 +78,18 @@ export function FilterPanel({
     [filters, onChange],
   );
 
+  const resetDays = useCallback(() => {
+    onChange({ ...filters, daysOfWeek: [] });
+  }, [filters, onChange]);
+
+  const resetTime = useCallback(() => {
+    onChange({
+      ...filters,
+      timeFrom: DEFAULT_FILTER_STATE.timeFrom,
+      timeTo: DEFAULT_FILTER_STATE.timeTo,
+    });
+  }, [filters, onChange]);
+
   const handleClear = useCallback(() => {
     onChange({ ...DEFAULT_FILTER_STATE });
   }, [onChange]);
@@ -86,14 +104,14 @@ export function FilterPanel({
   const panelBody = (
     <div className="flex flex-col">
       <div className="space-y-7 px-6 py-6">
-        {/* Event type */}
+        {/* Event type — Variant F chips */}
         <section>
           <div className="mb-3 flex items-baseline justify-between">
             <h3 className="smallcaps text-[0.875rem] text-ink-faint">
               Service type
             </h3>
           </div>
-          <div className="flex divide-x divide-rule overflow-hidden rounded-md border border-rule-strong">
+          <div className="flex gap-2">
             {EVENT_TYPE_OPTIONS.map((option) => {
               const isSelected = filters.eventType === option.id;
               return (
@@ -102,53 +120,40 @@ export function FilterPanel({
                   type="button"
                   aria-pressed={isSelected}
                   onClick={() => selectEventType(option.id)}
-                  className={`group flex min-w-0 flex-1 basis-0 flex-col items-center gap-1.5 px-1 py-2.5 text-center transition-colors ${
-                    isSelected ? "bg-paper-deep/80" : "hover:bg-paper-deep/40"
+                  className={`min-w-0 flex-1 basis-0 border px-2 py-2.5 text-center font-display text-[0.95rem] transition-colors sm:text-[1.05rem] ${
+                    isSelected
+                      ? "border-rubric bg-rubric/5 text-rubric"
+                      : "border-rule-strong bg-transparent text-ink-soft hover:bg-paper-deep/40 hover:text-ink"
                   }`}
                 >
-                  <span
-                    aria-hidden
-                    className={`inline-block size-2 shrink-0 rounded-full transition-colors ${
-                      isSelected
-                        ? "bg-rubric"
-                        : "bg-transparent ring-1 ring-rule-strong"
-                    }`}
-                  />
-                  <span
-                    className={`font-display text-[0.95rem] leading-snug sm:text-[1.05rem] ${
-                      isSelected ? "text-rubric" : "text-ink"
-                    }`}
-                  >
-                    {option.label}
-                  </span>
+                  {option.label}
                 </button>
               );
             })}
           </div>
         </section>
 
-        {/* Day of week — abbreviated row with underline-on-select */}
+        {/* Day of week — Variant F connected single-letter strip */}
         <section>
-          <div className="mb-3 flex items-baseline justify-between gap-3">
+          <div className="mb-3 flex min-h-[1.125rem] items-baseline justify-between gap-3">
             <h3 className="smallcaps text-[0.875rem] text-ink-faint">
               Day of week
             </h3>
-            <button
-              type="button"
-              onClick={selectAnyDay}
-              aria-pressed={isAnyDaySelected}
-              className={`smallcaps text-[0.8125rem] transition-colors ${
-                isAnyDaySelected
-                  ? "text-rubric"
-                  : "text-ink-soft hover:text-rubric-deep"
-              }`}
-            >
-              {isAnyDaySelected ? "All days" : "Show every day"}
-            </button>
+            {!isDaysDefault ? (
+              <button
+                type="button"
+                onClick={resetDays}
+                className="smallcaps text-[0.8125rem] text-ink-soft transition-colors hover:text-rubric"
+              >
+                Reset
+              </button>
+            ) : null}
           </div>
-          <div className="flex items-center justify-between gap-1">
-            {FILTER_DAY_LABELS.map((day, dayIndex) => {
+          <div className="grid grid-cols-7 border border-rule-strong">
+            {DAY_DISPLAY_ORDER.map((dayIndex, position) => {
+              const day = FILTER_DAY_LABELS[dayIndex];
               const isSelected = filters.daysOfWeek.includes(dayIndex);
+              const isLast = position === DAY_DISPLAY_ORDER.length - 1;
               return (
                 <button
                   key={day.full}
@@ -156,23 +161,15 @@ export function FilterPanel({
                   aria-pressed={isSelected}
                   aria-label={day.full}
                   onClick={() => selectDay(dayIndex)}
-                  className="group relative flex-1 py-2 text-center"
+                  className={`smallcaps py-2.5 text-center text-[0.8125rem] transition-colors ${
+                    isLast ? "" : "border-r border-rule"
+                  } ${
+                    isSelected
+                      ? "bg-rubric text-paper"
+                      : "bg-transparent text-ink-soft hover:bg-paper-deep/50 hover:text-ink"
+                  }`}
                 >
-                  <span
-                    className={`smallcaps block text-[0.875rem] transition-colors ${
-                      isSelected
-                        ? "text-rubric"
-                        : "text-ink-soft group-hover:text-ink"
-                    }`}
-                  >
-                    {day.abbr}
-                  </span>
-                  <span
-                    className="absolute inset-x-2 bottom-0 h-[1.5px] origin-left bg-rubric transition-transform duration-300 ease-out"
-                    style={{
-                      transform: isSelected ? "scaleX(1)" : "scaleX(0)",
-                    }}
-                  />
+                  {day.abbr}
                 </button>
               );
             })}
@@ -181,10 +178,19 @@ export function FilterPanel({
 
         {/* Time range */}
         <section>
-          <div className="mb-3">
+          <div className="mb-3 flex min-h-[1.125rem] items-baseline justify-between gap-3">
             <h3 className="smallcaps text-[0.875rem] text-ink-faint">
               Time of day
             </h3>
+            {!isTimeDefault ? (
+              <button
+                type="button"
+                onClick={resetTime}
+                className="smallcaps text-[0.8125rem] text-ink-soft transition-colors hover:text-rubric"
+              >
+                Reset
+              </button>
+            ) : null}
           </div>
           <TimeRangeSlider
             min={0}
@@ -199,22 +205,22 @@ export function FilterPanel({
             onValueChange={handleTimeRangeChange}
           />
         </section>
-
-        <Fleuron />
       </div>
 
       <div
-        className={`flex items-center gap-4 border-t border-rule-strong bg-paper-deep/30 px-6 py-4 ${
+        className={`flex items-center gap-4 bg-paper-deep/30 px-6 py-4 ${
           isDesktop ? "" : "pb-[calc(1rem+var(--safe-area-inset-bottom))]"
         }`}
       >
-        <button
-          type="button"
-          onClick={handleClear}
-          className="rubric-link smallcaps text-[0.875rem] text-rubric hover:text-rubric-deep"
-        >
-          Reset
-        </button>
+        {!isAllDefault ? (
+          <button
+            type="button"
+            onClick={handleClear}
+            className="rubric-link smallcaps text-[0.875rem] text-rubric hover:text-rubric-deep"
+          >
+            Reset all
+          </button>
+        ) : null}
         <div className="flex-1" />
         <FeedbackTrigger
           label="Share feedback"
