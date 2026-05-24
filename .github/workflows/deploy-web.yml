@@ -1,0 +1,124 @@
+name: Deploy Web
+
+on:
+  push:
+    branches:
+      - "**"
+    paths:
+      - "apps/web/**"
+      - "data/**"
+      - "package.json"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - ".github/workflows/deploy-web.yml"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Choose deploy to publish immediately or upload-version to create a Worker version without rollout."
+        required: true
+        default: deploy
+        type: choice
+        options:
+          - deploy
+          - upload-version
+
+permissions:
+  contents: read
+
+concurrency:
+  group: web-deploy-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  deploy:
+    name: Deploy web
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Type check web app
+        run: pnpm --filter web check
+
+      - name: Build web app
+        run: pnpm --filter web build
+
+      - name: Prepare preview alias
+        id: preview
+        if: github.event_name == 'push' && github.ref_name != 'main'
+        shell: bash
+        run: |
+          alias="$(printf '%s' "$GITHUB_REF_NAME" \
+            | tr '[:upper:]' '[:lower:]' \
+            | sed -E 's/[^a-z0-9]+/-/g; s/^-+//; s/-+$//; s/-+/-/g' \
+            | cut -c1-48)"
+
+          if [ -z "$alias" ]; then
+            alias="branch-${GITHUB_SHA:0:7}"
+          fi
+
+          echo "alias=$alias" >> "$GITHUB_OUTPUT"
+
+      - name: Deploy production web app
+        id: production-deploy
+        if: (github.event_name == 'workflow_dispatch' && inputs.mode == 'deploy' && github.ref_name == 'main') || (github.event_name == 'push' && github.ref_name == 'main')
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy
+          workingDirectory: apps/web
+          packageManager: pnpm
+
+      - name: Upload preview web app
+        id: preview-deploy
+        if: github.event_name == 'push' && github.ref_name != 'main'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: versions upload --preview-alias ${{ steps.preview.outputs.alias }}
+          workingDirectory: apps/web
+          packageManager: pnpm
+
+      - name: Upload manual web app version
+        id: manual-version-upload
+        if: github.event_name == 'workflow_dispatch' && inputs.mode == 'upload-version'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: versions upload
+          workingDirectory: apps/web
+          packageManager: pnpm
+
+      - name: Summarize preview upload
+        if: github.event_name == 'push' && github.ref_name != 'main'
+        env:
+          COMMAND_OUTPUT: ${{ steps.preview-deploy.outputs.command-output }}
+          PREVIEW_ALIAS: ${{ steps.preview.outputs.alias }}
+        run: |
+          {
+            echo "### Cloudflare preview upload"
+            echo
+            echo "Preview alias: \`${PREVIEW_ALIAS}\`"
+            echo
+            echo '```'
+            echo "$COMMAND_OUTPUT"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

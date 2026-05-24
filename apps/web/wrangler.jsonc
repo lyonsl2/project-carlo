@@ -5,6 +5,7 @@
   "observability": {
     "enabled": true,
   },
+  "preview_urls": true,
   "assets": {
     "not_found_handling": "single-page-application",
   },
