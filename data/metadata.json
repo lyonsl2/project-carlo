@@ -4345,5 +4345,104 @@
     "fetched_at": "2026-06-07T10:42:23Z",
     "processed_at": "2026-06-07T10:46:10Z",
     "published_date": "2026-06-07"
+  },
+  {
+    "parish_slug": "net-catholic",
+    "source_url": "https://files.ecatholic.com/20434/bulletins/20260607.pdf?t=1780579470000",
+    "pdf_path": "data/bulletins/net-catholic/9812ecc279020b7df6b88e1edbaee9d346580e041a8f4aa4a05505da4a3a0bca.pdf",
+    "content_hash": "9812ecc279020b7df6b88e1edbaee9d346580e041a8f4aa4a05505da4a3a0bca",
+    "fetched_at": "2026-06-08T13:44:26Z",
+    "processed_at": "2026-06-08T13:48:47Z",
+    "published_date": "2026-06-07"
+  },
+  {
+    "parish_slug": "southeast-rochester-catholic-community",
+    "source_url": "https://files.ecatholic.com/19887/bulletins/20260607.pdf?t=1780664896000",
+    "pdf_path": "data/bulletins/southeast-rochester-catholic-community/2aab9fb99a5b6c7d756a35c84b9472cf289d2a14bf86971282af51486b513ee5.pdf",
+    "content_hash": "2aab9fb99a5b6c7d756a35c84b9472cf289d2a14bf86971282af51486b513ee5",
+    "fetched_at": "2026-06-08T13:44:28Z",
+    "processed_at": "2026-06-08T13:49:34Z",
+    "published_date": "2026-06-07"
+  },
+  {
+    "parish_slug": "st-jerome",
+    "source_url": "https://files.ecatholic.com/22370/bulletins/20260607.pdf?t=1780364453000",
+    "pdf_path": "data/bulletins/st-jerome/b93492603bb20f6345f3c34e93b967a1719c7f5579b84b015da0d153edd90d9e.pdf",
+    "content_hash": "b93492603bb20f6345f3c34e93b967a1719c7f5579b84b015da0d153edd90d9e",
+    "fetched_at": "2026-06-08T13:44:38Z",
+    "processed_at": "2026-06-08T13:48:58Z",
+    "published_date": "2026-06-07"
+  },
+  {
+    "parish_slug": "parish-of-the-holy-family",
+    "source_url": "https://files.ecatholic.com/32186/bulletins/20260607.pdf?t=1780516462000",
+    "pdf_path": "data/bulletins/parish-of-the-holy-family/eb09527dad706d8ae14b1b1333b5ea441d6c7f28e570078ec903074c2070ec3a.pdf",
+    "content_hash": "eb09527dad706d8ae14b1b1333b5ea441d6c7f28e570078ec903074c2070ec3a",
+    "fetched_at": "2026-06-08T13:45:32Z",
+    "processed_at": "2026-06-08T13:50:12Z",
+    "published_date": "2026-06-07"
+  },
+  {
+    "parish_slug": "peace-of-christ",
+    "source_url": "https://bulletins.discovermass.com/download.php?bulletin=ym4TkHw8wgwyJL%2B04cYJNJQQgK0%2FLnxMoFpZsBcizqT9S73sNhyCchauC3KsDxNmgSHd2VMTrU7mRZ8Vm1yxU516NLcJ6iLpR6GuFvmN%2BHM%3D",
+    "pdf_path": "data/bulletins/peace-of-christ/f76395848c76e3b13bf86063a2fe629e887ee6ca30873f0ca3eb9024a2c99fab.pdf",
+    "content_hash": "f76395848c76e3b13bf86063a2fe629e887ee6ca30873f0ca3eb9024a2c99fab",
+    "fetched_at": "2026-06-08T13:45:42Z",
+    "processed_at": "2026-06-08T13:52:50Z",
+    "published_date": "2026-06-07"
+  },
+  {
+    "parish_slug": "sacred-heart-cathedral",
+    "source_url": "https://container.parishesonline.com/bulletins/06/0007/20260607B.pdf",
+    "pdf_path": "data/bulletins/sacred-heart-cathedral/e5a31dc976a875f0d73f57692d6da9c59a5745b3e5f2586dbd56a4160bdfa1e2.pdf",
+    "content_hash": "e5a31dc976a875f0d73f57692d6da9c59a5745b3e5f2586dbd56a4160bdfa1e2",
+    "fetched_at": "2026-06-08T13:45:52Z",
+    "processed_at": "2026-06-08T13:53:32Z",
+    "published_date": "2026-06-07"
+  },
+  {
+    "parish_slug": "st-benedict-parish",
+    "source_url": "https://files.ecatholic.com/14273/bulletins/20260607.pdf?t=1780511177000",
+    "pdf_path": "data/bulletins/st-benedict-parish/1caba131c126d179e2812360be899deacd55305cced59e0ed8d15ce097aef1cd.pdf",
+    "content_hash": "1caba131c126d179e2812360be899deacd55305cced59e0ed8d15ce097aef1cd",
+    "fetched_at": "2026-06-08T13:46:03Z",
+    "processed_at": "2026-06-08T13:49:52Z",
+    "published_date": "2026-06-07"
+  },
+  {
+    "parish_slug": "st-catherine-of-siena-ithaca",
+    "source_url": "https://files.ecatholic.com/10905/bulletins/20260607.pdf?t=1780664387000",
+    "pdf_path": "data/bulletins/st-catherine-of-siena-ithaca/cd04bf13b8a4396452f21627265c5a2bf45e41b5e167835fd3193269a9ca5502.pdf",
+    "content_hash": "cd04bf13b8a4396452f21627265c5a2bf45e41b5e167835fd3193269a9ca5502",
+    "fetched_at": "2026-06-08T13:46:07Z",
+    "processed_at": "2026-06-08T13:52:08Z",
+    "published_date": "2026-06-07"
+  },
+  {
+    "parish_slug": "st-john-spencerport",
+    "source_url": "https://bulletins.discovermass.com/download.php?bulletin=pE2oi9EZnfhzUTevS1sZWCBG%2FkqkulCeINFOBAs2%2BQczrtlnISNoOpkrW0vjmFmpSuvTj6Z4iEJKxzdQ5zaD%2BOVjaQX2KfGZ%2FClttyjTSfA%3D",
+    "pdf_path": "data/bulletins/st-john-spencerport/d35331b1ba8fd8e3bd2623ef77e137f31a85d8eaa72cb75cc4302e1a13785293.pdf",
+    "content_hash": "d35331b1ba8fd8e3bd2623ef77e137f31a85d8eaa72cb75cc4302e1a13785293",
+    "fetched_at": "2026-06-08T13:46:27Z",
+    "processed_at": "2026-06-08T13:51:20Z",
+    "published_date": "2026-06-07"
+  },
+  {
+    "parish_slug": "st-luke-the-evangelist",
+    "source_url": "https://parishesonline.com/publication-page/st-luke-the-evangelist?selectedPublication=https://container.parishesonline.com/bulletins/06/0103/20260614B.pdf",
+    "pdf_path": "data/bulletins/st-luke-the-evangelist/c0d95f5a8b50d45d8e312c71f7ac1970774df41ccaf916bd5bf9eb2958c329f1.pdf",
+    "content_hash": "c0d95f5a8b50d45d8e312c71f7ac1970774df41ccaf916bd5bf9eb2958c329f1",
+    "fetched_at": "2026-06-08T13:47:02Z",
+    "processed_at": "2026-06-08T13:52:52Z",
+    "published_date": "2026-06-14"
+  },
+  {
+    "parish_slug": "st-patricks-victor",
+    "source_url": "https://bulletins.discovermass.com/download.php?bulletin=RHU6SljN%2BQrkhmNFCSM88glpcTcxhAdzRl3bIqxpeHLNJR0Xm6d9f9oY5Px0fCl39c97SGOXe6cZ3gOqpcz12s2%2FPxoMTFR%2BaCwwtZeTGXs%3D",
+    "pdf_path": "data/bulletins/st-patricks-victor/075416733abf2ddc48113a7ba1162a669a050a1cc969ce690b4df1f9417ebe22.pdf",
+    "content_hash": "075416733abf2ddc48113a7ba1162a669a050a1cc969ce690b4df1f9417ebe22",
+    "fetched_at": "2026-06-08T13:47:23Z",
+    "processed_at": null,
+    "published_date": null
   }
 ]
