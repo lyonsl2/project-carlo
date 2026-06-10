@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-import importlib
 import logging
 import re
 import time
 from pathlib import Path
 
+from pdf_extract.browser import launch_stealth_browser
 from pdf_extract.storage import (
     DETECT_RESULTS_PATH,
     connect_db,
@@ -176,50 +176,40 @@ def run_detection(
     if limit is not None:
         pending = pending[:limit]
 
-    playwright_module = importlib.import_module("playwright.sync_api")
-    sync_playwright = getattr(playwright_module, "sync_playwright")
-    stealth_cls = getattr(importlib.import_module("playwright_stealth"), "Stealth")
-    stealth = stealth_cls()
-
     updated = 0
     failed = 0
 
-    with sync_playwright() as p:
-        browser = p.chromium.launch(headless=False, channel="chrome")
-        try:
-            context = browser.new_context()
-            stealth.apply_stealth_sync(context)
-            page = context.new_page()
-            for row in pending:
-                slug = row["slug"]
-                url = str(row["homepage_url"])
-                try:
-                    LOGGER.info("Loading %s", url)
-                    page.goto(url, wait_until="domcontentloaded", timeout=30000)
-                    _wait_for_cloudflare(page)
-                    _wait_for_parishes_online_widget(page)
-                    html = _collect_page_html(page)
-                    provider, provider_id = detect_provider(html)
-                    if provider == "other":
-                        LOGGER.info("No provider on homepage, checking bulletin links for %s", url)
-                        provider, provider_id = _detect_from_bulletin_links(page)
-                    LOGGER.info("Detected provider=%s provider_id=%s for %s", provider, provider_id, url)
-                except (TimeoutError, OSError) as exc:
-                    LOGGER.warning("Failed to load %s: %s", url, exc)
-                    failed += 1
-                    continue
+    # Real Chrome (not bundled Chromium) passes the Cloudflare checks that
+    # _wait_for_cloudflare handles below.
+    with launch_stealth_browser(channel="chrome") as page:
+        for row in pending:
+            slug = row["slug"]
+            url = str(row["homepage_url"])
+            try:
+                LOGGER.info("Loading %s", url)
+                page.goto(url, wait_until="domcontentloaded", timeout=30000)
+                _wait_for_cloudflare(page)
+                _wait_for_parishes_online_widget(page)
+                html = _collect_page_html(page)
+                provider, provider_id = detect_provider(html)
+                if provider == "other":
+                    LOGGER.info("No provider on homepage, checking bulletin links for %s", url)
+                    provider, provider_id = _detect_from_bulletin_links(page)
+                LOGGER.info("Detected provider=%s provider_id=%s for %s", provider, provider_id, url)
+            except (TimeoutError, OSError) as exc:
+                LOGGER.warning("Failed to load %s: %s", url, exc)
+                failed += 1
+                continue
 
-                if not dry_run:
-                    results[slug] = {
-                        "bulletin_provider": provider,
-                        "provider_id": provider_id,
-                    }
-                updated += 1
+            if not dry_run:
+                results[slug] = {
+                    "bulletin_provider": provider,
+                    "provider_id": provider_id,
+                }
+            updated += 1
 
-                if pause_seconds > 0:
-                    time.sleep(pause_seconds)
-        finally:
-            browser.close()
+            if pause_seconds > 0:
+                time.sleep(pause_seconds)
 
     if not dry_run:
         save_json_dict(DETECT_RESULTS_PATH, results)

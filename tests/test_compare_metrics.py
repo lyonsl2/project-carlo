@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from pdf_extract import compare, extract_run
+from pdf_extract import compare, runner
 
 
 def _ev(**overrides):
@@ -76,7 +76,7 @@ def _write_metadata(tmp_path: Path, rows: list[dict]) -> None:
 
 @pytest.fixture
 def patched_runs(tmp_path, monkeypatch):
-    monkeypatch.setattr(extract_run, "RUNS_DIR", tmp_path / "runs")
+    monkeypatch.setattr(runner, "RUNS_DIR", tmp_path / "runs")
     monkeypatch.setattr(compare, "RUNS_DIR", tmp_path / "runs")
     monkeypatch.setattr(compare, "COMPARE_DIR", tmp_path / "runs" / "compare")
     monkeypatch.setattr(compare, "BULLETINS_METADATA_PATH", tmp_path / "metadata.json")

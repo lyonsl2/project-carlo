@@ -3,22 +3,17 @@
 from __future__ import annotations
 
 import hashlib
-import importlib
 import logging
-import os
 import re
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import date, datetime
 from pathlib import Path
-from typing import TYPE_CHECKING
 from urllib.error import HTTPError, URLError
 from urllib.parse import parse_qs, quote, unquote, urljoin, urlparse, urlunparse
 from urllib.request import Request, urlopen
 
-if TYPE_CHECKING:
-    from playwright.sync_api import Browser, Page, Playwright
-
+from pdf_extract.browser import AnchorLike, PageLike, launch_stealth_browser
 from pdf_extract.storage import (
     BULLETINS_DIR,
     BULLETINS_METADATA_PATH,
@@ -50,13 +45,6 @@ HTTP_DOWNLOAD_TIMEOUT_SECONDS = 60
 LOGGER = logging.getLogger(__name__)
 
 
-def _env_bool(name: str, default: bool) -> bool:
-    raw = os.getenv(name)
-    if raw is None:
-        return default
-    return raw.strip().lower() in {"1", "true", "yes", "on"}
-
-
 @dataclass(frozen=True)
 class BulletinLink:
     source_url: str
@@ -73,7 +61,7 @@ class _OtherPdfCandidate:
 # ── eCatholic bulletin resolution ───────────────────────────────────────────
 
 def build_latest_ecatholic_bulletin_links(
-    *, provider_id: str, reference_date: date | None = None, page: Page | None = None,
+    *, provider_id: str, reference_date: date | None = None, page: PageLike | None = None,
 ) -> BulletinLink:
     _ = reference_date
     source_url, fetch_url = _resolve_ecatholic_latest_link(provider_id=provider_id, page=page)
@@ -81,7 +69,7 @@ def build_latest_ecatholic_bulletin_links(
 
 
 def _resolve_ecatholic_latest_link(
-    *, provider_id: str, page: Page | None = None,
+    *, provider_id: str, page: PageLike | None = None,
 ) -> tuple[str, str]:
     bulletins_url = urljoin(provider_id.rstrip("/") + "/", ECATHOLIC_BULLETINS_PATH.lstrip("/"))
     return _resolve_latest_anchor_link_with_playwright(
@@ -97,7 +85,7 @@ def _resolve_ecatholic_latest_link(
 
 
 def _resolve_parishes_online_latest_link(
-    *, provider_id: str, page: Page | None = None,
+    *, provider_id: str, page: PageLike | None = None,
 ) -> tuple[str, str]:
     org_url = PARISHES_ONLINE_ORG_URL_TEMPLATE.format(provider_id=provider_id)
     return _resolve_latest_anchor_link_with_playwright(
@@ -113,26 +101,6 @@ def _resolve_parishes_online_latest_link(
     )
 
 
-def _launch_browser() -> tuple[Playwright, Browser, Page]:
-    """Launch a Playwright browser with stealth. Returns (playwright, browser, page)."""
-    playwright_module = importlib.import_module("playwright.sync_api")
-    sync_playwright = getattr(playwright_module, "sync_playwright")
-    stealth_cls = getattr(importlib.import_module("playwright_stealth"), "Stealth")
-    stealth = stealth_cls()
-    headless = _env_bool("PLAYWRIGHT_HEADLESS", False)
-    channel = os.getenv("PLAYWRIGHT_BROWSER_CHANNEL")
-    launch_kwargs: dict[str, object] = {"headless": headless}
-    if channel:
-        launch_kwargs["channel"] = channel
-
-    pw = sync_playwright().start()
-    browser = pw.chromium.launch(**launch_kwargs)
-    context = browser.new_context()
-    stealth.apply_stealth_sync(context)
-    page = context.new_page()
-    return pw, browser, page
-
-
 def _resolve_latest_anchor_link_with_playwright(
     *,
     page_url: str,
@@ -140,29 +108,21 @@ def _resolve_latest_anchor_link_with_playwright(
     source_label: str,
     href_to_urls: Callable[[str], tuple[str, str] | None],
     wait_for_state: str | None = None,
-    page: Page | None = None,
+    page: PageLike | None = None,
 ) -> tuple[str, str]:
-    owns_browser = page is None
-    pw = None
-    browser = None
-    if owns_browser:
-        pw, browser, page = _launch_browser()
-
-    try:
+    def _run(p: PageLike) -> tuple[str, str]:
         LOGGER.info("Resolving latest anchor link (%s)", source_label)
         LOGGER.info("Visiting page URL: %s", page_url)
-        _goto_with_retry(page=page, page_url=page_url)  # type: ignore[arg-type]
+        _goto_with_retry(page=p, page_url=page_url)
         if wait_for_state is None:
-            page.wait_for_selector(  # type: ignore[union-attr]
-                anchor_selector, timeout=PLAYWRIGHT_SELECTOR_TIMEOUT_MS,
-            )
+            p.wait_for_selector(anchor_selector, timeout=PLAYWRIGHT_SELECTOR_TIMEOUT_MS)
         else:
-            page.wait_for_selector(  # type: ignore[union-attr]
+            p.wait_for_selector(
                 anchor_selector,
                 timeout=PLAYWRIGHT_SELECTOR_TIMEOUT_MS,
                 state=wait_for_state,
             )
-        anchors = page.query_selector_all(anchor_selector)  # type: ignore[union-attr]
+        anchors = p.query_selector_all(anchor_selector)
         for anchor in anchors:
             href = anchor.get_attribute("href")
             if not isinstance(href, str):
@@ -172,14 +132,12 @@ def _resolve_latest_anchor_link_with_playwright(
                 continue
             LOGGER.info("Resolved latest anchor link (%s)", source_label)
             return urls
-    finally:
-        if owns_browser:
-            if browser is not None:
-                browser.close()
-            if pw is not None:
-                pw.stop()
+        raise ValueError(f"No matching anchor link found for {source_label} at {page_url}")
 
-    raise ValueError(f"No matching anchor link found for {source_label} at {page_url}")
+    if page is not None:
+        return _run(page)
+    with launch_stealth_browser() as p:
+        return _run(p)
 
 
 def _extract_ecatholic_pdf_url_from_href(*, href: str, base_url: str) -> tuple[str, str] | None:
@@ -197,7 +155,7 @@ def _extract_ecatholic_pdf_url_from_href(*, href: str, base_url: str) -> tuple[s
 
 
 def build_latest_parishes_online_bulletin_links(
-    *, provider_id: str, reference_date: date | None = None, page: Page | None = None,
+    *, provider_id: str, reference_date: date | None = None, page: PageLike | None = None,
 ) -> BulletinLink:
     source_url, fetch_url = _resolve_parishes_online_latest_link(provider_id=provider_id, page=page)
     _ = reference_date
@@ -205,7 +163,7 @@ def build_latest_parishes_online_bulletin_links(
 
 
 def build_latest_discover_mass_bulletin_links(
-    *, provider_id: str, reference_date: date | None = None, page: Page | None = None,
+    *, provider_id: str, reference_date: date | None = None, page: PageLike | None = None,
 ) -> BulletinLink:
     _ = reference_date
     source_url, fetch_url = _resolve_discover_mass_latest_link(provider_id=provider_id, page=page)
@@ -213,7 +171,7 @@ def build_latest_discover_mass_bulletin_links(
 
 
 def _resolve_discover_mass_latest_link(
-    *, provider_id: str, page: Page | None = None,
+    *, provider_id: str, page: PageLike | None = None,
 ) -> tuple[str, str]:
     bulletin_url = DISCOVER_MASS_BULLETIN_URL_TEMPLATE.format(provider_id=provider_id.strip("/"))
     return _resolve_latest_anchor_link_with_playwright(
@@ -243,7 +201,7 @@ def _extract_discover_mass_pdf_url_from_href(*, href: str, base_url: str) -> tup
 
 
 def build_latest_other_bulletin_links(
-    *, provider_id: str, reference_date: date | None = None, page: Page | None = None,
+    *, provider_id: str, reference_date: date | None = None, page: PageLike | None = None,
 ) -> BulletinLink:
     source_url, fetch_url = _resolve_other_latest_link(
         provider_id=provider_id, reference_date=reference_date, page=page,
@@ -252,31 +210,21 @@ def build_latest_other_bulletin_links(
 
 
 def _resolve_other_latest_link(
-    *, provider_id: str, reference_date: date | None = None, page: Page | None = None,
+    *, provider_id: str, reference_date: date | None = None, page: PageLike | None = None,
 ) -> tuple[str, str]:
-    owns_browser = page is None
-    pw = None
-    browser = None
-    if owns_browser:
-        pw, browser, page = _launch_browser()
-
-    try:
+    def _run(p: PageLike) -> tuple[str, str]:
         today = reference_date or date.today()
-        _goto_with_retry(page=page, page_url=provider_id)  # type: ignore[arg-type]
-        page.wait_for_selector(  # type: ignore[union-attr]
-            "a[href]", timeout=PLAYWRIGHT_SELECTOR_TIMEOUT_MS, state="attached",
-        )
-        bulletin_page_url = _find_other_bulletin_page_url(page=page, base_url=provider_id)
+        _goto_with_retry(page=p, page_url=provider_id)
+        p.wait_for_selector("a[href]", timeout=PLAYWRIGHT_SELECTOR_TIMEOUT_MS, state="attached")
+        bulletin_page_url = _find_other_bulletin_page_url(page=p, base_url=provider_id)
         if bulletin_page_url is None:
             raise ValueError(f"No bulletin page link found for other provider at {provider_id}")
 
-        _goto_with_retry(page=page, page_url=bulletin_page_url)  # type: ignore[arg-type]
-        page.wait_for_selector(  # type: ignore[union-attr]
-            "a[href]", timeout=PLAYWRIGHT_SELECTOR_TIMEOUT_MS, state="attached",
-        )
-        current_page_url = getattr(page, "url", bulletin_page_url)
+        _goto_with_retry(page=p, page_url=bulletin_page_url)
+        p.wait_for_selector("a[href]", timeout=PLAYWRIGHT_SELECTOR_TIMEOUT_MS, state="attached")
+        current_page_url = p.url or bulletin_page_url
         candidates = _collect_other_pdf_candidates(
-            page=page, base_url=current_page_url, reference_date=today,
+            page=p, base_url=current_page_url, reference_date=today,
         )
 
         # Some sites (e.g. WordPress parish blogs) list each weekly bulletin as a
@@ -285,17 +233,15 @@ def _resolve_other_latest_link(
         # the latest dated "bulletin" post and collect PDFs from there.
         if not candidates:
             post_url = _find_latest_other_bulletin_post_url(
-                page=page, base_url=current_page_url, reference_date=today,
+                page=p, base_url=current_page_url, reference_date=today,
             )
             if post_url is None:
                 raise ValueError(f"No PDF links found on bulletin page: {bulletin_page_url}")
-            _goto_with_retry(page=page, page_url=post_url)  # type: ignore[arg-type]
-            page.wait_for_selector(  # type: ignore[union-attr]
-                "a[href]", timeout=PLAYWRIGHT_SELECTOR_TIMEOUT_MS, state="attached",
-            )
-            current_page_url = getattr(page, "url", post_url)
+            _goto_with_retry(page=p, page_url=post_url)
+            p.wait_for_selector("a[href]", timeout=PLAYWRIGHT_SELECTOR_TIMEOUT_MS, state="attached")
+            current_page_url = p.url or post_url
             candidates = _collect_other_pdf_candidates(
-                page=page, base_url=current_page_url, reference_date=today,
+                page=p, base_url=current_page_url, reference_date=today,
             )
             if not candidates:
                 raise ValueError(f"No PDF links found on bulletin post page: {post_url}")
@@ -310,15 +256,14 @@ def _resolve_other_latest_link(
 
         first = candidates[0]
         return first.source_url, first.fetch_url
-    finally:
-        if owns_browser:
-            if browser is not None:
-                browser.close()
-            if pw is not None:
-                pw.stop()
+
+    if page is not None:
+        return _run(page)
+    with launch_stealth_browser() as p:
+        return _run(p)
 
 
-def _find_other_bulletin_page_url(*, page: Page, base_url: str) -> str | None:
+def _find_other_bulletin_page_url(*, page: PageLike, base_url: str) -> str | None:
     anchors = page.query_selector_all("a[href]")
     both_matches: list[str] = []
     either_matches: list[str] = []
@@ -349,7 +294,7 @@ def _find_other_bulletin_page_url(*, page: Page, base_url: str) -> str | None:
 
 
 def _find_latest_other_bulletin_post_url(
-    *, page: Page, base_url: str, reference_date: date,
+    *, page: PageLike, base_url: str, reference_date: date,
 ) -> str | None:
     """Find the latest dated non-PDF anchor that looks like a weekly bulletin post.
 
@@ -383,7 +328,7 @@ def _find_latest_other_bulletin_post_url(
 
 
 def _collect_other_pdf_candidates(
-    *, page: Page, base_url: str, reference_date: date,
+    *, page: PageLike, base_url: str, reference_date: date,
 ) -> list[_OtherPdfCandidate]:
     anchors = page.query_selector_all("a[href]")
     candidates: list[_OtherPdfCandidate] = []
@@ -419,16 +364,13 @@ _HTML_PDF_URL_PATTERN = re.compile(r'https?://[^\s"\'<>]+?\.pdf', flags=re.IGNOR
 
 
 def _collect_pdf_urls_from_html(
-    *, page: Page, base_url: str, reference_date: date,
+    *, page: PageLike, base_url: str, reference_date: date,
 ) -> list[_OtherPdfCandidate]:
-    content_method = getattr(page, "content", None)
-    if not callable(content_method):
-        return []
     try:
-        html = content_method()
+        html = page.content()
     except Exception:
         return []
-    if not isinstance(html, str) or not html:
+    if not html:
         return []
 
     # Unescape JSON-escaped slashes so URLs like "https:\/\/site\/file.pdf"
@@ -453,25 +395,15 @@ def _collect_pdf_urls_from_html(
     return candidates
 
 
-def _anchor_text(anchor) -> str:
-    inner_text_method = getattr(anchor, "inner_text", None)
-    if callable(inner_text_method):
-        try:
-            text = inner_text_method()
-            if isinstance(text, str):
-                return text.strip()
-        except Exception:
-            pass
-
-    text_content_method = getattr(anchor, "text_content", None)
-    if callable(text_content_method):
-        try:
-            text = text_content_method()
-            if isinstance(text, str):
-                return text.strip()
-        except Exception:
-            pass
-    return ""
+def _anchor_text(anchor: AnchorLike) -> str:
+    try:
+        return anchor.inner_text().strip()
+    except Exception:
+        pass
+    try:
+        return (anchor.text_content() or "").strip()
+    except Exception:
+        return ""
 
 
 def _parse_relaxed_date_from_texts(texts: list[str], reference_date: date) -> date | None:
@@ -613,7 +545,7 @@ def _extract_parishes_online_pdf_url_from_href(
 # ── Bulletin link resolution ────────────────────────────────────────────────
 
 def _build_bulletin_link(
-    bulletin_provider: str, fetch_provider_id: str, *, page: Page | None = None,
+    bulletin_provider: str, fetch_provider_id: str, *, page: PageLike | None = None,
 ) -> BulletinLink:
     if bulletin_provider == "ecatholic":
         return build_latest_ecatholic_bulletin_links(provider_id=fetch_provider_id, page=page)
@@ -676,7 +608,7 @@ def _normalize_url_for_request(url: str) -> str:
     return urlunparse((parsed.scheme, parsed.netloc, path, params, query, fragment))
 
 
-def _goto_with_retry(*, page: Page, page_url: str, max_attempts: int = 3) -> None:
+def _goto_with_retry(*, page: PageLike, page_url: str, max_attempts: int = 3) -> None:
     for attempt in range(1, max_attempts + 1):
         try:
             page.goto(page_url, wait_until="domcontentloaded")
@@ -728,8 +660,7 @@ def fetch_bulletins(
     fetched = 0
     skipped_existing = 0
 
-    pw, browser, page = _launch_browser()
-    try:
+    with launch_stealth_browser() as page:
         for parish in parishes:
             slug = parish["slug"]
             fetch_source = _resolve_fetch_source(parish)
@@ -779,9 +710,6 @@ def fetch_bulletins(
             except Exception as exc:
                 LOGGER.warning("Failed saving bulletin for parish %s: %s", slug, exc, exc_info=True)
                 continue
-    finally:
-        browser.close()
-        pw.stop()
 
     result = {"fetched_bulletins": fetched, "skipped_existing_urls": skipped_existing}
     LOGGER.info("Fetch stage finished: %s", result)

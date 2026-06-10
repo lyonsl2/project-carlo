@@ -1,19 +1,34 @@
-"""Bulletin process pipeline: extract schedules from PDFs with Gemini AI."""
+"""Bulletin process pipeline: extract schedules from PDFs with Gemini AI.
+
+Runs the production Gemini classifier over each parish's latest fetched
+bulletin. `processed_at` in metadata.json is the gate that keeps a bulletin
+from being re-extracted; the shared on-disk result cache under data/runs/
+(keyed by classifier version + bulletin content hash) is a second layer that
+lets a re-run after a metadata reset skip the API call.
+
+data/events.json is derived state: it holds exactly the events of each
+parish's most recent processed bulletin, and rows from superseded bulletins
+are compacted away on every run.
+"""
 
 from __future__ import annotations
 
 import logging
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import date
 from typing import Any
 
-from pdf_extract.schedule_extraction import extract_events
+from pdf_extract.classifiers.gemini import GeminiClassifier
+from pdf_extract.runner import (
+    flatten_extracted_events,
+    iter_extraction_outcomes,
+    latest_per_parish,
+    load_cached_result,
+    store_cached_result,
+)
 from pdf_extract.storage import (
     BULLETINS_METADATA_PATH,
     EVENTS_PATH,
     connect_db,
     get_parish_by_name,
-    load_bulletin_work_item,
     load_json_list,
     save_json_list,
     utc_now_iso,
@@ -21,21 +36,47 @@ from pdf_extract.storage import (
 
 LOGGER = logging.getLogger(__name__)
 
+DEFAULT_MODEL = "gemini-3-flash-preview"
 
-def _latest_per_parish(metadata: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Keep only the most recently fetched bulletin for each parish."""
-    latest_by_parish: dict[str, tuple[tuple[str, str, int], dict[str, Any]]] = {}
+
+def _frontend_bulletin_rank(entry: dict[str, Any], idx: int) -> tuple[str, str, str, int]:
+    """Bulletin recency as the frontend sees it.
+
+    Mirrors the latest-bulletin ORDER BY in extract_frontend_db.py
+    (published_date, fetched_at, processed_at, insertion order). This is
+    deliberately different from `latest_per_parish` (fetched_at first), which
+    decides what to *process*: some parish sites re-serve old issues, so the
+    most recently fetched bulletin is not always the most recently published.
+    """
+    return (
+        str(entry.get("published_date") or ""),
+        str(entry.get("fetched_at") or ""),
+        str(entry.get("processed_at") or ""),
+        idx,
+    )
+
+
+def compact_events(
+    events: list[dict[str, Any]], metadata: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """Keep only rows belonging to each parish's frontend-visible bulletin.
+
+    Without compaction, rows from superseded bulletins (and bulletins no longer
+    present in metadata.json) accumulate in events.json forever. Ranking
+    follows `_frontend_bulletin_rank` so compaction never drops a row the
+    frontend would display.
+    """
+    top_by_parish: dict[str, tuple[tuple[str, str, str, int], Any]] = {}
     for idx, entry in enumerate(metadata):
         parish_slug = entry.get("parish_slug")
-        if not isinstance(parish_slug, str):
+        if not isinstance(parish_slug, str) or not entry.get("processed_at"):
             continue
-        fetched_at = str(entry.get("fetched_at") or "")
-        # Use source-order as a final tie-breaker to keep behavior deterministic.
-        rank = (fetched_at, str(entry.get("published_date") or ""), idx)
-        current = latest_by_parish.get(parish_slug)
+        rank = _frontend_bulletin_rank(entry, idx)
+        current = top_by_parish.get(parish_slug)
         if current is None or rank > current[0]:
-            latest_by_parish[parish_slug] = (rank, entry)
-    return [item[1] for item in latest_by_parish.values()]
+            top_by_parish[parish_slug] = (rank, entry.get("source_url"))
+    keep_urls = {url for _, url in top_by_parish.values()}
+    return [e for e in events if e.get("bulletin_source_url") in keep_urls]
 
 
 def _merge_extracted(
@@ -53,37 +94,13 @@ def _merge_extracted(
     if isinstance(published_date, str) and published_date.strip():
         entry["published_date"] = published_date
 
-    appended = 0
     if extracted.get("wrong_bulletin"):
         LOGGER.warning(
             "Bulletin flagged as wrong PDF for parish %s (source=%s); skipping events",
             parish_slug, entry.get("source_url"),
         )
-    else:
-        for ev in extracted.get("events", []):
-            if not isinstance(ev, dict):
-                continue
-            church_slug = ev.get("church_slug")
-            if not isinstance(church_slug, str):
-                continue
-
-            note_raw = ev.get("note")
-            note = note_raw.strip() if isinstance(note_raw, str) and note_raw.strip() else None
-
-            events.append({
-                "church_slug": church_slug,
-                "bulletin_source_url": entry["source_url"],
-                "event_type": str(ev.get("type", "")),
-                "event_kind": str(ev.get("kind", "")),
-                "day_of_week": ev.get("day_of_week") if isinstance(ev.get("day_of_week"), str) else None,
-                "date": ev.get("date") if isinstance(ev.get("date"), str) else None,
-                "start_time": str(ev.get("start_time", "")),
-                "end_time": ev.get("end_time") if isinstance(ev.get("end_time"), str) else None,
-                "cancelled": bool(ev.get("cancelled", False)),
-                "page_number": ev.get("page_number") if isinstance(ev.get("page_number"), int) else None,
-                "note": note,
-            })
-            appended += 1
+    rows = flatten_extracted_events(entry, extracted)
+    events.extend(rows)
 
     if extracted.get("church_list_needs_review"):
         LOGGER.warning(
@@ -92,26 +109,30 @@ def _merge_extracted(
         )
 
     entry["processed_at"] = utc_now_iso()
-    return appended
+    return len(rows)
 
 
 def process_bulletins(
     *,
     parish_name: str | None = None,
-    model: str = "gemini-3-flash-preview",
+    model: str = DEFAULT_MODEL,
     concurrency: int = 5,
 ) -> dict[str, int]:
     LOGGER.info(
         "Starting process stage (parish_name=%s, model=%s, concurrency=%s)",
         parish_name or "*all*", model, concurrency,
     )
+    classifier = GeminiClassifier(model=model)
     metadata = load_json_list(BULLETINS_METADATA_PATH)
-    events = load_json_list(EVENTS_PATH)
 
     # Keep only the latest fetched bulletin per parish, then process those still pending.
     latest = [m for m in metadata if m.get("pdf_path")]
-    latest = _latest_per_parish(latest)
+    latest = latest_per_parish(latest)
     pending = [m for m in latest if m.get("processed_at") is None]
+
+    processed_count = 0
+    inserted_events = 0
+    cache_hits = 0
 
     conn = connect_db()
     try:
@@ -119,59 +140,64 @@ def process_bulletins(
             parish_row = get_parish_by_name(conn, parish_name)
             if not parish_row:
                 LOGGER.warning("Parish not found: %s", parish_name)
-                return {"processed_bulletins": 0, "inserted_events": 0}
+                return {"processed_bulletins": 0, "inserted_events": 0, "cache_hits": 0}
             target_slug = parish_row["slug"]
             pending = [m for m in pending if m["parish_slug"] == target_slug]
 
-        processed_count = 0
-        inserted_events = 0
+        # events.json is derived state; drop rows from superseded bulletins
+        # before merging anything new.
+        events = load_json_list(EVENTS_PATH)
+        compacted = compact_events(events, metadata)
+        if len(compacted) != len(events):
+            LOGGER.info(
+                "Compacted events.json: dropped %d stale rows",
+                len(events) - len(compacted),
+            )
+            events = compacted
+            save_json_list(EVENTS_PATH, events)
 
-        # Prepare work on the main thread, but only keep up to `concurrency`
-        # PDFs resident/in-flight at once. Some bulletins are large enough that
-        # preloading the whole corpus can exhaust memory before extraction starts.
-        today = date.today()
-        max_workers = max(1, concurrency)
-        with ThreadPoolExecutor(max_workers=max_workers) as pool:
-            futures = {}
+        def commit(entry: dict[str, Any], extracted: dict[str, Any]) -> None:
+            """Merge one result, re-compact, and persist both files for crash safety."""
+            nonlocal events, inserted_events, processed_count
+            inserted_events += _merge_extracted(entry, extracted, events)
+            processed_count += 1
+            events = compact_events(events, metadata)
+            save_json_list(BULLETINS_METADATA_PATH, metadata)
+            save_json_list(EVENTS_PATH, events)
 
-            def consume_completed(fut) -> None:
-                nonlocal inserted_events, processed_count
-                item = futures.pop(fut)
-                try:
-                    extracted = fut.result()
-                except Exception:
-                    LOGGER.warning(
-                        "extract_events failed for %s",
-                        item.entry.get("source_url"),
-                        exc_info=True,
-                    )
-                    return
+        # Serve bulletins whose extraction is already cached without an API call.
+        uncached: list[dict[str, Any]] = []
+        for entry in pending:
+            content_hash = entry.get("content_hash")
+            cached = (
+                load_cached_result(classifier.name, classifier.version, content_hash)
+                if isinstance(content_hash, str) and content_hash
+                else None
+            )
+            if cached is None:
+                uncached.append(entry)
+                continue
+            cache_hits += 1
+            commit(entry, cached)
 
-                inserted_events += _merge_extracted(item.entry, extracted, events)
-                processed_count += 1
-                save_json_list(BULLETINS_METADATA_PATH, metadata)
-                save_json_list(EVENTS_PATH, events)
-
-            for entry in pending:
-                prepared = load_bulletin_work_item(entry, conn)
-                if prepared is None:
-                    continue
-                fut = pool.submit(
-                    extract_events,
-                    prepared.pdf_bytes,
-                    churches=prepared.church_list,
-                    model=model,
-                    today=today,
+        for outcome in iter_extraction_outcomes(
+            uncached, conn, classifier.extract, concurrency=concurrency,
+        ):
+            if outcome.skipped or outcome.extracted is None:
+                continue
+            content_hash = outcome.entry.get("content_hash")
+            if isinstance(content_hash, str) and content_hash:
+                store_cached_result(
+                    classifier.name, classifier.version, content_hash, outcome.extracted,
                 )
-                futures[fut] = prepared
-                if len(futures) >= max_workers:
-                    consume_completed(next(as_completed(futures)))
-
-            while futures:
-                consume_completed(next(as_completed(futures)))
+            commit(outcome.entry, outcome.extracted)
     finally:
         conn.close()
 
-    result = {"processed_bulletins": processed_count, "inserted_events": inserted_events}
+    result = {
+        "processed_bulletins": processed_count,
+        "inserted_events": inserted_events,
+        "cache_hits": cache_hits,
+    }
     LOGGER.info("Process stage finished: %s", result)
     return result

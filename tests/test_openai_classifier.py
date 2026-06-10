@@ -10,23 +10,16 @@ import pytest
 
 from pdf_extract.classifiers import openai_gpt
 from pdf_extract.classifiers.openai_gpt import OpenAIClassifier
-
-
-class _FakeParsed:
-    def __init__(self, payload: dict[str, Any]) -> None:
-        self._payload = payload
-
-    def model_dump(self) -> dict[str, Any]:
-        return self._payload
+from pdf_extract.schedule_extraction import SchedulePayload
 
 
 class _FakeResponse:
-    def __init__(self, parsed: _FakeParsed | None) -> None:
+    def __init__(self, parsed: SchedulePayload | None) -> None:
         self.output_parsed = parsed
 
 
 class _FakeResponses:
-    def __init__(self, parsed: _FakeParsed | None) -> None:
+    def __init__(self, parsed: SchedulePayload | None) -> None:
         self._parsed = parsed
         self.last_kwargs: dict[str, Any] = {}
         self.call_count = 0
@@ -42,7 +35,7 @@ class _FakeClient:
         self.responses = responses
 
 
-def _install_fake(monkeypatch, parsed: _FakeParsed | None) -> _FakeResponses:
+def _install_fake(monkeypatch, parsed: SchedulePayload | None) -> _FakeResponses:
     fake_responses = _FakeResponses(parsed)
     monkeypatch.setattr(
         openai_gpt, "OpenAI", lambda **kwargs: _FakeClient(responses=fake_responses)
@@ -52,7 +45,7 @@ def _install_fake(monkeypatch, parsed: _FakeParsed | None) -> _FakeResponses:
 
 def test_request_passes_pdf_as_base64_input_file(monkeypatch):
     pdf_bytes = b"%PDF-1.4 hello"
-    parsed = _FakeParsed({
+    parsed = SchedulePayload.model_validate({
         "weekly_schedule": {"masses": [], "confessions": [], "adorations": []},
         "single_events": {"masses": [], "confessions": [], "adorations": []},
         "cancellations": {"masses": [], "confessions": [], "adorations": []},
@@ -88,7 +81,7 @@ def test_request_passes_pdf_as_base64_input_file(monkeypatch):
 
 
 def test_returns_normalized_event_shape(monkeypatch):
-    parsed = _FakeParsed({
+    parsed = SchedulePayload.model_validate({
         "weekly_schedule": {
             "masses": [
                 {

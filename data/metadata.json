@@ -4444,5 +4444,131 @@
     "fetched_at": "2026-06-08T13:47:23Z",
     "processed_at": null,
     "published_date": null
+  },
+  {
+    "parish_slug": "southeast-rochester-catholic-community",
+    "source_url": "https://files.ecatholic.com/19887/bulletins/20260614.pdf?t=1781100385000",
+    "pdf_path": "data\\bulletins\\southeast-rochester-catholic-community\\7c37c5d1f69b7ebf75013e279a6824d7773c2598e74ffbe086344447b5bd24c3.pdf",
+    "content_hash": "7c37c5d1f69b7ebf75013e279a6824d7773c2598e74ffbe086344447b5bd24c3",
+    "fetched_at": "2026-06-10T22:51:05Z",
+    "processed_at": "2026-06-10T23:00:04Z",
+    "published_date": "2026-06-14"
+  },
+  {
+    "parish_slug": "st-jerome",
+    "source_url": "https://files.ecatholic.com/22370/bulletins/20260614.pdf?t=1780956522000",
+    "pdf_path": "data\\bulletins\\st-jerome\\c3a670586c389d936559271744fcab361a89c7159f176b90f8ff75ab593549c9.pdf",
+    "content_hash": "c3a670586c389d936559271744fcab361a89c7159f176b90f8ff75ab593549c9",
+    "fetched_at": "2026-06-10T22:51:17Z",
+    "processed_at": "2026-06-10T23:11:58Z",
+    "published_date": "2026-06-14"
+  },
+  {
+    "parish_slug": "holy-spirit-st-josephs",
+    "source_url": "https://parishesonline.com/publication-page/st-josephs-catholic-church-and-church-of-the-holy-spirit?selectedPublication=https://container.parishesonline.com/bulletins/06/0030/20260614B.pdf",
+    "pdf_path": "data\\bulletins\\holy-spirit-st-josephs\\cf1f70383f6af9ce06d86a37cd57fa9c9c5dc4c04d1861137004ef437efd3f6b.pdf",
+    "content_hash": "cf1f70383f6af9ce06d86a37cd57fa9c9c5dc4c04d1861137004ef437efd3f6b",
+    "fetched_at": "2026-06-10T22:51:24Z",
+    "processed_at": "2026-06-10T23:06:03Z",
+    "published_date": "2026-06-14"
+  },
+  {
+    "parish_slug": "our-lady-of-the-valley",
+    "source_url": "https://www.olv14843.org/wp-content/uploads/20260614.pdf",
+    "pdf_path": "data\\bulletins\\our-lady-of-the-valley\\33cce10b42cff65fab22620acaa1518c1ae96b8a4f2079bbdc1c84069db8c20c.pdf",
+    "content_hash": "33cce10b42cff65fab22620acaa1518c1ae96b8a4f2079bbdc1c84069db8c20c",
+    "fetched_at": "2026-06-10T22:52:06Z",
+    "processed_at": "2026-06-10T23:02:38Z",
+    "published_date": "2026-06-14"
+  },
+  {
+    "parish_slug": "parish-of-the-holy-family",
+    "source_url": "https://files.ecatholic.com/32186/bulletins/20260614.pdf?t=1781123118000",
+    "pdf_path": "data\\bulletins\\parish-of-the-holy-family\\bed534ea16779ce151029cb6ad2595a7ceb51c653e741168fcc0c31f7702162e.pdf",
+    "content_hash": "bed534ea16779ce151029cb6ad2595a7ceb51c653e741168fcc0c31f7702162e",
+    "fetched_at": "2026-06-10T22:52:09Z",
+    "processed_at": "2026-06-10T23:02:38Z",
+    "published_date": "2026-06-14"
+  },
+  {
+    "parish_slug": "peace-of-christ",
+    "source_url": "https://bulletins.discovermass.com/download.php?bulletin=%2BhonVClkssTpyRVoDwkgPWzc3FCTH6PB8AiELjcWrk6UWAf2oBgoR%2F96Bizp20M4UZ14RtChMG7%2BZPhpzS1VEm7jnUhTos4Vei26Hp8yIh8%3D",
+    "pdf_path": "data\\bulletins\\peace-of-christ\\da9b4fcc568cdd97dfa86f143869e5e7233bf8c3d07089916774b9c792b1e1d2.pdf",
+    "content_hash": "da9b4fcc568cdd97dfa86f143869e5e7233bf8c3d07089916774b9c792b1e1d2",
+    "fetched_at": "2026-06-10T22:52:17Z",
+    "processed_at": "2026-06-10T23:10:23Z",
+    "published_date": "2026-06-14"
+  },
+  {
+    "parish_slug": "st-benedict-parish",
+    "source_url": "https://files.ecatholic.com/14273/bulletins/20260614.pdf?t=1781117177000",
+    "pdf_path": "data\\bulletins\\st-benedict-parish\\d296667b4c4de568efb677a90c62c91c89e647b535be683003a7f99f73ef6555.pdf",
+    "content_hash": "d296667b4c4de568efb677a90c62c91c89e647b535be683003a7f99f73ef6555",
+    "fetched_at": "2026-06-10T22:52:34Z",
+    "processed_at": "2026-06-10T23:00:43Z",
+    "published_date": "2026-06-14"
+  },
+  {
+    "parish_slug": "st-catherine-of-siena-ithaca",
+    "source_url": "https://files.ecatholic.com/10905/bulletins/20260614.pdf?t=1781112670000",
+    "pdf_path": "data\\bulletins\\st-catherine-of-siena-ithaca\\a69a400be29d08bbfb5675a8fab6fe12367b3afd3674828984f4a9ad18832d15.pdf",
+    "content_hash": "a69a400be29d08bbfb5675a8fab6fe12367b3afd3674828984f4a9ad18832d15",
+    "fetched_at": "2026-06-10T22:52:38Z",
+    "processed_at": "2026-06-10T23:01:48Z",
+    "published_date": "2026-06-14"
+  },
+  {
+    "parish_slug": "st-john-spencerport",
+    "source_url": "https://bulletins.discovermass.com/download.php?bulletin=KQ9n1GzgTDbbChQ9jkgc0DKTqyc6YuuDqMkuTgIk86DDBMpCED0awWG%2Be4IOaahJ%2BPfS16MtAjV2UITvBPjK2pxaCvCXQOAIAHYSSkF9Psg%3D",
+    "pdf_path": "data\\bulletins\\st-john-spencerport\\d35331b1ba8fd8e3bd2623ef77e137f31a85d8eaa72cb75cc4302e1a13785293.pdf",
+    "content_hash": "d35331b1ba8fd8e3bd2623ef77e137f31a85d8eaa72cb75cc4302e1a13785293",
+    "fetched_at": "2026-06-10T22:52:55Z",
+    "processed_at": "2026-06-10T23:01:53Z",
+    "published_date": "2026-06-07"
+  },
+  {
+    "parish_slug": "st-john-vianney",
+    "source_url": "https://www.sjvbath.org/wp-content/uploads/June-14th-11th-Sun-in-OT.pdf",
+    "pdf_path": "data\\bulletins\\st-john-vianney\\98f96cbf0eb9e8f8af81b243c312e766d1a877e70e34638f19d8dfe6d44a6a86.pdf",
+    "content_hash": "98f96cbf0eb9e8f8af81b243c312e766d1a877e70e34638f19d8dfe6d44a6a86",
+    "fetched_at": "2026-06-10T22:53:00Z",
+    "processed_at": "2026-06-10T23:10:25Z",
+    "published_date": "2026-06-14"
+  },
+  {
+    "parish_slug": "st-leo-the-great",
+    "source_url": "https://files.ecatholic.com/34045/bulletins/20260614.pdf?t=1781113948000",
+    "pdf_path": "data\\bulletins\\st-leo-the-great\\3726e32a1c72380e41e27bc0fdaa5b7584f8adac6edefa6dd43f64d5816d4807.pdf",
+    "content_hash": "3726e32a1c72380e41e27bc0fdaa5b7584f8adac6edefa6dd43f64d5816d4807",
+    "fetched_at": "2026-06-10T22:54:07Z",
+    "processed_at": "2026-06-10T23:14:19Z",
+    "published_date": "2026-06-14"
+  },
+  {
+    "parish_slug": "st-patricks-victor",
+    "source_url": "https://bulletins.discovermass.com/download.php?bulletin=PFjX6YPjxJXgCQsUm5Eg6NYMArSXS41%2BNYTOwLY3%2FS0ED7AHd9Qjqoo6UzCD81nioaCme8haUPXSeX2LAz1EyT4pbXv%2BgZL22RX4R759lp4%3D",
+    "pdf_path": "data\\bulletins\\st-patricks-victor\\075416733abf2ddc48113a7ba1162a669a050a1cc969ce690b4df1f9417ebe22.pdf",
+    "content_hash": "075416733abf2ddc48113a7ba1162a669a050a1cc969ce690b4df1f9417ebe22",
+    "fetched_at": "2026-06-10T22:54:28Z",
+    "processed_at": "2026-06-10T23:05:29Z",
+    "published_date": "2026-06-07"
+  },
+  {
+    "parish_slug": "st-pauls-webster",
+    "source_url": "https://www.stpaulsrcc.org/wp-content/uploads/June-14-2026.pdf",
+    "pdf_path": "data\\bulletins\\st-pauls-webster\\bbe0ab8ce3ba300b3c2ca3b472d0be6e9bd52b0a7e2545a376e505ab6be8978c.pdf",
+    "content_hash": "bbe0ab8ce3ba300b3c2ca3b472d0be6e9bd52b0a7e2545a376e505ab6be8978c",
+    "fetched_at": "2026-06-10T22:54:34Z",
+    "processed_at": "2026-06-10T23:10:02Z",
+    "published_date": "2026-06-14"
+  },
+  {
+    "parish_slug": "st-peters-ontario-county",
+    "source_url": "https://media.thechurchcoassets.com/accounts/4026/45c51291-182d-4fae-98ed-57245176e160-./2026-6-14BU-YR-A.pdf",
+    "pdf_path": "data\\bulletins\\st-peters-ontario-county\\ca7fe6d535576041529ccafe377fe1fba20c5468ccf830da8554a4b58acb9246.pdf",
+    "content_hash": "ca7fe6d535576041529ccafe377fe1fba20c5468ccf830da8554a4b58acb9246",
+    "fetched_at": "2026-06-10T22:54:38Z",
+    "processed_at": "2026-06-10T23:05:42Z",
+    "published_date": "2026-06-14"
   }
 ]
