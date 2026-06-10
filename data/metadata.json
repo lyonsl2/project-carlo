@@ -4570,5 +4570,32 @@
     "fetched_at": "2026-06-10T22:54:38Z",
     "processed_at": "2026-06-10T23:05:42Z",
     "published_date": "2026-06-14"
+  },
+  {
+    "parish_slug": "peace-of-christ",
+    "source_url": "https://bulletins.discovermass.com/download.php?bulletin=PAnl6MDP9XerWHMozBv11LfalF56kSll%2FtQAZmE2BLtyyJPsDqOTWPjfcbOuY%2BGhSuT2QqxkXa%2FNe3ZscDQld3jHk6HwCEqhlYxkI%2FMGNIA%3D",
+    "pdf_path": "data/bulletins/peace-of-christ/da9b4fcc568cdd97dfa86f143869e5e7233bf8c3d07089916774b9c792b1e1d2.pdf",
+    "content_hash": "da9b4fcc568cdd97dfa86f143869e5e7233bf8c3d07089916774b9c792b1e1d2",
+    "fetched_at": "2026-06-10T23:47:21Z",
+    "processed_at": "2026-06-10T23:52:09Z",
+    "published_date": "2026-06-14"
+  },
+  {
+    "parish_slug": "st-john-spencerport",
+    "source_url": "https://bulletins.discovermass.com/download.php?bulletin=9ODIimv03m%2BADbwYlvTQ2TDv7JDyzUAmZr17jne2FLl5SolMd3ArZb%2FcWnDmd6CDe1ArtRrG79swBvPqEAlfU8LXorBfs7IEFzEyFkIkYHE%3D",
+    "pdf_path": "data/bulletins/st-john-spencerport/d35331b1ba8fd8e3bd2623ef77e137f31a85d8eaa72cb75cc4302e1a13785293.pdf",
+    "content_hash": "d35331b1ba8fd8e3bd2623ef77e137f31a85d8eaa72cb75cc4302e1a13785293",
+    "fetched_at": "2026-06-10T23:48:43Z",
+    "processed_at": "2026-06-10T23:52:25Z",
+    "published_date": "2026-06-07"
+  },
+  {
+    "parish_slug": "st-patricks-victor",
+    "source_url": "https://bulletins.discovermass.com/download.php?bulletin=16cUOxIV4y4pqJuMO6US1vS6ACVd0kEgNDYsl45H1nIRI0AWjZkL1DAxhOQQu4937hO4RAStidUVvvUgnZ8KyS2Om1TxXNLrDZHbL9yachY%3D",
+    "pdf_path": "data/bulletins/st-patricks-victor/075416733abf2ddc48113a7ba1162a669a050a1cc969ce690b4df1f9417ebe22.pdf",
+    "content_hash": "075416733abf2ddc48113a7ba1162a669a050a1cc969ce690b4df1f9417ebe22",
+    "fetched_at": "2026-06-10T23:49:40Z",
+    "processed_at": "2026-06-10T23:52:33Z",
+    "published_date": "2026-06-07"
   }
 ]
