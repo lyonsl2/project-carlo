@@ -3,18 +3,32 @@ from types import SimpleNamespace
 import pytest
 from google.genai import errors
 
+import pdf_extract.schedule_extraction as schedule_extraction
 from pdf_extract.schedule_extraction import _generate_content_with_backoff
+
+
+def _patch_backoff_clock(monkeypatch: pytest.MonkeyPatch) -> list[float]:
+    """Fake monotonic clock so gate waits exit in one sleep, not a spin loop."""
+    clock = [1000.0]
+    sleep_delays: list[float] = []
+
+    def _fake_monotonic() -> float:
+        return clock[0]
+
+    def _fake_sleep(delay: float) -> None:
+        sleep_delays.append(delay)
+        clock[0] += delay
+
+    schedule_extraction._pause_until = 0.0
+    monkeypatch.setattr(schedule_extraction.time, "monotonic", _fake_monotonic)
+    monkeypatch.setattr(schedule_extraction.time, "sleep", _fake_sleep)
+    return sleep_delays
 
 
 def test_generate_content_with_backoff_retries_on_503(monkeypatch) -> None:
     attempts = 0
-    sleep_delays: list[float] = []
-
-    def _fake_sleep(delay: float) -> None:
-        sleep_delays.append(delay)
-
-    monkeypatch.setattr("pdf_extract.schedule_extraction.time.sleep", _fake_sleep)
-    monkeypatch.setattr("pdf_extract.schedule_extraction.random.uniform", lambda _a, _b: 0.0)
+    sleep_delays = _patch_backoff_clock(monkeypatch)
+    monkeypatch.setattr(schedule_extraction.random, "uniform", lambda _a, _b: 0.0)
 
     def _generate_content(**kwargs):
         nonlocal attempts
@@ -37,8 +51,7 @@ def test_generate_content_with_backoff_retries_on_503(monkeypatch) -> None:
 
 
 def test_generate_content_with_backoff_does_not_retry_non_retryable(monkeypatch) -> None:
-    sleep_delays: list[float] = []
-    monkeypatch.setattr("pdf_extract.schedule_extraction.time.sleep", lambda delay: sleep_delays.append(delay))
+    sleep_delays = _patch_backoff_clock(monkeypatch)
 
     def _generate_content(**kwargs):
         raise errors.ClientError(400, {"error": {"status": "INVALID_ARGUMENT"}})
