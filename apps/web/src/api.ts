@@ -37,7 +37,7 @@ export interface ChurchFilters {
   timeTo?: number;
 }
 
-interface RawEvent {
+export interface RawEvent {
   id: number;
   church_id: number;
   event_type: EventType;
@@ -60,7 +60,7 @@ type ChurchBase = Omit<ChurchMapItem, "event_types" | "upcoming_events">;
 let allChurchesPromise: Promise<ChurchBase[]> | null = null;
 let allEventsPromise: Promise<RawEvent[]> | null = null;
 
-function parseEventDateForFilter(eventDate: string): Date | null {
+export function parseEventDateForFilter(eventDate: string): Date | null {
   // Date-only filter check; accepts ISO and other parseable strings.
   const isoMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(eventDate.trim());
   if (isoMatch) {
@@ -74,50 +74,51 @@ function parseEventDateForFilter(eventDate: string): Date | null {
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
-function queryEvents(
-  db: Database,
-  churchIds: number[],
-  types: EventType[],
-): RawEvent[] {
-  if (churchIds.length === 0) return [];
-  const effectiveTypes = types.length === 0 ? ALL_TYPES : types;
-  const churchPh = churchIds.map(() => "?").join(",");
-  const typePh = effectiveTypes.map(() => "?").join(",");
-  const stmt = db.prepare(
-    `SELECT id, church_id, event_type, event_kind,
-            day_of_week, date, start_time, end_time, cancelled,
-            page_number, note
-     FROM event
-     WHERE church_id IN (${churchPh})
-       AND event_type IN (${typePh})`,
-  );
-  try {
-    stmt.bind([...churchIds, ...effectiveTypes]);
+function mapEventRow(row: Record<string, unknown>): RawEvent {
+  const ev: RawEvent = {
+    id: row["id"] as number,
+    church_id: row["church_id"] as number,
+    event_type: row["event_type"] as EventType,
+    event_kind: row["event_kind"] as "weekly" | "specific_date",
+    day_of_week: str(row["day_of_week"]),
+    date: str(row["date"]),
+    start_time: row["start_time"] as number,
+    end_time: num(row["end_time"]),
+    cancelled: Boolean(row["cancelled"]),
+    occurrence: null,
+    page_number: num(row["page_number"]),
+    note: str(row["note"]),
+  };
+  ev.occurrence = computeNextOccurrence(ev);
+  return ev;
+}
 
-    const results: RawEvent[] = [];
-    while (stmt.step()) {
-      const row = stmt.getAsObject();
-      const ev: RawEvent = {
-        id: row["id"] as number,
-        church_id: row["church_id"] as number,
-        event_type: row["event_type"] as EventType,
-        event_kind: row["event_kind"] as "weekly" | "specific_date",
-        day_of_week: str(row["day_of_week"]),
-        date: str(row["date"]),
-        start_time: row["start_time"] as number,
-        end_time: num(row["end_time"]),
-        cancelled: Boolean(row["cancelled"]),
-        occurrence: null,
-        page_number: num(row["page_number"]),
-        note: str(row["note"]),
-      };
-      ev.occurrence = computeNextOccurrence(ev);
-      results.push(ev);
-    }
-    return results;
-  } finally {
-    stmt.free();
-  }
+function mapChurchRow(row: Record<string, unknown>): ChurchBase {
+  return {
+    id: row["id"] as number,
+    parish_id: row["parish_id"] as number,
+    slug: row["slug"] as string,
+    name: str(row["name"]),
+    address_line1: str(row["address_line1"]),
+    address_line2: str(row["address_line2"]),
+    city: str(row["city"]),
+    state: str(row["state"]),
+    postal_code: str(row["postal_code"]),
+    latitude: num(row["latitude"]),
+    longitude: num(row["longitude"]),
+  };
+}
+
+async function loadCaches(
+  db: Database,
+): Promise<{ churches: ChurchBase[]; events: RawEvent[] }> {
+  const churches = await (allChurchesPromise ??= Promise.resolve(
+    loadAllChurches(db),
+  ));
+  const events = await (allEventsPromise ??= Promise.resolve(
+    loadAllEvents(db),
+  ));
+  return { churches, events };
 }
 
 function loadAllChurches(db: Database): ChurchBase[] {
@@ -128,20 +129,7 @@ function loadAllChurches(db: Database): ChurchBase[] {
   const churches: ChurchBase[] = [];
   try {
     while (stmt.step()) {
-      const row = stmt.getAsObject();
-      churches.push({
-        id: row["id"] as number,
-        parish_id: row["parish_id"] as number,
-        slug: row["slug"] as string,
-        name: str(row["name"]),
-        address_line1: str(row["address_line1"]),
-        address_line2: str(row["address_line2"]),
-        city: str(row["city"]),
-        state: str(row["state"]),
-        postal_code: str(row["postal_code"]),
-        latitude: num(row["latitude"]),
-        longitude: num(row["longitude"]),
-      });
+      churches.push(mapChurchRow(stmt.getAsObject()));
     }
   } finally {
     stmt.free();
@@ -159,23 +147,7 @@ function loadAllEvents(db: Database): RawEvent[] {
   const results: RawEvent[] = [];
   try {
     while (stmt.step()) {
-      const row = stmt.getAsObject();
-      const ev: RawEvent = {
-        id: row["id"] as number,
-        church_id: row["church_id"] as number,
-        event_type: row["event_type"] as EventType,
-        event_kind: row["event_kind"] as "weekly" | "specific_date",
-        day_of_week: str(row["day_of_week"]),
-        date: str(row["date"]),
-        start_time: row["start_time"] as number,
-        end_time: num(row["end_time"]),
-        cancelled: Boolean(row["cancelled"]),
-        occurrence: null,
-        page_number: num(row["page_number"]),
-        note: str(row["note"]),
-      };
-      ev.occurrence = computeNextOccurrence(ev);
-      results.push(ev);
+      results.push(mapEventRow(stmt.getAsObject()));
     }
   } finally {
     stmt.free();
@@ -199,7 +171,10 @@ function toEventSummary(ev: RawEvent): EventSummary {
   };
 }
 
-function eventMatchesFilters(ev: RawEvent, filters: ChurchFilters): boolean {
+export function eventMatchesFilters(
+  ev: RawEvent,
+  filters: ChurchFilters,
+): boolean {
   if (ev.cancelled) return false;
   if (filters.daysOfWeek && filters.daysOfWeek.length > 0) {
     if (ev.event_kind === "weekly" && ev.day_of_week) {
@@ -234,12 +209,7 @@ export async function fetchChurches(
   const types = filters.types.length > 0 ? filters.types : ALL_TYPES;
   const typeSet = new Set<EventType>(types);
 
-  const churches = await (allChurchesPromise ??= Promise.resolve(
-    loadAllChurches(db),
-  ));
-  const allEvents = await (allEventsPromise ??= Promise.resolve(
-    loadAllEvents(db),
-  ));
+  const { churches, events: allEvents } = await loadCaches(db);
 
   const grouped = new Map<number, RawEvent[]>();
   for (const ev of allEvents) {
@@ -309,7 +279,7 @@ export async function fetchAllChurchesForSearch(): Promise<
 > {
   const db = await getDb();
   const stmt = db.prepare(
-    `SELECT id, slug, name, address_line1, address_line2, city, state, postal_code,
+    `SELECT id, parish_id, slug, name, address_line1, address_line2, city, state, postal_code,
             latitude, longitude FROM church
      WHERE latitude IS NOT NULL AND longitude IS NOT NULL
      ORDER BY name`,
@@ -317,19 +287,7 @@ export async function fetchAllChurchesForSearch(): Promise<
   try {
     const results: ChurchSearchResult[] = [];
     while (stmt.step()) {
-      const row = stmt.getAsObject();
-      results.push({
-        id: row["id"] as number,
-        slug: row["slug"] as string,
-        name: str(row["name"]),
-        address_line1: str(row["address_line1"]),
-        address_line2: str(row["address_line2"]),
-        city: str(row["city"]),
-        state: str(row["state"]),
-        postal_code: str(row["postal_code"]),
-        latitude: num(row["latitude"]),
-        longitude: num(row["longitude"]),
-      });
+      results.push(mapChurchRow(stmt.getAsObject()));
     }
     return results;
   } finally {
@@ -350,17 +308,7 @@ export async function fetchChurch(slug: string): Promise<ChurchDetail> {
     }
     const row = stmt.getAsObject();
     return {
-      id: row["id"] as number,
-      parish_id: row["parish_id"] as number,
-      slug: row["slug"] as string,
-      name: str(row["name"]),
-      address_line1: str(row["address_line1"]),
-      address_line2: str(row["address_line2"]),
-      city: str(row["city"]),
-      state: str(row["state"]),
-      postal_code: str(row["postal_code"]),
-      latitude: num(row["latitude"]),
-      longitude: num(row["longitude"]),
+      ...mapChurchRow(row),
       homepage_url: str(row["homepage_url"]),
       bulletin_url: str(row["bulletin_url"]),
     };
@@ -374,15 +322,15 @@ export async function fetchChurchEvents(
   types: EventType[],
 ): Promise<EventSummary[]> {
   const db = await getDb();
+  const effectiveTypes = types.length > 0 ? types : ALL_TYPES;
+  const typeSet = new Set(effectiveTypes);
 
-  const idResult = db.exec("SELECT id FROM church WHERE slug = ?", [slug]);
-  if (idResult.length === 0 || idResult[0].values.length === 0) {
-    throw new ChurchNotFoundError(slug);
-  }
-  const churchId = idResult[0].values[0][0] as number;
+  const { churches, events: allEvents } = await loadCaches(db);
+  const church = churches.find((c) => c.slug === slug);
+  if (!church) throw new ChurchNotFoundError(slug);
 
-  const events = queryEvents(db, [churchId], types);
-  return events
+  return allEvents
+    .filter((e) => e.church_id === church.id && typeSet.has(e.event_type))
     .filter((e) => e.occurrence !== null)
     .map(toEventSummary)
     .sort((a, b) => compareSchedule(a, b));

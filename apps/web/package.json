@@ -12,7 +12,8 @@
     "build:prerender": "tsx --tsconfig tsconfig.app.json scripts/prerender.ts",
     "preview": "pnpm run build && wrangler dev",
     "lint": "eslint .",
-    "check": "tsc --noEmit",
+    "check": "tsc -b",
+    "test": "vitest run",
     "deploy": "pnpm run build && wrangler deploy",
     "test:e2e": "playwright test",
     "test:e2e:install": "playwright install --with-deps chromium"
@@ -57,6 +58,7 @@
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.46.2",
     "vite": "^7.1.11",
+    "vitest": "^4.1.8",
     "wrangler": "^4.71.0"
   }
 }

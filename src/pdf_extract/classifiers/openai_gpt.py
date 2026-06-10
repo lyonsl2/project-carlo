@@ -97,4 +97,4 @@ class OpenAIClassifier:
             )
             return reconstruct_events({})
 
-        return reconstruct_events(parsed.model_dump())
+        return reconstruct_events(parsed)

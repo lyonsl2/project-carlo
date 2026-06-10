@@ -1,4 +1,4 @@
-from pdf_extract.schedule_extraction import reconstruct_events
+from pdf_extract.schedule_extraction import SchedulePayload, reconstruct_events
 
 
 def test_normalize_weekly_schedule() -> None:
@@ -246,3 +246,39 @@ def test_normalize_published_date_rejects_invalid() -> None:
     for raw in ["April 12, 2026", "", "   ", None, 12345]:
         result = reconstruct_events({"published_date": raw})
         assert result["published_date"] is None
+
+
+def test_reconstruct_events_from_schedule_payload() -> None:
+    """Typed SchedulePayload path produces the same flat events as the dict path."""
+    data = {
+        "weekly_schedule": {
+            "masses": [
+                {
+                    "church_slug": "st-mary",
+                    "day_of_week": "Sunday",
+                    "start_time": "9:00 AM",
+                    "page_number": 1,
+                    "note": "  Spanish  ",
+                },
+            ],
+            "confessions": [],
+            "adorations": [],
+        },
+        "single_events": {
+            "masses": [
+                {
+                    "church_slug": "st-mary",
+                    "date": "2026-12-25",
+                    "start_time": "midnight",
+                    "note": "Latin (TLM)",
+                },
+            ],
+            "confessions": [],
+            "adorations": [],
+        },
+        "cancellations": {"masses": [], "confessions": [], "adorations": []},
+        "published_date": "2026-04-12",
+        "wrong_bulletin": True,
+    }
+    payload = SchedulePayload.model_validate(data)
+    assert reconstruct_events(payload) == reconstruct_events(data)

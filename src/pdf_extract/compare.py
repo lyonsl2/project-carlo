@@ -19,7 +19,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from pdf_extract.extract_run import RUNS_DIR, bulletins_path, events_path, run_summary_path
+from pdf_extract.extract_run import bulletins_path, events_path, run_summary_path
+from pdf_extract.runner import RUNS_DIR
 from pdf_extract.storage import BULLETINS_METADATA_PATH, load_json_list, utc_now_iso
 
 LOGGER = logging.getLogger(__name__)

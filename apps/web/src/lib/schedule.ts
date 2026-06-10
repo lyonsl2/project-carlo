@@ -69,9 +69,21 @@ function nextForWeekly(
   return target;
 }
 
-function nextForSpecific(eventDate: string, startMinutes: number): Date | null {
+function nextForSpecific(
+  eventDate: string,
+  startMinutes: number,
+  today: Date,
+): Date | null {
   const parsed = parseEventDate(eventDate);
   if (!parsed) return null;
+  // Drop events whose calendar day is already past; same-day events still show
+  // (date-only comparison, so an earlier start_time today is not filtered out).
+  const eventDay = new Date(
+    parsed.getFullYear(),
+    parsed.getMonth(),
+    parsed.getDate(),
+  );
+  if (eventDay.getTime() < today.getTime()) return null;
   const d = new Date(parsed);
   d.setHours(Math.floor(startMinutes / 60), startMinutes % 60, 0, 0);
   return Number.isNaN(d.getTime()) ? null : d;
@@ -90,7 +102,7 @@ export function computeNextOccurrence(
   if (event.event_kind === "weekly" && event.day_of_week) {
     occ = nextForWeekly(event.day_of_week, event.start_time, today);
   } else if (event.event_kind === "specific_date" && event.date) {
-    occ = nextForSpecific(event.date, event.start_time);
+    occ = nextForSpecific(event.date, event.start_time, today);
   }
   return occ ? occ.toISOString() : null;
 }

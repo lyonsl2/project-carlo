@@ -9,7 +9,7 @@ from typing import Any
 
 import pytest
 
-from pdf_extract import extract_run
+from pdf_extract import extract_run, runner
 from pdf_extract.classifiers import REGISTRY
 from pdf_extract.storage import SCHEMA_PATH, connect_db, save_json_list
 
@@ -91,8 +91,7 @@ def _payload_one_event() -> dict[str, Any]:
 
 def _patch_paths(monkeypatch, tmp_path: Path, classifier: _CountingClassifier) -> None:
     monkeypatch.setattr(extract_run, "BULLETINS_METADATA_PATH", tmp_path / "metadata.json")
-    monkeypatch.setattr(extract_run, "DATA_DIR", tmp_path)
-    monkeypatch.setattr(extract_run, "RUNS_DIR", tmp_path / "runs")
+    monkeypatch.setattr(runner, "RUNS_DIR", tmp_path / "runs")
     # Skip the pypdf truncation helper for these stub PDFs.
     monkeypatch.setattr("pdf_extract.storage.ensure_truncated_pdf", lambda path, **kwargs: path)
     monkeypatch.setitem(REGISTRY, classifier.name, lambda: classifier)
@@ -137,7 +136,7 @@ def test_first_run_calls_classifier_and_writes_outputs(seeded_run):
     assert summary["cache_misses"] == 1
     assert summary["events_written"] == 1
 
-    cache_file = extract_run.cache_path("counting", "v1", "hash-abc")
+    cache_file = runner.cache_path("counting", "v1", "hash-abc")
     assert cache_file.exists()
     cached = json.loads(cache_file.read_text(encoding="utf-8"))
     assert cached["events"][0]["church_slug"] == "st-mary-anytown"
@@ -186,7 +185,7 @@ def test_cache_miss_after_classifier_version_changes(seeded_run):
     assert classifier.call_count == 2
     assert summary["cache_hits"] == 0
     assert summary["cache_misses"] == 1
-    assert extract_run.cache_path("counting", "v2", "hash-abc").exists()
+    assert runner.cache_path("counting", "v2", "hash-abc").exists()
 
 
 def test_run_does_not_touch_metadata_processed_at(seeded_run):

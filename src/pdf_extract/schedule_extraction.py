@@ -4,19 +4,44 @@ import json
 import logging
 import random
 import re
+import threading
 import time
 from datetime import date
 from typing import Any, Literal
 
 from google import genai
 from google.genai import errors, types
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 LOGGER = logging.getLogger(__name__)
 _RETRYABLE_STATUS_CODES = {429, 500, 502, 503, 504}
 _MAX_API_ATTEMPTS = 8
 _BASE_BACKOFF_SECONDS = 2.0
 _MAX_BACKOFF_SECONDS = 30.0
+
+# Shared backoff gate: when any thread hits a transient Gemini error, no thread
+# starts a new request until the backoff window has expired. This stops fresh
+# requests from outcompeting the backed-off one for quota.
+_pause_lock = threading.Lock()
+_pause_until = 0.0  # time.monotonic() deadline
+
+
+def _wait_for_gate() -> None:
+    """Block until any active global backoff window has expired."""
+    while True:
+        with _pause_lock:
+            remaining = _pause_until - time.monotonic()
+        if remaining <= 0:
+            return
+        time.sleep(remaining)
+
+
+def _extend_gate(delay: float) -> None:
+    """Hold all new Gemini requests for at least `delay` seconds from now."""
+    global _pause_until
+    deadline = time.monotonic() + delay
+    with _pause_lock:
+        _pause_until = max(_pause_until, deadline)
 
 # ── LLM extraction schema ──────────────────────────────────────────────────
 
@@ -181,13 +206,80 @@ def _normalize_published_date(raw: Any) -> str | None:
     return value
 
 
-def reconstruct_events(raw: dict[str, Any]) -> dict[str, Any]:
-    """Convert structured schema to flat events format.
+def _note_value(note: str | None) -> str | None:
+    if note is None:
+        return None
+    stripped = note.strip()
+    return stripped or None
 
-    Returns:
-        Dict with "events" (list of flat event dicts), "church_list_needs_review" (bool),
-        "published_date" (str | None, YYYY-MM-DD), and "wrong_bulletin" (bool).
-    """
+
+def _weekly_slot_to_event(
+    slot: WeeklySlot,
+    *,
+    event_type: Literal["mass", "confession", "adoration"],
+    cancelled: bool,
+) -> dict[str, Any]:
+    return {
+        "church_slug": slot.church_slug,
+        "type": event_type,
+        "kind": "weekly",
+        "day_of_week": slot.day_of_week,
+        "date": None,
+        "start_time": slot.start_time,
+        "end_time": slot.end_time,
+        "cancelled": cancelled,
+        "page_number": slot.page_number,
+        "note": _note_value(slot.note),
+    }
+
+
+def _date_slot_to_event(
+    slot: DateSlot,
+    *,
+    event_type: Literal["mass", "confession", "adoration"],
+    cancelled: bool,
+) -> dict[str, Any]:
+    return {
+        "church_slug": slot.church_slug,
+        "type": event_type,
+        "kind": "specific_date",
+        "day_of_week": None,
+        "date": slot.date,
+        "start_time": slot.start_time,
+        "end_time": slot.end_time,
+        "cancelled": cancelled,
+        "page_number": slot.page_number,
+        "note": _note_value(slot.note),
+    }
+
+
+def _events_from_payload(payload: SchedulePayload) -> list[dict[str, Any]]:
+    events: list[dict[str, Any]] = []
+    for event_type, slots in [
+        ("mass", payload.weekly_schedule.masses),
+        ("confession", payload.weekly_schedule.confessions),
+        ("adoration", payload.weekly_schedule.adorations),
+    ]:
+        for slot in slots:
+            events.append(_weekly_slot_to_event(slot, event_type=event_type, cancelled=False))
+    for event_type, slots in [
+        ("mass", payload.single_events.masses),
+        ("confession", payload.single_events.confessions),
+        ("adoration", payload.single_events.adorations),
+    ]:
+        for slot in slots:
+            events.append(_date_slot_to_event(slot, event_type=event_type, cancelled=False))
+    for event_type, slots in [
+        ("mass", payload.cancellations.masses),
+        ("confession", payload.cancellations.confessions),
+        ("adoration", payload.cancellations.adorations),
+    ]:
+        for slot in slots:
+            events.append(_date_slot_to_event(slot, event_type=event_type, cancelled=True))
+    return events
+
+
+def _reconstruct_events_from_dict(raw: dict[str, Any]) -> dict[str, Any]:
     ws = raw.get("weekly_schedule") or {}
     se = raw.get("single_events") or {}
     can = raw.get("cancellations") or {}
@@ -197,15 +289,29 @@ def reconstruct_events(raw: dict[str, Any]) -> dict[str, Any]:
     events.extend(_collect_events(se, kind="specific_date", cancelled=False))
     events.extend(_collect_events(can, kind="specific_date", cancelled=True))
 
-    church_list_needs_review = bool(raw.get("church_list_needs_review", False))
-    published_date = _normalize_published_date(raw.get("published_date"))
-    wrong_bulletin = bool(raw.get("wrong_bulletin", False))
     return {
         "events": events,
-        "church_list_needs_review": church_list_needs_review,
-        "published_date": published_date,
-        "wrong_bulletin": wrong_bulletin,
+        "church_list_needs_review": bool(raw.get("church_list_needs_review", False)),
+        "published_date": _normalize_published_date(raw.get("published_date")),
+        "wrong_bulletin": bool(raw.get("wrong_bulletin", False)),
     }
+
+
+def reconstruct_events(raw: SchedulePayload | dict[str, Any]) -> dict[str, Any]:
+    """Convert structured schema to flat events format.
+
+    Returns:
+        Dict with "events" (list of flat event dicts), "church_list_needs_review" (bool),
+        "published_date" (str | None, YYYY-MM-DD), and "wrong_bulletin" (bool).
+    """
+    if isinstance(raw, SchedulePayload):
+        return {
+            "events": _events_from_payload(raw),
+            "church_list_needs_review": raw.church_list_needs_review,
+            "published_date": _normalize_published_date(raw.published_date),
+            "wrong_bulletin": raw.wrong_bulletin,
+        }
+    return _reconstruct_events_from_dict(raw)
 
 
 def _parse_llm_json(content: str, *, context: str) -> dict[str, Any]:
@@ -246,8 +352,13 @@ def _generate_content_with_backoff(
     contents: list[str | types.Part],
     config: types.GenerateContentConfig,
 ):
-    """Call Gemini generate_content with exponential backoff for transient API failures."""
+    """Call Gemini generate_content with exponential backoff for transient API failures.
+
+    Backoff windows are shared process-wide via the gate above: while any thread
+    is backing off, no thread starts a new request.
+    """
     for attempt in range(1, _MAX_API_ATTEMPTS + 1):
+        _wait_for_gate()
         try:
             return client.models.generate_content(
                 model=model,
@@ -268,7 +379,7 @@ def _generate_content_with_backoff(
                 _MAX_API_ATTEMPTS,
                 delay,
             )
-            time.sleep(delay)
+            _extend_gate(delay)
 
 
 # ── Verification models ──────────────────────────────────────────────────────
@@ -287,7 +398,7 @@ class Address(BaseModel):
 class ChurchVerification(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    church_slug: str
+    church_slug: str = Field(min_length=1)
     name_status: Literal["verified", "incorrect", "unverifiable"]
     address_status: Literal["verified", "incorrect", "unverifiable"]
     corrected_name: str | None = None
@@ -396,8 +507,15 @@ def extract_events(
         ),
     )
     content = response.text or "{}"
-    data = _parse_llm_json(content, context="extract_events")
-    return reconstruct_events(data)
+    try:
+        payload = SchedulePayload.model_validate_json(content)
+    except ValidationError as exc:
+        LOGGER.warning(
+            "extract_events: Pydantic validation failed (%s); using lenient fallback",
+            exc,
+        )
+        return reconstruct_events(_parse_llm_json(content, context="extract_events"))
+    return reconstruct_events(payload)
 
 
 # ── Verification extraction ──────────────────────────────────────────────────
@@ -465,12 +583,21 @@ def extract_verification(
         ),
     )
     content = response.text or "{}"
-    data = _parse_llm_json(content, context="extract_verification")
-    return _normalize_verification(data)
+    try:
+        payload = VerificationPayload.model_validate_json(content)
+    except ValidationError as exc:
+        LOGGER.warning(
+            "extract_verification: Pydantic validation failed (%s); using lenient fallback",
+            exc,
+        )
+        return _normalize_verification_lenient(
+            _parse_llm_json(content, context="extract_verification")
+        )
+    return payload.model_dump(mode="json")
 
 
-def _normalize_verification(data: dict[str, Any]) -> dict[str, Any]:
-    """Normalize verification payload."""
+def _normalize_verification_lenient(data: dict[str, Any]) -> dict[str, Any]:
+    """Lenient fallback when VerificationPayload.model_validate_json fails."""
     existing: list[dict[str, Any]] = []
     new_churches: list[dict[str, Any]] = []
 
@@ -517,6 +644,8 @@ def _normalize_verification(data: dict[str, Any]) -> dict[str, Any]:
             "address": c.get("address") if isinstance(c.get("address"), dict) else None,
         })
 
+    # Round-trip through the model so this path returns the exact same shape
+    # as the strict model_validate_json path.
     payload = VerificationPayload.model_validate(
         {"existing_churches": existing, "new_churches": new_churches}
     )

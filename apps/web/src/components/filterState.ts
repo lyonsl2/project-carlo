@@ -131,7 +131,6 @@ function parseMinute(raw: string | null, fallback: number): number {
   const m = Number(hhmm[2]);
   if (h < 0 || h > 24 || m < 0 || m >= 60) return fallback;
   const total = h * 60 + m;
-  if (total < 0) return 0;
   if (total > MAX_TIME_MINUTE) return MAX_TIME_MINUTE;
   return total;
 }
