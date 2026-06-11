@@ -1,8 +1,17 @@
 import { Link } from "react-router-dom";
 import { ArrowLeftIcon } from "@/components/icons";
 import { Masthead } from "@/components/Masthead";
+import { useDocumentMeta } from "@/hooks/useDocumentMeta";
+import { canonicalForPath } from "@/lib/seo";
 
 export function AboutPage() {
+  useDocumentMeta({
+    title: "About · Project Carlo",
+    description:
+      "About Project Carlo — a directory of Catholic parishes with Mass, Confession, and Adoration times parsed from weekly bulletins.",
+    canonicalUrl: canonicalForPath("/about"),
+  });
+
   return (
     <main className="min-h-svh bg-paper px-4 py-8 sm:py-12">
       <div className="mx-auto flex w-full max-w-[40rem] flex-col gap-8">

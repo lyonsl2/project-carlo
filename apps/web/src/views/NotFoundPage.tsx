@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { ArrowLeftIcon } from "@/components/icons";
+import { useDocumentMeta } from "@/hooks/useDocumentMeta";
 
 interface NotFoundPageProps {
   title?: string;
@@ -10,6 +11,8 @@ export function NotFoundPage({
   title = "Page not found",
   message = "We couldn't find what you were looking for.",
 }: NotFoundPageProps) {
+  useDocumentMeta({ title: `${title} · Project Carlo`, noindex: true });
+
   return (
     <main className="flex min-h-svh flex-col items-center justify-center gap-4 bg-paper px-4 py-8 text-center">
       <h1 className="font-display text-[1.5rem] leading-[1.1] text-ink">

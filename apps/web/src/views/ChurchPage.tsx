@@ -6,6 +6,12 @@ import { ArrowLeftIcon } from "@/components/icons";
 import { InlineQueryError } from "@/components/InlineQueryError";
 import { Masthead } from "@/components/Masthead";
 import { ChurchPageContent } from "@/components/ChurchPageContent";
+import { useDocumentMeta } from "@/hooks/useDocumentMeta";
+import {
+  buildChurchDescription,
+  buildChurchTitle,
+  canonicalForPath,
+} from "@/lib/seo";
 import { NotFoundPage } from "./NotFoundPage";
 
 export function ChurchPage() {
@@ -29,6 +35,25 @@ export function ChurchPage() {
 
   const events = eventsQuery.data;
   const church = churchQuery.data;
+
+  const notFound =
+    !enabled ||
+    churchQuery.error instanceof ChurchNotFoundError ||
+    eventsQuery.error instanceof ChurchNotFoundError;
+
+  useDocumentMeta({
+    title: notFound
+      ? "Parish not found · Project Carlo"
+      : church
+        ? buildChurchTitle(church)
+        : "Parish · Project Carlo",
+    description: !notFound && church ? buildChurchDescription(church) : undefined,
+    canonicalUrl:
+      !notFound && church && churchSlug
+        ? canonicalForPath(`/churches/${encodeURIComponent(churchSlug)}/`)
+        : undefined,
+    noindex: notFound,
+  });
 
   if (!enabled) {
     return (

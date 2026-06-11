@@ -199,9 +199,9 @@ export function ChurchPageContent({ church, events }: ChurchPageContentProps) {
 
       <div className="mx-auto w-full max-w-5xl px-6 py-10 pb-[calc(3rem+var(--safe-area-inset-bottom))] md:py-14">
         <section className="rise-in mx-auto max-w-2xl text-center">
-          <h2 className="font-display text-[clamp(2.25rem,6vw,3.75rem)] leading-[1.05] font-normal tracking-tight text-ink">
+          <h1 className="font-display text-[clamp(2.25rem,6vw,3.75rem)] leading-[1.05] font-normal tracking-tight text-ink">
             {church.name ?? "Unnamed parish"}
-          </h2>
+          </h1>
 
           {formatAddress(church) ? (
             <p className="mt-4 flex items-center justify-center gap-2 font-serif text-[0.95rem] text-ink-soft">
@@ -269,9 +269,9 @@ export function ChurchPageContent({ church, events }: ChurchPageContentProps) {
                 return (
                   <section key={eventType}>
                     <div className="mb-5 flex flex-wrap items-baseline">
-                      <h3 className="font-display text-[1.75rem] leading-none font-normal text-ink">
+                      <h2 className="font-display text-[1.75rem] leading-none font-normal text-ink">
                         {EVENT_TYPE_LABELS[eventType]}
-                      </h3>
+                      </h2>
                       {sectionPage != null ? (
                         <SectionPageRef
                           pageNumber={sectionPage}

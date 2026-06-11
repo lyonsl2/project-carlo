@@ -22,8 +22,10 @@ import {
 import { InlineQueryError } from "../components/InlineQueryError";
 import { useMinWidth } from "../hooks/useMinWidth";
 import { useFilterUrlState } from "../hooks/useFilterUrlState";
+import { useDocumentMeta } from "../hooks/useDocumentMeta";
 import { PLACE_SEARCH_ZOOM, type PlaceSearchResult } from "../placeSearch";
 import { isAboutPageEnabled } from "../lib/featureFlags";
+import { HOME_DESCRIPTION, HOME_TITLE, canonicalForPath } from "../lib/seo";
 
 const aboutPageEnabled = isAboutPageEnabled();
 
@@ -42,6 +44,12 @@ interface HomeNavState {
 }
 
 export function HomePage() {
+  useDocumentMeta({
+    title: HOME_TITLE,
+    description: HOME_DESCRIPTION,
+    canonicalUrl: canonicalForPath("/"),
+  });
+
   const [urlFilters, setUrlFilters] = useFilterUrlState();
   const [appliedFilters, setAppliedFilters] = useState<FilterState>(
     () => urlFilters,

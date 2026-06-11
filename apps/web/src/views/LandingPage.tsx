@@ -21,6 +21,8 @@ import {
 import { FILTER_DAY_LABELS } from "../constants/days";
 import { EVENT_TYPE_OPTIONS } from "../constants/eventTypes";
 import { useMinWidth } from "../hooks/useMinWidth";
+import { useDocumentMeta } from "../hooks/useDocumentMeta";
+import { canonicalForPath } from "../lib/seo";
 import { cn } from "@/lib/utils";
 import {
   PLACE_SEARCH_ZOOM,
@@ -38,6 +40,13 @@ const SERVICE_ICONS: Record<EventType, typeof LatinCrossIcon> = {
 };
 
 export function LandingPage() {
+  useDocumentMeta({
+    title: "Search Mass, Confession & Adoration Times · Project Carlo",
+    description:
+      "Search Catholic parishes by location, service, day, and time to find Mass, Confession, and Adoration times near you.",
+    canonicalUrl: canonicalForPath("/landing"),
+  });
+
   const navigate = useNavigate();
   const isDesktop = useMinWidth(768);
   const [open, setOpen] = useState(false);

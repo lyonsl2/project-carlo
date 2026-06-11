@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <style>
+      @font-face {
+        font-family: "Cardo";
+        font-style: normal;
+        font-weight: 400;
+        font-display: block;
+        src: url("../node_modules/@fontsource/cardo/files/cardo-latin-400-normal.woff2")
+          format("woff2");
+      }
+      @font-face {
+        font-family: "Cardo";
+        font-style: italic;
+        font-weight: 400;
+        font-display: block;
+        src: url("../node_modules/@fontsource/cardo/files/cardo-latin-400-italic.woff2")
+          format("woff2");
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+      }
+
+      .grain::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        mix-blend-mode: multiply;
+        opacity: 0.4;
+        background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.09  0 0 0 0 0.07  0 0 0 0 0.05  0 0 0 0.06 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Option 01 — Missal title page (docs/share-image-options.html) -->
+    <div
+      id="og-frame"
+      class="grain"
+      style="
+        position: relative;
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: oklch(0.955 0.022 82);
+        background-image:
+          radial-gradient(
+            ellipse 80% 62% at 50% 0%,
+            color-mix(in oklch, oklch(0.97 0.02 82) 85%, white) 0%,
+            transparent 70%
+          ),
+          radial-gradient(
+            ellipse 120% 80% at 50% 100%,
+            color-mix(in oklch, oklch(0.915 0.028 82) 65%, transparent) 0%,
+            transparent 75%
+          );
+      "
+    >
+      <div
+        style="
+          position: absolute;
+          inset: 36px;
+          border: 1px solid
+            color-mix(in oklch, oklch(0.2 0.015 50) 28%, transparent);
+        "
+      ></div>
+      <div
+        style="
+          position: absolute;
+          inset: 44px;
+          border: 1px solid
+            color-mix(in oklch, oklch(0.2 0.015 50) 13%, transparent);
+        "
+      ></div>
+      <div
+        style="
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+          gap: 34px;
+          padding: 0 90px;
+        "
+      >
+        <div
+          style="
+            font-family: Cardo, Georgia, serif;
+            font-variant-caps: all-small-caps;
+            text-transform: uppercase;
+            letter-spacing: 0.34em;
+            font-size: 22px;
+            color: oklch(0.4 0.018 50);
+          "
+        >
+          A Catholic parish finder
+        </div>
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            gap: 22px;
+            color: oklch(0.66 0.095 75);
+            width: 440px;
+          "
+        >
+          <span
+            style="
+              height: 1px;
+              flex: 1;
+              background: color-mix(
+                in oklch,
+                oklch(0.2 0.015 50) 26%,
+                transparent
+              );
+            "
+          ></span>
+          <svg
+            width="56"
+            height="28"
+            viewBox="0 0 48 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.1"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M18 12c0-3 2-5 4-5s4 2 4 5-2 5-4 5-4-2-4-5Z"
+            ></path>
+            <path d="M22 12c0-3-2-5-4-5"></path>
+            <path d="M26 12c0 3 2 5 4 5"></path>
+            <circle cx="24" cy="12" r="0.9" fill="currentColor" stroke="none"></circle>
+          </svg>
+          <span
+            style="
+              height: 1px;
+              flex: 1;
+              background: color-mix(
+                in oklch,
+                oklch(0.2 0.015 50) 26%,
+                transparent
+              );
+            "
+          ></span>
+        </div>
+        <h2
+          style="
+            font-family: Cardo, Georgia, serif;
+            font-weight: 400;
+            font-size: 124px;
+            line-height: 0.9;
+            letter-spacing: -0.02em;
+            color: oklch(0.2 0.015 50);
+            margin: 0;
+          "
+        >
+          Project
+          <span style="font-style: italic; color: oklch(0.46 0.165 28)">Carlo</span>
+        </h2>
+        <div
+          style="
+            font-family: Cardo, Georgia, serif;
+            font-variant-caps: all-small-caps;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            font-size: 28px;
+            color: oklch(0.4 0.018 50);
+          "
+        >
+          Mass, Confession &amp; Adoration times near you
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

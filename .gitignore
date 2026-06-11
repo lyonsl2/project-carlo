@@ -39,6 +39,7 @@ Thumbs.db
 node_modules/
 apps/*/node_modules/
 dist/
+*.tsbuildinfo
 
 # Cloudflare Wrangler
 .wrangler/
