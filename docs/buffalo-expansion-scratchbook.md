@@ -62,6 +62,56 @@ The final curated data lives in `data/parishes.csv` and `data/churches.csv`.
 
 (Newest first. Each entry: parish, what I found, source confidence, edge cases.)
 
+### Batch 5 — Southern Tier: Cattaraugus + Chautauqua counties (2 parishes, 5 churches)
+
+`db create` 85→87 parishes, 161→166 churches; 117 tests pass. Pushes the dataset
+into **two new counties** (Cattaraugus, Chautauqua) — the diocese's Southern Tier.
+
+| parish slug | church — address | website | provider |
+|---|---|---|---|
+| enchanted-mountains-catholic | Basilica of St. Mary of the Angels — 202 S Union St, Olean 14760; St. John the Evangelist — 931 N Union St, Olean 14760; St. Bonaventure — 95 E Main St, Allegany 14706; Sacred Heart — 43 Maple St, Portville 14770 | emcatholic.org | (detect) |
+| holy-trinity-dunkirk | Holy Trinity — 1032 Central Ave, Dunkirk 14048 | holytrinitydunkirk.org | (detect) |
+
+Edge cases / judgment calls:
+- **Enchanted Mountains Catholic Community (EMCC) = one parish, four worship sites**
+  (Cattaraugus County). Shared homepage emcatholic.org and one central office (202 S
+  Union St, the Basilica). The four sites — Basilica of St. Mary of the Angels (Olean,
+  a minor basilica since 2015–17), St. John the Evangelist (Olean), St. Bonaventure
+  (Allegany), Sacred Heart (Portville) — each confirmed on emcatholic.org's own
+  site-pages, so modeled like `tonawanda-catholic` / `catholic-family-cheektowaga`.
+  Provider left blank for `detect` (emcatholic.org is a custom/eCatholic-style site; no
+  clean combined parishesonline org id surfaced — St. Bonaventure alone has
+  `st-bonaventure-church-14706`, but the family bulletin org wasn't confirmed).
+- **St. John (Olean) is contested:** a "Save St John's" campaign (savestjohnsolean.com)
+  exists and St. John was slated to fold into the Basilica as a secondary worship site,
+  but it is **currently still an active EMCC Mass site** (Sat vigil + Sun morning), so
+  included. If it closes, the row should move to deferred.
+- **Address confidence:** Basilica (catholicchurch.directory + Wikipedia), St. John
+  (catholicchurch.directory + Waze, 931 N Union St), St. Bonaventure
+  (catholicchurch.directory + parishesonline, 95 E Main St) → `address_verified=true`.
+  **Sacred Heart (Portville)** rests on a single Yelp/directory listing (43 Maple St;
+  PO Box 808 is the mailing address) → left `address_verified=false` for the verify
+  stage.
+- **Holy Trinity (Dunkirk), Chautauqua County — own parish.** It is part of Family #3
+  ("The Lord's Vineyard", thelordsvineyard3.com), but maintains its **own homepage**
+  (holytrinitydunkirk.org) and is a single clearly-active church, so modeled as its own
+  parish (St. Jude / Christ the King precedent). Address 1032 Central Ave (diocese +
+  catholicchurch.directory + Yelp; one source said 1030 — used 1032 as the majority).
+- **Deferred (documented, need fuller mapping before they're clean):**
+  - **Jamestown / Holy Apostles + St. James (Family #4)** — in active flux: SS. Peter &
+    Paul (508 Cherry St) was slated to close in 2025 and Holy Apostles was to merge with
+    St. James (27 Allen St), but the **Vatican overturned the Jamestown merger decree in
+    Dec 2025**, leaving the current worship-site lineup unsettled as of mid-2026. Deferred
+    until the post-reversal site list stabilizes.
+  - **The Lord's Vineyard (Family #3, N. Chautauqua)** beyond Holy Trinity — St. Anthony
+    (66 Cushing St) + St. Joseph (145 E Main St) Fredonia share a combined bulletin ("The
+    Catholic Parishes of Fredonia", parishesonline `st-anthony-st-joseph-churches`), and
+    the family also includes Our Lady of Mount Carmel (Silver Creek), St. Elizabeth Ann
+    Seton & Blessed Mary Angela (Dunkirk). The whole family largely shares the single
+    thelordsvineyard3.com domain, which collides with the UNIQUE-website constraint unless
+    the entire family is modeled as one parish — needs the full worship-site/address list
+    first. Deferred.
+
 ### Batch 4 — Cheektowaga family + Genesee County + Northtowns (5 parishes, 8 churches)
 
 `db create` 80→85 parishes, 153→161 churches; 117 tests pass. New ground: the
@@ -205,12 +255,13 @@ Coordinates left blank for all 11 churches → the `geocode` stage will backfill
 
 ## Summary & handoff
 
-**Added so far: 23 Diocese of Buffalo parishes, 29 churches** (across 4 commits/
+**Added so far: 25 Diocese of Buffalo parishes, 34 churches** (across 5 commits/
 batches). Spread across Erie county (Buffalo, Amherst, Snyder, Williamsville,
 Getzville, Tonawanda, North Tonawanda, Cheektowaga, West Seneca, Lackawanna,
 Orchard Park, Hamburg, East Aurora, Lancaster, Springville, Clarence, Swormville),
-Niagara county (Lockport, Pendleton), and now **Genesee county** (Batavia). Every
-batch rebuilds the DB cleanly and keeps all 117 tests green.
+Niagara county (Lockport, Pendleton), Genesee county (Batavia), and now the Southern
+Tier — **Cattaraugus county** (Olean, Allegany, Portville) and **Chautauqua county**
+(Dunkirk). Every batch rebuilds the DB cleanly and keeps all 117 tests green.
 
 **What's intentionally NOT done here (and why):**
 - **Coordinates** — every new church has blank `latitude`/`longitude`. Nominatim is
@@ -237,6 +288,9 @@ batch rebuilds the DB cleanly and keeps all 117 tests green.
 **Known follow-ups (deferred, documented above):** Niagara Falls RC Family of Parishes
 (St. Mary of the Cataract et al.), Holy Spirit/North Collins homepage ambiguity,
 Blessed Sacrament (Kenmore) merger, All Saints (Lockport) post-merger status,
-St. Mary worship site of Resurrection/Batavia (on the closure list). The full diocese
-is ~160 parishes / ~36 Families, so this is a verified starting slice, not the whole
-diocese. *(Catholic Family of Cheektowaga — resolved in batch 4.)*
+St. Mary worship site of Resurrection/Batavia (on the closure list), Jamestown/Holy
+Apostles + St. James (post-Vatican-reversal flux), and the rest of The Lord's Vineyard
+family (Fredonia St. Anthony/St. Joseph, Silver Creek, Dunkirk — shared-domain mapping).
+The full diocese is ~160 parishes / ~36 Families, so this is a verified starting slice,
+not the whole diocese. *(Catholic Family of Cheektowaga — resolved in batch 4;
+Enchanted Mountains / Olean — resolved in batch 5.)*
