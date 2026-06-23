@@ -61,3 +61,26 @@ The final curated data lives in `data/parishes.csv` and `data/churches.csv`.
 ## Research log
 
 (Newest first. Each entry: parish, what I found, source confidence, edge cases.)
+
+### Batch 1 — Buffalo core + inner-ring suburbs (9 parishes, 11 churches)
+
+Added and verified `db create` (62→71 parishes, 132→143 churches; 117 tests pass).
+
+| parish slug | church(es) | website | provider | notes / edge cases |
+|---|---|---|---|---|
+| st-joseph-university-buffalo | St. Joseph University Church — 3269 Main St, Buffalo 14214 | stjosephbuffalo.org | (detect) | UB South Campus ministry parish. Provider not obvious from snippets → left empty for `detect`. |
+| st-john-baptist-kenmore | St. John the Baptist — 1085 Englewood Ave, Kenmore 14223 | stjohnskenmore.org | parishes_online (st-john-the-baptist-church-14223) | **ZIP conflict**: directory sites show both Kenmore/14217 and Buffalo/14223. Confirmed via follow-up search the church + school are 14223; the address straddles the Kenmore/Buffalo line. Used Kenmore + 14223. |
+| st-gregory-the-great-williamsville | St. Gregory the Great — 200 St. Gregory Ct, Williamsville 14221 | stgregs.org | (detect) | On discovermass + parishesonline "supporter" (not a clean org id) → left empty for `detect`. |
+| ss-peter-and-paul-williamsville | Saints Peter & Paul — 5480 Main St, Williamsville 14221 | ssppchurch.com | parishes_online (ss-peter-and-paul-church-14221) | Two sites exist (ssppchurch.com = parish, ssppwilliamsville.com = faith formation). Used the parish site. |
+| tonawanda-catholic | St. Amelia — 2999 Eggert Rd, Tonawanda 14150; St. Christopher — 2660 Niagara Falls Blvd, Tonawanda 14150; St. Francis of Assisi Chapel — 71 Adam St, Tonawanda 14150 | rcct.faith | parishes_online (roman-catholic-community-of-the-tonawandas) | **Family of Parishes** (Road to Renewal #18): several merged worship sites under one org/bulletin → modeled as ONE parish with multiple `church` rows (mirrors existing "N.E.T. Catholic"). St. Amelia address corroborated by directory; St. Christopher + St. Francis pulled from a single aggregated snippet → `address_verified=false` pending `verify`. Other RCCT sites (St. Jude N. Tonawanda, Our Lady of Czestochowa, St. Andrew Kim mission) deferred to a later batch — addresses not yet cleanly confirmed. |
+| nativity-of-our-lord-orchard-park | Nativity of Our Lord — 43 Argyle Pl, Orchard Park 14127 | nativityofourlordop.com | parishes_online (nativity-of-our-lord-church-14127) | School is at a different address (4414 S. Buffalo St) — did NOT use the school address. Church office at 43 Argyle Pl confirmed. |
+| st-mary-assumption-lancaster | St. Mary of the Assumption — 1 St. Mary's Hill, Lancaster 14086 | stmarysonthehill.org | parishes_online (st-mary-of-the-assumption-church-14086) | **Disambiguation**: many "St. Mary, Lancaster" hits are Lancaster PA / Lancaster OH. Pinned to NY via stmarysonthehill.org + parishesonline ...-14086. |
+| queen-of-heaven-west-seneca | Queen of Heaven — 4220 Seneca St, West Seneca 14224 | qofhchurch.org | parishes_online (queen-of-heaven-church) | A second domain (queenofheavenparish.org) hosts bulletins; used qofhchurch.org as homepage. |
+| our-lady-of-victory-basilica | Our Lady of Victory Basilica — 767 Ridge Rd, Lackawanna 14218 | olvbasilica.org | parishes_online (our-lady-of-victory-basilica) | National shrine/basilica; the parish worship site is the basilica itself. |
+
+Slug convention applied: where a dedication already exists in the Rochester data
+(e.g. `st-christopher` in N. Chili), Buffalo churches are city-suffixed
+(`st-christopher-tonawanda`) to keep the global `slug` UNIQUE constraint happy.
+
+Coordinates left blank for all 11 churches → the `geocode` stage will backfill
+(network-blocked here). Provider left blank for 2 parishes → `detect` will claim them.
