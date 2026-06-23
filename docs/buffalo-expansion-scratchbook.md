@@ -62,6 +62,53 @@ The final curated data lives in `data/parishes.csv` and `data/churches.csv`.
 
 (Newest first. Each entry: parish, what I found, source confidence, edge cases.)
 
+### Batch 6 — Orleans + Wyoming + Allegany counties (3 parishes, 4 churches)
+
+`db create` 87→90 parishes, 166→170 churches; 117 tests pass. With this batch the
+dataset reaches **all 8 counties** of the Diocese of Buffalo (Erie, Niagara, Genesee,
+Cattaraugus, Chautauqua, Orleans, Wyoming, Allegany).
+
+| parish slug | church — address | website | provider |
+|---|---|---|---|
+| holy-family-albion | Holy Family — 106 South Main St, Albion 14411 | holyfamilyalbion.com | (detect) |
+| st-michael-warsaw | St. Michael — 171 North Main St, Warsaw 14569 | stmichaelswarsaw2.com | (detect) |
+| catholic-communities-se-allegany | Immaculate Conception — 36 Maple Ave, Wellsville 14895; Holy Family of Jesus, Mary and Joseph — 5 Milton St, Belmont 14813 | icc-ics.com | (detect) |
+
+Edge cases / judgment calls:
+- **Three new counties in one batch, each via the most clearly-independent parish.**
+  All three sit inside larger "Families" but were picked because they keep their own
+  homepage and a well-verified address — same own-site → own-parish call as Holy
+  Trinity (Dunkirk).
+- **Holy Family (Albion), Orleans Co.** — part of the **ONE Catholic** family
+  (onecatholic.org, Orleans + E. Niagara) but has its own site (holyfamilyalbion.com).
+  Address 106 South Main St verified by catholicchurch.directory + catholicclocks +
+  discovermass → `true`.
+- **St. Michael (Warsaw), Wyoming Co.** — listed by the **Fields of Grace** family
+  (fieldsofgrace.family) as a "worship site", but it has its own homepage
+  (stmichaelswarsaw2.com) and its own parishesonline bulletin (container 14/0954), so
+  modeled as its own parish. **Address conflict** resolved: a mailing address of "16
+  North Street" appears in one bulletin header, but the **physical church is 171 North
+  Main Street** (catholicchurch.directory + Waze + catholicclocks agree) → used 171 N
+  Main, `true`.
+- **The Catholic Communities of South Eastern Allegany County, Allegany Co.** — one
+  parish (icc-ics.com) with two worship sites: Immaculate Conception (Wellsville) and
+  Holy Family of Jesus, Mary and Joseph (Belmont, which merged in and stays open as a
+  secondary site). Belmont @ 5 Milton St is triple-sourced → `true`.
+  - **Immaculate Conception (Wellsville) house-number is genuinely unresolved:** the
+    parish's own site (icc-ics.com) states *Church* = **36 Maple Avenue** and *Office*
+    = 17 Maple Avenue, while Yelp / catholicchurch.directory / catholicclocks all say
+    **6 Maple Avenue**. Used the parish site's stated church location (36 Maple Ave) but
+    left `address_verified=false` so the verify/geocode stage reconciles 6-vs-17-vs-36
+    before it lands on the map.
+- **Deferred (documented):** the rest of **ONE Catholic** — Holy Trinity (Medina, 211
+  Eagle St), and the linked **St. Mary (Holley) / St. Mark (Kendall)** parish
+  (stmarystmark.org) — because Holley's number conflicts across sources (11 vs 13 S Main
+  St) and St. Mark's Kendall street ("16789 Kenmore/Kendall Rd") wasn't cleanly
+  confirmed; and the rest of **Fields of Grace** (St. Vincent/Attica, St. Joseph/
+  Varysburg, St. Cecilia/Sheldon, St. Mary/Pavilion — now partly reorganized into the
+  new St. John Neumann Parish), which needs the post-reorg parish/worship-site split
+  pinned down first.
+
 ### Batch 5 — Southern Tier: Cattaraugus + Chautauqua counties (2 parishes, 5 churches)
 
 `db create` 85→87 parishes, 161→166 churches; 117 tests pass. Pushes the dataset
@@ -255,13 +302,14 @@ Coordinates left blank for all 11 churches → the `geocode` stage will backfill
 
 ## Summary & handoff
 
-**Added so far: 25 Diocese of Buffalo parishes, 34 churches** (across 5 commits/
-batches). Spread across Erie county (Buffalo, Amherst, Snyder, Williamsville,
-Getzville, Tonawanda, North Tonawanda, Cheektowaga, West Seneca, Lackawanna,
-Orchard Park, Hamburg, East Aurora, Lancaster, Springville, Clarence, Swormville),
-Niagara county (Lockport, Pendleton), Genesee county (Batavia), and now the Southern
-Tier — **Cattaraugus county** (Olean, Allegany, Portville) and **Chautauqua county**
-(Dunkirk). Every batch rebuilds the DB cleanly and keeps all 117 tests green.
+**Added so far: 28 Diocese of Buffalo parishes, 38 churches** (across 6 commits/
+batches), now spanning **all 8 counties of the diocese**: Erie (Buffalo, Amherst,
+Snyder, Williamsville, Getzville, Tonawanda, North Tonawanda, Cheektowaga, West Seneca,
+Lackawanna, Orchard Park, Hamburg, East Aurora, Lancaster, Springville, Clarence,
+Swormville), Niagara (Lockport, Pendleton), Genesee (Batavia), Cattaraugus (Olean,
+Allegany, Portville), Chautauqua (Dunkirk), Orleans (Albion), Wyoming (Warsaw), and
+Allegany (Wellsville, Belmont). Every batch rebuilds the DB cleanly and keeps all 117
+tests green.
 
 **What's intentionally NOT done here (and why):**
 - **Coordinates** — every new church has blank `latitude`/`longitude`. Nominatim is
@@ -289,8 +337,10 @@ Tier — **Cattaraugus county** (Olean, Allegany, Portville) and **Chautauqua co
 (St. Mary of the Cataract et al.), Holy Spirit/North Collins homepage ambiguity,
 Blessed Sacrament (Kenmore) merger, All Saints (Lockport) post-merger status,
 St. Mary worship site of Resurrection/Batavia (on the closure list), Jamestown/Holy
-Apostles + St. James (post-Vatican-reversal flux), and the rest of The Lord's Vineyard
-family (Fredonia St. Anthony/St. Joseph, Silver Creek, Dunkirk — shared-domain mapping).
-The full diocese is ~160 parishes / ~36 Families, so this is a verified starting slice,
-not the whole diocese. *(Catholic Family of Cheektowaga — resolved in batch 4;
-Enchanted Mountains / Olean — resolved in batch 5.)*
+Apostles + St. James (post-Vatican-reversal flux), the rest of The Lord's Vineyard
+family (Fredonia St. Anthony/St. Joseph, Silver Creek, Dunkirk — shared-domain mapping),
+the rest of ONE Catholic (Medina; Holley/Kendall address conflicts), and the rest of
+Fields of Grace (Attica/Varysburg/Sheldon/Pavilion — post-reorg St. John Neumann split).
+The full diocese is ~160 parishes / ~36 Families, so this is a verified starting slice
+covering all 8 counties, not the whole diocese. *(Catholic Family of Cheektowaga —
+resolved in batch 4; Enchanted Mountains / Olean — resolved in batch 5.)*
