@@ -62,6 +62,34 @@ The final curated data lives in `data/parishes.csv` and `data/churches.csv`.
 
 (Newest first. Each entry: parish, what I found, source confidence, edge cases.)
 
+### Batch 3 — Niagara County + Tonawanda family completion (3 parishes, 4 churches)
+
+`db create` 77→80 parishes, 149→153 churches; 117 tests pass.
+
+| parish slug | church — address | website | provider |
+|---|---|---|---|
+| st-jude-the-apostle-north-tonawanda | St. Jude the Apostle — 800 Niagara Falls Blvd, North Tonawanda 14120 | stjudetheapostleparish.org | parishes_online (st-jude-the-apostle-catholic-parish) |
+| tonawanda-catholic *(existing)* | Our Lady of Czestochowa — 64 Center Ave, North Tonawanda 14120 | (rcct.faith) | — |
+| st-john-baptist-lockport | St. John the Baptist — 168 Chestnut St, Lockport 14094 | stjohnslockport.com | parishes_online (st-john-the-baptist-church-14094) |
+| our-lady-of-peace-clarence | Our Lady of Peace — 10950 Main St, Clarence 14031 | olpclarence.org | parishes_online (our-lady-of-peace-roman-catholic-church) |
+
+Edge cases / judgment calls:
+- **St. Jude vs RCCT**: St. Jude appears in the RCCT "Family of Parishes" and has a
+  page on rcct.faith, BUT it also runs a dedicated site (stjudetheapostleparish.org)
+  and its own parishesonline org/bulletin. Modeled it as its **own parish** (own
+  bulletin) rather than a worship site of `tonawanda-catholic`. Our Lady of
+  Czestochowa, by contrast, has no independent site → added as a worship site under
+  `tonawanda-catholic`. The Buffalo "Family of Parishes" grouping ≠ canonical merger,
+  so I key the parish/church split on *who publishes the bulletin*.
+- **Lockport**: All Saints Parish was merged into St. John the Baptist by Vatican
+  decree (Jul 2025), currently under appeal ("partial victory"). Added only St. John
+  the Baptist (clearly active). All Saints (76 Church St) deferred until its
+  worship-site status settles.
+- **Deferred — Niagara Falls RC Family of Parishes** (nfrcfparish.org): St. Mary of
+  the Cataract's parishesonline org is the merged "Divine Mercy & St. Mary of the
+  Cataract", and the homepage is a shared multi-parish family site. Needs the full
+  NF family worship-site list before it can be modeled without guessing — deferred.
+
 ### Batch 2 — outer suburbs / Southtowns (6 parishes, 6 churches)
 
 Added; `db create` 71→77 parishes, 143→149 churches; 117 tests pass. All six
@@ -112,3 +140,39 @@ Slug convention applied: where a dedication already exists in the Rochester data
 
 Coordinates left blank for all 11 churches → the `geocode` stage will backfill
 (network-blocked here). Provider left blank for 2 parishes → `detect` will claim them.
+
+## Summary & handoff
+
+**Added so far: 18 Diocese of Buffalo parishes, 21 churches** (across 3 commits/
+batches). Spread across Erie county (Buffalo, Amherst, Williamsville, Tonawanda,
+North Tonawanda, Cheektowaga-area, West Seneca, Lackawanna, Orchard Park, Hamburg,
+East Aurora, Lancaster, Springville, Clarence, Swormville) and Niagara county
+(Lockport). Every batch rebuilds the DB cleanly and keeps all 117 tests green.
+
+**What's intentionally NOT done here (and why):**
+- **Coordinates** — every new church has blank `latitude`/`longitude`. Nominatim is
+  blocked in this environment, so the `geocode` pipeline stage owns this on the next
+  normal run (it already targets rows missing coordinates). Without coordinates the
+  churches won't render on the map until that stage runs — that's the expected
+  hand-off, not a defect.
+- **Bulletin provider for ~5 parishes** — left empty so the `detect` stage (Playwright)
+  resolves them live. Where research clearly exposed a parishesonline org id, it's
+  filled in directly.
+
+**To continue the expansion (same method):**
+1. Pick a city/Family of Parishes; `WebSearch` "<parish> <city> NY catholic church
+   address website" (WebFetch/curl are 403-blocked here — only WebSearch works).
+2. Cross-check the address against a 2nd source (catholicchurch.directory,
+   parishesonline, Yelp) before setting `address_verified=true`.
+3. Decide parish-vs-worship-site by **who publishes the bulletin**: a Family with one
+   shared bulletin → one `parish` + many `church` rows; a site with its own bulletin →
+   its own `parish`.
+4. Append via a csv-writer script that validates global `slug` + `website` uniqueness
+   (see commit scripts), then `uv run python -m pdf_extract db create` + `uv run pytest`.
+5. Commit per batch; log it here.
+
+**Known follow-ups (deferred, documented above):** Niagara Falls RC Family of Parishes
+(St. Mary of the Cataract et al.), Catholic Family of Cheektowaga (St. Josaphat et al.),
+Holy Spirit/North Collins homepage ambiguity, Blessed Sacrament (Kenmore) merger,
+All Saints (Lockport) post-merger status. The full diocese is ~160 parishes / ~36
+Families, so this is a verified starting slice, not the whole diocese.
