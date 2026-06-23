@@ -1,9 +1,17 @@
 import { memo, useEffect, useMemo, useRef } from "react";
 import { Link } from "react-router-dom";
-import { MapContainer, Marker, Popup, TileLayer, useMap } from "react-leaflet";
+import {
+  MapContainer,
+  Marker,
+  Popup,
+  TileLayer,
+  useMap,
+  useMapEvents,
+} from "react-leaflet";
 import type { Marker as LeafletMarker } from "leaflet";
 import L from "leaflet";
 import type { ChurchMapItem, EventSummary } from "../types";
+import type { MapView } from "../lib/mapView";
 import {
   formatAddress,
   formatEventDate,
@@ -89,6 +97,10 @@ interface ChurchMapProps {
     zoom?: number;
     requestId?: number;
   } | null;
+  /** Camera to mount the map at; falls back to the Rochester-area default. */
+  initialView?: MapView | null;
+  /** Fires after the user finishes panning/zooming so the view can be persisted. */
+  onViewChange?: (view: MapView) => void;
 }
 
 /**
@@ -140,6 +152,20 @@ function ChangeView({
       map.panTo([center.lat, center.lng]);
     }
   }, [map, center.lat, center.lng, center.zoom, center.requestId]);
+  return null;
+}
+
+/**
+ * Reports the map's camera up to the parent after each pan/zoom settles, so the
+ * view can be persisted to the URL. Read-only — it never moves the map itself.
+ */
+function ViewReporter({ onViewChange }: { onViewChange: (view: MapView) => void }) {
+  const map = useMapEvents({
+    moveend: () => {
+      const center = map.getCenter();
+      onViewChange({ lat: center.lat, lng: center.lng, zoom: map.getZoom() });
+    },
+  });
   return null;
 }
 
@@ -281,6 +307,8 @@ const SearchPlaceMarker = memo(function SearchPlaceMarker({
 export const ChurchMap = memo(function ChurchMap({
   churches,
   centerOn,
+  initialView,
+  onViewChange,
 }: ChurchMapProps) {
   const withCoords = useMemo(
     () =>
@@ -289,17 +317,23 @@ export const ChurchMap = memo(function ChurchMap({
       ),
     [churches],
   );
-  const center = defaultCenter;
+  // MapContainer only reads center/zoom on mount, which is exactly what we want:
+  // restore the persisted view once, then let the user (and `centerOn`) drive it.
+  const center: [number, number] = initialView
+    ? [initialView.lat, initialView.lng]
+    : defaultCenter;
+  const zoom = initialView?.zoom ?? 11;
 
   return (
     <MapContainer
       center={center}
-      zoom={11}
+      zoom={zoom}
       className="church-map h-full w-full"
       scrollWheelZoom
       zoomControl={false}
     >
       {centerOn && <ChangeView center={centerOn} />}
+      {onViewChange && <ViewReporter onViewChange={onViewChange} />}
       <PopupPaneElevator />
       <TileLayer
         attribution={OSM_ATTRIBUTION}
