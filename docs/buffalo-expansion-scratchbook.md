@@ -62,6 +62,34 @@ The final curated data lives in `data/parishes.csv` and `data/churches.csv`.
 
 (Newest first. Each entry: parish, what I found, source confidence, edge cases.)
 
+### Batch 2 — outer suburbs / Southtowns (6 parishes, 6 churches)
+
+Added; `db create` 71→77 parishes, 143→149 churches; 117 tests pass. All six
+addresses corroborated by `catholicchurch.directory` listings (+ parish sites).
+
+| parish slug | church — address | website | provider |
+|---|---|---|---|
+| st-benedict-amherst | St. Benedict — 1317 Eggert Rd, Amherst 14226 | saintbenedicts.com | parishes_online (st-benedict-church-and-st-leo-the-great-church) |
+| ss-peter-and-paul-hamburg | Saints Peter & Paul — 66 East Main St, Hamburg 14075 | sspphamburg.org | parishes_online (ss-peter-paul-church-14075) |
+| immaculate-conception-east-aurora | Immaculate Conception — 520 Oakwood Ave, East Aurora 14052 | icchurchea.org | parishes_online (immaculate-conception-church-14052) |
+| st-mary-of-the-lake-hamburg | St. Mary of the Lake — 4737 Lake Shore Rd, Hamburg 14075 | smolparish.org | (detect) |
+| st-mary-swormville | St. Mary's — 6919 Transit Rd, Swormville 14051 | stmaryswormville.org | (detect) |
+| st-aloysius-springville | St. Aloysius — 190 Franklin St, Springville 14141 | staloy.com | (detect) |
+
+Edge cases:
+- `st-benedict-parish` slug already exists (Rochester); used `st-benedict-amherst`.
+  Its parishesonline org is a combined St. Benedict + St. Leo bulletin — fine, the
+  schedule extractor attributes events per church.
+- **St. Christopher (Tonawanda)**: upgraded `address_verified` false→true — the
+  2660 Niagara Falls Blvd address is now corroborated by Yelp + catholicchurch.directory.
+- **Deferred (merged/family homepages, need full-family mapping before they're clean):**
+  - St. Josaphat (Cheektowaga) — homepage is the shared "Catholic Family of
+    Cheektowaga" site; needs the whole family's worship-site list to model correctly.
+  - Holy Spirit (North Collins) — conflicting homepages in snippets
+    (cfhrosary.org vs icchsc.org); homepage unresolved.
+  - Blessed Sacrament (Kenmore) — appears merged into St. John the Baptist's site;
+    would double-count a worship site already added.
+
 ### Batch 1 — Buffalo core + inner-ring suburbs (9 parishes, 11 churches)
 
 Added and verified `db create` (62→71 parishes, 132→143 churches; 117 tests pass).
