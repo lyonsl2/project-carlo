@@ -62,6 +62,68 @@ The final curated data lives in `data/parishes.csv` and `data/churches.csv`.
 
 (Newest first. Each entry: parish, what I found, source confidence, edge cases.)
 
+### Batch 4 — Cheektowaga family + Genesee County + Northtowns (5 parishes, 8 churches)
+
+`db create` 80→85 parishes, 153→161 churches; 117 tests pass. New ground: the
+**Catholic Family of Cheektowaga** and the first **Genesee County** parish (Batavia).
+
+| parish slug | church — address | website | provider |
+|---|---|---|---|
+| catholic-family-cheektowaga | St. Josaphat — 20 Peoria Ave, Cheektowaga 14206; Resurrection — 130 Como Park Blvd, Cheektowaga 14227; Queen of Martyrs — 180 George Urban Blvd, Cheektowaga 14225; Our Lady Help of Christians — 4125 Union Rd, Cheektowaga 14225 | cheektowagacatholicfamily.org | parishes_online (our-lady-help-of-christians-resurrection-st-josaphat-queen-of-martyrs-churches) |
+| resurrection-batavia | St. Joseph — 303 East Main St, Batavia 14020 | resurrectionbatavia.com | parishes_online (resurrection-parish) |
+| christ-the-king-snyder | Christ the King — 30 Lamarck Dr, Snyder 14226 | ctksnyder.org | parishes_online (church-of-christ-the-king) |
+| st-pius-x-getzville | St. Pius X — 1700 North French Rd, Getzville 14068 | stpiusxgetzville.org | (detect) |
+| good-shepherd-pendleton | Good Shepherd — 5442 Tonawanda Creek Rd, Pendleton 14120 | goodshepherdpendleton-campus.org | parishes_online (good-shepherd-roman-catholic-parish) |
+
+Edge cases / judgment calls:
+- **Catholic Family of Cheektowaga = one parish, four worship sites.** Confirmed a
+  single shared bulletin: the parishesonline org is literally
+  `our-lady-help-of-christians-resurrection-st-josaphat-queen-of-martyrs-churches`,
+  one homepage (cheektowagacatholicfamily.org), one central office (4125 Union Rd).
+  So modeled exactly like `tonawanda-catholic` — one `parish` row + four `church`
+  rows. The fourth site was initially ambiguous in snippets (one search conflated
+  "OLHC" with *Our Lady of Czestochowa*, 2158 Clinton St); resolved it to **Our Lady
+  Help of Christians** (the historic 1853 chapel/church campus at 4125 Union Rd) via
+  the family contact page + the combined parishesonline org name.
+- **address_verified split within the family:** St. Josaphat (corroborated by
+  catholicmasstime + catholicchurch.directory) and OLHC (catholicchurch.directory at
+  4125 Union Rd) → `true`. Resurrection (130 Como Park) and Queen of Martyrs (180
+  George Urban) rest only on the family's own contact-page synthesis so far → left
+  `address_verified=false` for the verify stage to confirm a second independent
+  listing (same pattern used for St. Christopher/St. Francis in batch 1).
+- **OLHC vs the central office:** 4125 Union Rd is *both* the family central office
+  and the OLHC church/chapel campus (its Mass schedule lists Masses in both "Church"
+  and "Chapel" at this address). Used it as the OLHC worship-site address, not a
+  bare office — but flagged here since the office co-location could look like a
+  mis-mapped admin address to a future reviewer.
+- **Genesee County / Batavia — merger pruning.** Resurrection Parish has two worship
+  sites: **St. Joseph** (303 E Main St, active, also the parish office) and **St. Mary**
+  (18 Ellicott St). St. Mary is on the diocese's *closure* list (Road to Renewal), so
+  only St. Joseph was added; St. Mary deferred until its status settles. First parish
+  in the dataset outside Erie/Niagara. Two homepages exist (resurrectionbatavia.com vs
+  resurrectionparish.net, the latter is the email domain) — used resurrectionbatavia.com
+  as the canonical "Home". Note: a `the12apostles.org` site also surfaces for a
+  "Resurrection Parish" — that is a *different* merged community, not this one; ignored.
+- **St. Pius X (Getzville) & Good Shepherd (Pendleton) modeled as their OWN parishes,
+  NOT folded into St. Gregory.** All three are Family of Parishes #19 with the existing
+  `st-gregory-the-great-williamsville`, but each maintains its **own homepage and
+  identity** (stpiusxgetzville.org, goodshepherdpendleton-campus.org), so — per the
+  same "own site/own bulletin → own parish" call made for St. Jude in batch 3 — they
+  get their own `parish` rows rather than becoming worship sites of "St. Gregory the
+  Great Parish" (whose name wouldn't fit a 3-parish family anyway). St. Pius X provider
+  left blank for `detect` (no clean parishesonline org id visible in research).
+- **Good Shepherd house-number conflict:** directories split 5441 vs 5442 Tonawanda
+  Creek Rd. Used **5442** — corroborated by the parish's own contact email
+  (good.shepherd5442@gmail.com). `address_verified=true` with this noted.
+- **Slug collisions with Rochester data** handled by city-suffixing: `st-pius-x-chili`
+  exists → `st-pius-x-getzville`; `good-shepherd-catholic-community` exists →
+  `good-shepherd-pendleton`; `assumption-resurrection` already owns a `resurrection`
+  church slug → `resurrection-cheektowaga` / `st-joseph-batavia`.
+- **Christ the King (Snyder):** independent parish/bulletin (own site ctksnyder.org,
+  parishesonline `church-of-christ-the-king`) → its own parish. City recorded as
+  **Snyder** (the 14226 hamlet of Amherst) to match the parish's branding and the
+  catholicchurch.directory listing.
+
 ### Batch 3 — Niagara County + Tonawanda family completion (3 parishes, 4 churches)
 
 `db create` 77→80 parishes, 149→153 churches; 117 tests pass.
@@ -143,11 +205,12 @@ Coordinates left blank for all 11 churches → the `geocode` stage will backfill
 
 ## Summary & handoff
 
-**Added so far: 18 Diocese of Buffalo parishes, 21 churches** (across 3 commits/
-batches). Spread across Erie county (Buffalo, Amherst, Williamsville, Tonawanda,
-North Tonawanda, Cheektowaga-area, West Seneca, Lackawanna, Orchard Park, Hamburg,
-East Aurora, Lancaster, Springville, Clarence, Swormville) and Niagara county
-(Lockport). Every batch rebuilds the DB cleanly and keeps all 117 tests green.
+**Added so far: 23 Diocese of Buffalo parishes, 29 churches** (across 4 commits/
+batches). Spread across Erie county (Buffalo, Amherst, Snyder, Williamsville,
+Getzville, Tonawanda, North Tonawanda, Cheektowaga, West Seneca, Lackawanna,
+Orchard Park, Hamburg, East Aurora, Lancaster, Springville, Clarence, Swormville),
+Niagara county (Lockport, Pendleton), and now **Genesee county** (Batavia). Every
+batch rebuilds the DB cleanly and keeps all 117 tests green.
 
 **What's intentionally NOT done here (and why):**
 - **Coordinates** — every new church has blank `latitude`/`longitude`. Nominatim is
@@ -172,7 +235,8 @@ East Aurora, Lancaster, Springville, Clarence, Swormville) and Niagara county
 5. Commit per batch; log it here.
 
 **Known follow-ups (deferred, documented above):** Niagara Falls RC Family of Parishes
-(St. Mary of the Cataract et al.), Catholic Family of Cheektowaga (St. Josaphat et al.),
-Holy Spirit/North Collins homepage ambiguity, Blessed Sacrament (Kenmore) merger,
-All Saints (Lockport) post-merger status. The full diocese is ~160 parishes / ~36
-Families, so this is a verified starting slice, not the whole diocese.
+(St. Mary of the Cataract et al.), Holy Spirit/North Collins homepage ambiguity,
+Blessed Sacrament (Kenmore) merger, All Saints (Lockport) post-merger status,
+St. Mary worship site of Resurrection/Batavia (on the closure list). The full diocese
+is ~160 parishes / ~36 Families, so this is a verified starting slice, not the whole
+diocese. *(Catholic Family of Cheektowaga — resolved in batch 4.)*
