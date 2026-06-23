@@ -6,7 +6,7 @@ import {
   useState,
   useCallback,
 } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { fetchChurches, type ChurchSearchResult } from "../api";
 import { ChurchMap } from "../components/ChurchMap";
@@ -23,6 +23,12 @@ import { InlineQueryError } from "../components/InlineQueryError";
 import { useMinWidth } from "../hooks/useMinWidth";
 import { useFilterUrlState } from "../hooks/useFilterUrlState";
 import { useDocumentMeta } from "../hooks/useDocumentMeta";
+import { rememberHomeSearch } from "../hooks/useHomeHref";
+import {
+  decodeMapViewFromParams,
+  encodeMapViewToParams,
+  type MapView,
+} from "../lib/mapView";
 import { PLACE_SEARCH_ZOOM, type PlaceSearchResult } from "../placeSearch";
 import { isAboutPageEnabled } from "../lib/featureFlags";
 import { HOME_DESCRIPTION, HOME_TITLE, canonicalForPath } from "../lib/seo";
@@ -90,6 +96,46 @@ export function HomePage() {
     return () => window.clearTimeout(id);
   }, [appliedFilters, setUrlFilters]);
 
+  // Map camera persistence. The map mounts at the view encoded in the URL (if
+  // any) and writes the view back as the user pans/zooms, so it survives a trip
+  // to a church page and back. Captured once on mount — MapContainer only reads
+  // its initial center/zoom, so later URL edits shouldn't yank a live map.
+  const [, setSearchParams] = useSearchParams();
+  const [initialMapView] = useState<MapView | null>(() =>
+    decodeMapViewFromParams(new URLSearchParams(window.location.search)),
+  );
+  const mapViewTimerRef = useRef<number | null>(null);
+  const handleMapViewChange = useCallback(
+    (view: MapView) => {
+      if (mapViewTimerRef.current != null) {
+        window.clearTimeout(mapViewTimerRef.current);
+      }
+      // Short debounce: moveend already fires once movement settles, so this
+      // just coalesces a flurry of zoom steps into one history.replaceState.
+      mapViewTimerRef.current = window.setTimeout(() => {
+        setSearchParams((prev) => encodeMapViewToParams(view, prev), {
+          replace: true,
+        });
+      }, 400);
+    },
+    [setSearchParams],
+  );
+  useEffect(
+    () => () => {
+      if (mapViewTimerRef.current != null) {
+        window.clearTimeout(mapViewTimerRef.current);
+      }
+    },
+    [],
+  );
+
+  // Mirror the live query string into sessionStorage so in-app "Back to map"
+  // links (plain pushes to "/") can restore the current filters + view.
+  const location = useLocation();
+  useEffect(() => {
+    rememberHomeSearch(location.search);
+  }, [location.search]);
+
   const [filterPanelOpen, setFilterPanelOpen] = useState(false);
   const isDesktop = useMinWidth(768);
   const [centerOn, setCenterOn] = useState<{
@@ -109,7 +155,6 @@ export function HomePage() {
   // Hydrate initial centering from router state (e.g. landing page navigation),
   // then clear the state via history.replaceState so a hard refresh
   // doesn't re-apply stale centering.
-  const location = useLocation();
   const hydratedFromStateRef = useRef(false);
   useEffect(() => {
     if (hydratedFromStateRef.current) return;
@@ -192,7 +237,14 @@ export function HomePage() {
       {/* Full-bleed map — no z-index so it doesn't create a stacking context;
        *  the elevated popup pane inside can then layer above the header. */}
       <div className="absolute inset-0">
-        {data ? <ChurchMap churches={data} centerOn={centerOn} /> : null}
+        {data ? (
+          <ChurchMap
+            churches={data}
+            centerOn={centerOn}
+            initialView={initialMapView}
+            onViewChange={handleMapViewChange}
+          />
+        ) : null}
       </div>
 
       {/* Initial load only — filter changes keep the map mounted via placeholderData */}
