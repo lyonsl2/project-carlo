@@ -119,3 +119,42 @@ modeling them wrong is worse than waiting:
 **WebFetch host blocklist observed:** `icc-ics.com`, `emcatholic.org` return HTTP 403 to
 WebFetch; `nfrcfparish.org`, `cheektowagacatholicfamily.org`, `blessedtrinitybuffalo.org`,
 and `gcatholic.org` all work. gcatholic is the reliable fallback (address + Plus Code).
+
+---
+
+## Session 1 (cont.) — Batch 8: 2 more independent parishes (2 churches)
+
+`db create` 94→96 parishes, 174→176 churches; 117 tests pass.
+
+| parish slug | church — address | website | provider | coords |
+|---|---|---|---|---|
+| corpus-christi-buffalo | Corpus Christi — 199 Clark St, Buffalo 14212 | corpuschristibuffalo.org | (detect) | 42.8918970, -78.8360600 (Nominatim house) — historic Polish parish, run by the Pauline Fathers |
+| st-stephen-grand-island | St. Stephen — 2100 Baseline Rd, Grand Island 14072 | ststephenswny.com | (detect) | 43.0181085, -78.9669596 (Nominatim church node) — **first Grand Island parish** in the dataset |
+
+Slugs city-suffixed to dodge existing Rochester `corpus-christi` (Rochester) and `st-stephen`
+(Geneva) church slugs.
+
+**Investigated but deliberately NOT added (with reasons):**
+- **St. Casimir (Buffalo, Kaisertown, 160 Cable St)** — multiple sources state it is **not
+  associated with the Diocese** (an independent/non-diocesan Polish church). Project Carlo
+  tracks Diocese of Buffalo parishes, so it's **out of scope**. Skipped.
+- **St. John Kanty (Buffalo, 101 Swinburne St)** — **closed**: final Mass May 2025, Vatican
+  suspended the closure pending a 90-day appeal. In active closure flux → deferred (same call
+  the cloud agent made for All Saints/Lockport and the Jamestown family).
+- **St. Peter (Lewiston, 620 Center St)** — its own domain `stpeterlewiston.org`
+  **301-redirects to the shared `niagarafrontiercatholic.org`** (St. Peter/Lewiston +
+  St. Bernard/Youngstown + Immaculate Conception/Ransomville). Shared-domain blocker → deferred.
+
+## Running totals (continuation)
+
+- Cloud agent left: **28 Buffalo parishes / 38 churches, 0 with coordinates**, 5 addresses
+  unverified.
+- After this session: **34 Buffalo parishes / 44 churches** (added Blessed Trinity, St. Louis,
+  St. Bernadette, St. Rose of Lima, Corpus Christi, St. Stephen), **all 44 geocoded**, only the
+  intentional Wellsville house-number flag left unverified. Dataset overall: 96 parishes /
+  176 churches; 117 tests green every step.
+- **Cleanest remaining work** (data captured above, blocked on canonical-parish split, not on
+  fetching): Niagara Falls family, ONE Catholic (Medina/Holley/Kendall), The Lord's Vineyard
+  (Fredonia), Fields of Grace, Niagara Frontier (Lewiston/Youngstown/Ransomville). Each needs
+  the per-canonical-parish homepage/bulletin confirmed before the shared domain can be split
+  without violating the UNIQUE-website constraint.
