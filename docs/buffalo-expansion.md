@@ -1,0 +1,180 @@
+# Diocese of Buffalo expansion — working document
+
+Single source of truth for the Buffalo expansion. Replaces the two earlier files
+(`buffalo-expansion-scratchbook.md` from the cloud agent, and
+`buffalo-expansion-continuation.md` from the first local session) — both folded in here.
+
+---
+
+## 1. Objective (the rule that governs every row)
+
+Extend Project Carlo (currently Diocese of Rochester only) to the **Roman Catholic
+Diocese of Buffalo** (8 WNY counties: Erie, Niagara, Cattaraugus, Chautauqua, Allegany,
+Genesee, Orleans, Wyoming).
+
+**One "parish" = one bulletin.** The website attached to that parish is the site where
+that bulletin is published/reachable. Concretely:
+
+- A church/community that **publishes its own bulletin on its own website** → its own
+  `parish` row.
+- A "Family of Parishes" (Buffalo's Road-to-Renewal groupings) that shares **one bulletin
+  on one website** → **one** `parish` row with **several** `church` rows (one per worship
+  site).
+- The Buffalo "Family of Parishes" label is an administrative grouping, **not** necessarily
+  a canonical merger and **not** the unit we model. We key on *who publishes the bulletin*.
+
+This matters because the diocese has had heavy recent church closings and parish mergers
+into "families," so sources conflict and some structures are still in flux (see §6).
+
+## 2. Data model (verified against the code)
+
+`data/parishes.csv` — `slug,name,website,bulletin_provider,provider_id`
+- One row per bulletin-publishing organization. `website` (→ `parish.homepage_url`) must be
+  **non-null and globally UNIQUE**; `slug` must be **UNIQUE**. This UNIQUE-website constraint
+  is exactly why shared-domain families can't be split into multiple parish rows (§6).
+- `bulletin_provider` ∈ {`ecatholic`, `parishes_online`, `discover_mass`, `google_drive`,
+  `no_bulletin`, `other`, empty}. **Empty** → the `detect` stage (Playwright, live site)
+  fills it on the next pipeline run (`src/pdf_extract/detect.py`). Fill it directly only when
+  research clearly exposes the provider (e.g. a real parishesonline org id).
+- `provider_id` — provider-specific id (used by some providers, e.g. parishesonline org slug).
+
+`data/churches.csv` —
+`parish_id,slug,name,line1,line2,city,state,postal_code,name_verified,address_verified,latitude,longitude`
+- `parish_id` = the **parish slug** (FK by slug, resolved in `db.py`).
+- One row per physical worship site; a parish may have several. `slug` UNIQUE across all churches.
+- `latitude`/`longitude` — backfilled by the `geocode` stage (Nominatim) when blank, but **this
+  environment can geocode directly**, so we fill them here (§4).
+- `name_verified`/`address_verified` — `true`/`false`/empty booleans set by the verify stage
+  (`apply_verify_results`). Set `true` only with ≥2 independent sources or an OSM church node.
+
+Conventions: `state` always `NY`; slugs lowercase-hyphenated, **city-suffixed** when a
+dedication already exists in the Rochester data (global UNIQUE) — e.g. `st-louis-buffalo`
+because Rochester already has `st-louis` (Pittsford). One commit per batch.
+
+## 3. Current state
+
+**Dataset: 96 parishes / 176 churches; 117 tests green.** (Rochester baseline was 62/132.)
+
+**Buffalo contribution: 34 parishes / 44 churches, all geocoded**, spanning **all 8 counties**.
+Only one intentional address flag remains open (Wellsville house number, §6).
+
+`db create` and `pytest` are run after every batch and must stay green (96/176, 117 passed
+as of the last commit `eb458d4`).
+
+## 4. Environment (this machine vs. the cloud agent)
+
+The original cloud agent ran in a sandbox where **all direct HTTP was 403** and Nominatim was
+blocked, so it left every new church with **blank coordinates** and some addresses unverified,
+handing those to the pipeline. **This local machine has working `WebFetch`, `WebSearch`, and
+Nominatim** (`uv run python -m pdf_extract geocode run` reaches it; raw `urlopen` to
+nominatim.openstreetmap.org works). So here we **geocode and verify inline** — no pipeline
+hand-off needed for new rows.
+
+Geocoding method when Nominatim free-form fails: try structured → name+city; if still no hit,
+pull the **Plus Code (Open Location Code)** from the church's `gcatholic.org` page, decode it,
+and **reverse-geocode to confirm** it lands on the right street/town before committing.
+
+**Known WebFetch 403 hosts** (some parish hosts block the fetcher): `icc-ics.com`,
+`emcatholic.org`. Reliable channels that never 403'd: `gcatholic.org` (addresses + Plus Codes),
+`cheektowagacatholicfamily.org`, `nfrcfparish.org`, `blessedtrinitybuffalo.org`. **gcatholic.org
+is the dependable independent fallback.**
+
+## 5. What's been added (by county / batch)
+
+All 34 Buffalo parishes, newest first. Full per-row reasoning is in git history (commit per
+batch, messages `data: add Buffalo batch N`); the load-bearing edge cases are kept in §6.
+
+- **Batch 8** — `corpus-christi-buffalo` (Corpus Christi, 199 Clark St), `st-stephen-grand-island`
+  (St. Stephen, 2100 Baseline Rd — first Grand Island parish).
+- **Batch 7** — `blessed-trinity-buffalo`, `st-louis-buffalo` (diocese's oldest parish, 1829),
+  `st-bernadette-orchard-park`, `st-rose-of-lima-buffalo`. All single-church, own site, own bulletin.
+- **Batch 6** (reaches all 8 counties) — `holy-family-albion` (Orleans), `st-michael-warsaw`
+  (Wyoming), `catholic-communities-se-allegany` (Allegany; Wellsville + Belmont).
+- **Batch 5** (Southern Tier) — `enchanted-mountains-catholic` (one parish, 4 worship sites:
+  Basilica of St. Mary of the Angels / St. John / St. Bonaventure / Sacred Heart-Portville),
+  `holy-trinity-dunkirk` (Chautauqua).
+- **Batch 4** — `catholic-family-cheektowaga` (one parish, 4 sites), `resurrection-batavia`
+  (first Genesee), `christ-the-king-snyder`, `st-pius-x-getzville`, `good-shepherd-pendleton`.
+- **Batch 3** — `st-jude-the-apostle-north-tonawanda`, `st-john-baptist-lockport`,
+  `our-lady-of-peace-clarence` (+ Our Lady of Czestochowa added as a worship site of existing
+  `tonawanda-catholic`).
+- **Batch 2** — `st-benedict-amherst`, `ss-peter-and-paul-hamburg`, `immaculate-conception-east-aurora`,
+  `st-mary-of-the-lake-hamburg`, `st-mary-swormville`, `st-aloysius-springville`.
+- **Batch 1** — `st-joseph-university-buffalo`, `st-john-baptist-kenmore`,
+  `st-gregory-the-great-williamsville`, `ss-peter-and-paul-williamsville`, `tonawanda-catholic`
+  (St. Amelia / St. Christopher / St. Francis Chapel), `nativity-of-our-lord-orchard-park`,
+  `st-mary-assumption-lancaster`, `queen-of-heaven-west-seneca`, `our-lady-of-victory-basilica`.
+
+Plus geocoding/verification backfill: all 38 cloud-agent churches geocoded; 4 of 5
+`address_verified=false` rows confirmed and flipped to `true`.
+
+## 6. Open items / where human input may be needed
+
+### 6a. Genuinely disputed data (needs a human / on-site confirmation)
+- **Immaculate Conception (Wellsville)** — house number unresolved. Parish site (icc-ics.com)
+  says church = **36 Maple Ave**; gcatholic + Yelp + catholicchurch.directory say **6 Maple Ave**
+  (office = 17). The OSM `place_of_worship` node sits closest to 36 (~48 m vs ~73 m to 17, ~85 m
+  to 6), so the **map coordinate is pinned to the church node** and the line kept as "36 Maple
+  Avenue", but `address_verified=false` is left on purpose. Human should confirm 6-vs-36 on site.
+- **(Out-of-scope, pre-existing Rochester rows, flagged not fixed):** `sacred-heart-of-jesus`
+  (Perkinsville) CSV `11114 Chapel St` vs sources' `11119`; `st-patrick-savannah` CSV
+  `52 Clyde St` vs directories' `1583 Grand Ave`. Left for the Rochester data owner.
+
+### 6b. Shared-domain families — DEFERRED, blocked on the UNIQUE-website constraint
+These are the cleanest remaining work but each is blocked on **canonical-parish structure, not
+on data we can fetch**. Multiple canonical parishes share **one domain**, which violates UNIQUE
+`website` unless we either (a) model the whole family as a single parish, or (b) pin down each
+canonical parish's own homepage/bulletin first. Addresses already captured so a future batch only
+needs the parish↔site split decision:
+
+- **Niagara Falls RC Family of Parishes** (nfrcfparish.org) — worship sites: Prince of Peace
+  (1055 Military Rd, 14304), St. Leo's (2748 Military Rd, 14304), St. John de LaSalle (8477 Buffalo
+  Ave, 14304), St. Mary of the Cataract (237 4th St, 14303), St. Joseph's (addr not listed), Holy
+  Family (1413 Pine Ave, 14301). Spans multiple canonical parishes (Divine Mercy vs St. Mary of the
+  Cataract vs Holy Family) under one domain.
+- **ONE Catholic** (onecatholic.org, Orleans + E. Niagara) — Holy Trinity (Medina) worships at
+  St. Mary, 211 Eagle St, Medina 14103; St. Mark (Kendall) pairs with St. Mary (Holley). Holley
+  number conflicts (11 vs 13 S Main St); Kendall street not cleanly confirmed. (Holy Family/Albion
+  already broke out in batch 6 because it kept its own holyfamilyalbion.com.)
+- **The Lord's Vineyard** (thelordsvineyard3.com, N. Chautauqua) beyond Holy Trinity/Dunkirk —
+  St. Anthony (66 Cushing St) + St. Joseph (145 E Main St) Fredonia share one bulletin
+  ("The Catholic Parishes of Fredonia", parishesonline `st-anthony-st-joseph-churches`); family also
+  has Our Lady of Mount Carmel (Silver Creek), St. Elizabeth Ann Seton & Blessed Mary Angela (Dunkirk).
+- **Niagara Frontier** (niagarafrontiercatholic.org) — St. Peter (Lewiston, 620 Center St; its own
+  stpeterlewiston.org 301-redirects to the shared domain) + St. Bernard (Youngstown) + Immaculate
+  Conception (Ransomville).
+- **Fields of Grace** (fieldsofgrace.family, Wyoming) beyond St. Michael/Warsaw — St. Vincent
+  (Attica), St. Joseph (Varysburg), St. Cecilia (Sheldon), St. Mary (Pavilion), now partly
+  reorganized into the new **St. John Neumann Parish** — needs the post-reorg split pinned down.
+
+### 6c. Parishes in active closure/merger flux — DEFERRED until status settles
+- **St. John Kanty** (Buffalo, 101 Swinburne St) — final Mass May 2025, Vatican suspended the
+  closure pending a 90-day appeal.
+- **All Saints** (Lockport, 76 Church St) — merged into St. John the Baptist by Vatican decree
+  (Jul 2025), under appeal.
+- **Jamestown / Holy Apostles + St. James** — Vatican overturned the merger decree Dec 2025;
+  worship-site lineup unsettled as of mid-2026.
+- **St. Mary** (18 Ellicott St, Batavia) — on the diocese's Road-to-Renewal closure list; only
+  St. Joseph was added under `resurrection-batavia`.
+- **Blessed Sacrament** (Kenmore) — appears merged into St. John the Baptist's site (would
+  double-count). **Holy Spirit** (North Collins) — conflicting homepages (cfhrosary.org vs icchsc.org).
+
+### 6d. Out of scope (decided, not deferred)
+- **St. Casimir** (Buffalo, Kaisertown, 160 Cable St) — independent/non-diocesan Polish church,
+  multiple sources say not associated with the Diocese. Project Carlo tracks Diocese of Buffalo, so excluded.
+
+## 7. How to continue (same method)
+
+1. Pick a city/Family of Parishes. Research with `WebSearch` + `WebFetch` (both work here);
+   fall back to `gcatholic.org` for address + Plus Code when a parish host 403s.
+2. Cross-check each address against a 2nd independent source before `address_verified=true`.
+3. Decide parish-vs-worship-site by **who publishes the bulletin** (§1): shared bulletin/site →
+   one parish + many churches; own bulletin/site → its own parish.
+4. **Geocode inline** (Nominatim works here; Plus-Code-decode + reverse-geocode fallback). Don't
+   leave coordinates blank — that was only the cloud agent's constraint.
+5. Append via a writer that validates global `slug` + `website` uniqueness, then
+   `uv run python -m pdf_extract db create` + `uv run pytest` (expect 117 passed), commit per batch,
+   and log the batch + any new edge cases back into this file.
+
+The full diocese is ~160 parishes / ~36 Families; this is a verified slice covering all 8 counties,
+not yet the whole diocese.
