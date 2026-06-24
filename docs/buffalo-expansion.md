@@ -53,10 +53,11 @@ because Rochester already has `st-louis` (Pittsford). One commit per batch.
 
 ## 3. Current state
 
-**Dataset: 101 parishes / 186 churches; 117 tests green.** (Rochester baseline was 62/132.)
+**Dataset: 99 parishes / 186 churches; 117 tests green.** (Rochester baseline was 62/132.)
 
-**Buffalo contribution: 39 parishes / 54 churches, all geocoded**, spanning **all 8 counties**.
-Only one intentional address flag remains open (Wellsville house number, §6).
+**Buffalo contribution: 37 parishes / 54 churches, all geocoded**, spanning **all 8 counties**.
+Only one intentional address flag remains open (Wellsville house number, §6). The parish count
+dropped from its peak as the website audit (§6e) correctly *consolidated* several over-split rows.
 
 `db create` and `pytest` are run after every batch and must stay green (96/176, 117 passed
 as of the last commit `eb458d4`).
@@ -81,17 +82,26 @@ is the dependable independent fallback.**
 
 ## 5. What's been added (by county / batch)
 
-All 39 Buffalo parishes, newest first. Full per-row reasoning is in git history (commit per
-batch, messages `data: add Buffalo batch N`); the load-bearing edge cases are kept in §6.
+Newest first. Full per-row reasoning is in git history (commit per batch); the load-bearing edge
+cases are kept in §6. **Note:** the website-audit pass (§6e) restructured several rows the cloud
+agent had added — `st-michael-warsaw` → folded into `eastern-rural-rcc`; `st-jude-the-apostle-
+north-tonawanda` → folded into `tonawanda-catholic`; `holy-family-albion` → folded into
+`one-catholic`; `resurrection-batavia` website → the12apostles.org. The batch-1–8 lists below
+record the *original* additions; the audit entries record the corrections.
 
+- **Website audit + St. Jude/Resurrection** (commit `d37b300`) — folded St. Jude into RCCT
+  (`tonawanda-catholic`, now 5 worship sites); repointed Resurrection/Batavia to the12apostles.org.
+- **St. Michael → ERRCC** (commit `a387442`) — dead domain stmichaelswarsaw2.com; St. Michael
+  (Warsaw) is a worship site of the Eastern Rural Roman Catholic Community (`eastern-rural-rcc`,
+  errcc.org, org st-michael-st-isidore). Other ERRCC sites deferred.
+- **Niagara Frontier** (commits `693fb43`, `cac41c5`) — `niagara-frontier-catholic`
+  (niagarafrontiercatholic.org): St. Peter (Lewiston) + St. Bernard (Youngstown) + Immaculate
+  Conception (Ransomville, dead own-domain icransomville.org → merged in). St. Raphael omitted (closed).
 - **ONE Catholic consolidation** (commit `ac8ecd8`) — collapsed into ONE parish `one-catholic`
   (onecatholic.org; combined bulletin since Dec 2023) with worship sites Holy Family/Albion,
   St. Mary/Medina, St. Mary/Holley. **Removed** the old `holy-family-albion` parish (its website
   holyfamilyalbion.com is now a squatted casino domain) and re-parented its church here. Excluded
   St. Mark/Kendall (closed/for-sale).
-- **Niagara Frontier** (commit `693fb43`) — split into `st-peter-lewiston`
-  (niagarafrontiercatholic.org; St. Peter + St. Bernard) and `immaculate-conception-ransomville`
-  (icransomville.org; single site). St. Raphael omitted — closed Feb 2024, building sold.
 - **Niagara Falls family** (commit `0bb742f`) — resolved the largest deferred shared-domain
   family into 3 parishes, each with its own website + bulletin: `st-vincent-de-paul-niagara-falls`
   (svdparish.org; Prince of Peace + St. Leo), `holy-family-niagara-falls` (holyfamilyrcchurch.org;
@@ -142,13 +152,24 @@ parish's own homepage/bulletin org, then split. Only model the whole family as O
 there is genuinely a single combined bulletin and no per-parish sites (the tonawanda-catholic /
 cheektowaga / enchanted-mountains case). Addresses already captured below:
 
-- **The Lord's Vineyard** (thelordsvineyard3.com, N. Chautauqua) beyond Holy Trinity/Dunkirk —
-  St. Anthony (66 Cushing St) + St. Joseph (145 E Main St) Fredonia share one bulletin
-  ("The Catholic Parishes of Fredonia", parishesonline `st-anthony-st-joseph-churches`); family also
-  has Our Lady of Mount Carmel (Silver Creek), St. Elizabeth Ann Seton & Blessed Mary Angela (Dunkirk).
-- **Fields of Grace** (fieldsofgrace.family, Wyoming) beyond St. Michael/Warsaw — St. Vincent
-  (Attica), St. Joseph (Varysburg), St. Cecilia (Sheldon), St. Mary (Pavilion), now partly
-  reorganized into the new **St. John Neumann Parish** — needs the post-reorg split pinned down.
+- **The Lord's Vineyard** (thelordsvineyard3.com, N. Chautauqua) — **4 canonical parishes / 5
+  worship sites**, org `the-lords-vineyard`. `holy-trinity-dunkirk` is already in the dataset as its
+  own parish, but its domain holytrinitydunkirk.org now 301s to thelordsvineyard3.com — so a human
+  should decide whether Holy Trinity still prints its own bulletin or now shares the family's (if the
+  latter, fold it in). Other sites: St. Anthony (66 Cushing St) + St. Joseph (145 E Main St) Fredonia
+  share a combined bulletin (`st-anthony-st-joseph-churches`); Our Lady of Mount Carmel (Silver
+  Creek); St. Elizabeth Ann Seton & Blessed Mary Angela (Dunkirk). Defer until the per-bulletin split
+  across the 4 parishes is mapped.
+- **Eastern Rural RCC (ERRCC)** (errcc.org, Wyoming/Genesee) — now modeled as `eastern-rural-rcc`
+  with **only St. Michael/Warsaw** attached. ERRCC's combined bulletin (org `st-michael-st-isidore`,
+  ParishesOnline 14/0954) also covers Mary Immaculate, St. Isidore (Perry/Silver Springs), St. Joseph,
+  St. Mary, and overlaps the old "Fields of Grace" reorg into **St. John Neumann Parish**. Add the
+  remaining ERRCC worship sites once their addresses + post-reorg status are confirmed (the roster is
+  currently fuzzy — St. Isidore appears in two towns; St. Joseph/St. Mary cities unconfirmed).
+- **Resurrection / The 12 Apostles** (the12apostles.org, Batavia) — `resurrection-batavia` currently
+  has only St. Joseph (303 E Main St). Resurrection has since absorbed Padre Pio (Oakfield), Holy Name
+  of Mary (East Pembroke), and Ascension (Batavia, slated to close then kept open). Add these worship
+  sites once addresses + final merger status are confirmed.
 
 ### 6c. Parishes in active closure/merger flux — DEFERRED until status settles
 - **St. John Kanty** (Buffalo, 101 Swinburne St) — final Mass May 2025, Vatican suspended the
@@ -166,17 +187,46 @@ cheektowaga / enchanted-mountains case). Addresses already captured below:
 - **St. Casimir** (Buffalo, Kaisertown, 160 Cable St) — independent/non-diocesan Polish church,
   multiple sources say not associated with the Diocese. Project Carlo tracks Diocese of Buffalo, so excluded.
 
-### 6e. Dead-domain audit — RECOMMENDED follow-up
-While resolving ONE Catholic, three parish domains the cloud agent had treated as "own site"
-turned out to be **dead/expired and in some cases squatted**: `holyfamilyalbion.com` (now a casino
-spam site), `stmarystmark.org` (301s to an unrelated Indonesian site), `holytrinitymedina.org`
-(DNS no longer resolves). Under the 1-parish=1-bulletin rule the parish website must be where the
-bulletin actually lives, so a dead website is a real defect. **Recommend a liveness sweep of every
-Buffalo parish website** (DNS-resolve + HTTP 200 + content sanity-check) to catch any other rows
-whose domain has lapsed since the cloud agent added it; re-point or consolidate as needed. This is
-also where a human may want to weigh in: when a parish's own domain dies and it falls back to a
-shared family bulletin, the call to fold it into the family parish (as done for Holy Family/Albion)
-is a judgment about current reality vs. the parish's prior independence.
+### 6e. Website liveness audit — DONE (a re-run is the recommended periodic check)
+Ran a DNS-resolve + HTTP + content sanity sweep over all 39 Buffalo parish websites
+(`scripts/check_parish_websites.py`). The cloud agent had assigned several parishes an "own domain" that has
+since **lapsed**, because it couldn't make HTTP requests to verify them. Findings and fixes:
+
+**Dead domains (DNS non-existent), fixed:**
+- `holyfamilyalbion.com` → now a casino-spam squat. Holy Family/Albion shares the ONE Catholic
+  combined bulletin → folded into `one-catholic` (commit `ac8ecd8`).
+- `icransomville.org` → non-existent. IC Ransomville shares the Niagara Frontier bulletin → folded
+  into `niagara-frontier-catholic` (commit `cac41c5`). *(This was a row added earlier this session —
+  the audit caught my own over-split.)*
+- `stmichaelswarsaw2.com` **and** `saintmichaelwarsaw.org` → both non-existent. St. Michael shares
+  the ERRCC combined bulletin → re-homed under `eastern-rural-rcc` (commit `a387442`). **Then the
+  audit caught that `errcc.org` itself is now squatted** (all paths 301 to a lottery-spam site
+  `inforesulthk.com`), so the ERRCC community currently has *no* working homepage. Repointed its
+  website to the live ParishesOnline org page where its bulletin is actually published
+  (`parishesonline.com/organization/st-michael-st-isidore`) — a deliberate, rule-honoring fallback
+  ("website = where the bulletin lives") for a parish whose vanity domain has lapsed. A human may
+  later swap in a new ERRCC homepage if/when they register one.
+- (`stmarystmark.org`, `holytrinitymedina.org` were ONE Catholic constituents — also dead; handled
+  by the `one-catholic` consolidation.)
+
+**Own-domain now 301s to a family site (parish likely folded into the family bulletin):**
+- `stjudetheapostleparish.org` → rcct.faith. St. Jude folded into `tonawanda-catholic` (commit `d37b300`).
+- `resurrectionbatavia.com` → the12apostles.org. Repointed website (commit `d37b300`).
+- `holytrinitydunkirk.org` → thelordsvineyard3.com. **Left for review** — see §6b (needs the Lord's
+  Vineyard bulletin split before deciding whether to fold Holy Trinity in).
+
+**False positives (live; flagged only by the crude content check):** `svdparish.org` is IPv6-only
+(this host has no IPv6, so it "timed out" but is live); `rcct.faith`, `olpclarence.org`,
+`blessedtrinitybuffalo.org`, `saintbopny.org`, `goodshepherdpendleton-campus.org` are JS-rendered
+(little crawlable text); `staloy.com`, `emcatholic.org`, `icc-ics.com` return 403 to bots;
+`smolparish.org`, `holyfamilyrcchurch.org` 404 on `/` but resolve and serve. All confirmed live.
+
+**Recommended periodic re-run:** `uv run python scratchpad/liveness.py` (or fold it into the
+pipeline) — parish domains in this diocese lapse frequently during the ongoing mergers, so a
+quarterly liveness check will keep the "website = where the bulletin lives" invariant honest.
+Where a dead domain means a parish has fallen back to a shared family bulletin, folding it into the
+family parish (as done above) is the right call under 1-parish=1-bulletin, but a human may want to
+confirm the parish hasn't simply moved to a new own-domain instead.
 
 ## 7. How to continue (same method)
 
