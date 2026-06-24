@@ -76,3 +76,46 @@ and Plus Codes and never 403'd.
 
 After this: `db create` → 90 parishes / 170 churches; `pytest` → 117 passed. Net unverified
 Buffalo addresses: 5 → 1 (the intentional Wellsville house-number flag).
+
+---
+
+## Session 1 (cont.) — Batch 7: 4 independent Buffalo-area parishes (4 churches)
+
+`db create` 90→94 parishes, 170→174 churches; 117 tests pass. All four are **single-church
+parishes with their own website and their own bulletin** (the cloud agent's "own site → own
+parish" rule), fully geocoded here (no pipeline handoff needed). Picked because each is
+unambiguous — no shared-domain modeling risk.
+
+| parish slug | church — address | website | provider | coordinate source |
+|---|---|---|---|---|
+| blessed-trinity-buffalo | Blessed Trinity — 317 Leroy Ave, Buffalo 14214 | blessedtrinitybuffalo.org | (detect) | Nominatim house; addr via Yelp + Library of Congress (NRHP Lombard-Romanesque, 1928) |
+| st-louis-buffalo | St. Louis — 35 Edward St, Buffalo 14202 | stlouisrcchurch.org | (detect) | Nominatim `place_of_worship` (exact); the diocese's oldest parish / "Mother Church" (1829) |
+| st-bernadette-orchard-park | St. Bernadette — 5930 South Abbott Rd, Orchard Park 14127 | saintbopny.org | parishes_online (st-bernadette-catholic-church-14127) | Nominatim house; **street corrected** South Park→South **Abbott** Rd |
+| st-rose-of-lima-buffalo | St. Rose of Lima — 500 Parker Ave, Buffalo 14216 | saintrosebuffalo.com | parishes_online (st-rose-of-lima) | Nominatim `place_of_worship` (exact) |
+
+Slug discipline: existing Rochester `st-louis` (Pittsford) and `st-rose` (Lima) forced
+city-suffixing → `st-louis-buffalo`, `st-rose-of-lima-buffalo`. All set `address_verified=true`
+(each corroborated by ≥2 independent sources or an OSM church node).
+
+### Deferred families — investigated, still deferred (with findings)
+
+I used WebFetch to map two of the cloud agent's deferred shared-domain families, but they
+stay deferred because the blocker is **canonical-parish structure**, not data I can fetch —
+modeling them wrong is worse than waiting:
+
+- **Niagara Falls RC Family of Parishes** (nfrcfparish.org). Fetched the family site; its
+  worship sites are Prince of Peace (1055 Military Rd, 14304), St. Leo's (2748 Military Rd,
+  14304), St. John de LaSalle (8477 Buffalo Ave, 14304), St. Mary of the Cataract (237 4th
+  St, 14303), St. Joseph's (addr not listed), and Holy Family (1413 Pine Ave, 14301). These
+  span **multiple canonical parishes** (e.g. Divine Mercy vs. St. Mary of the Cataract vs.
+  Holy Family) under **one shared domain** — which collides with the UNIQUE-website
+  constraint unless each canonical parish's own homepage/bulletin is pinned down first.
+  Addresses are now captured here so a future batch only needs the parish→site split.
+- **ONE Catholic** (onecatholic.org), Orleans + E. Niagara: confirmed Holy Trinity (Medina)
+  worships at St. Mary, **211 Eagle St, Medina 14103**, and St. Mark (Kendall) pairs with
+  St. Mary (Holley) — but all run under the shared onecatholic.org domain (Holy Family/Albion
+  in batch 6 only broke out because it kept holyfamilyalbion.com). Same shared-domain blocker.
+
+**WebFetch host blocklist observed:** `icc-ics.com`, `emcatholic.org` return HTTP 403 to
+WebFetch; `nfrcfparish.org`, `cheektowagacatholicfamily.org`, `blessedtrinitybuffalo.org`,
+and `gcatholic.org` all work. gcatholic is the reliable fallback (address + Plus Code).
