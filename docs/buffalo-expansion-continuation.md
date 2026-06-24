@@ -45,3 +45,34 @@ Method:
   listings showing `1583 Grand Ave, Savannah 13146`). Left for the Rochester data owner.
 
 Build/test after backfill: `db create` → 90 parishes / 170 churches; `pytest` → 117 passed.
+
+---
+
+## Session 1 (cont.) — Verifying the `address_verified=false` rows
+
+The cloud agent left 5 Buffalo churches with `address_verified=false` for the verify stage.
+Resolved 4 of them against authoritative sources (cross-checked, then flipped to `true`):
+
+| church | confirmed address | source |
+|---|---|---|
+| `st-francis-of-assisi-tonawanda` | 71 Adam St | parish's own site rcct.faith (it's now chapel-only — last Mass in the main church Apr 2025 — but still active for funerals/columbarium services) |
+| `sacred-heart-portville` | 43 Maple Ave | gcatholic (now titled "Oratory of the Sacred Heart") |
+| `resurrection-cheektowaga` | 130 Como Park Blvd | official cheektowagacatholicfamily.org |
+| `queen-of-martyrs-cheektowaga` | 180 George Urban Blvd | official cheektowagacatholicfamily.org |
+
+**`immaculate-conception-wellsville` — house number left disputed on purpose.** Sources
+split: parish site (icc-ics.com, per scratchbook) says church = **36 Maple Ave**; gcatholic,
+Yelp, and catholicchurch.directory say **6 Maple Ave** (office = 17). I geocoded all three
+house numbers plus the OSM `place_of_worship` node named "Immaculate Conception Roman
+Catholic Church" (42.1213889, -77.9425000). The church node sits **closest to 36 Maple
+(~48 m)**, vs ~73 m to 17 and ~85 m to 6 — which corroborates 36 over 6. So I **pinned the
+map coordinate to the church node** (most accurate regardless of street-number dispute) and
+kept the address line "36 Maple Avenue", but **left `address_verified=false`** because three
+reputable directories still disagree on the number. A human should confirm 6-vs-36 on site.
+
+Note `icc-ics.com` and `emcatholic.org` return **HTTP 403 to WebFetch** (some parish hosts
+block it), so gcatholic.org is the reliable independent channel here — it serves addresses
+and Plus Codes and never 403'd.
+
+After this: `db create` → 90 parishes / 170 churches; `pytest` → 117 passed. Net unverified
+Buffalo addresses: 5 → 1 (the intentional Wellsville house-number flag).
