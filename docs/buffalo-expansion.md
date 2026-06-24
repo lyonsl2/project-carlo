@@ -53,9 +53,9 @@ because Rochester already has `st-louis` (Pittsford). One commit per batch.
 
 ## 3. Current state
 
-**Dataset: 96 parishes / 176 churches; 117 tests green.** (Rochester baseline was 62/132.)
+**Dataset: 99 parishes / 181 churches; 117 tests green.** (Rochester baseline was 62/132.)
 
-**Buffalo contribution: 34 parishes / 44 churches, all geocoded**, spanning **all 8 counties**.
+**Buffalo contribution: 37 parishes / 49 churches, all geocoded**, spanning **all 8 counties**.
 Only one intentional address flag remains open (Wellsville house number, §6).
 
 `db create` and `pytest` are run after every batch and must stay green (96/176, 117 passed
@@ -81,9 +81,13 @@ is the dependable independent fallback.**
 
 ## 5. What's been added (by county / batch)
 
-All 34 Buffalo parishes, newest first. Full per-row reasoning is in git history (commit per
+All 37 Buffalo parishes, newest first. Full per-row reasoning is in git history (commit per
 batch, messages `data: add Buffalo batch N`); the load-bearing edge cases are kept in §6.
 
+- **Niagara Falls family** (commit `0bb742f`) — resolved the largest deferred shared-domain
+  family into 3 parishes, each with its own website + bulletin: `st-vincent-de-paul-niagara-falls`
+  (svdparish.org; Prince of Peace + St. Leo), `holy-family-niagara-falls` (holyfamilyrcchurch.org;
+  St. Mary of the Cataract + St. Joseph), `st-john-de-lasalle-niagara-falls` (stjohndelasalle.org).
 - **Batch 8** — `corpus-christi-buffalo` (Corpus Christi, 199 Clark St), `st-stephen-grand-island`
   (St. Stephen, 2100 Baseline Rd — first Grand Island parish).
 - **Batch 7** — `blessed-trinity-buffalo`, `st-louis-buffalo` (diocese's oldest parish, 1829),
@@ -120,18 +124,16 @@ Plus geocoding/verification backfill: all 38 cloud-agent churches geocoded; 4 of
   (Perkinsville) CSV `11114 Chapel St` vs sources' `11119`; `st-patrick-savannah` CSV
   `52 Clyde St` vs directories' `1583 Grand Ave`. Left for the Rochester data owner.
 
-### 6b. Shared-domain families — DEFERRED, blocked on the UNIQUE-website constraint
-These are the cleanest remaining work but each is blocked on **canonical-parish structure, not
-on data we can fetch**. Multiple canonical parishes share **one domain**, which violates UNIQUE
-`website` unless we either (a) model the whole family as a single parish, or (b) pin down each
-canonical parish's own homepage/bulletin first. Addresses already captured so a future batch only
-needs the parish↔site split decision:
+### 6b. Shared-domain families — the next tranche of work
+The cleanest remaining work. **Resolution pattern (proven on Niagara Falls):** a "family" site
+is usually a thin shell over 2–3 canonical parishes that *each* keep their own ParishesOnline
+bulletin org and often their own domain. When that's true it splits cleanly — one `parish` row
+per canonical parish, each with its own unique website + bulletin — satisfying both the
+1-parish=1-bulletin rule and the UNIQUE-website constraint. The work is: confirm each canonical
+parish's own homepage/bulletin org, then split. Only model the whole family as ONE parish when
+there is genuinely a single combined bulletin and no per-parish sites (the tonawanda-catholic /
+cheektowaga / enchanted-mountains case). Addresses already captured below:
 
-- **Niagara Falls RC Family of Parishes** (nfrcfparish.org) — worship sites: Prince of Peace
-  (1055 Military Rd, 14304), St. Leo's (2748 Military Rd, 14304), St. John de LaSalle (8477 Buffalo
-  Ave, 14304), St. Mary of the Cataract (237 4th St, 14303), St. Joseph's (addr not listed), Holy
-  Family (1413 Pine Ave, 14301). Spans multiple canonical parishes (Divine Mercy vs St. Mary of the
-  Cataract vs Holy Family) under one domain.
 - **ONE Catholic** (onecatholic.org, Orleans + E. Niagara) — Holy Trinity (Medina) worships at
   St. Mary, 211 Eagle St, Medina 14103; St. Mark (Kendall) pairs with St. Mary (Holley). Holley
   number conflicts (11 vs 13 S Main St); Kendall street not cleanly confirmed. (Holy Family/Albion
