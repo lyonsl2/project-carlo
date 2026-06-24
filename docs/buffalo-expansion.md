@@ -53,9 +53,9 @@ because Rochester already has `st-louis` (Pittsford). One commit per batch.
 
 ## 3. Current state
 
-**Dataset: 101 parishes / 184 churches; 117 tests green.** (Rochester baseline was 62/132.)
+**Dataset: 101 parishes / 186 churches; 117 tests green.** (Rochester baseline was 62/132.)
 
-**Buffalo contribution: 39 parishes / 52 churches, all geocoded**, spanning **all 8 counties**.
+**Buffalo contribution: 39 parishes / 54 churches, all geocoded**, spanning **all 8 counties**.
 Only one intentional address flag remains open (Wellsville house number, §6).
 
 `db create` and `pytest` are run after every batch and must stay green (96/176, 117 passed
@@ -84,6 +84,11 @@ is the dependable independent fallback.**
 All 39 Buffalo parishes, newest first. Full per-row reasoning is in git history (commit per
 batch, messages `data: add Buffalo batch N`); the load-bearing edge cases are kept in §6.
 
+- **ONE Catholic consolidation** (commit `ac8ecd8`) — collapsed into ONE parish `one-catholic`
+  (onecatholic.org; combined bulletin since Dec 2023) with worship sites Holy Family/Albion,
+  St. Mary/Medina, St. Mary/Holley. **Removed** the old `holy-family-albion` parish (its website
+  holyfamilyalbion.com is now a squatted casino domain) and re-parented its church here. Excluded
+  St. Mark/Kendall (closed/for-sale).
 - **Niagara Frontier** (commit `693fb43`) — split into `st-peter-lewiston`
   (niagarafrontiercatholic.org; St. Peter + St. Bernard) and `immaculate-conception-ransomville`
   (icransomville.org; single site). St. Raphael omitted — closed Feb 2024, building sold.
@@ -137,10 +142,6 @@ parish's own homepage/bulletin org, then split. Only model the whole family as O
 there is genuinely a single combined bulletin and no per-parish sites (the tonawanda-catholic /
 cheektowaga / enchanted-mountains case). Addresses already captured below:
 
-- **ONE Catholic** (onecatholic.org, Orleans + E. Niagara) — Holy Trinity (Medina) worships at
-  St. Mary, 211 Eagle St, Medina 14103; St. Mark (Kendall) pairs with St. Mary (Holley). Holley
-  number conflicts (11 vs 13 S Main St); Kendall street not cleanly confirmed. (Holy Family/Albion
-  already broke out in batch 6 because it kept its own holyfamilyalbion.com.)
 - **The Lord's Vineyard** (thelordsvineyard3.com, N. Chautauqua) beyond Holy Trinity/Dunkirk —
   St. Anthony (66 Cushing St) + St. Joseph (145 E Main St) Fredonia share one bulletin
   ("The Catholic Parishes of Fredonia", parishesonline `st-anthony-st-joseph-churches`); family also
@@ -164,6 +165,18 @@ cheektowaga / enchanted-mountains case). Addresses already captured below:
 ### 6d. Out of scope (decided, not deferred)
 - **St. Casimir** (Buffalo, Kaisertown, 160 Cable St) — independent/non-diocesan Polish church,
   multiple sources say not associated with the Diocese. Project Carlo tracks Diocese of Buffalo, so excluded.
+
+### 6e. Dead-domain audit — RECOMMENDED follow-up
+While resolving ONE Catholic, three parish domains the cloud agent had treated as "own site"
+turned out to be **dead/expired and in some cases squatted**: `holyfamilyalbion.com` (now a casino
+spam site), `stmarystmark.org` (301s to an unrelated Indonesian site), `holytrinitymedina.org`
+(DNS no longer resolves). Under the 1-parish=1-bulletin rule the parish website must be where the
+bulletin actually lives, so a dead website is a real defect. **Recommend a liveness sweep of every
+Buffalo parish website** (DNS-resolve + HTTP 200 + content sanity-check) to catch any other rows
+whose domain has lapsed since the cloud agent added it; re-point or consolidate as needed. This is
+also where a human may want to weigh in: when a parish's own domain dies and it falls back to a
+shared family bulletin, the call to fold it into the family parish (as done for Holy Family/Albion)
+is a judgment about current reality vs. the parish's prior independence.
 
 ## 7. How to continue (same method)
 
