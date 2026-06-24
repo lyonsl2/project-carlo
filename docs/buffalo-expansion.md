@@ -53,9 +53,9 @@ because Rochester already has `st-louis` (Pittsford). One commit per batch.
 
 ## 3. Current state
 
-**Dataset: 99 parishes / 181 churches; 117 tests green.** (Rochester baseline was 62/132.)
+**Dataset: 101 parishes / 184 churches; 117 tests green.** (Rochester baseline was 62/132.)
 
-**Buffalo contribution: 37 parishes / 49 churches, all geocoded**, spanning **all 8 counties**.
+**Buffalo contribution: 39 parishes / 52 churches, all geocoded**, spanning **all 8 counties**.
 Only one intentional address flag remains open (Wellsville house number, §6).
 
 `db create` and `pytest` are run after every batch and must stay green (96/176, 117 passed
@@ -81,9 +81,12 @@ is the dependable independent fallback.**
 
 ## 5. What's been added (by county / batch)
 
-All 37 Buffalo parishes, newest first. Full per-row reasoning is in git history (commit per
+All 39 Buffalo parishes, newest first. Full per-row reasoning is in git history (commit per
 batch, messages `data: add Buffalo batch N`); the load-bearing edge cases are kept in §6.
 
+- **Niagara Frontier** (commit `693fb43`) — split into `st-peter-lewiston`
+  (niagarafrontiercatholic.org; St. Peter + St. Bernard) and `immaculate-conception-ransomville`
+  (icransomville.org; single site). St. Raphael omitted — closed Feb 2024, building sold.
 - **Niagara Falls family** (commit `0bb742f`) — resolved the largest deferred shared-domain
   family into 3 parishes, each with its own website + bulletin: `st-vincent-de-paul-niagara-falls`
   (svdparish.org; Prince of Peace + St. Leo), `holy-family-niagara-falls` (holyfamilyrcchurch.org;
@@ -142,9 +145,6 @@ cheektowaga / enchanted-mountains case). Addresses already captured below:
   St. Anthony (66 Cushing St) + St. Joseph (145 E Main St) Fredonia share one bulletin
   ("The Catholic Parishes of Fredonia", parishesonline `st-anthony-st-joseph-churches`); family also
   has Our Lady of Mount Carmel (Silver Creek), St. Elizabeth Ann Seton & Blessed Mary Angela (Dunkirk).
-- **Niagara Frontier** (niagarafrontiercatholic.org) — St. Peter (Lewiston, 620 Center St; its own
-  stpeterlewiston.org 301-redirects to the shared domain) + St. Bernard (Youngstown) + Immaculate
-  Conception (Ransomville).
 - **Fields of Grace** (fieldsofgrace.family, Wyoming) beyond St. Michael/Warsaw — St. Vincent
   (Attica), St. Joseph (Varysburg), St. Cecilia (Sheldon), St. Mary (Pavilion), now partly
   reorganized into the new **St. John Neumann Parish** — needs the post-reorg split pinned down.
