@@ -1,4 +1,5 @@
 # Keep crawlable church URLs aligned with the prerendered directory form.
+/churches /churches/ 301
 /churches/:slug /churches/:slug/ 301
 /churches/:slug/index.html /churches/:slug/ 301
 

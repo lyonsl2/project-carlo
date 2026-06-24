@@ -99,5 +99,20 @@ Confession, and Adoration times parsed from weekly bulletins
     client navigation; wired into Home, Landing, About, NotFound (noindex), and
     the client-rendered ChurchPage — fixes the shell canonical leaking onto `/landing`
   - Church name promoted to `<h1>`; service sections to `<h2>`
+- [x] Phase 2.5 — technical SEO hardening
+  - Mass/Confession/Adoration schedule as `Event` + `eventSchedule` JSON-LD
+    nodes on the Church node (`churchJsonLd`), plus a `WebPage` node with
+    `dateModified` (same source as sitemap `<lastmod>`).
+  - Prerendered `/churches/` all-parishes index page (grouped by city) — gives
+    crawlers an internal-link path to all church pages instead of sitemap-only
+    discovery; linked from every church page footer, included in the sitemap,
+    and added as a "Parishes" breadcrumb level.
+  - Homepage `<h1>` now carries the intent keywords (Masthead tagline);
+    the wordmark is a styled `<p>` — visually unchanged.
+  - WebSite/Organization JSON-LD injected into `index.html` at build time from
+    `src/lib/seo.ts` (single source of truth); JSON-LD serialization escapes
+    `<` to keep `</script>`-safe.
 - [ ] Phase 3 — local long-tail expansion
-- [ ] Phase 4 — polish & measurement
+- [ ] Phase 4 — polish & measurement (submit sitemap to Google Search Console
+      + Bing Webmaster Tools after the next deploy; validate with the Rich
+      Results Test and Facebook Sharing Debugger — zero-code, do first)

@@ -3,7 +3,7 @@
  * and JSON-LD (schema.org) builders used by the prerendered church pages and
  * (in a later phase) the client-rendered routes.
  */
-import type { ChurchDetail } from "../types";
+import type { ChurchDetail, EventSummary, EventType } from "../types";
 
 export const SITE_NAME = "Project Carlo";
 export const SITE_LOCALE = "en_US";
@@ -66,6 +66,89 @@ export function buildChurchDescription(church: ChurchDetail): string {
   return `Mass, Confession, and Adoration times for ${name}${where}, parsed from the parish's latest weekly bulletin.`;
 }
 
+/** Canonical path of the prerendered all-parishes index page. */
+export const CHURCH_INDEX_PATH = "/churches/";
+
+export const CHURCH_INDEX_TITLE = `Browse Catholic Parishes — Mass, Confession & Adoration Times · ${SITE_NAME}`;
+
+export function buildChurchIndexDescription(parishCount: number): string {
+  return `Browse all ${parishCount} Catholic parishes on ${SITE_NAME} and find Mass, Confession, and Adoration times parsed from each parish's weekly bulletin.`;
+}
+
+const SCHEMA_DAY_URL: Record<string, string> = {
+  sunday: "https://schema.org/Sunday",
+  monday: "https://schema.org/Monday",
+  tuesday: "https://schema.org/Tuesday",
+  wednesday: "https://schema.org/Wednesday",
+  thursday: "https://schema.org/Thursday",
+  friday: "https://schema.org/Friday",
+  saturday: "https://schema.org/Saturday",
+};
+
+const EVENT_JSONLD_NAMES: Record<EventType, string> = {
+  mass: "Mass",
+  confession: "Confession",
+  adoration: "Eucharistic Adoration",
+};
+
+function minutesToIsoTime(minutes: number): string {
+  const h = String(Math.floor(minutes / 60)).padStart(2, "0");
+  const m = String(minutes % 60).padStart(2, "0");
+  return `${h}:${m}`;
+}
+
+function capitalize(word: string): string {
+  return word.charAt(0).toUpperCase() + word.slice(1);
+}
+
+/**
+ * schema.org `Event` nodes for a church's recurring (weekly) and one-off
+ * services, suitable for the Church node's `event` property. Weekly events use
+ * `eventSchedule` (`Schedule` with `repeatFrequency: P1W`); specific-date
+ * events use plain `startDate`/`endDate`. Cancelled events are skipped.
+ */
+function churchEventsJsonLd(
+  events: EventSummary[],
+  churchId: string,
+): Record<string, unknown>[] {
+  const nodes: Record<string, unknown>[] = [];
+  for (const event of events) {
+    if (event.cancelled) continue;
+    const label = EVENT_JSONLD_NAMES[event.type];
+    const startTime = minutesToIsoTime(event.start_time);
+    const endTime = event.end_time != null ? minutesToIsoTime(event.end_time) : null;
+
+    if (event.kind === "weekly" && event.day_of_week) {
+      const dayKey = event.day_of_week.toLowerCase();
+      const byDay = SCHEMA_DAY_URL[dayKey];
+      if (!byDay) continue;
+      const schedule: Record<string, unknown> = {
+        "@type": "Schedule",
+        byDay,
+        startTime,
+        repeatFrequency: "P1W",
+      };
+      if (endTime) schedule.endTime = endTime;
+      nodes.push({
+        "@type": "Event",
+        name: `${capitalize(dayKey)} ${label}`,
+        eventSchedule: schedule,
+        location: { "@id": churchId },
+      });
+    } else if (event.kind === "specific_date" && event.date) {
+      const node: Record<string, unknown> = {
+        "@type": "Event",
+        name: label,
+        startDate: `${event.date}T${startTime}`,
+        location: { "@id": churchId },
+      };
+      if (endTime) node.endDate = `${event.date}T${endTime}`;
+      nodes.push(node);
+    }
+  }
+  return nodes;
+}
+
 /** schema.org PostalAddress for a church, or null when no address is known. */
 function postalAddress(church: ChurchDetail): Record<string, unknown> | null {
   const street = [church.address_line1, church.address_line2]
@@ -85,18 +168,21 @@ function postalAddress(church: ChurchDetail): Record<string, unknown> | null {
 }
 
 /**
- * `Church` (PlaceOfWorship) structured data for a parish detail page. Only
+ * `Church` (PlaceOfWorship) structured data for a parish detail page,
+ * including its Mass/Confession/Adoration schedule as `Event` nodes. Only
  * emits fields that are actually known so the markup stays valid.
  */
 export function churchJsonLd(
   church: ChurchDetail,
+  events: EventSummary[],
   canonicalUrl: string,
 ): Record<string, unknown> {
   const origin = new URL(canonicalUrl).origin;
+  const churchId = `${canonicalUrl}#church`;
   const node: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "Church",
-    "@id": `${canonicalUrl}#church`,
+    "@id": churchId,
     name: church.name ?? "Catholic parish",
     url: canonicalUrl,
     image: absoluteUrl(origin, OG_IMAGE_PATH),
@@ -118,13 +204,41 @@ export function churchJsonLd(
   );
   if (sameAs.length > 0) node.sameAs = sameAs;
 
+  const eventNodes = churchEventsJsonLd(events, churchId);
+  if (eventNodes.length > 0) node.event = eventNodes;
+
   return node;
 }
 
 /**
- * BreadcrumbList: Home → {Parish}. A city level will be inserted once city
- * landing pages exist (Phase 3) — schema.org requires every non-final crumb to
- * carry an `item` URL, so we omit the city until it has a real page.
+ * `WebPage` node carrying `dateModified` (derived from the parish's latest
+ * bulletin, same source as the sitemap `<lastmod>`) — freshness signal for a
+ * schedules site.
+ */
+export function churchWebPageJsonLd(
+  church: ChurchDetail,
+  canonicalUrl: string,
+  dateModified: string | null,
+): Record<string, unknown> {
+  const node: Record<string, unknown> = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "@id": `${canonicalUrl}#webpage`,
+    url: canonicalUrl,
+    name: buildChurchTitle(church),
+    description: buildChurchDescription(church),
+    about: { "@id": `${canonicalUrl}#church` },
+    inLanguage: "en-US",
+  };
+  if (dateModified) node.dateModified = dateModified;
+  return node;
+}
+
+/**
+ * BreadcrumbList: Home → Parishes → {Parish}. A city level will be inserted
+ * once city landing pages exist (Phase 3) — schema.org requires every
+ * non-final crumb to carry an `item` URL, so we omit the city until it has a
+ * real page.
  */
 export function churchBreadcrumbJsonLd(
   church: ChurchDetail,
@@ -144,6 +258,12 @@ export function churchBreadcrumbJsonLd(
       {
         "@type": "ListItem",
         position: 2,
+        name: "Parishes",
+        item: absoluteUrl(origin, CHURCH_INDEX_PATH),
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
         name: church.name ?? "Parish",
         item: canonicalUrl,
       },

@@ -18,6 +18,7 @@ import { FeedbackTrigger } from "@/components/FeedbackTrigger";
 import { Fleuron } from "@/components/Fleuron";
 import { Masthead } from "@/components/Masthead";
 import { useHomeHref } from "@/hooks/useHomeHref";
+import { CHURCH_INDEX_PATH } from "@/lib/seo";
 
 interface EventsByType {
   weeklyByDay: Record<string, EventSummary[]>;
@@ -188,6 +189,7 @@ export function ChurchPageContent({ church, events }: ChurchPageContentProps) {
   const homeHref = useHomeHref();
 
   return (
+    <>
     <main className="min-h-svh bg-paper">
       <header className="sticky top-0 z-40 border-b border-rule-strong bg-paper/95 backdrop-blur supports-[backdrop-filter]:bg-paper/85">
         <div className="mx-auto flex w-full max-w-5xl items-center justify-between px-6 pt-[calc(0.85rem+var(--safe-area-inset-top))] pb-3">
@@ -377,5 +379,11 @@ export function ChurchPageContent({ church, events }: ChurchPageContentProps) {
         </div>
       </div>
     </main>
+    <footer className="bg-paper pb-[calc(3rem+var(--safe-area-inset-bottom))] text-center">
+      <a href={CHURCH_INDEX_PATH} className="rubric-link smallcaps text-[0.875rem]">
+        Browse all parishes
+      </a>
+    </footer>
+    </>
   );
 }

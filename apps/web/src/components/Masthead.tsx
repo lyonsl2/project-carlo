@@ -30,14 +30,17 @@ export function Masthead({
     );
   }
 
+  // The tagline is the <h1>: it carries the intent keywords ("Mass,
+  // Confession & Adoration times near you") that the branded wordmark lacks.
+  // Visually unchanged — only the heading semantics are swapped.
   return (
     <header className={cn("space-y-2", className)}>
-      <h1 className="font-display text-[2rem] leading-none font-normal tracking-tight text-ink sm:text-[2.5rem]">
+      <p className="font-display text-[2rem] leading-none font-normal tracking-tight text-ink sm:text-[2.5rem]">
         <Link to="/" aria-label="Project Carlo — home">
           Project <span className="italic text-rubric">Carlo</span>
         </Link>
-      </h1>
-      <p className="smallcaps text-[0.875rem] text-ink-soft">{tagline}</p>
+      </p>
+      <h1 className="smallcaps text-[0.875rem] font-normal text-ink-soft">{tagline}</h1>
     </header>
   );
 }

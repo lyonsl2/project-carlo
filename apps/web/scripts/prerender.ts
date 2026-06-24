@@ -6,11 +6,14 @@ import { createElement } from "react";
 import initSqlJs from "sql.js";
 import {
   getAllChurchSlugs,
+  getAllChurchesForIndex,
   getChurchDetail,
   getChurchEvents,
   getChurchLastModifiedDates,
 } from "../src/prerender/queries";
 import { StaticChurchPage } from "../src/prerender/StaticChurchPage";
+import { StaticChurchIndexPage } from "../src/prerender/StaticChurchIndexPage";
+import { CHURCH_INDEX_PATH } from "../src/lib/seo";
 
 const WEB_DIR = resolve(import.meta.dirname, "..");
 const DIST_DIR = resolve(WEB_DIR, "dist");
@@ -94,7 +97,7 @@ function writeSitemapAndRobots(
   origin: string,
   slugs: string[],
   lastmodBySlug: Record<string, string | null>,
-) {
+): number {
   const buildDate = new Date().toISOString().slice(0, 10);
   const churchUrls = slugs.map((slug) => ({
     loc: canonicalUrlForChurchSlug(origin, slug),
@@ -107,6 +110,7 @@ function writeSitemapAndRobots(
   const urls: { loc: string; lastmod: string }[] = [
     { loc: absoluteUrl(origin, "/"), lastmod: homepageLastmod },
     { loc: absoluteUrl(origin, "/landing"), lastmod: buildDate },
+    { loc: absoluteUrl(origin, CHURCH_INDEX_PATH), lastmod: homepageLastmod },
     ...churchUrls,
   ];
   if (isAboutPageEnabledAtBuild()) {
@@ -138,6 +142,7 @@ function writeSitemapAndRobots(
     `Sitemap: ${sitemapUrl}\n`;
 
   writeFileSync(resolve(distDir, "robots.txt"), robots, "utf-8");
+  return urls.length;
 }
 
 async function main() {
@@ -151,6 +156,10 @@ async function main() {
   const origin = getSiteOrigin();
 
   console.log(`Pre-rendering ${slugs.length} church pages...`);
+
+  // Same fallback as the sitemap <lastmod>: build date when no bulletin date
+  // is known, so JSON-LD dateModified and the sitemap never disagree.
+  const buildDate = new Date().toISOString().slice(0, 10);
 
   let count = 0;
   for (const slug of slugs) {
@@ -166,6 +175,7 @@ async function main() {
           cssPath,
           fontPaths,
           canonicalUrl: canonicalUrlForChurchSlug(origin, slug),
+          lastModified: normalizeLastmodDate(lastmodBySlug[slug]) ?? buildDate,
         }),
       );
 
@@ -175,8 +185,27 @@ async function main() {
     count++;
   }
 
-  writeSitemapAndRobots(DIST_DIR, origin, slugs, lastmodBySlug);
-  console.log(`Wrote sitemap.xml and robots.txt (${slugs.length + 2} URLs).`);
+  const indexLastmod = maxIsoDate(
+    slugs.map((slug) => normalizeLastmodDate(lastmodBySlug[slug]) ?? buildDate),
+    buildDate,
+  );
+  const indexHtml =
+    "<!DOCTYPE html>" +
+    renderToStaticMarkup(
+      createElement(StaticChurchIndexPage, {
+        churches: getAllChurchesForIndex(db),
+        cssPath,
+        fontPaths,
+        canonicalUrl: absoluteUrl(origin, CHURCH_INDEX_PATH),
+        lastModified: indexLastmod,
+      }),
+    );
+  mkdirSync(resolve(DIST_DIR, "churches"), { recursive: true });
+  writeFileSync(resolve(DIST_DIR, "churches", "index.html"), indexHtml, "utf-8");
+  console.log("Wrote churches/index.html (all-parishes index).");
+
+  const urlCount = writeSitemapAndRobots(DIST_DIR, origin, slugs, lastmodBySlug);
+  console.log(`Wrote sitemap.xml and robots.txt (${urlCount} URLs).`);
 
   db.close();
   console.log(`Pre-rendered ${count} church pages.`);

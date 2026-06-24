@@ -11,6 +11,32 @@ export function getAllChurchSlugs(db: Database): string[] {
   return result[0].values.map((row) => row[0] as string);
 }
 
+export interface ChurchIndexEntry {
+  slug: string;
+  name: string | null;
+  city: string | null;
+  state: string | null;
+}
+
+/** Slim church list for the prerendered all-parishes index page. */
+export function getAllChurchesForIndex(db: Database): ChurchIndexEntry[] {
+  const stmt = db.prepare(
+    "SELECT slug, name, city, state FROM church ORDER BY city, name",
+  );
+  const entries: ChurchIndexEntry[] = [];
+  while (stmt.step()) {
+    const row = stmt.getAsObject();
+    entries.push({
+      slug: row["slug"] as string,
+      name: str(row["name"]),
+      city: str(row["city"]),
+      state: str(row["state"]),
+    });
+  }
+  stmt.free();
+  return entries;
+}
+
 export function getChurchDetail(db: Database, slug: string): ChurchDetail {
   const stmt = db.prepare(
     `SELECT id, parish_id, slug, name, address_line1, address_line2, city, state, postal_code,
