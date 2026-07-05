@@ -5938,5 +5938,491 @@
     "fetched_at": "2026-06-28T10:39:13Z",
     "processed_at": "2026-06-28T10:44:02Z",
     "published_date": "2026-06-28"
+  },
+  {
+    "parish_slug": "all-saints-corning",
+    "source_url": "https://parishesonline.com/publication-page/all-saints-parish?selectedPublication=https://container.parishesonline.com/bulletins/06/0144/20260705B.pdf",
+    "pdf_path": "data/bulletins/all-saints-corning/5bf964c3bb32bc855be7faa2c932a59e945fcc4bdbef83a32f2c76bfd635dfe4.pdf",
+    "content_hash": "5bf964c3bb32bc855be7faa2c932a59e945fcc4bdbef83a32f2c76bfd635dfe4",
+    "fetched_at": "2026-07-05T10:28:29Z",
+    "processed_at": "2026-07-05T10:32:53Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "net-catholic",
+    "source_url": "https://files.ecatholic.com/20434/bulletins/20260705.pdf?t=1782921696000",
+    "pdf_path": "data/bulletins/net-catholic/5b7d194c97734eeaf30d7ffe258f18b4b58bc82e6e819479ece10342c956bcd1.pdf",
+    "content_hash": "5b7d194c97734eeaf30d7ffe258f18b4b58bc82e6e819479ece10342c956bcd1",
+    "fetched_at": "2026-07-05T10:28:32Z",
+    "processed_at": "2026-07-05T10:32:49Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "blessed-trinity-st-patrick",
+    "source_url": "https://blessed-trinity-parish.org/wp-content/parish_specific/bulletins/2026-07-05.pdf",
+    "pdf_path": "data/bulletins/blessed-trinity-st-patrick/99274130f591df26768808b03121ea37c94d668b84f4b0c08b481a93892ee332.pdf",
+    "content_hash": "99274130f591df26768808b03121ea37c94d668b84f4b0c08b481a93892ee332",
+    "fetched_at": "2026-07-05T10:28:54Z",
+    "processed_at": "2026-07-05T10:38:17Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "catholic-parishes-eastern-wayne-county",
+    "source_url": "https://parishesonline.com/publication-page/st-michael-s-church-st-joseph-the-worker-and-blessed-trinity-catholic-church?selectedPublication=https://container.parishesonline.com/bulletins/06/0326/20260705B.pdf",
+    "pdf_path": "data/bulletins/catholic-parishes-eastern-wayne-county/f9eb957a6b953f813c3127fe45a41e46573cf6eb910b1efa9e8e3fcdf90e08db.pdf",
+    "content_hash": "f9eb957a6b953f813c3127fe45a41e46573cf6eb910b1efa9e8e3fcdf90e08db",
+    "fetched_at": "2026-07-05T10:28:57Z",
+    "processed_at": "2026-07-05T10:33:23Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "st-jerome",
+    "source_url": "https://files.ecatholic.com/22370/bulletins/20260705.pdf?t=1783174330000",
+    "pdf_path": "data/bulletins/st-jerome/620a43bf760c35d7906a31b36a63b8043448193872bd7c7ff8112ddb386f84cf.pdf",
+    "content_hash": "620a43bf760c35d7906a31b36a63b8043448193872bd7c7ff8112ddb386f84cf",
+    "fetched_at": "2026-07-05T10:28:59Z",
+    "processed_at": "2026-07-05T10:32:29Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "assumption-resurrection",
+    "source_url": "https://files.ecatholic.com/1021/bulletins/20260705.pdf?t=1783004472000",
+    "pdf_path": "data/bulletins/assumption-resurrection/9899c130663e4235e3b469a410327fdf232c917a59dc4d418c67ecae1015fff6.pdf",
+    "content_hash": "9899c130663e4235e3b469a410327fdf232c917a59dc4d418c67ecae1015fff6",
+    "fetched_at": "2026-07-05T10:29:00Z",
+    "processed_at": "2026-07-05T10:33:17Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "holy-spirit-st-josephs",
+    "source_url": "https://parishesonline.com/publication-page/st-josephs-catholic-church-and-church-of-the-holy-spirit?selectedPublication=https://container.parishesonline.com/bulletins/06/0030/20260705B.pdf",
+    "pdf_path": "data/bulletins/holy-spirit-st-josephs/fdca9f59b4adfae0018fd0088004bddd0b74cf73680267aee6948c685208451d.pdf",
+    "content_hash": "fdca9f59b4adfae0018fd0088004bddd0b74cf73680267aee6948c685208451d",
+    "fetched_at": "2026-07-05T10:29:03Z",
+    "processed_at": "2026-07-05T10:37:59Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "nativity-seas",
+    "source_url": "https://parishesonline.com/publication-page/church-of-the-nativity-of-the-blessed-virgin-mary-and-st-elizabeth-ann-seton?selectedPublication=https://container.parishesonline.com/bulletins/06/0124/20260705B.pdf",
+    "pdf_path": "data/bulletins/nativity-seas/577ed0fa254e5b208d3d0fd8c30d7c6eeb4f980e70f6f1faeb11f94950700858.pdf",
+    "content_hash": "577ed0fa254e5b208d3d0fd8c30d7c6eeb4f980e70f6f1faeb11f94950700858",
+    "fetched_at": "2026-07-05T10:29:06Z",
+    "processed_at": "2026-07-05T10:33:03Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "transfiguration-st-catherine-mendon",
+    "source_url": "https://parishesonline.com/publication-page/church-of-the-transfiguration-and-st-catherine-of-siena-church?selectedPublication=https://container.parishesonline.com/bulletins/06/0105/20260705B.pdf",
+    "pdf_path": "data/bulletins/transfiguration-st-catherine-mendon/bebb5afcfb83482bbbecd381c9f85f986f326e5162beb5ea912894e4daac7259.pdf",
+    "content_hash": "bebb5afcfb83482bbbecd381c9f85f986f326e5162beb5ea912894e4daac7259",
+    "fetched_at": "2026-07-05T10:29:08Z",
+    "processed_at": "2026-07-05T10:33:16Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "good-shepherd-catholic-community",
+    "source_url": "https://parishesonline.com/publication-page/good-shepherd-catholic-community?selectedPublication=https://container.parishesonline.com/bulletins/06/0198/20260705B.pdf",
+    "pdf_path": "data/bulletins/good-shepherd-catholic-community/b4a16c8edbd253853f9482362470051f29959ad7ff18dcef2d3e68f2b84362d4.pdf",
+    "content_hash": "b4a16c8edbd253853f9482362470051f29959ad7ff18dcef2d3e68f2b84362d4",
+    "fetched_at": "2026-07-05T10:29:15Z",
+    "processed_at": "2026-07-05T10:34:08Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "our-mother-of-sorrows-holy-cross",
+    "source_url": "https://parishesonline.com/publication-page/our-mother-of-sorrows-church?selectedPublication=https://container.parishesonline.com/bulletins/04/0821/20260705B.pdf",
+    "pdf_path": "data/bulletins/our-mother-of-sorrows-holy-cross/0eec120d848b5442867074468656132cbda789a469621c49c8ff832df0affb34.pdf",
+    "content_hash": "0eec120d848b5442867074468656132cbda789a469621c49c8ff832df0affb34",
+    "fetched_at": "2026-07-05T10:29:18Z",
+    "processed_at": "2026-07-05T10:33:50Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "holy-family-catholic-community",
+    "source_url": "https://parishesonline.com/publication-page/holy-family-catholic-community-14572?selectedPublication=https://container.parishesonline.com/bulletins/06/0327/20260705B.pdf",
+    "pdf_path": "data/bulletins/holy-family-catholic-community/56bf712340ba43af19d0ffcd54f8ef6802e6bfb4d309fe4d5b14e809b51e65f7.pdf",
+    "content_hash": "56bf712340ba43af19d0ffcd54f8ef6802e6bfb4d309fe4d5b14e809b51e65f7",
+    "fetched_at": "2026-07-05T10:29:20Z",
+    "processed_at": "2026-07-05T10:33:47Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "holy-trinity-webster",
+    "source_url": "https://holytrinityweb.org/wp-content/uploads/2026/07/20260705B.pdf",
+    "pdf_path": "data/bulletins/holy-trinity-webster/65dc13bfba45b2b4cc26dd68154f4719d8781bc015b9552a427d90abca922f33.pdf",
+    "content_hash": "65dc13bfba45b2b4cc26dd68154f4719d8781bc015b9552a427d90abca922f33",
+    "fetched_at": "2026-07-05T10:29:23Z",
+    "processed_at": "2026-07-05T10:36:41Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "immaculate-conception-ithaca",
+    "source_url": "https://www.immconch.org/wp-content/uploads/2026/07/Bulletin_20260705.pdf",
+    "pdf_path": "data/bulletins/immaculate-conception-ithaca/4da61d786d8ca0f4f94a2d3e42cdbadf8a117b984e99aad7780b1291e41006af.pdf",
+    "content_hash": "4da61d786d8ca0f4f94a2d3e42cdbadf8a117b984e99aad7780b1291e41006af",
+    "fetched_at": "2026-07-05T10:29:33Z",
+    "processed_at": "2026-07-05T10:37:10Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "immaculate-conception-st-bridgets",
+    "source_url": "https://www.immaculateconceptionrochester.org/_files/ugd/309cee_200c4dab01a1476292dc5843ca677afd.pdf",
+    "pdf_path": "data/bulletins/immaculate-conception-st-bridgets/f430d9f64f91a6f8336e78be7476d3861513f7979c7a6df19998a4c3e435b1f8.pdf",
+    "content_hash": "f430d9f64f91a6f8336e78be7476d3861513f7979c7a6df19998a4c3e435b1f8",
+    "fetched_at": "2026-07-05T10:29:39Z",
+    "processed_at": "2026-07-05T10:36:41Z",
+    "published_date": "2025-07-13"
+  },
+  {
+    "parish_slug": "our-lady-of-lourdes-st-anne",
+    "source_url": "https://parishesonline.com/publication-page/our-lady-of-lourdes-saint-anne-church?selectedPublication=https://container.parishesonline.com/bulletins/06/0132/20260705B.pdf",
+    "pdf_path": "data/bulletins/our-lady-of-lourdes-st-anne/4fa89d659814c500f1955edc46b5a6acbd3103b6cb5a40f9c1b2000c4d46d62d.pdf",
+    "content_hash": "4fa89d659814c500f1955edc46b5a6acbd3103b6cb5a40f9c1b2000c4d46d62d",
+    "fetched_at": "2026-07-05T10:29:44Z",
+    "processed_at": "2026-07-05T10:33:49Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "our-lady-of-peace-geneva",
+    "source_url": "https://parishesonline.com/publication-page/our-lady-of-peace-parish-14456?selectedPublication=https://container.parishesonline.com/bulletins/06/0090/20260705B.pdf",
+    "pdf_path": "data/bulletins/our-lady-of-peace-geneva/30aebc144eb6e8db4a88805b943dfe822834514041fda8d8a0f0835e7548bbaf.pdf",
+    "content_hash": "30aebc144eb6e8db4a88805b943dfe822834514041fda8d8a0f0835e7548bbaf",
+    "fetched_at": "2026-07-05T10:29:47Z",
+    "processed_at": "2026-07-05T10:34:15Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "our-lady-of-the-lakes",
+    "source_url": "https://parishesonline.com/publication-page/our-lady-of-the-lakes-catholic-community?selectedPublication=https://container.parishesonline.com/bulletins/06/0100/20260705B.pdf",
+    "pdf_path": "data/bulletins/our-lady-of-the-lakes/b559de2c7125c202e0eee9d6eedfbd12b7378f3094f0c0ce7b416f74852270bd.pdf",
+    "content_hash": "b559de2c7125c202e0eee9d6eedfbd12b7378f3094f0c0ce7b416f74852270bd",
+    "fetched_at": "2026-07-05T10:29:49Z",
+    "processed_at": "2026-07-05T10:34:19Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "our-lady-of-the-valley",
+    "source_url": "https://www.olv14843.org/wp-content/uploads/20260705.pdf",
+    "pdf_path": "data/bulletins/our-lady-of-the-valley/47b18ca95fbbf0abbfefe7c8fbea3c76ccc733b24e20e149b79fab407a2795ac.pdf",
+    "content_hash": "47b18ca95fbbf0abbfefe7c8fbea3c76ccc733b24e20e149b79fab407a2795ac",
+    "fetched_at": "2026-07-05T10:29:57Z",
+    "processed_at": "2026-07-05T10:37:12Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "our-lady-queen-of-peace-st-thomas-more",
+    "source_url": "https://files.ecatholic.com/17932/bulletins/20260705.pdf?t=1783103585000",
+    "pdf_path": "data/bulletins/our-lady-queen-of-peace-st-thomas-more/4e78d7bd6b868f30e19ab09d3265e85c52c82980a04c9e2253ad9eaf9e3c84f0.pdf",
+    "content_hash": "4e78d7bd6b868f30e19ab09d3265e85c52c82980a04c9e2253ad9eaf9e3c84f0",
+    "fetched_at": "2026-07-05T10:29:59Z",
+    "processed_at": "2026-07-05T10:34:38Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "parish-of-the-holy-family",
+    "source_url": "https://files.ecatholic.com/32186/bulletins/20260705.pdf?t=1783080241000",
+    "pdf_path": "data/bulletins/parish-of-the-holy-family/6857dea72470583ce6ebde8d9db6d1008f4dba93b9e02c6a9d5cb13b818faca1.pdf",
+    "content_hash": "6857dea72470583ce6ebde8d9db6d1008f4dba93b9e02c6a9d5cb13b818faca1",
+    "fetched_at": "2026-07-05T10:30:00Z",
+    "processed_at": "2026-07-05T10:34:15Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "most-holy-name-of-jesus",
+    "source_url": "https://www.elmiracatholic.org/wp-content/uploads/2026/07/ElmiraCatholicChurchesBulletin-7-5-2026.pdf",
+    "pdf_path": "data/bulletins/most-holy-name-of-jesus/6a30017fb8f5aa1d626a62c83987b64734befe49d0ecde0e28eb8cbfbab50690.pdf",
+    "content_hash": "6a30017fb8f5aa1d626a62c83987b64734befe49d0ecde0e28eb8cbfbab50690",
+    "fetched_at": "2026-07-05T10:30:04Z",
+    "processed_at": "2026-07-05T10:39:24Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "peace-of-christ",
+    "source_url": "https://bulletins.discovermass.com/download.php?bulletin=1rccKfZZvaz3w%2F8L9djideQHyB75FDp2f2BUm7erv4kv8imnDeTzKAcQmcJ4C%2F%2BiWRvojcSmLfmPzpXMEjhw3NsBYBRR0CXyHQj1w85kKjc%3D",
+    "pdf_path": "data/bulletins/peace-of-christ/5b6fa286789a9f6935597ced468d51e91a9df5e4e3aff7446ad9543b41fc7ca8.pdf",
+    "content_hash": "5b6fa286789a9f6935597ced468d51e91a9df5e4e3aff7446ad9543b41fc7ca8",
+    "fetched_at": "2026-07-05T10:30:07Z",
+    "processed_at": "2026-07-05T10:38:15Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "sacred-heart-auburn-cluster",
+    "source_url": "https://www.sacredheartauburn.org/wp-content/uploads/Bulletin-070526.pdf",
+    "pdf_path": "data/bulletins/sacred-heart-auburn-cluster/724a67a1fde8666cdc41c2d2f3c33e643ee9694aa70638763325604b5c2b6054.pdf",
+    "content_hash": "724a67a1fde8666cdc41c2d2f3c33e643ee9694aa70638763325604b5c2b6054",
+    "fetched_at": "2026-07-05T10:30:10Z",
+    "processed_at": "2026-07-05T10:38:44Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "sacred-heart-cathedral",
+    "source_url": "https://container.parishesonline.com/bulletins/06/0007/20260628B.pdf",
+    "pdf_path": "data/bulletins/sacred-heart-cathedral/d2efe5ea320143749506da282bedafd1b94ca01c85539115991144ca17738ba4.pdf",
+    "content_hash": "d2efe5ea320143749506da282bedafd1b94ca01c85539115991144ca17738ba4",
+    "fetched_at": "2026-07-05T10:30:15Z",
+    "processed_at": "2026-07-05T10:38:48Z",
+    "published_date": "2026-06-28"
+  },
+  {
+    "parish_slug": "st-rita-webster",
+    "source_url": "https://s3-us-west-2.amazonaws.com/classrooms.stritawebster.org/Bulletins/2026/July 5.pdf",
+    "pdf_path": "data/bulletins/st-rita-webster/f392d055cfd6454594743308ecb718de1e99e9f979d60e14bee36e1323886e47.pdf",
+    "content_hash": "f392d055cfd6454594743308ecb718de1e99e9f979d60e14bee36e1323886e47",
+    "fetched_at": "2026-07-05T10:30:21Z",
+    "processed_at": "2026-07-05T10:37:27Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "sts-isidore-maria-torribia",
+    "source_url": "https://parishesonline.com/publication-page/sts-isidore-maria-torribia-parish?selectedPublication=https://container.parishesonline.com/bulletins/04/0677/20260705B.pdf",
+    "pdf_path": "data/bulletins/sts-isidore-maria-torribia/d4312a342e51b19735a7f010431533faef584514b7ab3e8fbc9b9c8ca5c49ba7.pdf",
+    "content_hash": "d4312a342e51b19735a7f010431533faef584514b7ab3e8fbc9b9c8ca5c49ba7",
+    "fetched_at": "2026-07-05T10:30:24Z",
+    "processed_at": "2026-07-05T10:34:37Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "our-lady-of-the-snow-saints-mary-and-martha",
+    "source_url": "https://parishesonline.com/publication-page/st-marys-church-13021?selectedPublication=https://container.parishesonline.com/bulletins/06/0329/20260705B.pdf",
+    "pdf_path": "data/bulletins/our-lady-of-the-snow-saints-mary-and-martha/a497b5b45a47cc500c2f22bfa8ee68eb71d9d8f603b03339a1b794477b9eddf0.pdf",
+    "content_hash": "a497b5b45a47cc500c2f22bfa8ee68eb71d9d8f603b03339a1b794477b9eddf0",
+    "fetched_at": "2026-07-05T10:30:26Z",
+    "processed_at": "2026-07-05T10:35:16Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "st-agnes-paul-rose",
+    "source_url": "https://parishesonline.com/publication-page/st-agnes-church-st-paul-of-the-cross-and-st-rose-church?selectedPublication=https://container.parishesonline.com/bulletins/06/0016/20260705B.pdf",
+    "pdf_path": "data/bulletins/st-agnes-paul-rose/9843e7bf4205fbcac3356cedb7b0a2486bebcd55b4bd2bba6f27391395ef21b1.pdf",
+    "content_hash": "9843e7bf4205fbcac3356cedb7b0a2486bebcd55b4bd2bba6f27391395ef21b1",
+    "fetched_at": "2026-07-05T10:30:29Z",
+    "processed_at": "2026-07-05T10:35:09Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "st-benedict-parish",
+    "source_url": "https://files.ecatholic.com/14273/bulletins/20260705.pdf?t=1782761415000",
+    "pdf_path": "data/bulletins/st-benedict-parish/b2fe63f81cb0dc4ce6352247bb8ac5276ee7929836157189bb2147752fdfe89b.pdf",
+    "content_hash": "b2fe63f81cb0dc4ce6352247bb8ac5276ee7929836157189bb2147752fdfe89b",
+    "fetched_at": "2026-07-05T10:30:31Z",
+    "processed_at": "2026-07-05T10:34:46Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "st-benedicts-st-marys-lake",
+    "source_url": "https://parishesonline.com/publication-page/st-marys-on-the-lake-st-benedicts?selectedPublication=https://container.parishesonline.com/bulletins/06/0201/20260705B.pdf",
+    "pdf_path": "data/bulletins/st-benedicts-st-marys-lake/64da8043402639c7c21749497a49fc2029389b6b4ea6095645f52df96f6f24cd.pdf",
+    "content_hash": "64da8043402639c7c21749497a49fc2029389b6b4ea6095645f52df96f6f24cd",
+    "fetched_at": "2026-07-05T10:30:34Z",
+    "processed_at": "2026-07-05T10:35:25Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "st-catherine-of-siena-ithaca",
+    "source_url": "https://files.ecatholic.com/10905/bulletins/20260705.pdf?t=1782753768000",
+    "pdf_path": "data/bulletins/st-catherine-of-siena-ithaca/4ca422dd488ca78bffddb26c08a48cfd8e5d1f7a1a0c1857fe7756b4571763ff.pdf",
+    "content_hash": "4ca422dd488ca78bffddb26c08a48cfd8e5d1f7a1a0c1857fe7756b4571763ff",
+    "fetched_at": "2026-07-05T10:30:36Z",
+    "processed_at": "2026-07-05T10:35:10Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "st-charles-borromeo",
+    "source_url": "https://parishesonline.com/publication-page/st-charles-borromeo-church-14616?selectedPublication=https://container.parishesonline.com/bulletins/06/0049/20260705B.pdf",
+    "pdf_path": "data/bulletins/st-charles-borromeo/4337dc37a14747a876d6a70ac092f47cfe8be5bcba3a90f0454b4d0e59c60236.pdf",
+    "content_hash": "4337dc37a14747a876d6a70ac092f47cfe8be5bcba3a90f0454b4d0e59c60236",
+    "fetched_at": "2026-07-05T10:30:38Z",
+    "processed_at": "2026-07-05T10:39:04Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "st-christopher",
+    "source_url": "https://parishesonline.com/publication-page/st-christophers-church?selectedPublication=https://container.parishesonline.com/bulletins/06/0126/20260705B.pdf",
+    "pdf_path": "data/bulletins/st-christopher/e557a551699bcc7c28bcdf11422d75989c26cd64d3d4c6cdc4ea76e552c2d7e0.pdf",
+    "content_hash": "e557a551699bcc7c28bcdf11422d75989c26cd64d3d4c6cdc4ea76e552c2d7e0",
+    "fetched_at": "2026-07-05T10:30:41Z",
+    "processed_at": "2026-07-05T10:39:01Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "st-francis-and-st-clare",
+    "source_url": "https://www.sfscrcc.org/bulletins/1783022694.pdf",
+    "pdf_path": "data/bulletins/st-francis-and-st-clare/f5405d06e3f32299659e3473399368160cf5af3d81d1a6797b931337055c71b4.pdf",
+    "content_hash": "f5405d06e3f32299659e3473399368160cf5af3d81d1a6797b931337055c71b4",
+    "fetched_at": "2026-07-05T10:30:59Z",
+    "processed_at": "2026-07-05T10:37:13Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "st-john-of-rochester",
+    "source_url": "https://files.ecatholic.com/34606/bulletins/20260705.pdf?t=1782930911000",
+    "pdf_path": "data/bulletins/st-john-of-rochester/bad3ee0a763992dd4381f3ad87d5923131d700ccf2a9056c01b1b3c620fdd86c.pdf",
+    "content_hash": "bad3ee0a763992dd4381f3ad87d5923131d700ccf2a9056c01b1b3c620fdd86c",
+    "fetched_at": "2026-07-05T10:31:00Z",
+    "processed_at": "2026-07-05T10:35:33Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "st-john-greece",
+    "source_url": "https://www.stjohngreece.org/wp-content/uploads/July-5-2026.pdf",
+    "pdf_path": "data/bulletins/st-john-greece/4c3b85d93a6d157b11d4cb415d1a30b345f3947bd71fd861863704f0e3fb413c.pdf",
+    "content_hash": "4c3b85d93a6d157b11d4cb415d1a30b345f3947bd71fd861863704f0e3fb413c",
+    "fetched_at": "2026-07-05T10:31:08Z",
+    "processed_at": "2026-07-05T10:37:21Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "st-john-spencerport",
+    "source_url": "https://bulletins.discovermass.com/download.php?bulletin=FDDl0lnS3GQFn1YkfUWPJLcUlQ%2F4Ovy6yyBWDRNDRYJd3iFYq8NIFmtU0gcr4hJAXGoKTT4JkDCviUN7zIr%2BPaHhU%2FpcwQg5G27ybbPy0aA%3D",
+    "pdf_path": "data/bulletins/st-john-spencerport/e54c800f554aded1a901372442bcee6ce404788a41fb9f26c350a84f0bff3a73.pdf",
+    "content_hash": "e54c800f554aded1a901372442bcee6ce404788a41fb9f26c350a84f0bff3a73",
+    "fetched_at": "2026-07-05T10:31:11Z",
+    "processed_at": "2026-07-05T10:35:37Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "st-john-vianney",
+    "source_url": "https://www.sjvbath.org/wp-content/uploads/July-5th-14th-Sun-in-OT.pdf",
+    "pdf_path": "data/bulletins/st-john-vianney/9422b21f3130d6ce697aa580ae6cc87f7656a8df3948b6cb00c763db27684e19.pdf",
+    "content_hash": "9422b21f3130d6ce697aa580ae6cc87f7656a8df3948b6cb00c763db27684e19",
+    "fetched_at": "2026-07-05T10:31:15Z",
+    "processed_at": "2026-07-05T10:38:59Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "st-kateri-tekakwitha",
+    "source_url": "https://parishesonline.com/publication-page/st-kateri-tekakwitha-parish-14617?selectedPublication=https://container.parishesonline.com/bulletins/06/0078/20260705B.pdf",
+    "pdf_path": "data/bulletins/st-kateri-tekakwitha/aef5dacf84d3fb53ced306d5ed1fc2c3a02dd8cb5d81a090e7880c94733e0ff0.pdf",
+    "content_hash": "aef5dacf84d3fb53ced306d5ed1fc2c3a02dd8cb5d81a090e7880c94733e0ff0",
+    "fetched_at": "2026-07-05T10:31:19Z",
+    "processed_at": "2026-07-05T10:35:43Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "st-katharine-drexel-st-maximilian-kolbe",
+    "source_url": "https://parishesonline.com/publication-page/st-maximillian-kolbe-parish?selectedPublication=https://container.parishesonline.com/bulletins/06/0230/20260705B.pdf",
+    "pdf_path": "data/bulletins/st-katharine-drexel-st-maximilian-kolbe/4daa78ccaa75045e69c205d5d0f42291a0d4d17348ce34136f764376be03e7e7.pdf",
+    "content_hash": "4daa78ccaa75045e69c205d5d0f42291a0d4d17348ce34136f764376be03e7e7",
+    "fetched_at": "2026-07-05T10:31:21Z",
+    "processed_at": "2026-07-05T10:36:11Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "st-lawrence",
+    "source_url": "https://www.stlawrencegreeceny.org/wp-content/uploads/20260621.pdf",
+    "pdf_path": "data/bulletins/st-lawrence/0e6125c403828ca7822945c6ae488d696ca717aba9fc4f7a4de3d18309a9c9c1.pdf",
+    "content_hash": "0e6125c403828ca7822945c6ae488d696ca717aba9fc4f7a4de3d18309a9c9c1",
+    "fetched_at": "2026-07-05T10:31:27Z",
+    "processed_at": "2026-07-05T10:37:28Z",
+    "published_date": "2026-06-21"
+  },
+  {
+    "parish_slug": "st-leo-the-great",
+    "source_url": "https://files.ecatholic.com/34045/bulletins/20260705.pdf?t=1782934469000",
+    "pdf_path": "data/bulletins/st-leo-the-great/680ac707197e2e839e190ef84154dc9fca92bef09c59e6f8fec0f5e0ed0151fa.pdf",
+    "content_hash": "680ac707197e2e839e190ef84154dc9fca92bef09c59e6f8fec0f5e0ed0151fa",
+    "fetched_at": "2026-07-05T10:31:28Z",
+    "processed_at": "2026-07-05T10:35:45Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "st-louis-pittsford",
+    "source_url": "https://parishesonline.com/publication-page/st-louis-church?selectedPublication=https://container.parishesonline.com/bulletins/06/0026/20260705B.pdf",
+    "pdf_path": "data/bulletins/st-louis-pittsford/a3af29959c9170e1c1349af5fc32f2adbfc1dd90efe92ef20a65f85fe0ee489d.pdf",
+    "content_hash": "a3af29959c9170e1c1349af5fc32f2adbfc1dd90efe92ef20a65f85fe0ee489d",
+    "fetched_at": "2026-07-05T10:31:30Z",
+    "processed_at": "2026-07-05T10:36:23Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "st-marianne-cope",
+    "source_url": "https://parishesonline.com/publication-page/st-marianne-cope-roman-catholic-parish?selectedPublication=https://container.parishesonline.com/bulletins/06/0135/20260705B.pdf",
+    "pdf_path": "data/bulletins/st-marianne-cope/e0be0661746b4a23f0d76dcc2bd0dd05f261247da90ded5fec6f1e1b3ec711ab.pdf",
+    "content_hash": "e0be0661746b4a23f0d76dcc2bd0dd05f261247da90ded5fec6f1e1b3ec711ab",
+    "fetched_at": "2026-07-05T10:31:36Z",
+    "processed_at": "2026-07-05T10:36:20Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "st-marks-greece",
+    "source_url": "https://parishesonline.com/publication-page/st-marks-church-14612?selectedPublication=https://container.parishesonline.com/bulletins/06/0096/20260705B.pdf",
+    "pdf_path": "data/bulletins/st-marks-greece/240720473e0387adef36544aeac8c4e7c63188c352b65f5f53bfe2a9f171e11f.pdf",
+    "content_hash": "240720473e0387adef36544aeac8c4e7c63188c352b65f5f53bfe2a9f171e11f",
+    "fetched_at": "2026-07-05T10:31:38Z",
+    "processed_at": "2026-07-05T10:35:57Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "st-martin-de-porres",
+    "source_url": "https://parishesonline.com/publication-page/st-martin-de-porres-parish-at-st-mary-of-the-assumption-church?selectedPublication=https://container.parishesonline.com/bulletins/06/0401/20260705B.pdf",
+    "pdf_path": "data/bulletins/st-martin-de-porres/7eef924d24eb66a212b7371f8ef6272cbc3e56f23135ee81b2cf68ce7d755559.pdf",
+    "content_hash": "7eef924d24eb66a212b7371f8ef6272cbc3e56f23135ee81b2cf68ce7d755559",
+    "fetched_at": "2026-07-05T10:31:41Z",
+    "processed_at": "2026-07-05T10:36:29Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "st-mary-our-mother",
+    "source_url": "https://stmaryourmother.com/Bulletins/2026/20260705.pdf",
+    "pdf_path": "data/bulletins/st-mary-our-mother/3ee670532a7bbecf649d4cc49af4fe2dd25eae9abcdf55a4500487d03ea4875e.pdf",
+    "content_hash": "3ee670532a7bbecf649d4cc49af4fe2dd25eae9abcdf55a4500487d03ea4875e",
+    "fetched_at": "2026-07-05T10:31:49Z",
+    "processed_at": "2026-07-05T10:38:38Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "st-marys-st-matthew",
+    "source_url": "https://www.stsmaryandmatthew.com/_files/ugd/dcc8c9_531e19efbce44407b491091ac9c6925c.pdf",
+    "pdf_path": "data/bulletins/st-marys-st-matthew/b5b55d3b833a7b6693c61a362404501774c8748de539d51369eef3bafb3223e9.pdf",
+    "content_hash": "b5b55d3b833a7b6693c61a362404501774c8748de539d51369eef3bafb3223e9",
+    "fetched_at": "2026-07-05T10:31:54Z",
+    "processed_at": "2026-07-05T10:37:30Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "st-patricks-victor",
+    "source_url": "https://bulletins.discovermass.com/download.php?bulletin=SuBb5UdPdUznXJrGOioMqFVsi8HtA3LA3eon7wEY9YzylhQj4KT4%2FvRVQqlzzOBzLVUlHyGcPjekjIe03McXlGyRqmYJ%2Fd9U8bnJaeoSLN0%3D",
+    "pdf_path": "data/bulletins/st-patricks-victor/cfc5f3bb7d49632a977113efaafffcc67bcc1492aa63a038dcc042abbc8636d4.pdf",
+    "content_hash": "cfc5f3bb7d49632a977113efaafffcc67bcc1492aa63a038dcc042abbc8636d4",
+    "fetched_at": "2026-07-05T10:31:57Z",
+    "processed_at": "2026-07-05T10:37:58Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "st-pauls-webster",
+    "source_url": "https://www.stpaulsrcc.org/wp-content/uploads/July-5-2026.pdf",
+    "pdf_path": "data/bulletins/st-pauls-webster/c5a7f3816c1b47f80064fbf02a5edaf55c1f9c6f08fda65a4ba2ff78fa31a99a.pdf",
+    "content_hash": "c5a7f3816c1b47f80064fbf02a5edaf55c1f9c6f08fda65a4ba2ff78fa31a99a",
+    "fetched_at": "2026-07-05T10:32:02Z",
+    "processed_at": "2026-07-05T10:38:37Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "st-peters-ontario-county",
+    "source_url": "https://media.thechurchcoassets.com/accounts/4026/74085d91-494c-411f-be67-6ffd1251eb2f-./2026-7-5BU-YR-A.pdf",
+    "pdf_path": "data/bulletins/st-peters-ontario-county/8ba14a0f4b6749cb0fb1cb3aa3a5633c6dd7e87e399837646afa1d3bc42e8004.pdf",
+    "content_hash": "8ba14a0f4b6749cb0fb1cb3aa3a5633c6dd7e87e399837646afa1d3bc42e8004",
+    "fetched_at": "2026-07-05T10:32:07Z",
+    "processed_at": "2026-07-05T10:37:50Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "st-pius-x-chili",
+    "source_url": "https://parishesonline.com/publication-page/st-pius-x-church-14624?selectedPublication=https://container.parishesonline.com/bulletins/06/0029/20260705B.pdf",
+    "pdf_path": "data/bulletins/st-pius-x-chili/9d42550016f0e72a38f9ba03b09cb94e0f93dd163a115480113b74b12eff286c.pdf",
+    "content_hash": "9d42550016f0e72a38f9ba03b09cb94e0f93dd163a115480113b74b12eff286c",
+    "fetched_at": "2026-07-05T10:32:10Z",
+    "processed_at": "2026-07-05T10:36:35Z",
+    "published_date": "2026-07-05"
+  },
+  {
+    "parish_slug": "st-stanislaus-kostka",
+    "source_url": "https://parishesonline.com/publication-page/st-stanislaus-kostka-church?selectedPublication=https://container.parishesonline.com/bulletins/06/0109/20260705B.pdf",
+    "pdf_path": "data/bulletins/st-stanislaus-kostka/d8127c0d10912ef125ae8a045cd40de5fe8ccb33bdb55b4a4b3392cff54ca5a7.pdf",
+    "content_hash": "d8127c0d10912ef125ae8a045cd40de5fe8ccb33bdb55b4a4b3392cff54ca5a7",
+    "fetched_at": "2026-07-05T10:32:12Z",
+    "processed_at": "2026-07-05T10:36:30Z",
+    "published_date": "2026-07-05"
   }
 ]
