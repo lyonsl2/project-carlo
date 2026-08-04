@@ -41,7 +41,7 @@ export function StaticChurchPage({
   const origin = new URL(canonicalUrl).origin;
   const ogImageUrl = absoluteUrl(origin, OG_IMAGE_PATH);
   const jsonLd = [
-    churchJsonLd(church, events, canonicalUrl),
+    churchJsonLd(church, canonicalUrl),
     churchWebPageJsonLd(church, canonicalUrl, lastModified),
     churchBreadcrumbJsonLd(church, canonicalUrl),
   ];

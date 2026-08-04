@@ -55,7 +55,7 @@ Confession, and Adoration times parsed from weekly bulletins
 2. Create a 1200×630 branded share image (`public/og-default.png`),
    `apple-touch-icon.png` (180×180), and `site.webmanifest`.
 3. Add JSON-LD to church pages: `Church` (PlaceOfWorship) with name, address,
-   geo, url + Mass/Confession/Adoration schedule; plus `BreadcrumbList`.
+   geo, and url; plus `BreadcrumbList`.
 4. Add `WebSite` + `SearchAction` JSON-LD to the homepage.
 
 ### Phase 2 — Titles, headings & SPA meta
@@ -100,9 +100,10 @@ Confession, and Adoration times parsed from weekly bulletins
     the client-rendered ChurchPage — fixes the shell canonical leaking onto `/landing`
   - Church name promoted to `<h1>`; service sections to `<h2>`
 - [x] Phase 2.5 — technical SEO hardening
-  - Mass/Confession/Adoration schedule as `Event` + `eventSchedule` JSON-LD
-    nodes on the Church node (`churchJsonLd`), plus a `WebPage` node with
-    `dateModified` (same source as sitemap `<lastmod>`).
+  - `WebPage` JSON-LD with `dateModified` (same source as sitemap `<lastmod>`).
+    Recurring schedules remain visible page content rather than `Event` JSON-LD:
+    Google requires each structured Event to have a unique leaf URL on a page
+    focused on that concrete event, which multi-event parish pages do not meet.
   - Prerendered `/churches/` all-parishes index page (grouped by city) — gives
     crawlers an internal-link path to all church pages instead of sitemap-only
     discovery; linked from every church page footer, included in the sitemap,
