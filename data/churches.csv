@@ -156,6 +156,8 @@ catholic-family-cheektowaga,resurrection-cheektowaga,Resurrection Church,130 Com
 catholic-family-cheektowaga,queen-of-martyrs-cheektowaga,Queen of Martyrs Church,180 George Urban Boulevard,,Cheektowaga,NY,14225,true,true,42.9191651,-78.7825939
 catholic-family-cheektowaga,our-lady-help-of-christians-cheektowaga,Our Lady Help of Christians Church,4125 Union Road,,Cheektowaga,NY,14225,true,true,42.9259778,-78.7539883
 resurrection-batavia,st-joseph-batavia,St. Joseph Church,303 East Main Street,,Batavia,NY,14020,true,true,42.9972222,-78.1783333
+resurrection-batavia,st-cecilia-oakfield,St. Cecilia Church,56 Maple Avenue,,Oakfield,NY,14125,true,true,43.0664375,-78.2770625
+resurrection-batavia,holy-name-of-mary-east-pembroke,Holy Name of Mary Church,8656 Church Street,,East Pembroke,NY,14056,true,true,42.9945625,-78.3129375
 christ-the-king-snyder,christ-the-king-snyder,Christ the King Church,30 Lamarck Drive,,Snyder,NY,14226,true,true,42.9596119,-78.7743295
 st-pius-x-getzville,st-pius-x-getzville,St. Pius X Church,1700 North French Road,,Getzville,NY,14068,true,true,43.0355191,-78.7625464
 good-shepherd-pendleton,good-shepherd-pendleton,Good Shepherd Church,5442 Tonawanda Creek Road,,Pendleton,NY,14120,true,true,43.0707829,-78.7643835
@@ -166,6 +168,7 @@ enchanted-mountains-catholic,sacred-heart-portville,Sacred Heart Church,43 Maple
 one-catholic,holy-family-albion,Holy Family Church,106 South Main Street,,Albion,NY,14411,true,true,43.2449573,-78.1941462
 catholic-communities-se-allegany,immaculate-conception-wellsville,Immaculate Conception Church,36 Maple Avenue,,Wellsville,NY,14895,true,false,42.1213889,-77.9425000
 catholic-communities-se-allegany,holy-family-belmont,"Holy Family of Jesus, Mary and Joseph Church",5 Milton Street,,Belmont,NY,14813,true,true,42.2280484,-78.0319071
+catholic-communities-se-allegany,our-lady-of-the-angels-cuba,Our Lady of the Angels Church,48 South Street,,Cuba,NY,14727,true,true,42.2144375,-78.2754375
 blessed-trinity-buffalo,blessed-trinity-buffalo,Blessed Trinity Church,317 Leroy Avenue,,Buffalo,NY,14214,true,true,42.9327367,-78.8344019
 st-louis-buffalo,st-louis-buffalo,St. Louis Church,35 Edward Street,,Buffalo,NY,14202,true,true,42.8956242,-78.8718674
 st-bernadette-orchard-park,st-bernadette-orchard-park,St. Bernadette Church,5930 South Abbott Road,,Orchard Park,NY,14127,true,true,42.7241359,-78.7967069
@@ -186,12 +189,14 @@ resurrection-batavia,st-mary-batavia,St. Mary Church,18 Ellicott Street,,Batavia
 resurrection-batavia,our-lady-of-mercy-leroy,Our Lady of Mercy Church,44 Lake Street,,LeRoy,NY,14482,true,true,42.9810625,-77.9921875
 st-patrick-belfast-fillmore,st-patrick-fillmore,St. Patrick Church,109 West Main Street,,Fillmore,NY,14735,true,true,42.4664375,-78.1184375
 st-patrick-belfast-fillmore,st-patrick-belfast,St. Patrick Church,1 Merton Avenue,,Belfast,NY,14711,true,false,42.3440625,-78.1096875
+st-patrick-belfast-fillmore,st-mary-canaseraga,St. Mary Church,7 North Street,,Canaseraga,NY,14822,true,true,42.4658125,-77.7756875
 st-anthony-of-padua-buffalo,st-anthony-of-padua-buffalo,St. Anthony of Padua Church,160 Court Street,,Buffalo,NY,14202,true,true,42.8866875,-78.8809375
 st-michael-buffalo,st-michael-buffalo,St. Michael Church,651 Washington Street,,Buffalo,NY,14203,true,true,42.8914375,-78.8711875
 holy-cross-buffalo,holy-cross-buffalo,Holy Cross Church,345 Seventh Street,,Buffalo,NY,14201,true,false,42.8946875,-78.8871875
 ss-columba-and-brigid-buffalo,ss-columba-and-brigid-buffalo,SS. Columba & Brigid Church,75 Hickory Street,,Buffalo,NY,14204,true,false,42.8819375,-78.8590625
 blessed-sacrament-buffalo,blessed-sacrament-buffalo,Blessed Sacrament Church,1035 Delaware Avenue,,Buffalo,NY,14209,true,false,42.9123125,-78.8693125
 st-stanislaus-buffalo,st-stanislaus-buffalo,St. Stanislaus Church,123 Townsend Street,,Buffalo,NY,14212,false,false,42.8883240,-78.8408640
+st-stanislaus-buffalo,st-john-gualbert-cheektowaga,St. John Gualbert Church,83 Gualbert Avenue,,Cheektowaga,NY,14211,true,true,42.9098125,-78.7930625
 st-martin-de-porres-buffalo,st-martin-de-porres-buffalo,St. Martin de Porres Church,555 Northampton Street,,Buffalo,NY,14208,true,true,42.9070625,-78.8463125
 our-lady-of-hope-buffalo,our-lady-of-hope-buffalo,Our Lady of Hope Church,18 Greenwood Place,,Buffalo,NY,14213,true,true,42.9203125,-78.8895625
 assumption-buffalo,assumption-buffalo,Assumption Church,435 Amherst Street,,Buffalo,NY,14207,true,true,42.9386875,-78.8880625
@@ -199,6 +204,7 @@ st-casimir-buffalo,st-casimir-buffalo,St. Casimir Church,160 Cable Street,,Buffa
 st-katharine-drexel-buffalo,st-katharine-drexel-buffalo,St. Katharine Drexel Church,118 Schiller Street,,Buffalo,NY,14206,true,true,42.8881875,-78.8021875
 st-teresa-buffalo,st-teresa-buffalo,St. Teresa Church,1974 Seneca Street,,Buffalo,NY,14210,true,true,42.8575625,-78.8120625
 st-mark-buffalo,st-mark-buffalo,St. Mark Church,401 Woodward Avenue,,Buffalo,NY,14214,true,true,42.9401875,-78.8490625
+st-mark-buffalo,st-margaret-buffalo,St. Margaret Church,1395 Hertel Avenue,,Buffalo,NY,14216,true,true,42.9474375,-78.8561875
 holy-spirit-buffalo,holy-spirit-buffalo,Holy Spirit Church,91 Dakota Street,,Buffalo,NY,14216,true,false,42.9468125,-78.8674375
 st-martin-of-tours-buffalo,st-martin-of-tours-buffalo,St. Martin of Tours Church,1140 Abbott Road,,Buffalo,NY,14220,false,true,42.8336875,-78.8056875
 st-paul-kenmore,st-paul-kenmore,St. Paul Church,33 Victoria Boulevard,,Kenmore,NY,14217,true,true,42.9639375,-78.8704375

@@ -53,13 +53,13 @@ because Rochester already has `st-louis` (Pittsford). One commit per batch.
 
 ## 3. Current state
 
-**Dataset: 142 parishes / 251 churches; 117 tests green.** (Rochester baseline was 62/132.)
+**Dataset: 142 parishes / 257 churches; 117 tests green.** (Rochester baseline was 62/132.)
 
-**Buffalo contribution: 80 parishes / 119 churches, all geocoded**, spanning **all 8 counties**.
+**Buffalo contribution: 80 parishes / 125 churches, all geocoded**, spanning **all 8 counties**.
 
 Measured against the diocese's own parish finder — 167 locations, which reduce to **158 real
 worship sites** (7 are St. Gianna Molla centers, §6d, and the feed repeats 2) — the dataset now
-covers **115 of 158, or 73%**. The uncovered remainder is 43 sites across 36 canonical parishes,
+covers **121 of 158, or 77%**. The uncovered remainder is 37 sites across 32 canonical parishes,
 every one deferred for a concrete, individually-documented reason (§6f): overwhelmingly "the
 parish's website is dead or the diocese lists none", not "not looked at yet".
 
@@ -226,6 +226,17 @@ north-tonawanda` → folded into `tonawanda-catholic`; `holy-family-albion` → 
 `one-catholic`; `resurrection-batavia` website → the12apostles.org. The batch-1–8 lists below
 record the *original* additions; the audit entries record the corrections.
 
+- **Six worship sites under parishes we already had** (churches 251 → 257) — the first harvest of
+  the §4c rule, and the cheapest batch in the project so far: no parish row touched, no bulletin
+  hunted. Each had been deferred as "diocese lists no website" or "vanity domain dead", questions
+  that stop mattering once the masterlist says the building is a *worship site* of a parish already
+  modelled with a working website.
+  - St. Mary (Canaseraga) → `st-patrick-belfast-fillmore`
+  - St. Cecilia (Oakfield) + Holy Name of Mary (East Pembroke) → `resurrection-batavia`
+    *(the feed still files these under the older "St. Padre Pio" and "St. Maximilian Kolbe" parishes)*
+  - St. Margaret (Buffalo) → `st-mark-buffalo` *(its own domain returns HTTP 410)*
+  - St. John Gualbert (Cheektowaga) → `st-stanislaus-buffalo`
+  - Our Lady of the Angels (Cuba) → `catholic-communities-se-allegany`
 - **Fields of Grace** (Wyoming/Genesee) — `fields-of-grace` (fieldsofgrace.family, container
   14/0954). Not a judgement call: the bulletin masthead and the diocese's April 2026 masterlist
   (§4c) list *the same* two parishes and five worship sites. So `eastern-rural-rcc` and
