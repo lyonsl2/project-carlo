@@ -53,14 +53,14 @@ because Rochester already has `st-louis` (Pittsford). One commit per batch.
 
 ## 3. Current state
 
-**Dataset: 143 parishes / 263 churches; 117 tests green.** (Rochester baseline was 62/132.)
+**Dataset: 143 parishes / 266 churches; 117 tests green.** (Rochester baseline was 62/132.)
 
-**Buffalo contribution: 81 parishes / 131 churches, all geocoded**, spanning **all 8 counties**.
+**Buffalo contribution: 81 parishes / 134 churches, all geocoded**, spanning **all 8 counties**.
 
 Measured against the diocese's own parish finder — 167 locations, which reduce to **152 real
 worship sites** once the entries in `data/buffalo_excluded_sites.csv` are removed and the 2 sites
-the feed repeats are collapsed — the dataset now covers **127 of 152, or 84%**. The uncovered
-remainder is 25 sites across 23 canonical parishes, every one deferred for a concrete,
+the feed repeats are collapsed — the dataset now covers **129 of 152, or 85%**. The uncovered
+remainder is 23 sites across 21 canonical parishes, every one deferred for a concrete,
 individually-documented reason (§6f): overwhelmingly "the parish's website is dead or the diocese
 lists none", not "not looked at yet".
 
@@ -247,7 +247,8 @@ pull the **Plus Code (Open Location Code)** from the church's `gcatholic.org` pa
 and **reverse-geocode to confirm** it lands on the right street/town before committing.
 
 **Known WebFetch 403 hosts** (some parish hosts block the fetcher): `icc-ics.com`,
-`emcatholic.org`. Reliable channels that never 403'd: `gcatholic.org` (addresses + Plus Codes),
+`emcatholic.org`, `tcsfh.org` (403s to a browser UA too — a member parish's own site answered the
+question instead, see §5). Reliable channels that never 403'd: `gcatholic.org` (addresses + Plus Codes),
 `cheektowagacatholicfamily.org`, `nfrcfparish.org`, `blessedtrinitybuffalo.org`. **gcatholic.org
 is the dependable independent fallback.**
 
@@ -260,6 +261,29 @@ north-tonawanda` → folded into `tonawanda-catholic`; `holy-family-albion` → 
 `one-catholic`; `resurrection-batavia` website → the12apostles.org. The batch-1–8 lists below
 record the *original* additions; the audit entries record the corrections.
 
+- **Three Catholic Sisters of the Foothills** (Family #25) — a **restructure**:
+  `three-catholic-sisters-foothills` (tcsfh.org) with **4 worship sites**, absorbing the standalone
+  `st-philomena-franklinville` row. Sites: Holy Name of Mary (Ellicottville), St. Philomena
+  (Franklinville), Our Lady of Peace (Salamanca), St. Pacificus Oratory (Humphrey). Parishes
+  143 → 143, churches 263 → 266; coverage 84% → 85%.
+  - **Settled without reading the container**, which is worth recording because `tcsfh.org` 403s to
+    every fetcher (add it to the §4 blocklist). St. Philomena's own live site does the work: *"St.
+    Philomena Parish is now part of the THREE CATHOLIC SISTERS OF THE FOOTHILLS FAMILY OF PARISHES
+    … Click Here to be redirected to the New Website www.tcsfh.org … MASS TIMES (Check Bulletin —
+    https://tcsfh.org/bulletins)"*. One bulletin page for all three, said by a member parish about
+    itself, with the other two member domains (`maryellicottville.org`, `olpsal.org`) both dead and
+    a single ParishesOnline organization for the family. **A member parish announcing its own
+    folding-in is as good as the masthead** — the masthead is only ever a proxy for this.
+  - **St. Pacificus Oratory (Humphrey) added although the diocesan feed has never listed it** — the
+    April 2026 masterlist puts it under Holy Name of Mary, GCatholic carries it (with no address),
+    the family site has a page for it, and OSM has the church node on Chapel Hill Road. Address
+    4722 Chapel Hill Road from the parish's own page; `address_verified=false` since no second
+    source gives the number and the OSM church node carries none. It does not move the coverage
+    figure, which counts the feed — the feed is not the whole diocese.
+  - Two disagreements left visible rather than resolved: GCatholic calls the Salamanca building
+    **Holy Cross** where the diocese, OSM and the family call it Our Lady of Peace
+    (`name_verified=false`), and its street number is 274 (OSM + family listing) or 284 (feed +
+    GCatholic) — modelled at 274 on the OSM node, `address_verified=false`.
 - **Roman Catholic Community of Cheektowaga-Kaisertown-Sloan** (Family #32) — a **restructure**:
   `cheektowaga-kaisertown-sloan-catholic` (olc-cheektowaga.com, container 14/0948) with **3 worship
   sites**, absorbing the standalone `st-casimir-buffalo` row. Sites: St. Casimir (Buffalo,
@@ -527,7 +551,7 @@ Where a dead domain means a parish has fallen back to a shared family bulletin, 
 family parish (as done above) is the right call under 1-parish=1-bulletin, but a human may want to
 confirm the parish hasn't simply moved to a new own-domain instead.
 
-### 6f. Deferred inventory — 25 worship sites / 23 parishes
+### 6f. Deferred inventory — 23 worship sites / 21 parishes
 
 A *closed* list, not an open-ended "rest of the diocese": every worship site the diocese lists is
 either in the dataset, in `data/buffalo_excluded_sites.csv` (§6d), or here.
@@ -549,17 +573,12 @@ St. Mary (East Arcade) and SS. Peter & Paul (Arcade) both sit under **St. Mary, 
 #33), which is not in the dataset — and note the masterlist also puts our existing standalone
 `st-aloysius-springville` under that same parish, so adding it is a restructure (see (d)).
 
-**(b) Whole families whose bulletin has not been probed yet — best value per lookup, 12 sites.**
+**(b) Whole families whose bulletin has not been probed yet — best value per lookup, 10 sites.**
 Each is one run of `probe_bulletin_container.py` away from resolving several sites at once, exactly
 as Fields of Grace, The Lord's Vineyard and Chautauqua were. **Find the container first** — the
 family's own homepage is usually not in the diocesan feed and a web search for the family name
 finds it (that is all Chautauqua took, after two sessions had written its member domains off as
 dead):
-- **Family #25 (Three Catholic Sisters of the Foothills)** — Holy Name of Mary (Ellicottville) and
-  Our Lady of Peace (Salamanca); the masterlist also places our existing standalone
-  `st-philomena-franklinville` under Holy Name of Mary, so this one is an addition *and* a
-  restructure. It further lists a St. Pacificus Oratory (Humphrey) that the feed does not carry —
-  confirm before adding. **2 sites.**
 - **Family #12 (Twelve Apostles)** — St. Brigid (Bergen) and Ascension (Batavia). Note the
   masterlist lists Our Lady of Mercy (LeRoy) as its own parish while we model it as a church of
   `resurrection-batavia`; worth re-checking against the bulletin. **2 sites.**
@@ -588,7 +607,6 @@ and each *removes* a parish row rather than adding one:
 - `enchanted-mountains-catholic` — the diocese lists St. John (Olean) and St. Mary of the Angels
   (Olean) as separate parishes with live domains, which under §1 argues for splitting our single row.
 - `st-aloysius-springville` → a worship site of St. Mary, Arcade (Family #33).
-- `st-philomena-franklinville` → a worship site of Holy Name of Mary, Ellicottville (Family #25).
 
 **(e) Open policy question.** Our Lady of Perpetual Help (Buffalo) lists only a Facebook page.
 Nobody has decided whether a social page may be the `website` when it genuinely is where the
@@ -653,4 +671,4 @@ Whichever step resolves it, the row-level rules are unchanged:
   bulletin's own Mass legend where you can (§4b).
 - `db create` + `pytest` after every batch, one commit per batch, and log the batch here.
 
-Coverage is **127 of 152 real worship sites (84%)**, all 8 counties, with 25 left in §6f.
+Coverage is **129 of 152 real worship sites (85%)**, all 8 counties, with 23 left in §6f.
