@@ -33,7 +33,9 @@ import json
 import re
 from pathlib import Path
 
-CHURCHES_CSV = Path(__file__).resolve().parent.parent / "data" / "churches.csv"
+DATA = Path(__file__).resolve().parent.parent / "data"
+CHURCHES_CSV = DATA / "churches.csv"
+EXCLUDED_CSV = DATA / "buffalo_excluded_sites.csv"
 
 SUFFIX = {
     "ave": "avenue", "av": "avenue", "st": "street", "rd": "road", "dr": "drive",
@@ -76,12 +78,29 @@ def main() -> None:
     ap.add_argument("--exclude", default="",
                     help="skip canonical parishes containing this substring "
                          "(e.g. a diocese's pregnancy-center entries)")
+    ap.add_argument("--exclude-file", type=Path, default=EXCLUDED_CSV,
+                    help="CSV of site,city rows never to count as missing "
+                         f"(default: {EXCLUDED_CSV.name}); pass a missing path to skip")
     ap.add_argument("-o", "--out", type=Path, help="write missing sites as JSON here")
     args = ap.parse_args()
 
     dio = json.loads(args.roster.read_text(encoding="utf-8"))
     if args.exclude:
         dio = [r for r in dio if args.exclude.lower() not in r["parish"].lower()]
+
+    # Sites we have decided will never be modelled -- closed buildings the feed
+    # still lists, and entries that are not parishes at all. Without this the
+    # "MISSING" count silently overstates the work left, because a diocese keeps
+    # listing a church for months or years after its last Mass.
+    excluded: set[tuple[str, str]] = set()
+    if args.exclude_file and args.exclude_file.exists():
+        with args.exclude_file.open(encoding="utf-8") as fh:
+            for row in csv.DictReader(fh):
+                excluded.add((norm_name(row["site"], ""), row["city"].strip().lower()))
+    dropped = [r for r in dio
+               if (norm_name(r["site"], ""), r["city"].strip().lower()) in excluded]
+    dio = [r for r in dio
+           if (norm_name(r["site"], ""), r["city"].strip().lower()) not in excluded]
 
     exact_addr: dict[str, str] = {}
     exact_name: dict[str, str] = {}
@@ -114,6 +133,9 @@ def main() -> None:
         missing.append(r)
 
     unique = len(dio) - len(dupes)
+    if dropped:
+        print(f"excluded    {len(dropped)}  (closed / not-a-parish, "
+              f"per {args.exclude_file.name})")
     print(f"feed rows {len(dio)}  (unique sites {unique})")
     print(f"  modelled     {len(matched) + len(loose)}"
           f"   ({len(loose)} matched only after ignoring the city spelling)")

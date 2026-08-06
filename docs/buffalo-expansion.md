@@ -57,11 +57,12 @@ because Rochester already has `st-louis` (Pittsford). One commit per batch.
 
 **Buffalo contribution: 80 parishes / 125 churches, all geocoded**, spanning **all 8 counties**.
 
-Measured against the diocese's own parish finder — 167 locations, which reduce to **158 real
-worship sites** (7 are St. Gianna Molla centers, §6d, and the feed repeats 2) — the dataset now
-covers **121 of 158, or 77%**. The uncovered remainder is 37 sites across 32 canonical parishes,
-every one deferred for a concrete, individually-documented reason (§6f): overwhelmingly "the
-parish's website is dead or the diocese lists none", not "not looked at yet".
+Measured against the diocese's own parish finder — 167 locations, which reduce to **153 real
+worship sites** once the 12 entries in `data/buffalo_excluded_sites.csv` are removed and the 2
+the feed repeats are collapsed — the dataset now covers **121 of 153, or 79%**. The uncovered
+remainder is 32 sites across 28 canonical parishes, every one deferred for a concrete,
+individually-documented reason (§6f): overwhelmingly "the parish's website is dead or the diocese
+lists none", not "not looked at yet".
 
 Note the parish count *fell* while coverage rose. That is the expected direction: several batches
 found that rows we already had were members of one bulletin and collapsed them (§4b). Parish count
@@ -71,8 +72,15 @@ is not a progress metric here — church coverage is.
 
 ```
 uv run python scripts/fetch_diocese_locator.py https://www.buffalodiocese.org/parish-finder/ -o dio.json
-uv run python scripts/reconcile_diocese_roster.py dio.json --exclude Gianna --list
+uv run python scripts/reconcile_diocese_roster.py dio.json --list
 ```
+
+`data/buffalo_excluded_sites.csv` is what keeps that number honest. **The diocese goes on listing a
+church for months or years after its last Mass** — six of the sites in this file are closed
+buildings still in the live feed — so without a machine-readable exclusion list the "what's left"
+count silently overstates the work and invites someone to go re-research a demolished parish. Each
+row carries its reason, its evidence and the date decided; add to it whenever a site is ruled out
+for good, and never delete a row to make the number look better.
 
 `db create` and `pytest` are run after every batch and must stay green.
 
@@ -389,9 +397,18 @@ cheektowaga / enchanted-mountains case). Addresses already captured below:
   double-count). **Holy Spirit** (North Collins) — conflicting homepages (cfhrosary.org vs icchsc.org).
 
 ### 6d. Out of scope (decided, not deferred)
-- **St. Gianna Molla Pregnancy Outreach Centers** (7 entries: Buffalo, Lackawanna, Cheektowaga,
-  Niagara Falls, Fredonia, Perry, Olean) — these share the diocesan parish finder but are social
-  service offices, not parishes, and publish no bulletin. Excluded permanently.
+
+**This list now lives in `data/buffalo_excluded_sites.csv`**, one row per site with its reason,
+evidence and the date decided, so `reconcile_diocese_roster.py` can subtract it automatically
+rather than relying on someone reading this prose. Currently 12 entries in two classes:
+
+- **not-a-parish (6)** — the St. Gianna Molla pregnancy centers (Buffalo, Lackawanna, Cheektowaga,
+  Niagara Falls, Fredonia, Perry, Olean). They share the diocesan parish finder but are
+  social-service offices and publish no bulletin.
+- **closed (6)** — St. Mary Queen of the Rosary (Strykersville), Our Lady of Loreto (Falconer),
+  Our Lady of the Snows (Panama), St. Joseph (Fredonia), St. Rose of Lima (Forestville),
+  St. Hedwig (Dunkirk). **Every one of these is still in the live diocesan feed.** That is the
+  point of the file.
 - ~~**St. Casimir** (Buffalo, Kaisertown, 160 Cable St) — independent/non-diocesan Polish church~~
   **— REVERSED (commit `e556743`).** The earlier call was wrong. The Diocese of Buffalo's *own*
   parish finder lists St. Casimir at 160 Cable St as a diocesan parish (founded 1891) with its own
@@ -449,7 +466,7 @@ worship sites is either in the dataset, excluded as not-a-parish (§6d), or list
 diocese edits the feed:
 
 ```
-uv run python scripts/reconcile_diocese_roster.py dio.json --exclude Gianna --list -o missing.json
+uv run python scripts/reconcile_diocese_roster.py dio.json --list -o missing.json
 ```
 
 The narrative groups (a)–(h) below are kept because they record *why* each site is blocked, which
