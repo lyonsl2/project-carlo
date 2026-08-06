@@ -155,9 +155,6 @@ catholic-family-cheektowaga,st-josaphat-cheektowaga,St. Josaphat Church,20 Peori
 catholic-family-cheektowaga,resurrection-cheektowaga,Resurrection Church,130 Como Park Boulevard,,Cheektowaga,NY,14227,true,true,42.8932154,-78.7510864
 catholic-family-cheektowaga,queen-of-martyrs-cheektowaga,Queen of Martyrs Church,180 George Urban Boulevard,,Cheektowaga,NY,14225,true,true,42.9191651,-78.7825939
 catholic-family-cheektowaga,our-lady-help-of-christians-cheektowaga,Our Lady Help of Christians Church,4125 Union Road,,Cheektowaga,NY,14225,true,true,42.9259778,-78.7539883
-resurrection-batavia,st-joseph-batavia,St. Joseph Church,303 East Main Street,,Batavia,NY,14020,true,true,42.9972222,-78.1783333
-resurrection-batavia,st-cecilia-oakfield,St. Cecilia Church,56 Maple Avenue,,Oakfield,NY,14125,true,true,43.0664375,-78.2770625
-resurrection-batavia,holy-name-of-mary-east-pembroke,Holy Name of Mary Church,8656 Church Street,,East Pembroke,NY,14056,true,true,42.9945625,-78.3129375
 christ-the-king-snyder,christ-the-king-snyder,Christ the King Church,30 Lamarck Drive,,Snyder,NY,14226,true,true,42.9596119,-78.7743295
 st-pius-x-getzville,st-pius-x-getzville,St. Pius X Church,1700 North French Road,,Getzville,NY,14068,true,true,43.0355191,-78.7625464
 good-shepherd-pendleton,good-shepherd-pendleton,Good Shepherd Church,5442 Tonawanda Creek Road,,Pendleton,NY,14120,true,true,43.0707829,-78.7643835
@@ -185,8 +182,6 @@ niagara-frontier-catholic,st-bernard-youngstown,St. Bernard Church,422 Second St
 niagara-frontier-catholic,immaculate-conception-ransomville,Immaculate Conception Church,4671 Townline Road,,Ransomville,NY,14131,true,true,43.1870018,-78.8840511
 one-catholic,st-mary-medina,St. Mary Church,211 Eagle Street,,Medina,NY,14103,true,true,43.2226333,-78.3900354
 one-catholic,st-mary-holley,St. Mary Church,13 South Main Street,,Holley,NY,14470,true,true,43.225453,-78.0270565
-resurrection-batavia,st-mary-batavia,St. Mary Church,18 Ellicott Street,,Batavia,NY,14020,true,true,42.9969375,-78.1863125
-resurrection-batavia,our-lady-of-mercy-leroy,Our Lady of Mercy Church,44 Lake Street,,LeRoy,NY,14482,true,true,42.9810625,-77.9921875
 st-patrick-belfast-fillmore,st-patrick-fillmore,St. Patrick Church,109 West Main Street,,Fillmore,NY,14735,true,true,42.4664375,-78.1184375
 st-patrick-belfast-fillmore,st-patrick-belfast,St. Patrick Church,1 Merton Avenue,,Belfast,NY,14711,true,false,42.3440625,-78.1096875
 st-patrick-belfast-fillmore,st-mary-canaseraga,St. Mary Church,7 North Street,,Canaseraga,NY,14822,true,true,42.4658125,-77.7756875
@@ -265,3 +260,9 @@ three-catholic-sisters-foothills,holy-name-of-mary-ellicottville,Holy Name of Ma
 three-catholic-sisters-foothills,st-philomena-franklinville,St. Philomena Church,26 North Plymouth Avenue,,Franklinville,NY,14737,true,true,42.3441875,-78.4516875
 three-catholic-sisters-foothills,our-lady-of-peace-salamanca,Our Lady of Peace Church,274 Broad Street,,Salamanca,NY,14779,false,false,42.1570083,-78.7258459
 three-catholic-sisters-foothills,st-pacificus-humphrey,St. Pacificus Oratory,4722 Chapel Hill Road,,Humphrey,NY,14741,true,false,42.2039539,-78.5336352
+twelve-apostles-catholic,st-joseph-batavia,St. Joseph Church,303 East Main Street,,Batavia,NY,14020,true,true,42.9972222,-78.1783333
+twelve-apostles-catholic,st-cecilia-oakfield,St. Cecilia Church,56 Maple Avenue,,Oakfield,NY,14125,true,true,43.0664375,-78.2770625
+twelve-apostles-catholic,holy-name-of-mary-east-pembroke,Holy Name of Mary Church,8656 Church Street,,East Pembroke,NY,14056,true,true,42.9945625,-78.3129375
+twelve-apostles-catholic,our-lady-of-mercy-leroy,Our Lady of Mercy Church,44 Lake Street,,LeRoy,NY,14482,true,true,42.9810625,-77.9921875
+twelve-apostles-catholic,st-brigid-bergen,St. Brigid Church,18 Gibson Street,,Bergen,NY,14416,true,true,43.0874375,-77.9440625
+twelve-apostles-catholic,ascension-batavia,Ascension Church,135 South Swan Street,,Batavia,NY,14020,false,false,42.9889375,-78.1785625

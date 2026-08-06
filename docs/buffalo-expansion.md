@@ -53,14 +53,14 @@ because Rochester already has `st-louis` (Pittsford). One commit per batch.
 
 ## 3. Current state
 
-**Dataset: 143 parishes / 266 churches; 117 tests green.** (Rochester baseline was 62/132.)
+**Dataset: 143 parishes / 267 churches; 117 tests green.** (Rochester baseline was 62/132.)
 
-**Buffalo contribution: 81 parishes / 134 churches, all geocoded**, spanning **all 8 counties**.
+**Buffalo contribution: 81 parishes / 135 churches, all geocoded**, spanning **all 8 counties**.
 
-Measured against the diocese's own parish finder — 167 locations, which reduce to **152 real
+Measured against the diocese's own parish finder — 167 locations, which reduce to **151 real
 worship sites** once the entries in `data/buffalo_excluded_sites.csv` are removed and the 2 sites
-the feed repeats are collapsed — the dataset now covers **129 of 152, or 85%**. The uncovered
-remainder is 23 sites across 21 canonical parishes, every one deferred for a concrete,
+the feed repeats are collapsed — the dataset now covers **130 of 151, or 86%**. The uncovered
+remainder is 21 sites across 19 canonical parishes, every one deferred for a concrete,
 individually-documented reason (§6f): overwhelmingly "the parish's website is dead or the diocese
 lists none", not "not looked at yet".
 
@@ -83,7 +83,7 @@ barely moved (127/154 vs 125/152 at the time) but the raw counts were wrong, and
 the thing this project trusts over its own prose.
 
 `data/buffalo_excluded_sites.csv` is what keeps that number honest. **The diocese goes on listing a
-church for months or years after its last Mass** — seven of the sites in this file are closed
+church for months or years after its last Mass** — eight of the sites in this file are closed
 buildings still in the live feed — so without a machine-readable exclusion list the "what's left"
 count silently overstates the work and invites someone to go re-research a demolished parish. Each
 row carries its reason, its evidence and the date decided; add to it whenever a site is ruled out
@@ -261,6 +261,25 @@ north-tonawanda` → folded into `tonawanda-catholic`; `holy-family-albion` → 
 `one-catholic`; `resurrection-batavia` website → the12apostles.org. The batch-1–8 lists below
 record the *original* additions; the audit entries record the corrections.
 
+- **The 12 Apostles** (Family #12) — a **rename plus two additions and a removal**:
+  `resurrection-batavia` becomes `twelve-apostles-catholic` (the12apostles.org unchanged) with
+  **6 worship sites**. Added St. Brigid (Bergen) and Ascension (Batavia); removed St. Mary
+  (Batavia). Parishes 143 → 143, churches 266 → 267; coverage 85% → 86%.
+  - The row already pointed at the family site — it was named for one member parish while holding
+    another's churches. **A row can be right about the bulletin and wrong about the name**, and the
+    name is what the next person reads.
+  - One bulletin, evidenced without a container: the site embeds a single LPi
+    `publicationWidget` id (`0018000000QbzysAAB`) on one `/bulletin` page for a nav that lists four
+    parishes. Both member domains confirm it — `ourladyofmercyleroy.org` 301s to the family site
+    (settling the masterlist's claim that Our Lady of Mercy is its own parish: under §1 it is a
+    worship site) and `ascensionrcc.weconnect.com` serves LPi's "Temporarily Unavailable" stub.
+  - **St. Mary (18 Ellicott Street, Batavia) removed as closed** — last Mass 14 Aug 2024, absent
+    from the family site, still in the diocesan feed. It had been added as an active site by an
+    earlier batch, so this is the first row the exclusion file takes *back* out of `churches.csv`.
+  - Ascension's worship site is **135 South Swan Street**; the feed's `19 Sumner St` is the parish
+    *office*, which the family site says plainly and the feed's own coordinates confirm (they fall
+    on Swan Street, not Sumner). GCatholic calls the Swan Street building Sacred Heart of Jesus, so
+    both flags are `false` there.
 - **Three Catholic Sisters of the Foothills** (Family #25) — a **restructure**:
   `three-catholic-sisters-foothills` (tcsfh.org) with **4 worship sites**, absorbing the standalone
   `st-philomena-franklinville` row. Sites: Holy Name of Mary (Ellicottville), St. Philomena
@@ -465,10 +484,11 @@ cheektowaga / enchanted-mountains case). Addresses already captured below:
   is stale branding, and the family is actually St. John Neumann + St. Michael. **St. Isidore is not
   in it.** Its two sites (St. Mary/Silver Spring, St. Joseph/Perry) are still deferred — the
   masterlist (§4c) does not place them under any family, so they need their own bulletin home found.
-- **Resurrection / The 12 Apostles** (the12apostles.org, Batavia) — `resurrection-batavia` currently
-  has only St. Joseph (303 E Main St). Resurrection has since absorbed Padre Pio (Oakfield), Holy Name
-  of Mary (East Pembroke), and Ascension (Batavia, slated to close then kept open). Add these worship
-  sites once addresses + final merger status are confirmed.
+- ~~**Resurrection / The 12 Apostles** (the12apostles.org, Batavia)~~ **— RESOLVED as
+  `twelve-apostles-catholic`**, 6 worship sites. The row had been named for one member parish while
+  already pointing at the family's site; it is now named for the family. Our Lady of Mercy (LeRoy),
+  which the masterlist calls a parish of its own, keeps a domain that 301s to the family site, so it
+  stays a worship site under §1.
 
 ### 6c. Parishes in active closure/merger flux — DEFERRED until status settles
 - **St. John Kanty** (Buffalo, 101 Swinburne St) — final Mass May 2025, Vatican suspended the
@@ -482,8 +502,11 @@ cheektowaga / enchanted-mountains case). Addresses already captured below:
 - ~~**Jamestown / Holy Apostles + St. James** — Vatican overturned the merger decree Dec 2025.~~
   **— RESOLVED** the same way: all four Jamestown-area parishes share the Catholic Neighbors in
   Faith bulletin regardless of the overturned decree → one `catholic-neighbors-in-faith` row.
-- **St. Mary** (18 Ellicott St, Batavia) — on the diocese's Road-to-Renewal closure list; only
-  St. Joseph was added under `resurrection-batavia`.
+- ~~**St. Mary** (18 Ellicott St, Batavia) — on the diocese's Road-to-Renewal closure list~~
+  **— RESOLVED as closed**, last Mass 14 Aug 2024, and **removed from `churches.csv`**: it had been
+  added as an active worship site before the closure was confirmed. Now in
+  `buffalo_excluded_sites.csv`. Worth noting the direction — the exclusion file is not only for
+  sites we never added.
 - **Blessed Sacrament** (Kenmore) — appears merged into St. John the Baptist's site (would
   double-count). **Holy Spirit** (North Collins) — conflicting homepages (cfhrosary.org vs icchsc.org).
 
@@ -491,16 +514,16 @@ cheektowaga / enchanted-mountains case). Addresses already captured below:
 
 **This list now lives in `data/buffalo_excluded_sites.csv`**, one row per site with its reason,
 evidence and the date decided, so `reconcile_diocese_roster.py` can subtract it automatically
-rather than relying on someone reading this prose. Currently 15 rows in two classes:
+rather than relying on someone reading this prose. Currently 16 rows in two classes:
 
 - **not-a-parish (7)** — the St. Gianna Molla pregnancy centers (Buffalo, Lackawanna, Cheektowaga,
   Niagara Falls, Fredonia, Perry, Olean). They share the diocesan parish finder but are
   social-service offices and publish no bulletin.
-- **closed (8)** — St. Mary Queen of the Rosary (Strykersville), Our Lady of Loreto (Falconer),
+- **closed (9)** — St. Mary Queen of the Rosary (Strykersville), Our Lady of Loreto (Falconer),
   Our Lady of the Snows (Panama), St. Joseph (Fredonia), St. Rose of Lima (Forestville),
-  St. Hedwig (Dunkirk), St. Patrick (Brocton), St. Isaac Jogues (Sherman). **All but Sherman are
-  still in the live diocesan feed.** That is the point of the file — and Sherman is in it because
-  GCatholic still files that closed building under a current parish.
+  St. Hedwig (Dunkirk), St. Patrick (Brocton), St. Isaac Jogues (Sherman), St. Mary (Batavia).
+  **All but Sherman are still in the live diocesan feed.** That is the point of the file — and
+  Sherman is in it because GCatholic still files that closed building under a current parish.
 - ~~**St. Casimir** (Buffalo, Kaisertown, 160 Cable St) — independent/non-diocesan Polish church~~
   **— REVERSED (commit `e556743`).** The earlier call was wrong. The Diocese of Buffalo's *own*
   parish finder lists St. Casimir at 160 Cable St as a diocesan parish (founded 1891) with its own
@@ -551,7 +574,7 @@ Where a dead domain means a parish has fallen back to a shared family bulletin, 
 family parish (as done above) is the right call under 1-parish=1-bulletin, but a human may want to
 confirm the parish hasn't simply moved to a new own-domain instead.
 
-### 6f. Deferred inventory — 23 worship sites / 21 parishes
+### 6f. Deferred inventory — 21 worship sites / 19 parishes
 
 A *closed* list, not an open-ended "rest of the diocese": every worship site the diocese lists is
 either in the dataset, in `data/buffalo_excluded_sites.csv` (§6d), or here.
@@ -573,15 +596,12 @@ St. Mary (East Arcade) and SS. Peter & Paul (Arcade) both sit under **St. Mary, 
 #33), which is not in the dataset — and note the masterlist also puts our existing standalone
 `st-aloysius-springville` under that same parish, so adding it is a restructure (see (d)).
 
-**(b) Whole families whose bulletin has not been probed yet — best value per lookup, 10 sites.**
+**(b) Whole families whose bulletin has not been probed yet — best value per lookup, 8 sites.**
 Each is one run of `probe_bulletin_container.py` away from resolving several sites at once, exactly
 as Fields of Grace, The Lord's Vineyard and Chautauqua were. **Find the container first** — the
 family's own homepage is usually not in the diocesan feed and a web search for the family name
 finds it (that is all Chautauqua took, after two sessions had written its member domains off as
 dead):
-- **Family #12 (Twelve Apostles)** — St. Brigid (Bergen) and Ascension (Batavia). Note the
-  masterlist lists Our Lady of Mercy (LeRoy) as its own parish while we model it as a church of
-  `resurrection-batavia`; worth re-checking against the bulletin. **2 sites.**
 - **Family #27 (Catholic Family of the Holy Rosary)** — St. Joseph (Gowanda) and Epiphany of Our
   Lord (which the feed puts in Langford and the masterlist in North Collins), alongside our
   existing `immaculate-conception-eden`. **2 sites.**
@@ -671,4 +691,4 @@ Whichever step resolves it, the row-level rules are unchanged:
   bulletin's own Mass legend where you can (§4b).
 - `db create` + `pytest` after every batch, one commit per batch, and log the batch here.
 
-Coverage is **129 of 152 real worship sites (85%)**, all 8 counties, with 23 left in §6f.
+Coverage is **130 of 151 real worship sites (86%)**, all 8 counties, with 21 left in §6f.
