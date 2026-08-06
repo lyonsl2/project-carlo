@@ -147,7 +147,7 @@ ss-peter-and-paul-hamburg,ss-peter-and-paul-hamburg,Saints Peter & Paul Church,6
 immaculate-conception-east-aurora,immaculate-conception-east-aurora,Immaculate Conception Church,520 Oakwood Avenue,,East Aurora,NY,14052,true,true,42.7659734,-78.6155447
 st-mary-of-the-lake-hamburg,st-mary-of-the-lake-hamburg,St. Mary of the Lake Church,4737 Lake Shore Road,,Hamburg,NY,14075,true,true,42.7540234,-78.8898175
 st-mary-swormville,st-mary-swormville,St. Mary's Church (Swormville),6919 Transit Road,,Swormville,NY,14051,true,true,43.0378575,-78.6964044
-st-aloysius-springville,st-aloysius-springville,St. Aloysius Church,190 Franklin Street,,Springville,NY,14141,true,true,42.5099337,-78.6694678
+cattaraugus-creek-catholic,st-aloysius-springville,St. Aloysius Church,190 Franklin Street,,Springville,NY,14141,true,true,42.5099337,-78.6694678
 tonawanda-catholic,st-jude-the-apostle-north-tonawanda,St. Jude the Apostle Church,800 Niagara Falls Boulevard,,North Tonawanda,NY,14120,true,true,43.0590885,-78.8396086
 tonawanda-catholic,our-lady-of-czestochowa-north-tonawanda,Our Lady of Czestochowa Church,64 Center Avenue,,North Tonawanda,NY,14120,true,true,43.0387375,-78.8808090
 our-lady-of-peace-clarence,our-lady-of-peace-clarence,Our Lady of Peace Church,10950 Main Street,,Clarence,NY,14031,true,true,42.9819746,-78.5794286
@@ -268,3 +268,6 @@ twelve-apostles-catholic,ascension-batavia,Ascension Church,135 South Swan Stree
 catholic-family-holy-rosary,immaculate-conception-eden,Immaculate Conception Church,8791 South Main Street,,Eden,NY,14057,true,true,42.6468125,-78.8994375
 catholic-family-holy-rosary,epiphany-of-our-lord-langford,Epiphany of Our Lord Church,10893 Sisson Highway,,Langford,NY,14111,true,true,42.5850625,-78.8420625
 catholic-family-holy-rosary,st-joseph-gowanda,St. Joseph Church,26 Erie Street,,Gowanda,NY,14070,true,false,42.4646875,-78.9324375
+cattaraugus-creek-catholic,st-mary-arcade,St. Mary Church,417 West Main Street,,Arcade,NY,14009,false,true,42.5339375,-78.4304375
+cattaraugus-creek-catholic,st-mary-east-arcade,St. Mary Church,6785 East Arcade Road,,East Arcade,NY,14009,true,true,42.5728125,-78.3431875
+cattaraugus-creek-catholic,st-joseph-holland,St. Joseph Church,46 North Main Street,,Holland,NY,14080,true,true,42.6416875,-78.5431875

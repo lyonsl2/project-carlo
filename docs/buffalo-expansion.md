@@ -70,14 +70,14 @@ decided — apply them, don't re-litigate them:
 
 ## 3. Current state
 
-**Dataset: 143 parishes / 269 churches; 117 tests green.** (Rochester baseline was 62/132.)
+**Dataset: 143 parishes / 272 churches; 117 tests green.** (Rochester baseline was 62/132.)
 
-**Buffalo contribution: 81 parishes / 137 churches, all geocoded**, spanning **all 8 counties**.
+**Buffalo contribution: 81 parishes / 140 churches, all geocoded**, spanning **all 8 counties**.
 
-Measured against the diocese's own parish finder — 167 locations, which reduce to **150 real
+Measured against the diocese's own parish finder — 167 locations, which reduce to **149 real
 worship sites** once the entries in `data/buffalo_excluded_sites.csv` are removed and the 2 sites
-the feed repeats are collapsed — the dataset now covers **132 of 150, or 88%**. The uncovered
-remainder is 18 sites across 17 canonical parishes, every one deferred for a concrete,
+the feed repeats are collapsed — the dataset now covers **135 of 149, or 91%**. The uncovered
+remainder is 14 sites across 13 canonical parishes, every one deferred for a concrete,
 individually-documented reason (§6f): overwhelmingly "the parish's website is dead or the diocese
 lists none", not "not looked at yet".
 
@@ -280,6 +280,33 @@ north-tonawanda` → folded into `tonawanda-catholic`; `holy-family-albion` → 
 `one-catholic`; `resurrection-batavia` website → the12apostles.org. The batch-1–8 lists below
 record the *original* additions; the audit entries record the corrections.
 
+- **Cattaraugus Creek Catholic Community** (Family #33) — a **restructure**:
+  `cattaraugus-creek-catholic` (ccccfamily.org, container 14/0156) with **4 worship sites**,
+  absorbing the standalone `st-aloysius-springville` row. Sites: St. Aloysius (Springville),
+  St. Mary (Arcade), St. Mary (East Arcade), St. Joseph (Holland). Parishes 143 → 143, churches
+  269 → 272; coverage 88% → 91%. This one batch cleared **all** of §6f(a), one of the five
+  families in §6f(b), and one entry each from (c) and (d).
+  - **The container had already answered this, under its old name.** A search for the family turned
+    up two PDFs in the *same* container `14/0156` — `20230423B` headed "St. Aloysius OF
+    Springville" and `20231001B` headed "CATTARAUGUS CREEK CATHOLIC Community". A parish container
+    that starts printing a family's name **is** the fold-in, recorded by the publisher. That is
+    §4b's "member's own channel went silent" signal in its cheapest form: same channel, new
+    masthead, no second container to find.
+  - The current issue (2 Aug 2026) gives one Mass schedule over four buildings — St. Aloysius,
+    St. Mary/Arcade, St. Mary/East Arcade, St. Joseph/Holland — under one "PARISH FAMILY OFFICE"
+    and `www.ccccfamily.org`. The family describes itself as "two parishes united in faith", which
+    is exactly the masterlist's structure (St. Mary/Arcade + St. Joseph/Holland) and, under §1,
+    one row.
+  - **The feed's "SS. Peter & Paul" and the masterlist's "St. Mary, Arcade" are the same
+    building** — 417 W Main St. Both were on the deferred list, one in §6f(a) and one implicitly,
+    which is how a single site can look like two open questions. GCatholic states it outright:
+    church *name* "Sts. Peter and Paul", *parish* "St. Mary Parish". Modelled as St. Mary with
+    `name_verified=false` (§6a).
+  - **Two more closures, both from the family's own site**, and both were on the deferred list as
+    live research: St. Jude (Sardinia) — final Mass 19 Oct 2024, still in the diocesan feed, listed
+    in §6f(c) as "no family, no website" — and St. John the Baptist (West Valley), merged into
+    St. Aloysius, absent from the feed but still carried by GCatholic. **A family's "our churches"
+    page is a closure list as well as a roster**, and it is cheaper than the masthead bisect.
 - **Catholic Family of the Holy Rosary** (Family #27) — a **restructure**:
   `catholic-family-holy-rosary` (cfhrosary.org, container 14/0937) with **3 worship sites**,
   absorbing the standalone `immaculate-conception-eden` row. Sites: Immaculate Conception (Eden),
@@ -497,6 +524,14 @@ Plus geocoding/verification backfill: all 38 cloud-agent churches geocoded; 4 of
   feed's other row say 24. Modelled as 22 with the coordinate pinned to the OSM node, and
   `address_verified=false` on purpose. Likely 24 is the office/rectory next door; a human can
   settle it on site.
+- **St. Mary (Arcade), 417 West Main Street** — **dedication disputed, address not.** The family's
+  own site, its bulletin Mass schedule and the OSM church node all call the building St. Mary; the
+  diocesan feed and GCatholic call it Sts. Peter and Paul. GCatholic is the one source that gives
+  both at once — church name "Sts. Peter and Paul", parish "St. Mary Parish" — which reads as the
+  historic dedication of the building against the name of the 2007 merged parish now using it.
+  Modelled as **St. Mary Church** (the name the parish itself and the map both use, and the name a
+  visitor would look for) with `name_verified=false`. All four sources agree on 417 W Main St, so
+  `address_verified=true`. A human could confirm what is actually carved over the door.
 - **(Out-of-scope, pre-existing Rochester rows, flagged not fixed):** `sacred-heart-of-jesus`
   (Perkinsville) CSV `11114 Chapel St` vs sources' `11119`; `st-patrick-savannah` CSV
   `52 Clyde St` vs directories' `1583 Grand Ave`. Left for the Rochester data owner.
@@ -554,17 +589,18 @@ cheektowaga / enchanted-mountains case). Addresses already captured below:
 
 **This list now lives in `data/buffalo_excluded_sites.csv`**, one row per site with its reason,
 evidence and the date decided, so `reconcile_diocese_roster.py` can subtract it automatically
-rather than relying on someone reading this prose. Currently 18 rows in two classes:
+rather than relying on someone reading this prose. Currently 20 rows in two classes:
 
 - **not-a-parish (7)** — the St. Gianna Molla pregnancy centers (Buffalo, Lackawanna, Cheektowaga,
   Niagara Falls, Fredonia, Perry, Olean). They share the diocesan parish finder but are
   social-service offices and publish no bulletin.
-- **closed (11)** — St. Mary Queen of the Rosary (Strykersville), Our Lady of Loreto (Falconer),
+- **closed (13)** — St. Mary Queen of the Rosary (Strykersville), Our Lady of Loreto (Falconer),
   Our Lady of the Snows (Panama), St. Joseph (Fredonia), St. Rose of Lima (Forestville),
   St. Hedwig (Dunkirk), St. Patrick (Brocton), St. Isaac Jogues (Sherman), St. Mary (Batavia),
-  Holy Spirit (North Collins), St. Mary (Cattaraugus). **All but Sherman and Cattaraugus are still
-  in the live diocesan feed.** That is the point of the file — and those two are in it because
-  GCatholic still files closed buildings under current parishes.
+  Holy Spirit (North Collins), St. Mary (Cattaraugus), St. Jude (Sardinia), St. John the Baptist
+  (West Valley). **All but Sherman, Cattaraugus and West Valley are still in the live diocesan
+  feed.** That is the point of the file — and those three are in it because GCatholic still files
+  closed buildings under current parishes.
 - ~~**St. Casimir** (Buffalo, Kaisertown, 160 Cable St) — independent/non-diocesan Polish church~~
   **— REVERSED (commit `e556743`).** The earlier call was wrong. The Diocese of Buffalo's *own*
   parish finder lists St. Casimir at 160 Cable St as a diocesan parish (founded 1891) with its own
@@ -615,7 +651,7 @@ Where a dead domain means a parish has fallen back to a shared family bulletin, 
 family parish (as done above) is the right call under 1-parish=1-bulletin, but a human may want to
 confirm the parish hasn't simply moved to a new own-domain instead.
 
-### 6f. Deferred inventory — 18 worship sites / 17 parishes
+### 6f. Deferred inventory — 14 worship sites / 13 parishes
 
 A *closed* list, not an open-ended "rest of the diocese": every worship site the diocese lists is
 either in the dataset, in `data/buffalo_excluded_sites.csv` (§6d), or here.
@@ -630,41 +666,42 @@ uv run python scripts/reconcile_diocese_roster.py dio.json --list -o missing.jso
 The value the tooling cannot regenerate is *why* each site is blocked, so that is what the groups
 below record. They are ordered cheapest first.
 
-**(a) Sites under a parish the masterlist names — cheapest work left.** §4c decides these with no
-bulletin research: a `◦` line means the site shares its parent's bulletin. What is left in this
-class needs its *parent* modelled first, so it is really the parent that is blocking:
-St. Mary (East Arcade) and SS. Peter & Paul (Arcade) both sit under **St. Mary, Arcade** (Family
-#33), which is not in the dataset — and note the masterlist also puts our existing standalone
-`st-aloysius-springville` under that same parish, so adding it is a restructure (see (d)).
+**(a) Sites under a parish the masterlist names — EMPTY.** Cattaraugus Creek cleared the last of
+this class. It is the cheapest work there is, so re-check it first after every masterlist re-issue:
+any `◦` line under a parish already in `parishes.csv` is a church row with no research attached.
 
-**(b) Whole families whose bulletin has not been probed yet — best value per lookup, 6 sites.**
-Each is one run of `probe_bulletin_container.py` away from resolving several sites at once, exactly
-as Fields of Grace, The Lord's Vineyard and Chautauqua were. **Find the container first** — the
-family's own homepage is usually not in the diocesan feed and a web search for the family name
-finds it (that is all Chautauqua took, after two sessions had written its member domains off as
-dead):
+**(b) Whole families whose bulletin has not been probed yet — best value per lookup, 4 sites.**
+Each is one run of `probe_bulletin_container.py` away from resolving one or more sites, exactly as
+Fields of Grace, The Lord's Vineyard, Chautauqua and Cattaraugus Creek were. **Find the container
+first** — the family's own homepage is usually not in the diocesan feed and a web search for the
+family name finds it (that is all Chautauqua took, after two sessions had written its member
+domains off as dead), and check whether a *member's* container has simply been renamed to the
+family, which is what settled Cattaraugus Creek:
 - **Family #22 (Downtown Buffalo Family of Catholic Parishes)** — St. Joseph Cathedral. The
   masterlist retires the question this doc used to pose about the cathedral — it is not an orphan
   needing its own bulletin home found from scratch, it is one parish of a family, so probe that
   family's bulletin. It still cannot take `buffalodiocese.org` as its `website` (the diocese's own
   site, and not where a parish bulletin lives). **1 site.**
-- **Family #33** St. Joseph (Holland) · **Family #7** St. John XXIII (West Seneca) · **Family #29**
-  St. John Paul II (Lake View) · **Family #31** Our Lady of Charity + Our Lady of Perpetual Help
-  (Buffalo). **5 sites.**
+- **Family #7** St. John XXIII (West Seneca) · **Family #29** St. John Paul II (Lake View) ·
+  **Family #31** Our Lady of Charity (Buffalo). **3 sites.** Note §4c's warning applies hardest
+  here: Family #7 is named there as a family whose parishes look to publish *separately*, in which
+  case St. John XXIII is simply its own row (it has a live domain, `stjohn23.com`) and no
+  restructure follows. Families #29 and #31 both contain parishes we already model as standalone
+  rows, so either could go the other way and *collapse* rows.
 
-**(c) No family, no website — needs per-parish research, 10 sites.** Nothing structural to lean on;
+**(c) No family, no website — needs per-parish research, 9 sites.** Nothing structural to lean on;
 the masterlist places none of these under any family:
 St. Isidore (St. Mary/Silver Spring + St. Joseph/Perry — *not* part of Fields of Grace despite the
 org name, see §6b), Queen of Angels (Lackawanna), St. Andrew Kim (Tonawanda), Holy Family
-(Tuscarora Reservation, Sanborn), St. Jude (Sardinia), SS. Brendan & Jude (Almond, on
-`icc-ics.com` which 403s to bots), Immaculate Conception (Cassadaga), Our Lady of Fatima (Elba),
-Mary Immaculate (Immaculate Conception, East Bethany).
+(Tuscarora Reservation, Sanborn), SS. Brendan & Jude (Almond, on `icc-ics.com` which 403s to bots),
+Immaculate Conception (Cassadaga), Our Lady of Fatima (Elba), Mary Immaculate (Immaculate
+Conception, East Bethany), Our Lady of Perpetual Help (Buffalo — Facebook-only, unblocked by §2
+policy 1 but probe Family #31's bulletin first, since it may be a worship site).
 
-**(d) Restructures of existing rows — deliberately not done.** Each needs a bulletin probe first,
-and each *removes* a parish row rather than adding one:
+**(d) Restructures of existing rows — deliberately not done.** Needs a bulletin probe first, and it
+*removes* a parish row rather than adding one:
 - `enchanted-mountains-catholic` — the diocese lists St. John (Olean) and St. Mary of the Angels
   (Olean) as separate parishes with live domains, which under §1 argues for splitting our single row.
-- `st-aloysius-springville` → a worship site of St. Mary, Arcade (Family #33).
 
 **(e) ~~Open policy question~~ — SETTLED.** A social page may be the `website` when it genuinely
 hosts the bulletin (§2). Our Lady of Perpetual Help (Buffalo), which the diocese lists with a
@@ -731,4 +768,4 @@ Whichever step resolves it, the row-level rules are unchanged:
   bulletin's own Mass legend where you can (§4b).
 - `db create` + `pytest` after every batch, one commit per batch, and log the batch here.
 
-Coverage is **132 of 150 real worship sites (88%)**, all 8 counties, with 18 left in §6f.
+Coverage is **135 of 149 real worship sites (91%)**, all 8 counties, with 14 left in §6f.
