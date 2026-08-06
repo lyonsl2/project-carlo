@@ -21,8 +21,12 @@ Matching runs several nets, because no single one is sufficient (docs §4a):
 A dedication-only net is deliberately NOT used: with two dioceses loaded there
 is a St. Mary and a St. Joseph in a dozen towns, so it matches nearly anything.
 
-The feed also repeats some sites verbatim, so exact-duplicate rows are reported
-separately rather than counted as missing.
+The feed also lists some sites twice — same dedication, same town, slightly
+different street text — so repeats are collapsed *before* matching and reported
+separately. Collapsing first matters: while repeats were only detected among the
+rows that failed to match, modelling such a site made both of its feed rows
+count as covered, which quietly inflated the numerator and the denominator (and
+reported "repeated 0" for a feed that still contained the repeat).
 """
 
 from __future__ import annotations
@@ -30,6 +34,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import math
 import re
 from pathlib import Path
 
@@ -68,6 +73,26 @@ def norm_name(name: str, city: str) -> str:
     s = re.sub(r"\bof the\b", "", s)
     s = re.sub(r"\bof\b", "", s)
     return re.sub(r"[^a-z0-9]+", "", s) + "|" + (city or "").strip().lower()
+
+
+# Two feed rows for the same dedication in the same town are the same building
+# only if they also sit in the same place: the feed carries St. Mary, Mayville
+# at both "24 E. Chautauqua St" and "22 East Chautauqua St, Route 430", 30 m
+# apart. A city with two genuinely distinct churches of one dedication would not
+# come anywhere near this.
+SAME_SITE_METRES = 200
+
+
+def metres_apart(a: dict, b: dict) -> float | None:
+    try:
+        lat1, lon1, lat2, lon2 = (float(a["latitude"]), float(a["longitude"]),
+                                  float(b["latitude"]), float(b["longitude"]))
+    except (KeyError, TypeError, ValueError):
+        return None
+    p1, p2 = math.radians(lat1), math.radians(lat2)
+    dp, dl = p2 - p1, math.radians(lon2 - lon1)
+    h = math.sin(dp / 2) ** 2 + math.cos(p1) * math.cos(p2) * math.sin(dl / 2) ** 2
+    return 2 * 6371000 * math.asin(math.sqrt(h))
 
 
 def main() -> None:
@@ -112,9 +137,23 @@ def main() -> None:
             exact_name[norm_name(row["name"], row["city"])] = tag
             addr_nocity.setdefault(norm_addr(row["line1"], ""), tag)
 
-    matched, loose, dupes, missing = [], [], [], []
+    # Collapse the feed's repeats first, so a site counts once whether or not we
+    # already model it.
+    dupes, feed = [], []
     seen: dict[str, dict] = {}
     for r in dio:
+        key = norm_name(r["site"], r["city"])
+        first = seen.get(key)
+        if first is not None:
+            gap = metres_apart(first, r)
+            if gap is None or gap <= SAME_SITE_METRES:
+                dupes.append({**r, "_dupe_of": first["site"]})
+                continue
+        seen.setdefault(key, r)
+        feed.append(r)
+
+    matched, loose, missing = [], [], []
+    for r in feed:
         hit = (exact_addr.get(norm_addr(r["line1"], r["city"]))
                or exact_name.get(norm_name(r["site"], r["city"]))
                or exact_name.get(norm_name(r["parish"], r["city"])))
@@ -125,11 +164,6 @@ def main() -> None:
         if near:
             loose.append({**r, "_hit": near})
             continue
-        key = norm_name(r["site"], r["city"])
-        if key in seen:
-            dupes.append({**r, "_dupe_of": seen[key]["site"]})
-            continue
-        seen[key] = r
         missing.append(r)
 
     unique = len(dio) - len(dupes)
