@@ -51,6 +51,23 @@ Conventions: `state` always `NY`; slugs lowercase-hyphenated, **city-suffixed** 
 dedication already exists in the Rochester data (global UNIQUE) — e.g. `st-louis-buffalo`
 because Rochester already has `st-louis` (Pittsford). One commit per batch.
 
+**Settled policy calls (data owner, 2026-08-06).** These three came up repeatedly and are now
+decided — apply them, don't re-litigate them:
+
+1. **A social page may be a parish `website`** when it demonstrably *is* where the bulletin is
+   posted. Check that it actually carries the bulletin before using it; a page that only exists is
+   not enough. This unblocks parishes the diocese lists with a Facebook URL and no domain, starting
+   with Our Lady of Perpetual Help (Buffalo).
+2. **A closed church is removed from `churches.csv`** and recorded in the exclusion CSV, and its
+   public URL is simply allowed to 404. No redirect to a sibling church, and no `closed` column on
+   `church` — the schema stays as it is. (Church pages are prerendered per slug at
+   `/churches/<slug>/`, so a removal does drop a crawlable URL; that is accepted. See
+   `docs/seo-plan.md`.)
+3. **The dataset tracks real worship sites, not the diocesan feed.** A site with solid multi-source
+   evidence goes in whether or not the feed lists it — St. Pacificus Oratory (Humphrey) is the
+   precedent. Coverage % is measured *against the feed*, so it is a floor on the diocese, not a
+   description of the dataset.
+
 ## 3. Current state
 
 **Dataset: 143 parishes / 269 churches; 117 tests green.** (Rochester baseline was 62/132.)
@@ -87,7 +104,9 @@ church for months or years after its last Mass** — nine of the sites in this f
 buildings still in the live feed — so without a machine-readable exclusion list the "what's left"
 count silently overstates the work and invites someone to go re-research a demolished parish. Each
 row carries its reason, its evidence and the date decided; add to it whenever a site is ruled out
-for good, and never delete a row to make the number look better. Rows the feed *doesn't* list are
+for good, and never delete a row to make the number look better. When the closed site is one we
+had already modelled, delete the `church` row as well and let its `/churches/<slug>/` URL 404 (§2);
+St. Mary (Batavia) is the worked example. Rows the feed *doesn't* list are
 worth keeping too (St. Isaac Jogues, Sherman): the reconciler ignores them, but they stop the next
 person re-deriving a closed church from GCatholic, which lags harder than the feed does.
 
@@ -647,9 +666,11 @@ and each *removes* a parish row rather than adding one:
   (Olean) as separate parishes with live domains, which under §1 argues for splitting our single row.
 - `st-aloysius-springville` → a worship site of St. Mary, Arcade (Family #33).
 
-**(e) Open policy question.** Our Lady of Perpetual Help (Buffalo) lists only a Facebook page.
-Nobody has decided whether a social page may be the `website` when it genuinely is where the
-bulletin is posted. Worth settling once, since it will recur in every diocese.
+**(e) ~~Open policy question~~ — SETTLED.** A social page may be the `website` when it genuinely
+hosts the bulletin (§2). Our Lady of Perpetual Help (Buffalo), which the diocese lists with a
+Facebook URL and no domain, is therefore **unblocked**: confirm the page actually carries the
+bulletin, then add it. It sits in Family #31 above, so probing that family's bulletin may settle
+it as a worship site instead — do that first.
 
 ### 6g. Dead end worth recording: the ParishesOnline API
 
