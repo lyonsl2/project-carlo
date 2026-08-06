@@ -457,90 +457,68 @@ Where a dead domain means a parish has fallen back to a shared family bulletin, 
 family parish (as done above) is the right call under 1-parish=1-bulletin, but a human may want to
 confirm the parish hasn't simply moved to a new own-domain instead.
 
-### 6f. Complete deferred inventory (49 worship sites / 38 parishes)
+### 6f. Deferred inventory — 32 worship sites / 28 parishes
 
-This is a *closed* list, not an open-ended "rest of the diocese": every one of the diocese's
-worship sites is either in the dataset, excluded as not-a-parish (§6d), or listed here.
+A *closed* list, not an open-ended "rest of the diocese": every worship site the diocese lists is
+either in the dataset, in `data/buffalo_excluded_sites.csv` (§6d), or here.
 
-**Regenerate it rather than reading the prose below** — the groupings are a snapshot, and the
-diocese edits the feed:
+**Regenerate it; don't read the prose as current.** The counts and groupings below are a snapshot,
+the diocese edits the feed, and this section has already been wrong twice:
 
 ```
 uv run python scripts/reconcile_diocese_roster.py dio.json --list -o missing.json
 ```
 
-The narrative groups (a)–(h) below are kept because they record *why* each site is blocked, which
-the tooling cannot regenerate. Counts are as of the Central Niagara / CNIF batch; the group letters
-still describe the shape of the remaining work even where a few members have since been resolved.
+The value the tooling cannot regenerate is *why* each site is blocked, so that is what the groups
+below record. They are ordered cheapest first.
 
-**Resolved out of this inventory since it was written:** All Saints (Lockport) and Our Lady of the
-Lake's two sites → `central-niagara-catholic`; St. James, Holy Apostles' two sites, Sacred
-Heart/Lakewood and St. Patrick/Randolph → `catholic-neighbors-in-faith`; St. Elizabeth Ann Seton,
-St. Hyacinth, Our Lady of Mount Carmel and St. Anthony of Padua → `the-lords-vineyard`.
+**(a) Sites under a parish the masterlist names — cheapest work left.** §4c decides these with no
+bulletin research: a `◦` line means the site shares its parent's bulletin. What is left in this
+class needs its *parent* modelled first, so it is really the parent that is blocking:
+St. Mary (East Arcade) and SS. Peter & Paul (Arcade) both sit under **St. Mary, Arcade** (Family
+#33), which is not in the dataset — and note the masterlist also puts our existing standalone
+`st-aloysius-springville` under that same parish, so adding it is a restructure (see (d)).
 
-**Excluded as closed** (the diocesan feed still lists all of these): Our Lady of Loreto (Falconer),
-Our Lady of the Snows (Panama), St. Joseph (Fredonia), St. Rose of Lima (Forestville), St. Hedwig
-(Dunkirk). A site being in the feed is not evidence it is open — the families' own pages and
-bulletin mastheads are, and they disagree with the feed often enough to check every time.
+**(b) Whole families whose bulletin has not been probed yet — best value per lookup.** Each is one
+run of `probe_bulletin_container.py` away from resolving several sites at once, exactly as Fields
+of Grace and The Lord's Vineyard were:
+- **Family #5 (Chautauqua)** — St. Mary of Lourdes (Mayville + Bemus Point), St. Dominic
+  (St. Patrick/Brocton + St. James Major/Westfield), Christ Our Hope (St. Matthias/Clymer).
+  **6 sites**, all on dead or login-walled domains. The single biggest remaining win.
+- **Family #32 (Cheektowaga-Kaisertown-Sloan)** — Our Lady of Czestochowa (Cheektowaga) and
+  St. Andrew (Sloan), alongside our existing `st-casimir-buffalo`. **2 sites.**
+- **Family #25 (Three Catholic Sisters of the Foothills)** — Holy Name of Mary (Ellicottville) and
+  Our Lady of Peace (Salamanca); the masterlist also places our existing standalone
+  `st-philomena-franklinville` under Holy Name of Mary, so this one is an addition *and* a
+  restructure. **2 sites.**
+- **Family #12 (Twelve Apostles)** — St. Brigid (Bergen) and Ascension (Batavia). Note the
+  masterlist lists Our Lady of Mercy (LeRoy) as its own parish while we model it as a church of
+  `resurrection-batavia`; worth re-checking against the bulletin. **2 sites.**
+- **Family #27** St. Joseph (Gowanda) · **Family #33** St. Joseph (Holland) · **Family #7**
+  St. John XXIII (West Seneca) · **Family #29** St. John Paul II (Lake View) · **Family #31**
+  Our Lady of Charity + Our Lady of Perpetual Help (Buffalo). **6 sites.**
 
-**(a) Diocese lists no website — 21 sites.** These need a bulletin home found by hand. Several are
-clearly worship sites of a parish already named, which is the cheapest place to start:
-Our Lady of Mt. Carmel (Silver Creek) + St. Rose of Lima (Forestville); Our Lady of the Lake —
-St. Patrick (Barker) + St. Joseph (Lyndonville); St. Isidore — St. Mary (Silver Spring) +
-St. Joseph (Perry) *(these two are ERRCC, §6b)*; St. Anthony (Fredonia) + Immaculate Conception
-(Cassadaga); Sacred Heart — Our Lady of the Snows (Panama); SS. Peter & Paul (Arcade) + St. Mary
-(East Arcade). Singles: Our Lady of Czestochowa (Cheektowaga), St. John Gualbert (Cheektowaga),
-Queen of Angels (Lackawanna), St. Andrew Kim (Tonawanda), Holy Family (Tuscarora Reservation,
-Sanborn), Holy Spirit (North Collins), St. Jude (Sardinia), St. Brigid (Bergen), St. Patrick
-(Randolph), Our Lady of Loreto (Falconer).
+**(c) No family, no website — needs per-parish research.** Nothing structural to lean on:
+St. Isidore (St. Mary/Silver Spring + St. Joseph/Perry — *not* part of Fields of Grace despite the
+org name, see §6b), Queen of Angels (Lackawanna), St. Andrew Kim (Tonawanda), Holy Family
+(Tuscarora Reservation, Sanborn), Holy Spirit (North Collins), St. Jude (Sardinia), SS. Brendan &
+Jude (Almond, on `icc-ics.com` which 403s to bots), Immaculate Conception (Cassadaga), Our Lady of
+Fatima (Elba). **10 sites.**
 
-**(b) Vanity domain no longer resolves — 19 sites / 13 parishes.** DNS is NXDOMAIN, so the
-diocese's link is simply stale. Per the ERRCC precedent (§6e) the fix is to point `website` at
-wherever the bulletin actually lives now — usually a ParishesOnline org page or a family site:
-St. Andrew (Sloan), St. John XXIII (West Seneca), Epiphany of Our Lord (Langford), St. Joseph
-(Holland), St. Joseph (Gowanda), Our Lady of Peace (Salamanca), Our Lady of the Angels (Cuba),
-St. Mary (Canaseraga), Holy Name of Mary (Ellicottville), SS. Joachim and Anne (St. Joseph/
-Varysburg + St. Vincent/Attica), Mary Immaculate (IC/East Bethany + St. Mary/Pavilion),
-St. Dominic (St. Patrick/Brocton + St. James Major/Westfield), St. Mary of Lourdes (St. Mary/
-Mayville + Our Lady of Lourdes/Bemus Point).
-*Checked and ruled out:* GCatholic offers an alternate homepage for only one of these
-(Sacred Heart/Lakewood → `sacredheartlakewood.org`), and that domain is dead too.
+**(d) Restructures of existing rows — deliberately not done.** Each needs a bulletin probe first,
+and each *removes* a parish row rather than adding one:
+- `enchanted-mountains-catholic` — the diocese lists St. John (Olean) and St. Mary of the Angels
+  (Olean) as separate parishes with live domains, which under §1 argues for splitting our single row.
+- `st-aloysius-springville` → a worship site of St. Mary, Arcade (Family #33).
+- `st-philomena-franklinville` → a worship site of Holy Name of Mary, Ellicottville (Family #25).
 
-**(c) Domain squatted or parked — 4 sites.** Saint John Paul II (Lake View, `jp2parish.org` →
-togel spam), Saint Maximilian Kolbe / Holy Name of Mary (East Pembroke, `stmax.net` → Indonesian
-gambling site), Sacred Heart (Lakewood, `sh.thischurch.org` → vendor template), St. Margaret
-(Buffalo, HTTP 410 Gone). Same fix as (b).
+**(e) Cathedral — 1 site.** St. Joseph Cathedral (50 Franklin St) is listed under
+`buffalodiocese.org` itself, which is the diocese's own site and cannot be a parish `website` — it
+would collide and is not where a parish bulletin lives. Needs the cathedral's own bulletin home.
 
-**(d) Website is a social page only — 2 sites.** Our Lady of Perpetual Help (Buffalo, Facebook
-only) and Christ Our Hope / St. Matthias (Clymer, Google Sites behind a login redirect). Needs a
-decision on whether a Facebook page can be the `website` when it is genuinely where the bulletin
-is posted.
-
-**(e) Genuinely in flux — 7 sites.** Unchanged from §6b/§6c and still the right call to wait:
-Holy Apostles (St. John + SS. Peter and Paul, Jamestown) and St. James (Jamestown); All Saints /
-St. Mary (Lockport); Ascension (Batavia); St. Padre Pio (St. Cecilia/Oakfield + Our Lady of
-Fatima/Elba). Note the diocese *does* still list Ascension and St. Padre Pio as their own parishes,
-which contradicts the earlier note that Resurrection had absorbed them — worth re-checking before
-modelling either way.
-
-**(f) Lord's Vineyard — RESOLVED, and it was the test case for §4b.** Formerly "the one place
-where the mechanical rule is known to be insufficient": Blessed Mary Angela / St. Hyacinth,
-St. Elizabeth Ann Seton and St. Joseph / Fredonia each had their own live domain, so per-domain
-grouping said "split", while §6b's evidence of a shared bulletin org said "don't". Reading the
-container settled it in one step — one bulletin, one row, five worship sites — and incidentally
-showed St. Joseph / Fredonia had closed on 24 Dec 2024, so the domain that provoked the whole
-question belonged to a church that no longer exists. **Where domains and the bulletin disagree,
-the domains are the stale signal.**
-
-**(g) Would duplicate existing rows — 2 sites.** St. John (Olean, `sjteolean.org`) and St. Mary of
-the Angels (Olean, `smaolean.org`) are already modelled as worship sites of
-`enchanted-mountains-catholic`. The diocese lists them as *separate parishes with their own live
-domains*, which under §1 argues for splitting `enchanted-mountains-catholic` into per-parish rows.
-That is a restructure of existing data, not an addition — deliberately not done here.
-
-**(h) Cathedral — 1 site.** St. Joseph Cathedral (50 Franklin St) is listed under
-`buffalodiocese.org` itself, which is the diocese's site and cannot be a parish `website` (it would
-collide and is not where a parish bulletin lives). Needs the cathedral's own bulletin home.
+**(f) Open policy question.** Our Lady of Perpetual Help (Buffalo) lists only a Facebook page.
+Nobody has decided whether a social page may be the `website` when it genuinely is where the
+bulletin is posted. Worth settling once, since it will recur in every diocese.
 
 ### 6g. Dead end worth recording: the ParishesOnline API
 
@@ -570,21 +548,34 @@ Then: probe every candidate domain for liveness **and redirect target** → grou
 occurs more than once in the diocese → validate `slug`/`website` uniqueness → `db create` +
 `pytest` → commit per batch → log the batch and any new edge cases here.
 
-**For the rest of Buffalo**, the bulk method is exhausted: §6f is a closed list of all 60 remaining
-worship sites, and every one of them is blocked on the same per-parish question — *where does this
-parish's bulletin live now that its domain is gone?* Work group (a) and (b) of §6f parish by parish
-with `WebSearch`; ParishesOnline's API is a dead end for this (§6g). Steps 1–4 below are still the
-right per-parish procedure:
+**For the rest of Buffalo**, the earlier advice here — "every remaining site is blocked on
+per-parish research, work them one at a time with `WebSearch`" — turned out to be wrong, and it was
+wrong in an expensive direction. Most of those sites were not blocked on research at all. They were
+blocked on *structure*, and the diocese publishes the structure. Coverage went 62% → 79% in a
+single session, mostly by reading two documents the earlier passes never opened.
 
-1. Pick a parish from §6f. Research with `WebSearch` + `WebFetch` (both work here);
-   fall back to `gcatholic.org` for address + Plus Code when a parish host 403s.
-2. Cross-check each address against a 2nd independent source before `address_verified=true`.
-3. Decide parish-vs-worship-site by **who publishes the bulletin** (§1): shared bulletin/site →
-   one parish + many churches; own bulletin/site → its own parish.
-4. **Geocode inline** — decode the Plus Code from gcatholic (no network needed, see
-   `decode_plus_code` in `scripts/fetch_gcatholic_roster.py`), or use Nominatim, which works here.
-   Don't leave coordinates blank — that was only the cloud agent's constraint.
+Work in this order, cheapest first, and only fall through when a step genuinely cannot answer:
 
-Coverage against the diocese's own parish finder is **100 of 160 worship sites (62%)**, all 8
-counties. The residual 60 are enumerated exhaustively in §6f, so "what's left" is now a finite
-checklist rather than an open-ended survey.
+1. **Read the family masterlist (§4c).** `fetch_diocese_family_list.py`. Every `◦` line under a
+   parish already in `parishes.csv` is a church row you can add immediately — no bulletin research,
+   no website needed. Six sites landed this way in one batch.
+2. **Probe the family's bulletin container (§4b).** `probe_bulletin_container.py`. This answers
+   "one parish or several?" directly, and it is the *only* thing that answers it when members keep
+   separate live domains. Start from the families listed in §6f(b).
+3. **Only then** research a parish individually with `WebSearch`/`WebFetch`, falling back to
+   `gcatholic.org` for address + Plus Code when a parish host 403s. ParishesOnline's API is a dead
+   end for finding bulletins in bulk (§6g).
+
+Whichever step resolves it, the row-level rules are unchanged:
+
+- Cross-check each address against a 2nd independent source before `address_verified=true`, and
+  leave it `false` when sources genuinely disagree rather than picking a favourite quietly.
+- Decide parish-vs-worship-site by **who publishes the bulletin** (§1) — never by domain count.
+- **Geocode inline** — decode the Plus Code from gcatholic (no network needed, see
+  `decode_plus_code` in `scripts/fetch_gcatholic_roster.py`), or use Nominatim, which works here.
+- **Check whether the building still exists** before adding it. The feed lists closed churches for
+  years; six such are already in `data/buffalo_excluded_sites.csv`, and confirming a closure is as
+  much progress as adding a row. Record it there with its evidence.
+- `db create` + `pytest` after every batch, one commit per batch, and log the batch here.
+
+Coverage is **121 of 153 real worship sites (79%)**, all 8 counties, with 32 left in §6f.
