@@ -53,13 +53,13 @@ because Rochester already has `st-louis` (Pittsford). One commit per batch.
 
 ## 3. Current state
 
-**Dataset: 143 parishes / 245 churches; 117 tests green.** (Rochester baseline was 62/132.)
+**Dataset: 143 parishes / 249 churches; 117 tests green.** (Rochester baseline was 62/132.)
 
-**Buffalo contribution: 81 parishes / 113 churches, all geocoded**, spanning **all 8 counties**.
+**Buffalo contribution: 81 parishes / 117 churches, all geocoded**, spanning **all 8 counties**.
 
 Measured against the diocese's own parish finder — 167 locations, which reduce to **158 real
 worship sites** (7 are St. Gianna Molla centers, §6d, and the feed repeats 2) — the dataset now
-covers **109 of 158, or 69%**. The uncovered remainder is exactly 49 sites across 38 canonical
+covers **113 of 158, or 72%**. The uncovered remainder is exactly 45 sites across 36 canonical
 parishes, every one deferred for a concrete, individually-documented reason (§6f): overwhelmingly
 "the parish's website is dead or the diocese lists none", not "not looked at yet".
 
@@ -183,6 +183,20 @@ north-tonawanda` → folded into `tonawanda-catholic`; `holy-family-albion` → 
 `one-catholic`; `resurrection-batavia` website → the12apostles.org. The batch-1–8 lists below
 record the *original* additions; the audit entries record the corrections.
 
+- **The Lord's Vineyard** (N. Chautauqua) — the case §6f(f) called "the one place where the
+  mechanical rule is known to be insufficient", closed by §4b. Container 14/1221 is still
+  publishing and its masthead lists every member church under one banner → **one parish row**
+  `the-lords-vineyard` (thelordsvineyard3.com), 5 worship sites: Holy Trinity + St. Elizabeth Ann
+  Seton + St. Hyacinth (Dunkirk), Our Lady of Mount Carmel (Silver Creek), St. Anthony of Padua
+  (Fredonia). The standing `holy-trinity-dunkirk` row collapsed in, as §6b anticipated.
+  Churches 245 → 249.
+  - **Three sites the diocesan feed still lists are excluded as closed**, each dated from the
+    family's own churches page: St. Joseph (Fredonia) 24 Dec 2024; St. Rose of Lima (Forestville),
+    last Mass 5 Jan 2025; St. Hedwig (Dunkirk) 8 Jun 2025. The masthead corroborates: St. Hedwig
+    appears in the May 2025 issue and is gone by March 2026.
+  - **Still open: Immaculate Conception (Cassadaga).** The diocese and GCatholic both place it
+    under St. Anthony parish, but the family's current masthead and Mass schedule omit it
+    entirely and no closure notice was found. Deferred rather than guessed either way.
 - **Central Niagara + Catholic Neighbors in Faith** — two families resolved by reading the
   *bulletin itself* rather than the websites (§4b). Net: parishes unchanged at 143, churches
   237 → 245.
@@ -274,14 +288,10 @@ parish's own homepage/bulletin org, then split. Only model the whole family as O
 there is genuinely a single combined bulletin and no per-parish sites (the tonawanda-catholic /
 cheektowaga / enchanted-mountains case). Addresses already captured below:
 
-- **The Lord's Vineyard** (thelordsvineyard3.com, N. Chautauqua) — **4 canonical parishes / 5
-  worship sites**, org `the-lords-vineyard`. `holy-trinity-dunkirk` is already in the dataset as its
-  own parish, but its domain holytrinitydunkirk.org now 301s to thelordsvineyard3.com — so a human
-  should decide whether Holy Trinity still prints its own bulletin or now shares the family's (if the
-  latter, fold it in). Other sites: St. Anthony (66 Cushing St) + St. Joseph (145 E Main St) Fredonia
-  share a combined bulletin (`st-anthony-st-joseph-churches`); Our Lady of Mount Carmel (Silver
-  Creek); St. Elizabeth Ann Seton & Blessed Mary Angela (Dunkirk). Defer until the per-bulletin split
-  across the 4 parishes is mapped.
+- ~~**The Lord's Vineyard** (thelordsvineyard3.com, N. Chautauqua)~~ **— RESOLVED** as one
+  `the-lords-vineyard` row with 5 worship sites; `holy-trinity-dunkirk` folded in. The question
+  this entry posed — "does Holy Trinity still print its own bulletin?" — was answered by reading
+  the container, not by inspecting domains. See §6f(f).
 - **Eastern Rural RCC (ERRCC)** (errcc.org, Wyoming/Genesee) — now modeled as `eastern-rural-rcc`
   with **only St. Michael/Warsaw** attached. ERRCC's combined bulletin (org `st-michael-st-isidore`,
   ParishesOnline 14/0954) also covers Mary Immaculate, St. Isidore (Perry/Silver Springs), St. Joseph,
@@ -380,8 +390,13 @@ still describe the shape of the remaining work even where a few members have sin
 
 **Resolved out of this inventory since it was written:** All Saints (Lockport) and Our Lady of the
 Lake's two sites → `central-niagara-catholic`; St. James, Holy Apostles' two sites, Sacred
-Heart/Lakewood and St. Patrick/Randolph → `catholic-neighbors-in-faith`; Our Lady of Loreto
-(Falconer) and Our Lady of the Snows (Panama) → **closed**, excluded permanently.
+Heart/Lakewood and St. Patrick/Randolph → `catholic-neighbors-in-faith`; St. Elizabeth Ann Seton,
+St. Hyacinth, Our Lady of Mount Carmel and St. Anthony of Padua → `the-lords-vineyard`.
+
+**Excluded as closed** (the diocesan feed still lists all of these): Our Lady of Loreto (Falconer),
+Our Lady of the Snows (Panama), St. Joseph (Fredonia), St. Rose of Lima (Forestville), St. Hedwig
+(Dunkirk). A site being in the feed is not evidence it is open — the families' own pages and
+bulletin mastheads are, and they disagree with the feed often enough to check every time.
 
 **(a) Diocese lists no website — 21 sites.** These need a bulletin home found by hand. Several are
 clearly worship sites of a parish already named, which is the cheapest place to start:
@@ -423,17 +438,14 @@ Fatima/Elba). Note the diocese *does* still list Ascension and St. Padre Pio as 
 which contradicts the earlier note that Resurrection had absorbed them — worth re-checking before
 modelling either way.
 
-**(f) Lord's Vineyard, still unsplit — 3 sites.** Blessed Mary Angela / St. Hyacinth (Dunkirk),
-St. Elizabeth Ann Seton (Dunkirk), St. Joseph (Fredonia). Each has its own live domain, so the
-per-domain rule *would* split them — but §6b records that St. Anthony + St. Joseph (Fredonia) share
-one bulletin org, so splitting blind would over-split.
-
-**This is now tractable, and it is the best next job in the list.** It is exactly the shape §4b
-solves: several live domains, one uncertain bulletin map. Probe the Lord's Vineyard container and
-each candidate member's own container — whichever is still publishing this week defines the parish
-rows, and the combined issue's masthead names its members outright. Note the same evidence may
-argue for folding the existing `holy-trinity-dunkirk` row in (its domain already 301s to
-thelordsvineyard3.com), exactly as Central Niagara absorbed two standing rows.
+**(f) Lord's Vineyard — RESOLVED, and it was the test case for §4b.** Formerly "the one place
+where the mechanical rule is known to be insufficient": Blessed Mary Angela / St. Hyacinth,
+St. Elizabeth Ann Seton and St. Joseph / Fredonia each had their own live domain, so per-domain
+grouping said "split", while §6b's evidence of a shared bulletin org said "don't". Reading the
+container settled it in one step — one bulletin, one row, five worship sites — and incidentally
+showed St. Joseph / Fredonia had closed on 24 Dec 2024, so the domain that provoked the whole
+question belonged to a church that no longer exists. **Where domains and the bulletin disagree,
+the domains are the stale signal.**
 
 **(g) Would duplicate existing rows — 2 sites.** St. John (Olean, `sjteolean.org`) and St. Mary of
 the Angels (Olean, `smaolean.org`) are already modelled as worship sites of
