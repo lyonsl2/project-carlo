@@ -200,7 +200,6 @@ st-stanislaus-buffalo,st-john-gualbert-cheektowaga,St. John Gualbert Church,83 G
 st-martin-de-porres-buffalo,st-martin-de-porres-buffalo,St. Martin de Porres Church,555 Northampton Street,,Buffalo,NY,14208,true,true,42.9070625,-78.8463125
 our-lady-of-hope-buffalo,our-lady-of-hope-buffalo,Our Lady of Hope Church,18 Greenwood Place,,Buffalo,NY,14213,true,true,42.9203125,-78.8895625
 assumption-buffalo,assumption-buffalo,Assumption Church,435 Amherst Street,,Buffalo,NY,14207,true,true,42.9386875,-78.8880625
-st-casimir-buffalo,st-casimir-buffalo,St. Casimir Church,160 Cable Street,,Buffalo,NY,14206,true,true,42.8689375,-78.8076875
 st-katharine-drexel-buffalo,st-katharine-drexel-buffalo,St. Katharine Drexel Church,118 Schiller Street,,Buffalo,NY,14206,true,true,42.8881875,-78.8021875
 st-teresa-buffalo,st-teresa-buffalo,St. Teresa Church,1974 Seneca Street,,Buffalo,NY,14210,true,true,42.8575625,-78.8120625
 st-mark-buffalo,st-mark-buffalo,St. Mark Church,401 Woodward Avenue,,Buffalo,NY,14214,true,true,42.9401875,-78.8490625
@@ -260,3 +259,6 @@ chautauqua-family-catholic,st-mary-mayville,St. Mary Church,22 East Chautauqua S
 chautauqua-family-catholic,our-lady-of-lourdes-bemus-point,Our Lady of Lourdes Church,41 Main Street,,Bemus Point,NY,14712,true,true,42.1581875,-79.3906875
 chautauqua-family-catholic,st-james-major-westfield,St. James Major Church,15 Union Street,,Westfield,NY,14787,false,true,42.3225625,-79.5746875
 chautauqua-family-catholic,st-matthias-clymer,St. Matthias Church,1762 French Creek Mina Road,,Clymer,NY,14724,true,true,42.0755625,-79.6978125
+cheektowaga-kaisertown-sloan-catholic,st-casimir-buffalo,St. Casimir Church,160 Cable Street,,Buffalo,NY,14206,true,true,42.8689375,-78.8076875
+cheektowaga-kaisertown-sloan-catholic,our-lady-of-czestochowa-cheektowaga,Our Lady of Czestochowa Church,2158 Clinton Street,,Cheektowaga,NY,14206,true,true,42.8718125,-78.7965625
+cheektowaga-kaisertown-sloan-catholic,st-andrew-sloan,St. Andrew Church,34 Francis Avenue,,Sloan,NY,14212,true,true,42.8954375,-78.7880625

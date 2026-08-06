@@ -53,14 +53,14 @@ because Rochester already has `st-louis` (Pittsford). One commit per batch.
 
 ## 3. Current state
 
-**Dataset: 143 parishes / 261 churches; 117 tests green.** (Rochester baseline was 62/132.)
+**Dataset: 143 parishes / 263 churches; 117 tests green.** (Rochester baseline was 62/132.)
 
-**Buffalo contribution: 81 parishes / 129 churches, all geocoded**, spanning **all 8 counties**.
+**Buffalo contribution: 81 parishes / 131 churches, all geocoded**, spanning **all 8 counties**.
 
 Measured against the diocese's own parish finder — 167 locations, which reduce to **152 real
 worship sites** once the entries in `data/buffalo_excluded_sites.csv` are removed and the 2 sites
-the feed repeats are collapsed — the dataset now covers **125 of 152, or 82%**. The uncovered
-remainder is 27 sites across 25 canonical parishes, every one deferred for a concrete,
+the feed repeats are collapsed — the dataset now covers **127 of 152, or 84%**. The uncovered
+remainder is 25 sites across 23 canonical parishes, every one deferred for a concrete,
 individually-documented reason (§6f): overwhelmingly "the parish's website is dead or the diocese
 lists none", not "not looked at yet".
 
@@ -79,8 +79,8 @@ The reconciler now collapses the feed's repeated sites **before** matching. It u
 only among rows it could not match, so the moment a repeated site got modelled — as St. Mary
 (Mayville) and Our Lady of Lourdes (Bemus Point) just did — both of its feed rows counted as
 covered and the tool reported "repeated 0" for a feed that still contained the repeat. Coverage
-barely moved (127/154 vs 125/152) but the raw counts were wrong, and these counts are the thing
-this project trusts over its own prose.
+barely moved (127/154 vs 125/152 at the time) but the raw counts were wrong, and these counts are
+the thing this project trusts over its own prose.
 
 `data/buffalo_excluded_sites.csv` is what keeps that number honest. **The diocese goes on listing a
 church for months or years after its last Mass** — seven of the sites in this file are closed
@@ -161,6 +161,11 @@ Two signals together are conclusive, and they are cheap:
 1. **The combined container is still publishing this week** → the family bulletin is current, not
    a historical arrangement.
 2. **A member's own former container has gone silent** → that member folded in.
+
+Signal 2 is not only about containers. St. Casimir (Buffalo) keeps a live domain that links a
+Google Drive folder of bulletins — four monthly PDFs whose newest is May 2025, while the family's
+weekly bulletin has carried St. Casimir's Masses, collections and events every week since. Read
+the dates, not the presence of a link.
 
 That pair is what settled Central Niagara, including the part domain-grouping got wrong: St. John
 the Baptist and St. Brendan on the Lake both keep live, distinct, parish-looking domains, so every
@@ -255,6 +260,21 @@ north-tonawanda` → folded into `tonawanda-catholic`; `holy-family-albion` → 
 `one-catholic`; `resurrection-batavia` website → the12apostles.org. The batch-1–8 lists below
 record the *original* additions; the audit entries record the corrections.
 
+- **Roman Catholic Community of Cheektowaga-Kaisertown-Sloan** (Family #32) — a **restructure**:
+  `cheektowaga-kaisertown-sloan-catholic` (olc-cheektowaga.com, container 14/0948) with **3 worship
+  sites**, absorbing the standalone `st-casimir-buffalo` row. Sites: St. Casimir (Buffalo,
+  Kaisertown), Our Lady of Czestochowa (Cheektowaga), St. Andrew (Sloan). Parishes 143 → 143
+  (one added, one collapsed), churches 261 → 263; coverage 82% → 84%.
+  - The family's homepage is `olc-cheektowaga.com` — a member church's domain that has become the
+    community's site (it names all three churches and links the shared bulletin). The diocesan feed
+    does not carry it; it lists `standrewsloan.com`, which no longer resolves.
+  - **St. Casimir keeps a live domain with a bulletin link, and still folds in.** The link is a
+    Google Drive folder holding four *monthly* PDFs, newest May 2025; the family's *weekly*
+    bulletin has run continuously since and carries St. Casimir's Masses, collections and events.
+    Same §4b test as Central Niagara, different shape of "own channel gone silent".
+  - Address note: the family's own masthead gives Our Lady of Czestochowa as 23 Willowlawn Parkway
+    while the feed, GCatholic and the parish site all say 2158 Clinton Street — the same corner
+    building. Modelled at 2158 Clinton Street.
 - **Chautauqua Family of Catholic Churches** (Family #5, the last whole family on the deferred
   list) — `chautauqua-family-catholic` (cfofcc.net, container 14/0681), **4 worship sites**:
   St. Mary (Mayville), Our Lady of Lourdes (Bemus Point), St. James Major (Westfield), St. Matthias
@@ -462,7 +482,9 @@ rather than relying on someone reading this prose. Currently 15 rows in two clas
   parish finder lists St. Casimir at 160 Cable St as a diocesan parish (founded 1891) with its own
   homepage `stcasimirbuffalo.com`, which resolves and serves parish content. Added as
   `st-casimir-buffalo`. Lesson worth keeping: prefer the diocese's own directory over third-party
-  claims about jurisdiction.
+  claims about jurisdiction. *(It is now a worship site of `cheektowaga-kaisertown-sloan-catholic`
+  — a diocesan parish with a live site, and still not a bulletin of its own. §1 is about the
+  bulletin, not about jurisdiction or hosting.)*
 
 ### 6e. Website liveness audit — DONE (a re-run is the recommended periodic check)
 Ran a DNS-resolve + HTTP + content sanity sweep over all 39 Buffalo parish websites
@@ -505,7 +527,7 @@ Where a dead domain means a parish has fallen back to a shared family bulletin, 
 family parish (as done above) is the right call under 1-parish=1-bulletin, but a human may want to
 confirm the parish hasn't simply moved to a new own-domain instead.
 
-### 6f. Deferred inventory — 27 worship sites / 25 parishes
+### 6f. Deferred inventory — 25 worship sites / 23 parishes
 
 A *closed* list, not an open-ended "rest of the diocese": every worship site the diocese lists is
 either in the dataset, in `data/buffalo_excluded_sites.csv` (§6d), or here.
@@ -527,14 +549,12 @@ St. Mary (East Arcade) and SS. Peter & Paul (Arcade) both sit under **St. Mary, 
 #33), which is not in the dataset — and note the masterlist also puts our existing standalone
 `st-aloysius-springville` under that same parish, so adding it is a restructure (see (d)).
 
-**(b) Whole families whose bulletin has not been probed yet — best value per lookup, 14 sites.**
+**(b) Whole families whose bulletin has not been probed yet — best value per lookup, 12 sites.**
 Each is one run of `probe_bulletin_container.py` away from resolving several sites at once, exactly
 as Fields of Grace, The Lord's Vineyard and Chautauqua were. **Find the container first** — the
 family's own homepage is usually not in the diocesan feed and a web search for the family name
 finds it (that is all Chautauqua took, after two sessions had written its member domains off as
 dead):
-- **Family #32 (Cheektowaga-Kaisertown-Sloan)** — Our Lady of Czestochowa (Cheektowaga) and
-  St. Andrew (Sloan), alongside our existing `st-casimir-buffalo`. **2 sites.**
 - **Family #25 (Three Catholic Sisters of the Foothills)** — Holy Name of Mary (Ellicottville) and
   Our Lady of Peace (Salamanca); the masterlist also places our existing standalone
   `st-philomena-franklinville` under Holy Name of Mary, so this one is an addition *and* a
@@ -633,4 +653,4 @@ Whichever step resolves it, the row-level rules are unchanged:
   bulletin's own Mass legend where you can (§4b).
 - `db create` + `pytest` after every batch, one commit per batch, and log the batch here.
 
-Coverage is **125 of 152 real worship sites (82%)**, all 8 counties, with 27 left in §6f.
+Coverage is **127 of 152 real worship sites (84%)**, all 8 counties, with 25 left in §6f.
