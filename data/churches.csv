@@ -145,7 +145,7 @@ our-lady-of-victory-basilica,our-lady-of-victory-lackawanna,Our Lady of Victory 
 st-benedict-amherst,st-benedict-amherst,St. Benedict Church,1317 Eggert Road,,Amherst,NY,14226,true,true,42.9643669,-78.8028461
 ss-peter-and-paul-hamburg,ss-peter-and-paul-hamburg,Saints Peter & Paul Church,66 East Main Street,,Hamburg,NY,14075,true,true,42.7157733,-78.8270067
 immaculate-conception-east-aurora,immaculate-conception-east-aurora,Immaculate Conception Church,520 Oakwood Avenue,,East Aurora,NY,14052,true,true,42.7659734,-78.6155447
-st-mary-of-the-lake-hamburg,st-mary-of-the-lake-hamburg,St. Mary of the Lake Church,4737 Lake Shore Road,,Hamburg,NY,14075,true,true,42.7540234,-78.8898175
+lakeshore-catholic-faith-community,st-mary-of-the-lake-hamburg,St. Mary of the Lake Church,4737 Lake Shore Road,,Hamburg,NY,14075,true,true,42.7540234,-78.8898175
 st-mary-swormville,st-mary-swormville,St. Mary's Church (Swormville),6919 Transit Road,,Swormville,NY,14051,true,true,43.0378575,-78.6964044
 cattaraugus-creek-catholic,st-aloysius-springville,St. Aloysius Church,190 Franklin Street,,Springville,NY,14141,true,true,42.5099337,-78.6694678
 tonawanda-catholic,st-jude-the-apostle-north-tonawanda,St. Jude the Apostle Church,800 Niagara Falls Boulevard,,North Tonawanda,NY,14120,true,true,43.0590885,-78.8396086
@@ -211,7 +211,7 @@ st-timothy-tonawanda,st-timothy-tonawanda,St. Timothy Church,565 East Park Drive
 our-lady-of-the-sacred-heart-orchard-park,our-lady-of-the-sacred-heart-orchard-park,Our Lady of the Sacred Heart Church,3148 Abbott Road,,Orchard Park,NY,14127,true,false,42.7995625,-78.7959375
 st-philip-the-apostle-cheektowaga,st-philip-the-apostle-cheektowaga,St. Philip the Apostle Church,950 Losson Road,,Cheektowaga,NY,14227,true,true,42.8813125,-78.7251875
 st-leo-the-great-amherst,st-leo-the-great-amherst,St. Leo the Great Church,885 Sweet Home Road,,Amherst,NY,14226,true,true,42.9868125,-78.8073125
-st-francis-of-assisi-athol-springs,st-francis-of-assisi-athol-springs,St. Francis of Assisi Church,4263 St. Francis Drive,,Athol Springs,NY,14010,true,false,42.7686875,-78.8634375
+lakeshore-catholic-faith-community,st-francis-of-assisi-athol-springs,St. Francis of Assisi Church,4263 St. Francis Drive,,Athol Springs,NY,14010,true,false,42.7686875,-78.8634375
 st-martha-depew,st-martha-depew,St. Martha Church,10 French Road,,Depew,NY,14043,true,true,42.9191875,-78.7141875
 st-john-vianney-orchard-park,st-john-vianney-orchard-park,St. John Vianney Church,2950 Southwestern Boulevard,,Orchard Park,NY,14127,true,true,42.8063125,-78.7359375
 blessed-mother-teresa-of-calcutta-depew,blessed-mother-teresa-of-calcutta-depew,Blessed Mother Teresa of Calcutta Church,496 Terrace Boulevard,,Depew,NY,14043,true,true,42.9040625,-78.6956875
@@ -223,7 +223,7 @@ st-vincent-de-paul-springbrook,st-vincent-de-paul-springbrook,St. Vincent de Pau
 church-of-the-annunciation-elma,church-of-the-annunciation-elma,Church of the Annunciation,7580 Clinton Street,,Elma,NY,14059,false,true,42.8561875,-78.6060625
 divine-mercy-niagara-falls,divine-mercy-niagara-falls,Divine Mercy Church,2437 Niagara Street,,Niagara Falls,NY,14303,true,true,43.0883125,-79.0325625
 st-john-the-baptist-alden,st-john-the-baptist-alden,St. John the Baptist Church,2021 Sandridge Road,,Alden,NY,14004,true,true,42.9110625,-78.5231875
-most-precious-blood-angola,most-precious-blood-angola,Most Precious Blood Church,22 Prospect Street,,Angola,NY,14006,false,true,42.6373125,-79.0365625
+lakeshore-catholic-faith-community,most-precious-blood-angola,Most Precious Blood Church,22 Prospect Street,,Angola,NY,14006,false,true,42.6373125,-79.0365625
 st-john-the-baptist-boston,st-john-the-baptist-boston,St. John the Baptist Church,6895 Boston Cross Road,,Boston,NY,14025,true,true,42.6301875,-78.7361875
 st-teresa-of-avila-akron,st-teresa-of-avila-akron,St. Teresa of Avila Church,5771 Buell Street,,Akron,NY,14001,true,true,43.0033125,-78.5013125
 central-niagara-catholic,st-john-baptist-lockport,St. John the Baptist Church,168 Chestnut Street,,Lockport,NY,14094,true,true,43.1737227,-78.6837304
@@ -274,3 +274,6 @@ cattaraugus-creek-catholic,st-joseph-holland,St. Joseph Church,46 North Main Str
 catholic-family-south-buffalo,st-ambrose-buffalo,St. Ambrose Church,260 Okell Street,,Buffalo,NY,14220,true,false,42.8386696,-78.8203109
 catholic-family-south-buffalo,holy-family-buffalo,Holy Family Church,1885 South Park Avenue,,Buffalo,NY,14220,true,false,42.8472192,-78.8242963
 catholic-family-south-buffalo,our-lady-of-perpetual-help-buffalo,Our Lady of Perpetual Help Church,115 O'Connell Avenue,,Buffalo,NY,14204,true,false,42.8672579,-78.8614476
+lakeshore-catholic-faith-community,st-john-paul-ii-lake-view,St. John Paul II Church,2052 Lake View Road,,Lake View,NY,14085,true,true,42.7105625,-78.9331875
+st-john-xxiii-west-seneca,st-john-xxiii-west-seneca,St. John XXIII Church,1 Arcade Street,,West Seneca,NY,14224,true,true,42.8575625,-78.7881875
+st-joseph-cathedral-buffalo,st-joseph-cathedral-buffalo,St. Joseph Cathedral,50 Franklin Street,,Buffalo,NY,14202,true,true,42.8827978,-78.8781834

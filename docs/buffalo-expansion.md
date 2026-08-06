@@ -70,16 +70,17 @@ decided — apply them, don't re-litigate them:
 
 ## 3. Current state
 
-**Dataset: 142 parishes / 275 churches; 117 tests green.** (Rochester baseline was 62/132.)
+**Dataset: 142 parishes / 278 churches; 117 tests green.** (Rochester baseline was 62/132.)
 
-**Buffalo contribution: 80 parishes / 143 churches, all geocoded**, spanning **all 8 counties**.
+**Buffalo contribution: 80 parishes / 146 churches, all geocoded**, spanning **all 8 counties**.
 
 Measured against the diocese's own parish finder — 167 locations, which reduce to **149 real
 worship sites** once the entries in `data/buffalo_excluded_sites.csv` are removed and the 2 sites
-the feed repeats are collapsed — the dataset now covers **137 of 149, or 92%**. The uncovered
-remainder is 12 sites across 11 canonical parishes, every one deferred for a concrete,
-individually-documented reason (§6f): overwhelmingly "the parish's website is dead or the diocese
-lists none", not "not looked at yet".
+the feed repeats are collapsed — the dataset now covers **140 of 149, or 94%**. The uncovered
+remainder is 9 sites across 8 canonical parishes, every one deferred for a concrete,
+individually-documented reason (§6f). **Every family in the diocese has now been probed**, so what
+is left is the residue the structural sources cannot help with: parishes the masterlist places in
+no family and the diocese lists with no website.
 
 Note the parish count *fell* while coverage rose. That is the expected direction: several batches
 found that rows we already had were members of one bulletin and collapsed them (§4b). Parish count
@@ -181,6 +182,18 @@ Two signals together are conclusive, and they are cheap:
    a historical arrangement.
 2. **A member's own former container has gone silent** → that member folded in.
 
+**Signal 2 is only meaningful when signal 1 holds.** In Blessed Family 7 *every* member container
+is dead — Fourteen Holy Helpers (14/0935), Queen of Heaven (14/1013) and St. John Vianney
+(14/1022) all 403 on every Sunday — because the family moved off those containers, not because
+anybody folded into anybody. A silent container is evidence of a fold-in only when there is a live
+container to have folded *into*. Otherwise it just means the publisher changed.
+
+**When there is no container to read, compare LPi widget ids.** Parish sites on LPi/WeConnect embed
+`parishesonline.com/publicationWidget?type=bulletin&id=<18-char id>`, and that id *is* the
+publication. Same id on two sites = one bulletin (how The 12 Apostles was settled); different ids =
+two bulletins, even when a masterlist, a decree and a shared festival raffle all say one parish.
+It costs one HTTP GET per site and works when every container in the family is dead.
+
 Signal 2 is not only about containers. St. Casimir (Buffalo) keeps a live domain that links a
 Google Drive folder of bulletins — four monthly PDFs whose newest is May 2025, while the family's
 weekly bulletin has carried St. Casimir's Masses, collections and events every week since. Read
@@ -250,9 +263,15 @@ already dropped all four. **Where the two disagree about structure, the masterli
 
 Two rules for using it:
 
-- **A `◦` line is decisive.** "Worship site of X" means that building shares X's bulletin, so if X
-  is already in `parishes.csv` the site can be added as a church row with no further research.
-  This is the cheapest work in the whole backlog.
+- **A `◦` line is decisive for *adding*, not for *collapsing*.** "Worship site of X" is good enough
+  to add an unmodelled building as a church row under X with no further research — the cheapest
+  work in the whole backlog, and nothing else has to be true for it to be safe.
+  **It is not good enough to delete a parish row that has its own bulletin.** Fourteen Holy Helpers
+  is a `◦` under Queen of Heaven in the April 2026 masterlist *and* was canonically merged into it
+  in June 2025, yet the two publish different bulletins (different LPi `publicationWidget` ids) and
+  it keeps its own site, Mass schedule and ParishesOnline organization. §1 models the bulletin, so
+  it stays its own row. The masterlist is the authority on *canonical structure*; the bulletin is
+  the authority on what we model, and Buffalo is a diocese where the two are years apart.
 - **A Family is NOT automatically one bulletin**, and the bulletin is what we model (§1). Plenty of
   families here are 4–5 parishes that each publish separately — Family #7 and Family #16, for
   instance. Learn the structure here, then confirm the bulletin per §4b before collapsing a family
@@ -293,6 +312,47 @@ north-tonawanda` → folded into `tonawanda-catholic`; `holy-family-albion` → 
 `one-catholic`; `resurrection-batavia` website → the12apostles.org. The batch-1–8 lists below
 record the *original* additions; the audit entries record the corrections.
 
+- **The last three families: #29 Lakeshore, #22 Downtown Buffalo, #7 Blessed Family 7** — one
+  collapse and two plain additions. Parishes 142 → 140 → 142, churches 275 → 278; coverage
+  92% → 94%, and **§6f(b) is now empty**. The three went three different ways, which is the point:
+  *a Family of Parishes predicts nothing about how many bulletins it has.*
+  - **Lakeshore Catholic Faith Community** (#29) — `lakeshore-catholic-faith-community`
+    (lakeshorecatholicfc.org, container 14/1884), **4 worship sites**, absorbing **three** standing
+    rows: `most-precious-blood-angola`, `st-mary-of-the-lake-hamburg` and
+    `st-francis-of-assisi-athol-springs`. Sites: St. Mary of the Lake (Hamburg), St. Francis of
+    Assisi (Athol Springs), Most Precious Blood (Angola), St. John Paul II (Lake View, added).
+    One page-1 Mass schedule over all four, one family office at 24 Prospect St, Angola.
+    - **St. Anthony (Farnham) excluded as closed, dated to the week by the schedule itself.** It
+      carried Masses through the 25 May 2025 issue and none from 1 June; from Nov 2025 the same
+      bulletin lists it among the parishes whose *sacramental records* the family office merely
+      holds — alongside St. Vincent de Paul (North Evans) and an Our Lady of Perpetual Help
+      (Lake View, no relation to the South Buffalo one). **That records list is a graveyard**, and
+      a useful one: it names former parishes the feed and GCatholic may still be carrying.
+    - Note `stanthonysfarnham.org` no longer resolves, and the bulletin's weekly "St. Anthony
+      Devotionals ... in the St. Francis church" kept the *name* alive after the *site* closed —
+      the §4b warning about counting a name rather than reading the legend, in prose form.
+  - **St. Joseph Cathedral** (#22) — `st-joseph-cathedral-buffalo`, its own row, **1 site**
+    (50 Franklin Street). The family shares no bulletin: the cathedral publishes *The Cathedral
+    Chronicle* in its own live container **14/1023**, whose masthead names the cathedral alone. The
+    other four members of #22 were already separate rows and stay that way.
+    - Website is `buffalocathedral.org`, which 301s to `buffalodiocese.org/st.-joseph-cathedral`.
+      §6f(b) ruled out `buffalodiocese.org` and that still holds — but the cathedral's *own* domain
+      is a different thing: it is unique, it is what the bulletin masthead prints, and the page it
+      lands on carries a "Latest Bulletins" link to `parishesonline.com/find/st-joseph-cathedral-14202`.
+      So the bulletin is reachable from it, which is all §1 asks.
+  - **St. John XXIII** (#7) — `st-john-xxiii-west-seneca`, its own row, **1 site** (1 Arcade Street,
+    West Seneca). §4c predicted this family publishes separately and it was right, but the evidence
+    had to change shape: **all three ParishesOnline containers in the family are dead**, so the
+    "member's channel went silent" test says nothing. See §4b — that signal only works when the
+    *family's* container is live.
+  - **Fourteen Holy Helpers deliberately NOT collapsed, against both the masterlist and a decree.**
+    The April 2026 masterlist makes it a `◦` worship site of Queen of Heaven, and 14 Holy Helpers
+    Parish was canonically merged into Queen of Heaven in June 2025. But the two sites embed
+    **different** LPi `publicationWidget` ids — `0018000000Qbyz4AAB` vs `0018000000Qc02EAAR` — and
+    14hh.org is a live parish site with its own Mass schedule, its own rectory and its own
+    ParishesOnline organization (`fourteen-holy-helpers-church`). Two bulletins, so under §1 two
+    rows. This **falsifies §4c's "a `◦` line is decisive"** in the collapsing direction; see the
+    correction there.
 - **The Catholic Family of South Buffalo** (Family #31) — a **restructure that removes two rows**:
   `catholic-family-south-buffalo` (catholicsouthbuffalo.com, container 14/0940) with **5 worship
   sites**, absorbing both `st-teresa-buffalo` and `st-martin-of-tours-buffalo`. Sites: St. Teresa,
@@ -652,18 +712,19 @@ cheektowaga / enchanted-mountains case). Addresses already captured below:
 
 **This list now lives in `data/buffalo_excluded_sites.csv`**, one row per site with its reason,
 evidence and the date decided, so `reconcile_diocese_roster.py` can subtract it automatically
-rather than relying on someone reading this prose. Currently 21 rows in two classes:
+rather than relying on someone reading this prose. Currently 22 rows in two classes:
 
 - **not-a-parish (7)** — the St. Gianna Molla pregnancy centers (Buffalo, Lackawanna, Cheektowaga,
   Niagara Falls, Fredonia, Perry, Olean). They share the diocesan parish finder but are
   social-service offices and publish no bulletin.
-- **closed (14)** — St. Mary Queen of the Rosary (Strykersville), Our Lady of Loreto (Falconer),
+- **closed (15)** — St. Mary Queen of the Rosary (Strykersville), Our Lady of Loreto (Falconer),
   Our Lady of the Snows (Panama), St. Joseph (Fredonia), St. Rose of Lima (Forestville),
   St. Hedwig (Dunkirk), St. Patrick (Brocton), St. Isaac Jogues (Sherman), St. Mary (Batavia),
   Holy Spirit (North Collins), St. Mary (Cattaraugus), St. Jude (Sardinia), St. John the Baptist
-  (West Valley), St. Thomas Aquinas (Buffalo). **All but Sherman, Cattaraugus, West Valley and
-  St. Thomas Aquinas are still in the live diocesan feed.** That is the point of the file — and
-  those four are in it because GCatholic still files closed buildings under current parishes.
+  (West Valley), St. Thomas Aquinas (Buffalo), St. Anthony (Farnham). **All but Sherman,
+  Cattaraugus, West Valley, St. Thomas Aquinas and Farnham are still in the live diocesan feed.**
+  That is the point of the file — and those five are in it because GCatholic still files closed
+  buildings under current parishes.
 - ~~**St. Casimir** (Buffalo, Kaisertown, 160 Cable St) — independent/non-diocesan Polish church~~
   **— REVERSED (commit `e556743`).** The earlier call was wrong. The Diocese of Buffalo's *own*
   parish finder lists St. Casimir at 160 Cable St as a diocesan parish (founded 1891) with its own
@@ -714,7 +775,7 @@ Where a dead domain means a parish has fallen back to a shared family bulletin, 
 family parish (as done above) is the right call under 1-parish=1-bulletin, but a human may want to
 confirm the parish hasn't simply moved to a new own-domain instead.
 
-### 6f. Deferred inventory — 12 worship sites / 11 parishes
+### 6f. Deferred inventory — 9 worship sites / 8 parishes
 
 A *closed* list, not an open-ended "rest of the diocese": every worship site the diocese lists is
 either in the dataset, in `data/buffalo_excluded_sites.csv` (§6d), or here.
@@ -733,28 +794,20 @@ below record. They are ordered cheapest first.
 this class. It is the cheapest work there is, so re-check it first after every masterlist re-issue:
 any `◦` line under a parish already in `parishes.csv` is a church row with no research attached.
 
-**(b) Whole families whose bulletin has not been probed yet — best value per lookup, 3 sites.**
-Each is one run of `probe_bulletin_container.py` away from resolving one or more sites, exactly as
-Fields of Grace, The Lord's Vineyard, Chautauqua and Cattaraugus Creek were. **Find the container
-first** — the family's own homepage is usually not in the diocesan feed and a web search for the
-family name finds it (that is all Chautauqua took, after two sessions had written its member
-domains off as dead), and check whether a *member's* container has simply been renamed to the
-family, which is what settled Cattaraugus Creek:
-- **Family #22 (Downtown Buffalo Family of Catholic Parishes)** — St. Joseph Cathedral. The
-  masterlist retires the question this doc used to pose about the cathedral — it is not an orphan
-  needing its own bulletin home found from scratch, it is one parish of a family, so probe that
-  family's bulletin. It still cannot take `buffalodiocese.org` as its `website` (the diocese's own
-  site, and not where a parish bulletin lives). **1 site.**
-- **Family #7** St. John XXIII (West Seneca) · **Family #29** St. John Paul II (Lake View).
-  **2 sites.** Note §4c's warning applies hardest here: Family #7 is named there as a family whose
-  parishes look to publish *separately*, in which case St. John XXIII is simply its own row (it has
-  a live domain, `stjohn23.com`) and no restructure follows. Both families contain parishes we
-  already model as standalone rows — Fourteen Holy Helpers under Queen of Heaven (#7) and
-  St. Francis of Assisi/Athol Springs under St. Mary of the Lake (#29) are `◦` lines in the
-  masterlist — so either could go the other way and *collapse* rows, as South Buffalo did.
+**(b) Whole families whose bulletin has not been probed — EMPTY. Every family in the diocese has
+now been read.** The five that were listed here went three different ways, and that spread is the
+finding: Cattaraugus Creek and Lakeshore were each **one** bulletin over several standing rows
+(collapsing 1 and 3 rows respectively), South Buffalo the same (collapsing 2), while Downtown
+Buffalo and Blessed Family 7 share **no** bulletin at all and simply needed one more row each.
+**Never assume a family's shape before reading its bulletin** — and note the two that did not
+collapse are the two with the most members. Size predicts nothing either.
 
-**(c) No family, no website — needs per-parish research, 8 sites.** Nothing structural to lean on;
-the masterlist places none of these under any family:
+**(c) No family, no website — needs per-parish research, 9 sites across 8 parishes. This is now the
+whole remaining backlog.** Nothing structural is left to lean on: the masterlist places none of
+these under any family, so neither §4c nor §4b applies and each needs its own `WebSearch`. Six of
+the nine have no website in the feed at all. Expect a meaningful share of them to turn out closed
+rather than missing — that has been the pattern every time a site had no family and no domain, and
+confirming a closure is progress (§2 policy 2):
 St. Isidore (St. Mary/Silver Spring + St. Joseph/Perry — *not* part of Fields of Grace despite the
 org name, see §6b), Queen of Angels (Lackawanna), St. Andrew Kim (Tonawanda), Holy Family
 (Tuscarora Reservation, Sanborn), SS. Brendan & Jude (Almond, on `icc-ics.com` which 403s to bots),
@@ -776,7 +829,7 @@ it just never got used on this one.
 
 ### 6g. Dead end worth recording: the ParishesOnline API
 
-Groups (b)–(d) all reduce to "find the bulletin org", so a bulk source for that was worth chasing.
+Groups (c)–(d) all reduce to "find the bulletin org", so a bulk source for that was worth chasing.
 ParishesOnline's SPA calls an unauthenticated API at
 `https://f2141mdwk2.execute-api.us-east-1.amazonaws.com/prod/organizations` (the shipped
 `X-API-KEY` is the literal string `"MISSING_ENV_VAR".API_KEY`, i.e. `undefined`, and the endpoint
@@ -813,12 +866,17 @@ Work in this order, cheapest first, and only fall through when a step genuinely 
 1. **Read the family masterlist (§4c).** `fetch_diocese_family_list.py`. Every `◦` line under a
    parish already in `parishes.csv` is a church row you can add immediately — no bulletin research,
    no website needed. Six sites landed this way in one batch.
-2. **Probe the family's bulletin container (§4b).** `probe_bulletin_container.py`. This answers
-   "one parish or several?" directly, and it is the *only* thing that answers it when members keep
-   separate live domains. Start from the families listed in §6f(b).
+2. **Probe the family's bulletin container (§4b).** `probe_bulletin_container.py --pages 3`. This
+   answers "one parish or several?" directly, and it is the *only* thing that answers it when
+   members keep separate live domains. **Buffalo's families are all read now (§6f(b) is empty)**,
+   so this step is for the next diocese — where the lesson to carry over is that a family predicts
+   nothing: of Buffalo's last five, three were one bulletin and two were none.
+   If every container in the family is dead, compare the sites' LPi `publicationWidget` ids
+   instead (§4b) — same id is one bulletin, different ids are two.
 3. **Only then** research a parish individually with `WebSearch`/`WebFetch`, falling back to
    `gcatholic.org` for address + Plus Code when a parish host 403s. ParishesOnline's API is a dead
-   end for finding bulletins in bulk (§6g).
+   end for finding bulletins in bulk (§6g). **This is where all of Buffalo's remaining work now
+   is** — §6f(c), 9 sites with no family and mostly no website.
 
 Whichever step resolves it, the row-level rules are unchanged:
 
@@ -828,9 +886,11 @@ Whichever step resolves it, the row-level rules are unchanged:
 - **Geocode inline** — decode the Plus Code from gcatholic (no network needed, see
   `decode_plus_code` in `scripts/fetch_gcatholic_roster.py`), or use Nominatim, which works here.
 - **Check whether the building still exists** before adding it. The feed lists closed churches for
-  years; seven such are already in `data/buffalo_excluded_sites.csv`, and confirming a closure is
-  as much progress as adding a row. Record it there with its evidence, and date it from the
-  bulletin's own Mass legend where you can (§4b).
+  years; fifteen closures are already in `data/buffalo_excluded_sites.csv`, and confirming a closure
+  is as much progress as adding a row. Record it there with its evidence, and date it from the
+  bulletin's own Mass legend or schedule where you can (§4b).
 - `db create` + `pytest` after every batch, one commit per batch, and log the batch here.
 
-Coverage is **137 of 149 real worship sites (92%)**, all 8 counties, with 12 left in §6f.
+Coverage is **140 of 149 real worship sites (94%)**, all 8 counties, with 9 left in §6f — all of
+them in §6f(c), the per-parish residue. The structural sources are exhausted: every `◦` line is
+modelled and every family bulletin has been read.
