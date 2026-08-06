@@ -53,14 +53,63 @@ because Rochester already has `st-louis` (Pittsford). One commit per batch.
 
 ## 3. Current state
 
-**Dataset: 99 parishes / 186 churches; 117 tests green.** (Rochester baseline was 62/132.)
+**Dataset: 143 parishes / 237 churches; 117 tests green.** (Rochester baseline was 62/132.)
 
-**Buffalo contribution: 37 parishes / 54 churches, all geocoded**, spanning **all 8 counties**.
-Only one intentional address flag remains open (Wellsville house number, §6). The parish count
-dropped from its peak as the website audit (§6e) correctly *consolidated* several over-split rows.
+**Buffalo contribution: 81 parishes / 105 churches, all geocoded**, spanning **all 8 counties**.
 
-`db create` and `pytest` are run after every batch and must stay green (96/176, 117 passed
-as of the last commit `eb458d4`).
+Measured against the diocese's own parish finder — 167 locations, of which 160 are real worship
+sites (§6d) — the dataset now covers **100 of 160, or 62%**. The uncovered remainder is exactly
+60 sites, every one of them deferred for a concrete, individually-documented reason (§6f):
+overwhelmingly "the parish's website is dead or the diocese lists none", not "not looked at yet".
+(Buffalo contributes 105 church rows against those 100 matched sites; the extra 5 are worship
+sites the diocese does not list separately, e.g. St. Francis of Assisi Chapel in Tonawanda.)
+
+`db create` and `pytest` are run after every batch and must stay green.
+
+## 4a. The bulk method (supersedes per-parish research)
+
+The first ~37 parishes were built one at a time from `WebSearch`. That works but is slow and
+re-derives facts the diocese already publishes. Everything from commit `e556743` onward uses a
+**bulk join of two authoritative sources**, which is both faster and more accurate:
+
+1. **The diocese's own parish finder** — `buffalodiocese.org/parish-finder/` runs the WordPress
+   "WP Store Locator" plugin, whose `store_search` AJAX action returns **all 167 worship sites**
+   in one unauthenticated request: name, street, city, zip, phone, coordinates, homepage. Crucially
+   the location name encodes the structure we model:
+   `"St. Mary of Lourdes [2008] – Our Lady of Lourdes Worship Site"` = canonical parish + year +
+   worship site. Script: `scripts/fetch_diocese_locator.py`.
+2. **GCatholic's diocesan roster** — `gcatholic.org/churches/local/buff0` lists 205 churches, each
+   detail page carrying a second independent address **and an Open Location Code (Plus Code)**.
+   Decoding the Plus Code locally yields building-precise coordinates with **no geocoder call at
+   all**. Script: `scripts/fetch_gcatholic_roster.py` (includes a self-contained OLC decoder,
+   checked against Google's reference code `849VCWC8+R9`).
+
+**The grouping key is the *effective* website domain, after following redirects.** This is the
+mechanical form of the §1 rule: one website = one bulletin = one parish row, and it satisfies the
+UNIQUE-website constraint by construction. It also self-corrects the hardest modelling call —
+a parish whose vanity domain now 301s into a family site has, by that very fact, folded into the
+family bulletin and must **not** become its own row. That is how `st-josaphat.com`, `stamelia.com`,
+`resurrectionbatavia.com` etc. correctly resolved to existing family parishes rather than
+duplicating them.
+
+**Cross-validation instead of assertion.** The two sources are independent, so
+`address_verified` / `name_verified` are set `true` only where both agree (40/51 and 45/51 in the
+first bulk batch), and coordinates prefer the Plus Code only when it lands within 400 m of the
+diocesan point. No pair disagreed by more than that.
+
+**Dedup must run on both address and name.** Normalised-address matching alone missed 18 churches
+already modelled under family parishes (address formatting differs: `20 Peoria Ave.` vs
+`20 Peoria Avenue`); city+dedication matching alone missed 2 more (`St. Mary of the Angels` vs
+`Basilica of St. Mary of the Angels`, Olean). Run both nets or you will duplicate worship sites.
+
+**Slugs are city-suffixed by frequency, not by collision.** A dedication occurring more than once
+anywhere in the diocese (or already in the dataset) gets a city suffix even when nothing collides
+*yet*, so the deferred batches — which contain many more St. Marys and St. Josephs — can be added
+later without renaming committed rows.
+
+Caveat: the diocesan feed is only as fresh as the diocese keeps it. **13 of its listed homepages no
+longer resolve at all** (§6f). Always run new URLs through `scripts/check_parish_websites.py`
+before trusting them.
 
 ## 4. Environment (this machine vs. the cloud agent)
 
@@ -89,6 +138,14 @@ north-tonawanda` → folded into `tonawanda-catholic`; `holy-family-albion` → 
 `one-catholic`; `resurrection-batavia` website → the12apostles.org. The batch-1–8 lists below
 record the *original* additions; the audit entries record the corrections.
 
+- **Bulk batch 1** (commit `e556743`) — **44 parishes / 51 churches** in one pass via §4a, plus
+  three churches folded into existing parishes on redirect evidence: St. Mary (Batavia) and Our
+  Lady of Mercy (LeRoy) under `resurrection-batavia` (both domains 301 to the12apostles.org), and
+  Our Lady of Pompeii (Lancaster) under `st-mary-assumption-lancaster` (olpparish.com 301s to
+  stmarysonthehill.org). Includes the first multi-site parishes found this way:
+  `st-brendan-on-the-lake` (St. Bridget/Newfane + Our Lady of the Rosary/Wilson + St. Charles
+  Borromeo Oratory/Olcott), `st-john-neumann` (Strykersville + Sheldon), and
+  `st-patrick-belfast-fillmore` (two churches both dedicated to St. Patrick).
 - **Website audit + St. Jude/Resurrection** (commit `d37b300`) — folded St. Jude into RCCT
   (`tonawanda-catholic`, now 5 worship sites); repointed Resurrection/Batavia to the12apostles.org.
 - **St. Michael → ERRCC** (commit `a387442`) — dead domain stmichaelswarsaw2.com; St. Michael
@@ -184,8 +241,15 @@ cheektowaga / enchanted-mountains case). Addresses already captured below:
   double-count). **Holy Spirit** (North Collins) — conflicting homepages (cfhrosary.org vs icchsc.org).
 
 ### 6d. Out of scope (decided, not deferred)
-- **St. Casimir** (Buffalo, Kaisertown, 160 Cable St) — independent/non-diocesan Polish church,
-  multiple sources say not associated with the Diocese. Project Carlo tracks Diocese of Buffalo, so excluded.
+- **St. Gianna Molla Pregnancy Outreach Centers** (7 entries: Buffalo, Lackawanna, Cheektowaga,
+  Niagara Falls, Fredonia, Perry, Olean) — these share the diocesan parish finder but are social
+  service offices, not parishes, and publish no bulletin. Excluded permanently.
+- ~~**St. Casimir** (Buffalo, Kaisertown, 160 Cable St) — independent/non-diocesan Polish church~~
+  **— REVERSED (commit `e556743`).** The earlier call was wrong. The Diocese of Buffalo's *own*
+  parish finder lists St. Casimir at 160 Cable St as a diocesan parish (founded 1891) with its own
+  homepage `stcasimirbuffalo.com`, which resolves and serves parish content. Added as
+  `st-casimir-buffalo`. Lesson worth keeping: prefer the diocese's own directory over third-party
+  claims about jurisdiction.
 
 ### 6e. Website liveness audit — DONE (a re-run is the recommended periodic check)
 Ran a DNS-resolve + HTTP + content sanity sweep over all 39 Buffalo parish websites
@@ -228,18 +292,111 @@ Where a dead domain means a parish has fallen back to a shared family bulletin, 
 family parish (as done above) is the right call under 1-parish=1-bulletin, but a human may want to
 confirm the parish hasn't simply moved to a new own-domain instead.
 
+### 6f. Complete deferred inventory (60 worship sites, exhaustive)
+
+This is now a *closed* list, not an open-ended "rest of the diocese": every one of the diocese's
+167 worship sites is either in the dataset, excluded as not-a-parish (§6d), or listed here. Ordered
+by how much work each group needs.
+
+**(a) Diocese lists no website — 21 sites.** These need a bulletin home found by hand. Several are
+clearly worship sites of a parish already named, which is the cheapest place to start:
+Our Lady of Mt. Carmel (Silver Creek) + St. Rose of Lima (Forestville); Our Lady of the Lake —
+St. Patrick (Barker) + St. Joseph (Lyndonville); St. Isidore — St. Mary (Silver Spring) +
+St. Joseph (Perry) *(these two are ERRCC, §6b)*; St. Anthony (Fredonia) + Immaculate Conception
+(Cassadaga); Sacred Heart — Our Lady of the Snows (Panama); SS. Peter & Paul (Arcade) + St. Mary
+(East Arcade). Singles: Our Lady of Czestochowa (Cheektowaga), St. John Gualbert (Cheektowaga),
+Queen of Angels (Lackawanna), St. Andrew Kim (Tonawanda), Holy Family (Tuscarora Reservation,
+Sanborn), Holy Spirit (North Collins), St. Jude (Sardinia), St. Brigid (Bergen), St. Patrick
+(Randolph), Our Lady of Loreto (Falconer).
+
+**(b) Vanity domain no longer resolves — 19 sites / 13 parishes.** DNS is NXDOMAIN, so the
+diocese's link is simply stale. Per the ERRCC precedent (§6e) the fix is to point `website` at
+wherever the bulletin actually lives now — usually a ParishesOnline org page or a family site:
+St. Andrew (Sloan), St. John XXIII (West Seneca), Epiphany of Our Lord (Langford), St. Joseph
+(Holland), St. Joseph (Gowanda), Our Lady of Peace (Salamanca), Our Lady of the Angels (Cuba),
+St. Mary (Canaseraga), Holy Name of Mary (Ellicottville), SS. Joachim and Anne (St. Joseph/
+Varysburg + St. Vincent/Attica), Mary Immaculate (IC/East Bethany + St. Mary/Pavilion),
+St. Dominic (St. Patrick/Brocton + St. James Major/Westfield), St. Mary of Lourdes (St. Mary/
+Mayville + Our Lady of Lourdes/Bemus Point).
+*Checked and ruled out:* GCatholic offers an alternate homepage for only one of these
+(Sacred Heart/Lakewood → `sacredheartlakewood.org`), and that domain is dead too.
+
+**(c) Domain squatted or parked — 4 sites.** Saint John Paul II (Lake View, `jp2parish.org` →
+togel spam), Saint Maximilian Kolbe / Holy Name of Mary (East Pembroke, `stmax.net` → Indonesian
+gambling site), Sacred Heart (Lakewood, `sh.thischurch.org` → vendor template), St. Margaret
+(Buffalo, HTTP 410 Gone). Same fix as (b).
+
+**(d) Website is a social page only — 2 sites.** Our Lady of Perpetual Help (Buffalo, Facebook
+only) and Christ Our Hope / St. Matthias (Clymer, Google Sites behind a login redirect). Needs a
+decision on whether a Facebook page can be the `website` when it is genuinely where the bulletin
+is posted.
+
+**(e) Genuinely in flux — 7 sites.** Unchanged from §6b/§6c and still the right call to wait:
+Holy Apostles (St. John + SS. Peter and Paul, Jamestown) and St. James (Jamestown); All Saints /
+St. Mary (Lockport); Ascension (Batavia); St. Padre Pio (St. Cecilia/Oakfield + Our Lady of
+Fatima/Elba). Note the diocese *does* still list Ascension and St. Padre Pio as their own parishes,
+which contradicts the earlier note that Resurrection had absorbed them — worth re-checking before
+modelling either way.
+
+**(f) Lord's Vineyard, still unsplit — 3 sites.** Blessed Mary Angela / St. Hyacinth (Dunkirk),
+St. Elizabeth Ann Seton (Dunkirk), St. Joseph (Fredonia). Each has its own live domain, so the
+per-domain rule *would* split them — but §6b records that St. Anthony + St. Joseph (Fredonia) share
+one bulletin org, so splitting blind would over-split. Confirm the family's bulletin map first.
+This is the one place where the mechanical rule is known to be insufficient.
+
+**(g) Would duplicate existing rows — 2 sites.** St. John (Olean, `sjteolean.org`) and St. Mary of
+the Angels (Olean, `smaolean.org`) are already modelled as worship sites of
+`enchanted-mountains-catholic`. The diocese lists them as *separate parishes with their own live
+domains*, which under §1 argues for splitting `enchanted-mountains-catholic` into per-parish rows.
+That is a restructure of existing data, not an addition — deliberately not done here.
+
+**(h) Cathedral — 1 site.** St. Joseph Cathedral (50 Franklin St) is listed under
+`buffalodiocese.org` itself, which is the diocese's site and cannot be a parish `website` (it would
+collide and is not where a parish bulletin lives). Needs the cathedral's own bulletin home.
+
+### 6g. Dead end worth recording: the ParishesOnline API
+
+Groups (b)–(d) all reduce to "find the bulletin org", so a bulk source for that was worth chasing.
+ParishesOnline's SPA calls an unauthenticated API at
+`https://f2141mdwk2.execute-api.us-east-1.amazonaws.com/prod/organizations` (the shipped
+`X-API-KEY` is the literal string `"MISSING_ENV_VAR".API_KEY`, i.e. `undefined`, and the endpoint
+answers without it). **It is not usable for bulk work:** `limit` is honoured but `page`, `offset`
+and `skip` are all ignored, the response caps out around 3,000 records with a 502/504 beyond that,
+and `latitude`/`longitude`/`state` filters are ignored — that slice contains only 5 WNY
+organisations. Per-slug lookup (`/organizations/slug/<slug>`) 404s from outside the app. So
+resolving (b)–(d) stays per-parish research; don't re-derive this.
+
 ## 7. How to continue (same method)
 
-1. Pick a city/Family of Parishes. Research with `WebSearch` + `WebFetch` (both work here);
+**For a new diocese**, run the bulk method (§4a) — it is the fast path and it produced 44 parishes
+in one pass:
+
+```
+uv run python scripts/fetch_diocese_locator.py <diocese parish-finder URL> -o scratch/dio.json
+uv run python scripts/fetch_gcatholic_roster.py <gcatholic key, e.g. buff0> -o scratch/gcat.json
+```
+
+Then: probe every candidate domain for liveness **and redirect target** → group sites by the
+*effective* domain → drop groups whose domain is dead/squatted → dedup against `churches.csv` on
+**both** normalised address and city+dedication → emit rows, city-suffixing any dedication that
+occurs more than once in the diocese → validate `slug`/`website` uniqueness → `db create` +
+`pytest` → commit per batch → log the batch and any new edge cases here.
+
+**For the rest of Buffalo**, the bulk method is exhausted: §6f is a closed list of all 60 remaining
+worship sites, and every one of them is blocked on the same per-parish question — *where does this
+parish's bulletin live now that its domain is gone?* Work group (a) and (b) of §6f parish by parish
+with `WebSearch`; ParishesOnline's API is a dead end for this (§6g). Steps 1–4 below are still the
+right per-parish procedure:
+
+1. Pick a parish from §6f. Research with `WebSearch` + `WebFetch` (both work here);
    fall back to `gcatholic.org` for address + Plus Code when a parish host 403s.
 2. Cross-check each address against a 2nd independent source before `address_verified=true`.
 3. Decide parish-vs-worship-site by **who publishes the bulletin** (§1): shared bulletin/site →
    one parish + many churches; own bulletin/site → its own parish.
-4. **Geocode inline** (Nominatim works here; Plus-Code-decode + reverse-geocode fallback). Don't
-   leave coordinates blank — that was only the cloud agent's constraint.
-5. Append via a writer that validates global `slug` + `website` uniqueness, then
-   `uv run python -m pdf_extract db create` + `uv run pytest` (expect 117 passed), commit per batch,
-   and log the batch + any new edge cases back into this file.
+4. **Geocode inline** — decode the Plus Code from gcatholic (no network needed, see
+   `decode_plus_code` in `scripts/fetch_gcatholic_roster.py`), or use Nominatim, which works here.
+   Don't leave coordinates blank — that was only the cloud agent's constraint.
 
-The full diocese is ~160 parishes / ~36 Families; this is a verified slice covering all 8 counties,
-not yet the whole diocese.
+Coverage against the diocese's own parish finder is **100 of 160 worship sites (62%)**, all 8
+counties. The residual 60 are enumerated exhaustively in §6f, so "what's left" is now a finite
+checklist rather than an open-ended survey.
