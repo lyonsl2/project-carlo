@@ -145,6 +145,7 @@ our-lady-of-victory-basilica,our-lady-of-victory-lackawanna,Our Lady of Victory 
 st-benedict-amherst,st-benedict-amherst,St. Benedict Church,1317 Eggert Road,,Amherst,NY,14226,true,true,42.9643669,-78.8028461
 ss-peter-and-paul-hamburg,ss-peter-and-paul-hamburg,Saints Peter & Paul Church,66 East Main Street,,Hamburg,NY,14075,true,true,42.7157733,-78.8270067
 immaculate-conception-east-aurora,immaculate-conception-east-aurora,Immaculate Conception Church,520 Oakwood Avenue,,East Aurora,NY,14052,true,true,42.7659734,-78.6155447
+immaculate-conception-east-aurora,st-george-west-falls,St. George Chapel,74 Old Glenwood Road,,West Falls,NY,14170,false,true,42.7202734,-78.6814428
 lakeshore-catholic-faith-community,st-mary-of-the-lake-hamburg,St. Mary of the Lake Church,4737 Lake Shore Road,,Hamburg,NY,14075,true,true,42.7540234,-78.8898175
 st-mary-swormville,st-mary-swormville,St. Mary's Church (Swormville),6919 Transit Road,,Swormville,NY,14051,true,true,43.0378575,-78.6964044
 cattaraugus-creek-catholic,st-aloysius-springville,St. Aloysius Church,190 Franklin Street,,Springville,NY,14141,true,true,42.5099337,-78.6694678
@@ -166,6 +167,7 @@ one-catholic,holy-family-albion,Holy Family Church,106 South Main Street,,Albion
 catholic-communities-se-allegany,immaculate-conception-wellsville,Immaculate Conception Church,36 Maple Avenue,,Wellsville,NY,14895,true,false,42.1213889,-77.9425000
 catholic-communities-se-allegany,holy-family-belmont,"Holy Family of Jesus, Mary and Joseph Church",5 Milton Street,,Belmont,NY,14813,true,true,42.2280484,-78.0319071
 catholic-communities-se-allegany,our-lady-of-the-angels-cuba,Our Lady of the Angels Church,48 South Street,,Cuba,NY,14727,true,true,42.2144375,-78.2754375
+catholic-communities-se-allegany,st-jude-alfred,St. Jude Chapel,299 Lower College Drive,,Alfred,NY,14802,true,true,42.2557686,-77.7931675
 blessed-trinity-buffalo,blessed-trinity-buffalo,Blessed Trinity Church,317 Leroy Avenue,,Buffalo,NY,14214,true,true,42.9327367,-78.8344019
 st-louis-buffalo,st-louis-buffalo,St. Louis Church,35 Edward Street,,Buffalo,NY,14202,true,true,42.8956242,-78.8718674
 st-bernadette-orchard-park,st-bernadette-orchard-park,St. Bernadette Church,5930 South Abbott Road,,Orchard Park,NY,14127,true,true,42.7241359,-78.7967069
@@ -192,6 +194,7 @@ ss-columba-and-brigid-buffalo,ss-columba-and-brigid-buffalo,SS. Columba & Brigid
 blessed-sacrament-buffalo,blessed-sacrament-buffalo,Blessed Sacrament Church,1035 Delaware Avenue,,Buffalo,NY,14209,true,false,42.9123125,-78.8693125
 st-stanislaus-buffalo,st-stanislaus-buffalo,St. Stanislaus Church,123 Townsend Street,,Buffalo,NY,14212,false,false,42.8883240,-78.8408640
 st-stanislaus-buffalo,st-john-gualbert-cheektowaga,St. John Gualbert Church,83 Gualbert Avenue,,Cheektowaga,NY,14211,true,true,42.9098125,-78.7930625
+st-stanislaus-buffalo,st-adalbert-buffalo,St. Adalbert Basilica,212 Stanislaus Street,,Buffalo,NY,14212,false,false,42.8977494,-78.8314305
 st-martin-de-porres-buffalo,st-martin-de-porres-buffalo,St. Martin de Porres Church,555 Northampton Street,,Buffalo,NY,14208,true,true,42.9070625,-78.8463125
 our-lady-of-hope-buffalo,our-lady-of-hope-buffalo,Our Lady of Hope Church,18 Greenwood Place,,Buffalo,NY,14213,true,true,42.9203125,-78.8895625
 assumption-buffalo,assumption-buffalo,Assumption Church,435 Amherst Street,,Buffalo,NY,14207,true,true,42.9386875,-78.8880625
@@ -225,6 +228,7 @@ divine-mercy-niagara-falls,divine-mercy-niagara-falls,Divine Mercy Church,2437 N
 st-john-the-baptist-alden,st-john-the-baptist-alden,St. John the Baptist Church,2021 Sandridge Road,,Alden,NY,14004,true,true,42.9110625,-78.5231875
 lakeshore-catholic-faith-community,most-precious-blood-angola,Most Precious Blood Church,22 Prospect Street,,Angola,NY,14006,false,true,42.6373125,-79.0365625
 st-john-the-baptist-boston,st-john-the-baptist-boston,St. John the Baptist Church,6895 Boston Cross Road,,Boston,NY,14025,true,true,42.6301875,-78.7361875
+st-john-the-baptist-boston,st-mary-oratory-east-eden,St. Mary Oratory,8175 East Eden Road,,East Eden,NY,14057,true,true,42.6632960,-78.8272065
 st-teresa-of-avila-akron,st-teresa-of-avila-akron,St. Teresa of Avila Church,5771 Buell Street,,Akron,NY,14001,true,true,43.0033125,-78.5013125
 central-niagara-catholic,st-john-baptist-lockport,St. John the Baptist Church,168 Chestnut Street,,Lockport,NY,14094,true,true,43.1737227,-78.6837304
 central-niagara-catholic,all-saints-lockport,All Saints Church,76 Church Street,,Lockport,NY,14094,true,true,43.1719375,-78.6949375
@@ -232,7 +236,6 @@ central-niagara-catholic,st-bridget,St. Bridget Church,3455 Ewings Road,,Newfane
 central-niagara-catholic,our-lady-of-the-rosary,Our Lady of the Rosary Church,345 Lake Street,,Wilson,NY,14172,true,true,43.3083125,-78.8264375
 central-niagara-catholic,st-charles-borromeo-olcott,St. Charles Borromeo Oratory,5972 Main Street,,Olcott,NY,14126,true,true,43.3378125,-78.7139375
 central-niagara-catholic,st-patrick-barker,St. Patrick Church,1726 Quaker Road,,Barker,NY,14012,true,true,43.3260625,-78.5548125
-central-niagara-catholic,st-joseph-lyndonville,St. Joseph Church,36 Lake Avenue,,Lyndonville,NY,14098,true,true,43.3183125,-78.3866875
 catholic-neighbors-in-faith,st-james-jamestown,St. James Church,27 Allen Street,,Jamestown,NY,14701,true,true,42.0918125,-79.2353125
 catholic-neighbors-in-faith,st-john-jamestown,St. John Church,282 Newton Avenue,,Jamestown,NY,14701,true,true,42.1083125,-79.2258125
 catholic-neighbors-in-faith,ss-peter-and-paul-jamestown,Ss. Peter and Paul Church,508 Cherry Street,,Jamestown,NY,14701,true,true,42.0985625,-79.2430625
@@ -277,3 +280,4 @@ catholic-family-south-buffalo,our-lady-of-perpetual-help-buffalo,Our Lady of Per
 lakeshore-catholic-faith-community,st-john-paul-ii-lake-view,St. John Paul II Church,2052 Lake View Road,,Lake View,NY,14085,true,true,42.7105625,-78.9331875
 st-john-xxiii-west-seneca,st-john-xxiii-west-seneca,St. John XXIII Church,1 Arcade Street,,West Seneca,NY,14224,true,true,42.8575625,-78.7881875
 st-joseph-cathedral-buffalo,st-joseph-cathedral-buffalo,St. Joseph Cathedral,50 Franklin Street,,Buffalo,NY,14202,true,true,42.8827978,-78.8781834
+st-andrew-kim-tonawanda,st-andrew-kim-tonawanda,St. Andrew Kim Church,9 O'Hara Road,,Tonawanda,NY,14150,true,true,43.0003125,-78.8624375

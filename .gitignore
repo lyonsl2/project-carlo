@@ -53,6 +53,7 @@ apps/web/.playwright/
 data/bulletins/**/*.pdf
 data/*.db
 data/runs/
+scratch/
 
 # Generated frontend assets
 # apps/web/public/frontend.snapshot

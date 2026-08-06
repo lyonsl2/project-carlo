@@ -70,17 +70,28 @@ decided — apply them, don't re-litigate them:
 
 ## 3. Current state
 
-**Dataset: 142 parishes / 278 churches; 117 tests green.** (Rochester baseline was 62/132.)
+**Dataset: 143 parishes / 282 churches; 117 tests green.** (Rochester baseline was 62/132.)
 
-**Buffalo contribution: 80 parishes / 146 churches, all geocoded**, spanning **all 8 counties**.
+**Buffalo contribution: 81 parishes / 150 churches, all geocoded**, spanning **all 8 counties**.
 
-Measured against the diocese's own parish finder — 167 locations, which reduce to **149 real
+Measured against the diocese's own parish finder — 167 locations, which reduce to **142 real
 worship sites** once the entries in `data/buffalo_excluded_sites.csv` are removed and the 2 sites
-the feed repeats are collapsed — the dataset now covers **140 of 149, or 94%**. The uncovered
-remainder is 9 sites across 8 canonical parishes, every one deferred for a concrete,
-individually-documented reason (§6f). **Every family in the diocese has now been probed**, so what
-is left is the residue the structural sources cannot help with: parishes the masterlist places in
-no family and the diocese lists with no website.
+the feed repeats are collapsed — the dataset now covers **140 of 142, or 99%**. The uncovered
+remainder is 2 sites, and **neither is blocked on research**: both are live parishes we have
+positively confirmed, held up by a schema constraint and by a closure date that has not arrived
+(§6f(c)).
+
+**Do not read that 99% as "done."** It is a statement about the *feed*, and the feed is the source
+this project has the most machinery for. Two independent things have now gone wrong with it:
+
+- **The feed cannot see a structural error.** An earlier claim that "every family in the diocese has
+  now been probed" was wrong — §6f(b) held unread families whose member parishes we carry as
+  separate rows, invisible precisely because every one of their worship sites was already modelled.
+  Collapsing three parish rows into one changes no site, so coverage would not have moved.
+- **The feed is not the diocese's only list of buildings.** §4e is a diocesan page of weekend Mass
+  times, and diffing it against `churches.csv` found a live public Mass venue — Our Lady of Fatima
+  Shrine, Lewiston — that is **not in the parish finder at all** and therefore cannot appear in this
+  metric as either covered or missing. The denominator is a feed, not the diocese.
 
 Note the parish count *fell* while coverage rose. That is the expected direction: several batches
 found that rows we already had were members of one bulletin and collapsed them (§4b). Parish count
@@ -101,8 +112,10 @@ barely moved (127/154 vs 125/152 at the time) but the raw counts were wrong, and
 the thing this project trusts over its own prose.
 
 `data/buffalo_excluded_sites.csv` is what keeps that number honest. **The diocese goes on listing a
-church for months or years after its last Mass** — nine of the sites in this file are closed
-buildings still in the live feed — so without a machine-readable exclusion list the "what's left"
+church for months or years after its last Mass** — sixteen of the sites in this file are closed
+buildings still in the live feed, one of them (St. Joseph, Lyndonville) **demolished in 2023** and
+another (Immaculate Conception, Cassadaga) a parish the diocese's own records index closed in
+**2008** — so without a machine-readable exclusion list the "what's left"
 count silently overstates the work and invites someone to go re-research a demolished parish. Each
 row carries its reason, its evidence and the date decided; add to it whenever a site is ruled out
 for good, and never delete a row to make the number look better. When the closed site is one we
@@ -263,9 +276,16 @@ already dropped all four. **Where the two disagree about structure, the masterli
 
 Two rules for using it:
 
-- **A `◦` line is decisive for *adding*, not for *collapsing*.** "Worship site of X" is good enough
-  to add an unmodelled building as a church row under X with no further research — the cheapest
-  work in the whole backlog, and nothing else has to be true for it to be safe.
+- **A `◦` line is a good lead for *adding*, never grounds for *collapsing* — and it still needs a
+  liveness check.** "Worship site of X" points you at a building to add under X, and it is the
+  cheapest work in the backlog. But the earlier claim that "nothing else has to be true for it to be
+  safe" is **false**, and St. Joseph (Lockport) is the counter-example: the April 2026 masterlist
+  carries it as a `◦` worship site of All Saints, while the diocese's own September 2024 decision
+  closed that campus, the Central Niagara family's current Mass schedule covers six buildings and
+  none of them is St. Joseph, and the feed has already dropped it. **The masterlist lags too** — it
+  is fresher than the feed on *structure*, which is what §4c is for, but it is not a statement that
+  a building is still open. Confirm against the family's current Mass schedule before adding, which
+  costs one fetch. Cheap does not mean free.
   **It is not good enough to delete a parish row that has its own bulletin.** Fourteen Holy Helpers
   is a `◦` under Queen of Heaven in the April 2026 masterlist *and* was canonically merged into it
   in June 2025, yet the two publish different bulletins (different LPi `publicationWidget` ids) and
@@ -283,6 +303,83 @@ masterlist and by the bulletin masthead, with the feed supplying the addresses.
 
 Note the masterlist has no Family #13, and its trailing pages repeat family numbers next to schools
 and chaplaincies; the parser stops at the first repeated number, so those are excluded.
+
+## 4d. The Road to Renewal summary sheets — a plan, and useful only as one
+
+`buffalodiocese.org/wp-content/uploads/2024/09/Renewal-Timeline-and-Summary-Sheet.pdf`. Eight pages,
+one per vicariate, each a **three-column verdict on every parish**: *Parishes open*, *Secondary
+worship sites*, *Parishes/sites merging and closing*. Nothing else in this project enumerates the
+diocese's intent for every building at once, and the middle column in particular is the answer to
+"which of these buildings survives the merger?" — it is what identified St. Jude (Alfred) as the
+surviving half of SS. Brendan & Jude, and St. Mary (East Eden) and St. Adalbert as surviving
+worship sites. The same list is mirrored in press coverage (WKBW, News 4) if the PDF moves.
+
+**It is a September 2024 plan, and the diocese has not executed it.** Treat every line as a
+hypothesis to check, never as evidence. Four ways it is already wrong:
+
+- It lists **St. Rose of Lima (Buffalo), St. John XXIII (West Seneca), St. John Vianney (Orchard
+  Park) and Blessed Sacrament (Tonawanda)** as merging and closing. All four are live parishes with
+  their own bulletins today, and three are `parishes.csv` rows added by earlier sessions on
+  bulletin evidence.
+- It dates two closures precisely — **St. Anthony (Fredonia) and St. Hyacinth (Dunkirk), both
+  "Feb. 15, 2026"** — and neither happened. The Lord's Vineyard's current Mass Times page still
+  lists both, which is why our five rows there are unchanged.
+- It has **St. Mary (East Arcade)** closing; the Cattaraugus Creek bulletin still gives it Mass.
+- It has **Our Lady of the Rosary (Wilson)** closing; the Central Niagara schedule still gives it a
+  Saturday vigil and a weekday Mass.
+
+So the rule is the same one §4b already states, pointed at a new document: **the plan says what the
+diocese intended, the bulletin says what happened, and the bulletin wins.** Where the plan and the
+current Mass schedule agree, you have two independent sources and can act; where they disagree, the
+schedule decides. Used that way it is the best *lead generator* in the project — used any other way
+it will have you deleting live churches.
+
+## 4e. The two diocesan sources this project should have been using all along
+
+Both are plain pages on `buffalodiocese.org`, both cover the whole diocese in one fetch, and neither
+had been opened before this session. Between them they answer the two questions every batch actually
+asks — *is this building still open?* and *is this parish gone?* — without a single per-parish
+`WebSearch`. **Check both before doing any research on an individual site.**
+
+**(1) `buffalodiocese.org/sunday-morning-mass-times/` — a diocese-wide liveness oracle.** A flat
+`Parish | Locale/Town | Time` table of every Sunday-morning Mass in the diocese, with sibling pages
+for Saturday afternoon and Sunday afternoon. It is the check §4d demands, at diocese scale instead
+of one family at a time. In one pass it independently confirmed **St. George (West Falls)** at
+Sun 10:30, **St. Jude's Chapel (Alfred)** at Sun 9:45 and **Holy Family (Sanborn/Tuscarora Nation)**,
+had **no Cassadaga entry**, and listed **St. Rose of Lima (Buffalo), St. John XXIII (West Seneca),
+St. John Vianney (Orchard Park) and Blessed Sacrament (Tonawanda)** — the four the Road to Renewal
+plan says are closing (§4d) — as live. Two cautions. Its footer claims "updated as of May 5th,
+2024" and that is **wrong in the useful direction**: it carries post-2024 merged names and a
+`*NEW*` marker, so it is maintained but not re-dated; treat it as current and confirm anything
+load-bearing. And it is a *Mass* list, so absence is not proof of closure for a building that only
+hosts funerals — **St. Adalbert is absent and is open** (§6a).
+
+Diff it against `churches.csv` directly; do not eyeball it. Normalise `&`/`and`, `St.`/`Saint`,
+strip `Church|Parish|Basilica|Shrine|Oratory|Chapel|Campus`, split the slashed compound names
+(`Resurrection / St. Cecilia`), and match on locale — **the page names hamlets where the feed names
+towns** (Eggertsville for Amherst, Harris Hill for Williamsville, Athol Springs for Hamburg), which
+produces about a dozen false positives you must resolve by hand before believing any of them.
+
+**(2) `buffalodiocese.org/sacramental-records/` — the diocese's own index of dead parishes.** An
+alphabetical table of every closed or merged parish, each with a date range and the parish now
+holding its records: `Immaculate Conception, Cassadaga (1940-2008) | St. Anthony, Fredonia`. §4b
+already treats "who holds the sacramental records" as strong fold-in evidence; this is that evidence
+**published centrally for the entire diocese**, and it reaches back decades further than any Road to
+Renewal document. It settled Cassadaga outright, and it independently corroborated three additions
+made from other sources: `St. Mary, East Eden (1835-2008) | St. John the Baptist, Boston` (the
+oratory attaches to Boston, not to Hamburg as the masterlist implies), `St. Adalbert (1886-2011) |
+St. John Kanty` together with `St. John Kanty (1892-2025) | St. Stanislaus` (the chain that lands
+St. Adalbert under `st-stanislaus-buffalo`), and `Our Lady of the Sacred Heart, Colden (1912-2008) |
+St. George, West Falls`.
+
+Read the closing date as *the parish's*, not *the building's* — they differ by years and the gap is
+where mistakes live. St. Joseph (Perry) and St. Mary (Silver Springs) both close in the table in
+2007/2008, when they merged into St. Isidore, but the *sites* went on hosting Mass until the 2024
+decision. Conversely a parish can be listed as dead while its building is the survivor: St. John the
+Baptist (Boston) closes in 2025 with records at SS. Peter & Paul, yet it still publishes its own
+Mass schedule and keeps its `parishes.csv` row under the Fourteen Holy Helpers rule (§4c). **The
+table tells you a corporation ended and where the paperwork went. It never tells you a building
+is shut.**
 
 ## 4. Environment (this machine vs. the cloud agent)
 
@@ -312,6 +409,107 @@ north-tonawanda` → folded into `tonawanda-catholic`; `holy-family-albion` → 
 `one-catholic`; `resurrection-batavia` website → the12apostles.org. The batch-1–8 lists below
 record the *original* additions; the audit entries record the corrections.
 
+- **The residue, and what re-reading the masterlist found underneath it** — 5 church rows added,
+  1 removed, 1 parish row added, 8 exclusions. Parishes 142 → 143, churches 278 → 282; coverage
+  94% → **99%**, and §6f(c) drops from 9 sites to 2. The headline is not the coverage number
+  though — it is that **§6f(a) and §6f(b) were both wrongly declared empty**, and re-running the
+  two structural scripts before doing any research is what showed it. The batch then found **two
+  diocesan sources nobody had opened** (§4e) which would have answered most of it in two fetches.
+  - **§6f(a) was not empty: five `◦` worship-site lines sat under parishes we already model.**
+    The previous session harvested six such lines and concluded the class was exhausted; the
+    masterlist in fact still held St. Jude (Alfred), St. Mary Oratory (East Eden), St. Adalbert
+    (Buffalo), St. George Chapel (West Falls) and St. Joseph (Lockport). Four became church rows;
+    the fifth is closed (below). **The lesson is procedural: `reconcile_diocese_roster.py` cannot
+    see this class at all**, because none of the five is in the parish-finder feed. The reconciler
+    measures the feed, the masterlist is a different document, and a site missing from both our
+    data *and* the feed is invisible to the only tool we routinely run. Re-diff the masterlist
+    against `churches.csv` directly, every session.
+  - **St. Jude Chapel, 299 Lower College Drive, Alfred** → `catholic-communities-se-allegany`, whose
+    own Mass schedule at icc-ics.com lists exactly four sites (Wellsville, Cuba, Alfred, Belmont)
+    and we had three. **A directory's street number can be a PO Box that lost its label:**
+    DiscoverMass gives "1154 Lower College Dr.", and the parish's own bulletin masthead reads
+    "Lower College Drive, **PO Box 1154**". Alfred University's chaplaincy page, the Newman Club and
+    the OSM church node all say **299**, so the row is 299 with `address_verified=true`.
+  - **St. Mary Oratory, 8175 East Eden Road** → `st-john-the-baptist-boston`, *not* the parish the
+    masterlist files it under. The masterlist makes both St. John the Baptist (Boston) and St. Mary
+    Oratory `◦` lines of SS. Peter and Paul (Hamburg), but stjohnrcchurch.org is titled "St. John
+    the Baptist Parish **and St. Mary's Oratory**" and prints one Mass schedule covering both
+    (Sat 4:00 St. John's, Sat 6:00 St. Mary's). §1 models the bulletin, so the oratory attaches to
+    the row that publishes it — the Fourteen Holy Helpers rule, applied to an *addition* rather
+    than a collapse.
+  - **St. Adalbert Basilica, 212 Stanislaus Street** → `st-stanislaus-buffalo`. **Four Masses a
+    year is still a worship site.** Its own live site says the basilica hosts Mass four times
+    annually plus weddings and funerals and sends weekend liturgies to St. Stanislaus, and the
+    diocese lists it as a surviving secondary worship site. Both flags `false` (§6a).
+  - **St. George Chapel, 74 Old Glenwood Road, West Falls** → `immaculate-conception-east-aurora`,
+    and this one was nearly recorded as a closure. Every closure source pointed one way — the
+    diocese's own list has "St. George, West Falls" under *merged and closed*, and the East Aurora
+    Advertiser reported the parish closing with the chapel kept "open for private prayer", which
+    reads exactly like a building that no longer holds Mass. **The family's own site says
+    otherwise:** wheatss.org lists "Memorare Chapel of the Immaculate Conception – West Falls,
+    74 Old Glenwood Road, **Mass Times: Saturday 9 am**". *A closed parish is not a closed
+    building* — here the 1912 original chapel outlived the church next to it and took over as the
+    worship site under a new dedication. Check the family's Mass schedule before writing an
+    exclusion row, not just the closure reporting.
+  - **St. Andrew Kim (Tonawanda)** — a new parish row `st-andrew-kim-tonawanda` (bukoca.org),
+    1 site at 9 O'Hara Road beside Cardinal O'Hara High School. The Korean personal parish for
+    Western New York, in no family and in no masterlist, which is why the structural sources never
+    surfaced it; it has a live site with its own Mass times (Sun 11:00, Wed 20:00) and mission
+    Masses in Rochester and Syracuse. Feed, GCatholic and the parish site agree on the address.
+  - **St. Joseph (Lyndonville) removed — burned in 2023 and demolished.** Fire on 28 Feb 2023, the
+    diocese announced on 10 Jul 2023 that it would not be rebuilt, and Orleans Hub reported the
+    wrecking crew on site. **The building does not exist and the diocesan feed still lists it**,
+    which is the strongest single illustration of why the exclusion file has to exist. We had been
+    carrying it as an active worship site with verified address and coordinates.
+  - **Six more exclusions, all from the same re-read**: St. Brendan (Almond) sold, the other half
+    of SS. Brendan & Jude; St. Joseph (Perry) and St. Mary (Silver Spring), both St. Isidore sites;
+    Immaculate Conception (East Bethany); Our Lady of Fatima (Elba); St. Joseph (Lockport).
+    - **A family bulletin's staff list is a fold-in record.** The Fields of Grace masthead gives
+      Mass times for five worship sites, none in Perry or Silver Springs, and names
+      "Pastor Emeritus (**St. Isidore Parish**)". A family that prints another parish's emeritus
+      pastor has absorbed it — the same class of evidence as §4b's sacramental-records graveyard,
+      and it sits on page 1.
+    - **Our Lady of Fatima (Elba) retires an "undecided" entry from §6a.** The rule there is that
+      nothing gets an exclusion row unless a source *says* it closed. The vicariate summary says
+      it: "St. Padre Pio, Elba site" under merged and closed, with "St. Padre Pio, Oakfield" kept
+      as the surviving site — and Oakfield is already `st-cecilia-oakfield`. Same for East Bethany,
+      whose surviving twin is `st-mary-pavilion`. **These two were only ever blocked on a document
+      nobody had opened** (§4d).
+    - **GCatholic files a two-building parish as one record.** Its "Sts. Brendan and Jude" entry
+      carries Alfred's street with Almond's zip and Almond's Plus Code, so it cannot arbitrate
+      between the two sites and quietly implies the wrong one survives.
+  - **Immaculate Conception (Cassadaga) excluded — the feed is eighteen years behind on this one.**
+    It was the last §6f(c) entry that structural sources had never touched: in the feed as a worship
+    site of St. Anthony, and in *nothing* else — not the September 2024 vicariate summary, not the
+    April 2026 masterlist, not the Lord's Vineyard Mass schedule, which covers five buildings.
+    §4e(2) closed it: `Immaculate Conception, Cassadaga (1940-2008) | St. Anthony, Fredonia`, with
+    `St. John the Evangelist, Sinclairville (1948-2007)` folded into the same place. The feed also
+    still hangs it off St. Anthony, which is itself now only a secondary worship site of Holy
+    Trinity — **a site of a site, which should be read as a smell**.
+  - **Holy Family (Tuscarora Nation) — researched to a finish, then blocked by our own schema.**
+    Live and confirmed by the diocese itself (§4e(1), Sun 9:30 June–Aug / 10:00 Sept–May), a
+    Barnabite-run predominantly Tuscarora parish founded 1953, in no family and in no diocesan
+    planning document. Its real address is **5180 Chew Road, Sanborn 14132**; the feed's
+    "Tuscarora Reservation, Sanborn **14174**" has no street and the wrong zip — 14174 is
+    Youngstown, where the **Barnabite provincial house** is, so the feed is carrying the *order's*
+    mailing zip for the parish. It has **no website of any kind**: `barnabites.com` is the order's
+    site with no parish page and no Mass times, and the only social presence is a Facebook *group*.
+    `parish.homepage_url` is `NOT NULL UNIQUE`, so there is no row we can honestly write. Left in
+    §6f(c) as an open decision, not as unfinished research.
+  - **Queen of Angels (Lackawanna) deferred on purpose, with a trigger date.** Open today — the
+    diocesan Mass page gives Sun 10:00 and Sun 11:30 (Spanish), and Buffalo Mass Mob 58 is there on
+    **9 Aug 2026** — and closing "near the end of the summer" per the Mass Mob and the Am-Pol Eagle
+    (30 Jul 2026). Adding a row we would delete in three weeks is churn; excluding a church with
+    Mass this Sunday is false. **Re-check after Labor Day 2026** and write the exclusion row then.
+    Worth knowing the plan and the bulletin disagree on *who it merged into*: the vicariate summary
+    files it under secondary worship sites without a parent, while OLV's own 2024-09-15 bulletin
+    says it merges into **Our Lady of the Sacred Heart (Orchard Park)** for multi-cultural ministry.
+    Use the bulletin (§4b) if it ever needs a parent.
+  - **Our Lady of Fatima Shrine (Lewiston) — a live public Mass venue that is not in the feed.**
+    Surfaced only by diffing §4e(1) against `churches.csv`; Sun 9:00 and 12:00, Barnabite-run like
+    Holy Family. Not a parish, so nothing in the model fits it, and because it is absent from the
+    parish finder it can never show up as "missing". New open question in §6f(f) — the point for
+    now is that **the coverage denominator has a hole in it that the reconciler cannot report**.
 - **The last three families: #29 Lakeshore, #22 Downtown Buffalo, #7 Blessed Family 7** — one
   collapse and two plain additions. Parishes 142 → 140 → 142, churches 275 → 278; coverage
   92% → 94%, and **§6f(b) is now empty**. The three went three different ways, which is the point:
@@ -649,6 +847,22 @@ Plus geocoding/verification backfill: all 38 cloud-agent churches geocoded; 4 of
   agreeing) vs **125** (the OSM church node). Two independent sources would normally settle it,
   but the dissenter here is the OSM node itself, so it is modelled at 115 with
   `address_verified=false` rather than quietly outvoting the map.
+- **St. Adalbert (Buffalo)** — **212 Stanislaus Street** (GCatholic, the basilica's own site and the
+  family site eastbuffalocatholic.org, all agreeing) vs **208** (the OSM church node). The OLPH
+  pattern: three independent sources would normally settle it, but the dissenter is the map itself,
+  so it is modelled at 212 pinned to the OSM node with `address_verified=false`. `name_verified` is
+  also `false`, for a different and more interesting reason — **the "Basilica" in the name is
+  disputed by the Vatican.** The church has been called St. Adalbert Basilica since a 1907
+  affiliation with St. Peter's, but in 2025 the Congregation wrote to Bishop Fisher that the 1907
+  document was a capitular decree granting *aggregation* for indulgences and "does not in any way
+  equate to elevation to the rank of Minor Basilica." The diocese's masterlist and vicariate summary
+  both call it plainly "St. Adalbert"; its own domain is saintadalbertbasilica.org. Modelled as
+  **St. Adalbert Basilica**, the name a visitor searches for, with the flag left `false`.
+- **St. George Chapel (West Falls, 74 Old Glenwood Road)** — **dedication disputed, address not.**
+  The OSM church node and the April 2026 masterlist both call it St. George Chapel; the family that
+  publishes its bulletin calls it "Memorare Chapel of the Immaculate Conception". Those are two
+  different dedications, not two spellings, so `name_verified=false`. All three sources agree on the
+  address, so `address_verified=true`.
 - **St. Agatha (Buffalo, 54 Alamo Place)** — **left undecided, not excluded.** GCatholic still
   files it under Our Lady of Charity Parish; the family's own site does not list it among its
   worship sites, the feed and the April 2026 masterlist both omit it, and Overpass finds no
@@ -712,19 +926,23 @@ cheektowaga / enchanted-mountains case). Addresses already captured below:
 
 **This list now lives in `data/buffalo_excluded_sites.csv`**, one row per site with its reason,
 evidence and the date decided, so `reconcile_diocese_roster.py` can subtract it automatically
-rather than relying on someone reading this prose. Currently 22 rows in two classes:
+rather than relying on someone reading this prose. Currently 30 rows in two classes:
 
 - **not-a-parish (7)** — the St. Gianna Molla pregnancy centers (Buffalo, Lackawanna, Cheektowaga,
   Niagara Falls, Fredonia, Perry, Olean). They share the diocesan parish finder but are
   social-service offices and publish no bulletin.
-- **closed (15)** — St. Mary Queen of the Rosary (Strykersville), Our Lady of Loreto (Falconer),
+- **closed (23)** — St. Mary Queen of the Rosary (Strykersville), Our Lady of Loreto (Falconer),
   Our Lady of the Snows (Panama), St. Joseph (Fredonia), St. Rose of Lima (Forestville),
   St. Hedwig (Dunkirk), St. Patrick (Brocton), St. Isaac Jogues (Sherman), St. Mary (Batavia),
   Holy Spirit (North Collins), St. Mary (Cattaraugus), St. Jude (Sardinia), St. John the Baptist
-  (West Valley), St. Thomas Aquinas (Buffalo), St. Anthony (Farnham). **All but Sherman,
-  Cattaraugus, West Valley, St. Thomas Aquinas and Farnham are still in the live diocesan feed.**
-  That is the point of the file — and those five are in it because GCatholic still files closed
-  buildings under current parishes.
+  (West Valley), St. Thomas Aquinas (Buffalo), St. Anthony (Farnham), SS. Brendan & Jude (Almond),
+  St. Joseph (Perry), St. Mary (Silver Spring), Immaculate Conception (East Bethany), Our Lady of
+  Fatima (Elba), St. Joseph (Lyndonville), St. Joseph (Lockport), Immaculate Conception (Cassadaga).
+  **Sixteen of them are still in the live diocesan feed**, including Lyndonville, which was
+  **demolished in 2023**, and Cassadaga, whose parish the diocese's own records index closed in
+  **2008** — eighteen years of lag in a single row. The rest are in the file because GCatholic, or
+  the April 2026 masterlist, still files them under a current parish. Two rows are ones we had
+  already modelled and took back out: St. Mary (Batavia) and St. Joseph (Lyndonville).
 - ~~**St. Casimir** (Buffalo, Kaisertown, 160 Cable St) — independent/non-diocesan Polish church~~
   **— REVERSED (commit `e556743`).** The earlier call was wrong. The Diocese of Buffalo's *own*
   parish finder lists St. Casimir at 160 Cable St as a diocesan parish (founded 1891) with its own
@@ -775,7 +993,7 @@ Where a dead domain means a parish has fallen back to a shared family bulletin, 
 family parish (as done above) is the right call under 1-parish=1-bulletin, but a human may want to
 confirm the parish hasn't simply moved to a new own-domain instead.
 
-### 6f. Deferred inventory — 9 worship sites / 8 parishes
+### 6f. Deferred inventory — 2 worship sites / 2 parishes, neither blocked on research
 
 A *closed* list, not an open-ended "rest of the diocese": every worship site the diocese lists is
 either in the dataset, in `data/buffalo_excluded_sites.csv` (§6d), or here.
@@ -790,9 +1008,12 @@ uv run python scripts/reconcile_diocese_roster.py dio.json --list -o missing.jso
 The value the tooling cannot regenerate is *why* each site is blocked, so that is what the groups
 below record. They are ordered cheapest first.
 
-**(a) Sites under a parish the masterlist names — EMPTY.** Cattaraugus Creek cleared the last of
-this class. It is the cheapest work there is, so re-check it first after every masterlist re-issue:
-any `◦` line under a parish already in `parishes.csv` is a church row with no research attached.
+**(a) Sites under a parish the masterlist names — empty *as of this session's re-diff*, and it has
+been wrongly declared empty twice.** Both times the claim came from having harvested the `◦` lines
+someone happened to look at, not from diffing the whole masterlist. **`reconcile_diocese_roster.py`
+cannot see this class**: a `◦` site absent from both `churches.csv` and the parish finder is
+invisible to the reconciler, which only measures the feed. Re-diff `fetch_diocese_family_list.py`
+output against `churches.csv` yourself, every session, and after every masterlist re-issue.
 
 **(b) Whole families whose bulletin has not been probed — EMPTY. Every family in the diocese has
 now been read.** The five that were listed here went three different ways, and that spread is the
@@ -802,17 +1023,24 @@ Buffalo and Blessed Family 7 share **no** bulletin at all and simply needed one 
 **Never assume a family's shape before reading its bulletin** — and note the two that did not
 collapse are the two with the most members. Size predicts nothing either.
 
-**(c) No family, no website — needs per-parish research, 9 sites across 8 parishes. This is now the
-whole remaining backlog.** Nothing structural is left to lean on: the masterlist places none of
-these under any family, so neither §4c nor §4b applies and each needs its own `WebSearch`. Six of
-the nine have no website in the feed at all. Expect a meaningful share of them to turn out closed
-rather than missing — that has been the pattern every time a site had no family and no domain, and
-confirming a closure is progress (§2 policy 2):
-St. Isidore (St. Mary/Silver Spring + St. Joseph/Perry — *not* part of Fields of Grace despite the
-org name, see §6b), Queen of Angels (Lackawanna), St. Andrew Kim (Tonawanda), Holy Family
-(Tuscarora Reservation, Sanborn), SS. Brendan & Jude (Almond, on `icc-ics.com` which 403s to bots),
-Immaculate Conception (Cassadaga), Our Lady of Fatima (Elba), Mary Immaculate (Immaculate
-Conception, East Bethany).
+**(c) The last 2 feed sites. Research is finished on both; each needs a decision, not a lookup.**
+Every other entry that stood here has been resolved — five became church rows, one became a parish
+row, and five turned out to be closed and are now in `data/buffalo_excluded_sites.csv`. What is
+left is not the same kind of thing as what was here before, so do not treat it as backlog:
+
+- **Holy Family, Tuscarora Reservation (5180 Chew Road, Sanborn 14132)** — live, confirmed by the
+  diocese's own Mass-times page, Barnabite-run, in no family. **Blocked on a schema constraint, not
+  on evidence:** `parish.homepage_url` is `NOT NULL UNIQUE` and this parish has no website, no
+  family site, and no bulletin — a Facebook *group* is its entire web presence, and DiscoverMass
+  confirms no bulletin exists. Three ways out, none of them free: make `homepage_url` nullable
+  (touches the schema and the frontend join for every diocese); use the Facebook group under the
+  §6f(e) policy, which requires first confirming it actually carries announcements; or accept that
+  a parish with no bulletin is out of scope for a bulletin-extraction project and record it as a
+  permanent exclusion with reason `no-bulletin` rather than `closed`. **This is a maintainer
+  decision.**
+- **Queen of Angels, Lackawanna (144 Warsaw St)** — live now, closing "near the end of the summer"
+  2026. Deliberately neither modelled nor excluded; see the §5 entry. **Re-check after Labor Day
+  2026**, then write the exclusion row.
 
 **(d) Restructures of existing rows — deliberately not done.** Needs a bulletin probe first, and it
 *removes* a parish row rather than adding one:
@@ -825,7 +1053,24 @@ Perpetual Help (Buffalo), listed by the diocese with a Facebook URL and no domai
 to need it: it shares the Catholic Family of South Buffalo bulletin, so it is a **worship site**
 with no `website` of its own. The advice this entry already gave ("probe that family's bulletin
 first") was the right order of operations. The policy stands for the next Facebook-only parish;
-it just never got used on this one.
+it just never got used on this one — though Holy Family (Tuscarora) in (c) may finally be the case
+it was written for.
+
+**(f) Open policy question — public Mass venues that are not parishes and not in the feed.**
+Diffing the diocesan Mass-times page (§4e) against `churches.csv` surfaced **Our Lady of Fatima
+Shrine, Lewiston** — Sunday Mass at 9:00 and 12:00, Barnabite-run, its own site at
+`fatimashrine.com`, and **absent from the parish finder**, so the reconciler will never mention it.
+It is a shrine, not a parish and not a worship site *of* a parish, so no existing row type fits.
+
+The question is where the line goes, and it is the same line §6a drew for St. Adalbert from the
+other side. There we decided **four Masses a year at a parish's own building still counts**; here
+the venue has *weekly* Mass but no parish attached. If "somewhere a Catholic can go to Mass this
+Sunday" is the thing this project indexes, shrines, university chapels and oratories belong in it
+and the feed is the wrong denominator. If "parishes that publish bulletins" is the thing, this one
+is out and so is Holy Family. **Decide it once, for both**, and note the answer changes the
+coverage metric's meaning rather than its numerator: Fatima Shrine cannot be counted as missing
+today because nothing counts it at all. Re-run the §4e diff after deciding — it was run once, by
+hand, and shrines are exactly what it is good at finding.
 
 ### 6g. Dead end worth recording: the ParishesOnline API
 
@@ -863,20 +1108,26 @@ single session, mostly by reading two documents the earlier passes never opened.
 
 Work in this order, cheapest first, and only fall through when a step genuinely cannot answer:
 
-1. **Read the family masterlist (§4c).** `fetch_diocese_family_list.py`. Every `◦` line under a
-   parish already in `parishes.csv` is a church row you can add immediately — no bulletin research,
-   no website needed. Six sites landed this way in one batch.
-2. **Probe the family's bulletin container (§4b).** `probe_bulletin_container.py --pages 3`. This
+1. **Pull the two diocese-wide pages (§4e) and diff them against `churches.csv`.** The Mass-times
+   page tells you which buildings are open; the sacramental-records index tells you which parishes
+   are dead and where they went. Two fetches, whole diocese, and between them they resolve most of
+   what used to be per-parish research. This step is new and it goes first because everything below
+   is more expensive.
+2. **Read the family masterlist (§4c).** `fetch_diocese_family_list.py`. Every `◦` line under a
+   parish already in `parishes.csv` is a lead for a church row, cheap because no bulletin research
+   is needed — but **diff the whole masterlist against `churches.csv` rather than reading down it**,
+   and check the site against step 1 before adding, because the masterlist lags on closures (§4c).
+3. **Probe the family's bulletin container (§4b).** `probe_bulletin_container.py --pages 3`. This
    answers "one parish or several?" directly, and it is the *only* thing that answers it when
    members keep separate live domains. **Buffalo's families are all read now (§6f(b) is empty)**,
    so this step is for the next diocese — where the lesson to carry over is that a family predicts
    nothing: of Buffalo's last five, three were one bulletin and two were none.
    If every container in the family is dead, compare the sites' LPi `publicationWidget` ids
    instead (§4b) — same id is one bulletin, different ids are two.
-3. **Only then** research a parish individually with `WebSearch`/`WebFetch`, falling back to
+4. **Only then** research a parish individually with `WebSearch`/`WebFetch`, falling back to
    `gcatholic.org` for address + Plus Code when a parish host 403s. ParishesOnline's API is a dead
-   end for finding bulletins in bulk (§6g). **This is where all of Buffalo's remaining work now
-   is** — §6f(c), 9 sites with no family and mostly no website.
+   end for finding bulletins in bulk (§6g). **Buffalo has no work left at this step** — the two
+   entries in §6f(c) are researched and waiting on decisions, not lookups.
 
 Whichever step resolves it, the row-level rules are unchanged:
 
@@ -885,12 +1136,18 @@ Whichever step resolves it, the row-level rules are unchanged:
 - Decide parish-vs-worship-site by **who publishes the bulletin** (§1) — never by domain count.
 - **Geocode inline** — decode the Plus Code from gcatholic (no network needed, see
   `decode_plus_code` in `scripts/fetch_gcatholic_roster.py`), or use Nominatim, which works here.
-- **Check whether the building still exists** before adding it. The feed lists closed churches for
-  years; fifteen closures are already in `data/buffalo_excluded_sites.csv`, and confirming a closure
-  is as much progress as adding a row. Record it there with its evidence, and date it from the
-  bulletin's own Mass legend or schedule where you can (§4b).
+- **Check whether the building still exists** before adding it, and check it against the diocesan
+  Mass-times page (§4e), not against closure reporting. The feed lists closed churches for years —
+  twenty-three closures are already in `data/buffalo_excluded_sites.csv`, one demolished and one
+  suppressed in 2008 — and confirming a closure is as much progress as adding a row. But the
+  converse trap is worse and St. George (West Falls) is the example: **a closed parish is not a
+  closed building**, and every closure source said "closed" while the family's schedule said
+  Saturday 9 am. Record exclusions with their evidence, dated from a Mass schedule where you can.
 - `db create` + `pytest` after every batch, one commit per batch, and log the batch here.
 
-Coverage is **140 of 149 real worship sites (94%)**, all 8 counties, with 9 left in §6f — all of
-them in §6f(c), the per-parish residue. The structural sources are exhausted: every `◦` line is
-modelled and every family bulletin has been read.
+Coverage is **140 of 142 real worship sites (99%)**, all 8 counties, with 2 left in §6f(c) —
+Holy Family (Tuscarora), blocked on the `NOT NULL UNIQUE` website column rather than on evidence,
+and Queen of Angels (Lackawanna), open now and closing at the end of summer 2026. **There is no
+research backlog left in this diocese.** What remains is two maintainer decisions and one policy
+question (§6f(f), non-parish Mass venues) — and a standing caution that the 99% is measured against
+the parish finder, which §4e has now shown is not the diocese's only list of buildings.
