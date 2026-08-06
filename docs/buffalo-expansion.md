@@ -70,14 +70,14 @@ decided — apply them, don't re-litigate them:
 
 ## 3. Current state
 
-**Dataset: 143 parishes / 272 churches; 117 tests green.** (Rochester baseline was 62/132.)
+**Dataset: 142 parishes / 275 churches; 117 tests green.** (Rochester baseline was 62/132.)
 
-**Buffalo contribution: 81 parishes / 140 churches, all geocoded**, spanning **all 8 counties**.
+**Buffalo contribution: 80 parishes / 143 churches, all geocoded**, spanning **all 8 counties**.
 
 Measured against the diocese's own parish finder — 167 locations, which reduce to **149 real
 worship sites** once the entries in `data/buffalo_excluded_sites.csv` are removed and the 2 sites
-the feed repeats are collapsed — the dataset now covers **135 of 149, or 91%**. The uncovered
-remainder is 14 sites across 13 canonical parishes, every one deferred for a concrete,
+the feed repeats are collapsed — the dataset now covers **137 of 149, or 92%**. The uncovered
+remainder is 12 sites across 11 canonical parishes, every one deferred for a concrete,
 individually-documented reason (§6f): overwhelmingly "the parish's website is dead or the diocese
 lists none", not "not looked at yet".
 
@@ -191,11 +191,24 @@ the Baptist and St. Brendan on the Lake both keep live, distinct, parish-looking
 website-based heuristic says "two parishes" — but there is one bulletin, so under §1 there is one
 parish. **Where a live domain and the bulletin disagree, the bulletin wins.**
 
-Two practical notes. A *missing* object in the container answers **403, not 404**, so "403 on
+Three practical notes. A *missing* object in the container answers **403, not 404**, so "403 on
 every Sunday" is the dead-container signal — always confirm against a container you know is live
-before concluding from it. And many issues are scanned images with no extractable text; when that
+before concluding from it. Many issues are scanned images with no extractable text; when that
 happens, fall back to an older issue from the same container, which is usually text-native and
-carries the same masthead.
+carries the same masthead. And **the masthead is not always on page 1**: LPi wraps many bulletins
+in a generic cover reflection, so the first readable page can be a homily about carbohydrates with
+the member parishes printed underneath it or on page 2–3. The probe used to print only the first
+readable page and therefore reported South Buffalo as anonymous; it now takes `--pages`. *A
+container that looks anonymous is usually one page short, not a dead end.*
+
+**Read the masthead in the same issue that announces the closure.** The bisect in the paragraph
+below dates a closure by finding the issue where a code disappears. Cheaper still: a family that is
+about to close a church usually *says so* in the last issues that still list it. South Buffalo's
+13 Oct 2024 masthead names St. Thomas Aquinas and the same issue announces "the closing Mass at
+St. Thomas Aquinas: Saturday, November 9th at 11:30 AM" — one fetch giving both the membership and
+the date. And membership moves both ways: that masthead lists St. Thomas Aquinas and *not* Our Lady
+of Perpetual Help, while the Jan 2025 one reverses both. **Quote the current masthead, never a
+remembered one.**
 
 Corollary for the shells: All Saints', St. Brendan's and the family's own `/bulletin` pages all
 render the *identical* LPi widget with no PDF link in the HTML. Matching shells across sites is a
@@ -267,7 +280,7 @@ and **reverse-geocode to confirm** it lands on the right street/town before comm
 
 **Known WebFetch 403 hosts** (some parish hosts block the fetcher): `icc-ics.com`,
 `emcatholic.org`, `tcsfh.org` (403s to a browser UA too — a member parish's own site answered the
-question instead, see §5). Reliable channels that never 403'd: `gcatholic.org` (addresses + Plus Codes),
+question instead, see §5), `lakeshorecatholicfc.org`. Reliable channels that never 403'd: `gcatholic.org` (addresses + Plus Codes),
 `cheektowagacatholicfamily.org`, `nfrcfparish.org`, `blessedtrinitybuffalo.org`. **gcatholic.org
 is the dependable independent fallback.**
 
@@ -280,6 +293,36 @@ north-tonawanda` → folded into `tonawanda-catholic`; `holy-family-albion` → 
 `one-catholic`; `resurrection-batavia` website → the12apostles.org. The batch-1–8 lists below
 record the *original* additions; the audit entries record the corrections.
 
+- **The Catholic Family of South Buffalo** (Family #31) — a **restructure that removes two rows**:
+  `catholic-family-south-buffalo` (catholicsouthbuffalo.com, container 14/0940) with **5 worship
+  sites**, absorbing both `st-teresa-buffalo` and `st-martin-of-tours-buffalo`. Sites: St. Teresa,
+  St. Martin of Tours, St. Ambrose, Holy Family, Our Lady of Perpetual Help (all Buffalo).
+  Parishes 143 → 142, churches 272 → 275; coverage 91% → 92%.
+  - The masthead is **at the foot of page 1, under an LPi cover reflection about carbohydrates** —
+    which is why this container looked anonymous on the first probe. `probe_bulletin_container.py`
+    only ever printed the first readable page, so it printed the homily. It now takes `--pages`
+    (§4b). *A container that looks anonymous is usually one page short, not a dead end.*
+  - Current masthead: "Our Lady of Charity • Our Lady of Perpetual Help • St. Martin of Tours •
+    St. Teresa" — one bulletin, four parishes, therefore one row.
+  - **This resolves the §6f(e) policy question by dissolving it.** Our Lady of Perpetual Help is
+    the parish the diocese lists with a Facebook URL and no domain, and §2 policy 1 had just been
+    settled to unblock it. It never needed the policy: it shares the family bulletin, so it is a
+    worship site and needs no `website` of its own. **Settling a policy question is not the same as
+    needing it** — probing the family first, as §6f(e) itself advised, was the cheaper path.
+  - **Two feed entries that are worship sites under other names.** The feed's "Our Lady of Charity,
+    260 Okell St" is the **St. Ambrose** building (the family's own site calls it "Our Lady of
+    Charity – St. Ambrose"), which is why St. Ambrose looked absent from the feed while sitting in
+    the masterlist. Holy Family is in neither the feed nor GCatholic, and is added on the family
+    site, the masterlist and an OSM church node (the St. Pacificus precedent, §2 policy 3) — so
+    churches rose by 3 while coverage rose by only 2.
+  - **St. Thomas Aquinas (450 Abbott Rd) excluded as closed, dated from the bulletin both ways.**
+    The 13 Oct 2024 masthead names it *and* announces "the closing Mass at St. Thomas Aquinas:
+    Saturday, November 9th at 11:30 AM"; the 10 Nov masthead has dropped it; the 17 Nov issue says
+    "Now that St. Thomas Aquinas has been closed". A masthead bisect is cheaper still when the
+    bulletin announces the closure in the same issue it last lists the parish.
+  - Correction worth recording: the 2024 masthead lists **St. Thomas Aquinas and not** Our Lady of
+    Perpetual Help; OLPH first appears in the Jan 2025 masthead. The family's membership changed in
+    both directions inside three months, so **quote the current masthead, never a remembered one**.
 - **Cattaraugus Creek Catholic Community** (Family #33) — a **restructure**:
   `cattaraugus-creek-catholic` (ccccfamily.org, container 14/0156) with **4 worship sites**,
   absorbing the standalone `st-aloysius-springville` row. Sites: St. Aloysius (Springville),
@@ -532,6 +575,26 @@ Plus geocoding/verification backfill: all 38 cloud-agent churches geocoded; 4 of
   Modelled as **St. Mary Church** (the name the parish itself and the map both use, and the name a
   visitor would look for) with `name_verified=false`. All four sources agree on 417 W Main St, so
   `address_verified=true`. A human could confirm what is actually carved over the door.
+- **St. Ambrose (Buffalo)** — **260 Okell Street** (the diocesan feed and the parish's own site)
+  vs **65 Ridgewood Road** (GCatholic). Nominatim puts the two ~76 m apart and OSM has a single
+  `Saint Ambrose Church` node between them: one corner building with two street frontages, the
+  St. Joseph (Gowanda) pattern. Modelled at 260 Okell Street, pinned to the OSM node,
+  `address_verified=false`.
+- **Holy Family (Buffalo)** — **1885 South Park Avenue** (OSM church node, Yelp,
+  catholicchurch.directory and the Buffalo architectural survey at `buffaloah.com/a/spark/1885/`)
+  vs **1901 South Park Avenue** (Our Lady of Charity's own site and masstime.us). Almost certainly
+  the church vs the parish office next door — the St. Mary (Mayville) pattern. Modelled at 1885 on
+  the OSM node, `address_verified=false`.
+- **Our Lady of Perpetual Help (Buffalo)** — **115 O'Connell Avenue** (the feed *and* GCatholic
+  agreeing) vs **125** (the OSM church node). Two independent sources would normally settle it,
+  but the dissenter here is the OSM node itself, so it is modelled at 115 with
+  `address_verified=false` rather than quietly outvoting the map.
+- **St. Agatha (Buffalo, 54 Alamo Place)** — **left undecided, not excluded.** GCatholic still
+  files it under Our Lady of Charity Parish; the family's own site does not list it among its
+  worship sites, the feed and the April 2026 masterlist both omit it, and Overpass finds no
+  `place_of_worship` node there. Everything points to closed and nothing *says* so, so it gets no
+  exclusion row (which would assert a closure) and no church row. Same treatment as Our Lady of
+  Fatima (Elba) and Immaculate Conception (Cassadaga): someone has to ask the parish.
 - **(Out-of-scope, pre-existing Rochester rows, flagged not fixed):** `sacred-heart-of-jesus`
   (Perkinsville) CSV `11114 Chapel St` vs sources' `11119`; `st-patrick-savannah` CSV
   `52 Clyde St` vs directories' `1583 Grand Ave`. Left for the Rochester data owner.
@@ -589,18 +652,18 @@ cheektowaga / enchanted-mountains case). Addresses already captured below:
 
 **This list now lives in `data/buffalo_excluded_sites.csv`**, one row per site with its reason,
 evidence and the date decided, so `reconcile_diocese_roster.py` can subtract it automatically
-rather than relying on someone reading this prose. Currently 20 rows in two classes:
+rather than relying on someone reading this prose. Currently 21 rows in two classes:
 
 - **not-a-parish (7)** — the St. Gianna Molla pregnancy centers (Buffalo, Lackawanna, Cheektowaga,
   Niagara Falls, Fredonia, Perry, Olean). They share the diocesan parish finder but are
   social-service offices and publish no bulletin.
-- **closed (13)** — St. Mary Queen of the Rosary (Strykersville), Our Lady of Loreto (Falconer),
+- **closed (14)** — St. Mary Queen of the Rosary (Strykersville), Our Lady of Loreto (Falconer),
   Our Lady of the Snows (Panama), St. Joseph (Fredonia), St. Rose of Lima (Forestville),
   St. Hedwig (Dunkirk), St. Patrick (Brocton), St. Isaac Jogues (Sherman), St. Mary (Batavia),
   Holy Spirit (North Collins), St. Mary (Cattaraugus), St. Jude (Sardinia), St. John the Baptist
-  (West Valley). **All but Sherman, Cattaraugus and West Valley are still in the live diocesan
-  feed.** That is the point of the file — and those three are in it because GCatholic still files
-  closed buildings under current parishes.
+  (West Valley), St. Thomas Aquinas (Buffalo). **All but Sherman, Cattaraugus, West Valley and
+  St. Thomas Aquinas are still in the live diocesan feed.** That is the point of the file — and
+  those four are in it because GCatholic still files closed buildings under current parishes.
 - ~~**St. Casimir** (Buffalo, Kaisertown, 160 Cable St) — independent/non-diocesan Polish church~~
   **— REVERSED (commit `e556743`).** The earlier call was wrong. The Diocese of Buffalo's *own*
   parish finder lists St. Casimir at 160 Cable St as a diocesan parish (founded 1891) with its own
@@ -651,7 +714,7 @@ Where a dead domain means a parish has fallen back to a shared family bulletin, 
 family parish (as done above) is the right call under 1-parish=1-bulletin, but a human may want to
 confirm the parish hasn't simply moved to a new own-domain instead.
 
-### 6f. Deferred inventory — 14 worship sites / 13 parishes
+### 6f. Deferred inventory — 12 worship sites / 11 parishes
 
 A *closed* list, not an open-ended "rest of the diocese": every worship site the diocese lists is
 either in the dataset, in `data/buffalo_excluded_sites.csv` (§6d), or here.
@@ -670,7 +733,7 @@ below record. They are ordered cheapest first.
 this class. It is the cheapest work there is, so re-check it first after every masterlist re-issue:
 any `◦` line under a parish already in `parishes.csv` is a church row with no research attached.
 
-**(b) Whole families whose bulletin has not been probed yet — best value per lookup, 4 sites.**
+**(b) Whole families whose bulletin has not been probed yet — best value per lookup, 3 sites.**
 Each is one run of `probe_bulletin_container.py` away from resolving one or more sites, exactly as
 Fields of Grace, The Lord's Vineyard, Chautauqua and Cattaraugus Creek were. **Find the container
 first** — the family's own homepage is usually not in the diocesan feed and a web search for the
@@ -682,32 +745,34 @@ family, which is what settled Cattaraugus Creek:
   needing its own bulletin home found from scratch, it is one parish of a family, so probe that
   family's bulletin. It still cannot take `buffalodiocese.org` as its `website` (the diocese's own
   site, and not where a parish bulletin lives). **1 site.**
-- **Family #7** St. John XXIII (West Seneca) · **Family #29** St. John Paul II (Lake View) ·
-  **Family #31** Our Lady of Charity (Buffalo). **3 sites.** Note §4c's warning applies hardest
-  here: Family #7 is named there as a family whose parishes look to publish *separately*, in which
-  case St. John XXIII is simply its own row (it has a live domain, `stjohn23.com`) and no
-  restructure follows. Families #29 and #31 both contain parishes we already model as standalone
-  rows, so either could go the other way and *collapse* rows.
+- **Family #7** St. John XXIII (West Seneca) · **Family #29** St. John Paul II (Lake View).
+  **2 sites.** Note §4c's warning applies hardest here: Family #7 is named there as a family whose
+  parishes look to publish *separately*, in which case St. John XXIII is simply its own row (it has
+  a live domain, `stjohn23.com`) and no restructure follows. Both families contain parishes we
+  already model as standalone rows — Fourteen Holy Helpers under Queen of Heaven (#7) and
+  St. Francis of Assisi/Athol Springs under St. Mary of the Lake (#29) are `◦` lines in the
+  masterlist — so either could go the other way and *collapse* rows, as South Buffalo did.
 
-**(c) No family, no website — needs per-parish research, 9 sites.** Nothing structural to lean on;
+**(c) No family, no website — needs per-parish research, 8 sites.** Nothing structural to lean on;
 the masterlist places none of these under any family:
 St. Isidore (St. Mary/Silver Spring + St. Joseph/Perry — *not* part of Fields of Grace despite the
 org name, see §6b), Queen of Angels (Lackawanna), St. Andrew Kim (Tonawanda), Holy Family
 (Tuscarora Reservation, Sanborn), SS. Brendan & Jude (Almond, on `icc-ics.com` which 403s to bots),
 Immaculate Conception (Cassadaga), Our Lady of Fatima (Elba), Mary Immaculate (Immaculate
-Conception, East Bethany), Our Lady of Perpetual Help (Buffalo — Facebook-only, unblocked by §2
-policy 1 but probe Family #31's bulletin first, since it may be a worship site).
+Conception, East Bethany).
 
 **(d) Restructures of existing rows — deliberately not done.** Needs a bulletin probe first, and it
 *removes* a parish row rather than adding one:
 - `enchanted-mountains-catholic` — the diocese lists St. John (Olean) and St. Mary of the Angels
   (Olean) as separate parishes with live domains, which under §1 argues for splitting our single row.
 
-**(e) ~~Open policy question~~ — SETTLED.** A social page may be the `website` when it genuinely
-hosts the bulletin (§2). Our Lady of Perpetual Help (Buffalo), which the diocese lists with a
-Facebook URL and no domain, is therefore **unblocked**: confirm the page actually carries the
-bulletin, then add it. It sits in Family #31 above, so probing that family's bulletin may settle
-it as a worship site instead — do that first.
+**(e) ~~Open policy question~~ — SETTLED, AND THEN MOOT.** A social page may be the `website` when
+it genuinely hosts the bulletin (§2 policy 1). The parish that prompted the question — Our Lady of
+Perpetual Help (Buffalo), listed by the diocese with a Facebook URL and no domain — turned out not
+to need it: it shares the Catholic Family of South Buffalo bulletin, so it is a **worship site**
+with no `website` of its own. The advice this entry already gave ("probe that family's bulletin
+first") was the right order of operations. The policy stands for the next Facebook-only parish;
+it just never got used on this one.
 
 ### 6g. Dead end worth recording: the ParishesOnline API
 
@@ -768,4 +833,4 @@ Whichever step resolves it, the row-level rules are unchanged:
   bulletin's own Mass legend where you can (§4b).
 - `db create` + `pytest` after every batch, one commit per batch, and log the batch here.
 
-Coverage is **135 of 149 real worship sites (91%)**, all 8 counties, with 14 left in §6f.
+Coverage is **137 of 149 real worship sites (92%)**, all 8 counties, with 12 left in §6f.

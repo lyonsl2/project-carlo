@@ -196,11 +196,11 @@ st-martin-de-porres-buffalo,st-martin-de-porres-buffalo,St. Martin de Porres Chu
 our-lady-of-hope-buffalo,our-lady-of-hope-buffalo,Our Lady of Hope Church,18 Greenwood Place,,Buffalo,NY,14213,true,true,42.9203125,-78.8895625
 assumption-buffalo,assumption-buffalo,Assumption Church,435 Amherst Street,,Buffalo,NY,14207,true,true,42.9386875,-78.8880625
 st-katharine-drexel-buffalo,st-katharine-drexel-buffalo,St. Katharine Drexel Church,118 Schiller Street,,Buffalo,NY,14206,true,true,42.8881875,-78.8021875
-st-teresa-buffalo,st-teresa-buffalo,St. Teresa Church,1974 Seneca Street,,Buffalo,NY,14210,true,true,42.8575625,-78.8120625
+catholic-family-south-buffalo,st-teresa-buffalo,St. Teresa Church,1974 Seneca Street,,Buffalo,NY,14210,true,true,42.8575625,-78.8120625
 st-mark-buffalo,st-mark-buffalo,St. Mark Church,401 Woodward Avenue,,Buffalo,NY,14214,true,true,42.9401875,-78.8490625
 st-mark-buffalo,st-margaret-buffalo,St. Margaret Church,1395 Hertel Avenue,,Buffalo,NY,14216,true,true,42.9474375,-78.8561875
 holy-spirit-buffalo,holy-spirit-buffalo,Holy Spirit Church,91 Dakota Street,,Buffalo,NY,14216,true,false,42.9468125,-78.8674375
-st-martin-of-tours-buffalo,st-martin-of-tours-buffalo,St. Martin of Tours Church,1140 Abbott Road,,Buffalo,NY,14220,false,true,42.8336875,-78.8056875
+catholic-family-south-buffalo,st-martin-of-tours-buffalo,St. Martin of Tours Church,1140 Abbott Road,,Buffalo,NY,14220,false,true,42.8336875,-78.8056875
 st-paul-kenmore,st-paul-kenmore,St. Paul Church,33 Victoria Boulevard,,Kenmore,NY,14217,true,true,42.9639375,-78.8704375
 st-aloysius-gonzaga-cheektowaga,st-aloysius-gonzaga-cheektowaga,St. Aloysius Gonzaga Church,157 Cleveland Drive,,Cheektowaga,NY,14215,true,true,42.9446875,-78.7936875
 our-lady-of-bistrica-lackawanna,our-lady-of-bistrica-lackawanna,Our Lady of Bistrica Church,1619 Abbott Road,,Lackawanna,NY,14218,true,true,42.8211875,-78.8031875
@@ -271,3 +271,6 @@ catholic-family-holy-rosary,st-joseph-gowanda,St. Joseph Church,26 Erie Street,,
 cattaraugus-creek-catholic,st-mary-arcade,St. Mary Church,417 West Main Street,,Arcade,NY,14009,false,true,42.5339375,-78.4304375
 cattaraugus-creek-catholic,st-mary-east-arcade,St. Mary Church,6785 East Arcade Road,,East Arcade,NY,14009,true,true,42.5728125,-78.3431875
 cattaraugus-creek-catholic,st-joseph-holland,St. Joseph Church,46 North Main Street,,Holland,NY,14080,true,true,42.6416875,-78.5431875
+catholic-family-south-buffalo,st-ambrose-buffalo,St. Ambrose Church,260 Okell Street,,Buffalo,NY,14220,true,false,42.8386696,-78.8203109
+catholic-family-south-buffalo,holy-family-buffalo,Holy Family Church,1885 South Park Avenue,,Buffalo,NY,14220,true,false,42.8472192,-78.8242963
+catholic-family-south-buffalo,our-lady-of-perpetual-help-buffalo,Our Lady of Perpetual Help Church,115 O'Connell Avenue,,Buffalo,NY,14204,true,false,42.8672579,-78.8614476
