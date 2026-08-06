@@ -53,16 +53,22 @@ because Rochester already has `st-louis` (Pittsford). One commit per batch.
 
 ## 3. Current state
 
-**Dataset: 143 parishes / 237 churches; 117 tests green.** (Rochester baseline was 62/132.)
+**Dataset: 143 parishes / 245 churches; 117 tests green.** (Rochester baseline was 62/132.)
 
-**Buffalo contribution: 81 parishes / 105 churches, all geocoded**, spanning **all 8 counties**.
+**Buffalo contribution: 81 parishes / 113 churches, all geocoded**, spanning **all 8 counties**.
 
-Measured against the diocese's own parish finder — 167 locations, of which 160 are real worship
-sites (§6d) — the dataset now covers **100 of 160, or 62%**. The uncovered remainder is exactly
-60 sites, every one of them deferred for a concrete, individually-documented reason (§6f):
-overwhelmingly "the parish's website is dead or the diocese lists none", not "not looked at yet".
-(Buffalo contributes 105 church rows against those 100 matched sites; the extra 5 are worship
-sites the diocese does not list separately, e.g. St. Francis of Assisi Chapel in Tonawanda.)
+Measured against the diocese's own parish finder — 167 locations, which reduce to **158 real
+worship sites** (7 are St. Gianna Molla centers, §6d, and the feed repeats 2) — the dataset now
+covers **109 of 158, or 69%**. The uncovered remainder is exactly 49 sites across 38 canonical
+parishes, every one deferred for a concrete, individually-documented reason (§6f): overwhelmingly
+"the parish's website is dead or the diocese lists none", not "not looked at yet".
+
+**Recompute these numbers, don't trust this paragraph** — the diocesan feed changes underneath you:
+
+```
+uv run python scripts/fetch_diocese_locator.py https://www.buffalodiocese.org/parish-finder/ -o dio.json
+uv run python scripts/reconcile_diocese_roster.py dio.json --exclude Gianna --list
+```
 
 `db create` and `pytest` are run after every batch and must stay green.
 
@@ -111,6 +117,45 @@ Caveat: the diocesan feed is only as fresh as the diocese keeps it. **13 of its 
 longer resolve at all** (§6f). Always run new URLs through `scripts/check_parish_websites.py`
 before trusting them.
 
+## 4b. Read the bulletin, not the websites (settles "family or not?")
+
+§4a groups sites by effective domain. That is the right *first* pass, but it cannot answer the
+case that actually blocks progress: **several live domains that nevertheless share one bulletin.**
+Domain-grouping over-splits there, and the doc previously flagged this as the place where "the
+mechanical rule is known to be insufficient".
+
+The fix is to stop inferring and go read the artefact the rule is actually about. ParishesOnline
+serves bulletins from an unauthenticated flat path,
+`container.parishesonline.com/bulletins/<a>/<b>/<YYYYMMDD>B.pdf`, one PDF per Sunday.
+`scripts/probe_bulletin_container.py` walks Sundays backwards to find the latest issue and prints
+its first readable page. **A family bulletin's masthead simply lists its member parishes**, which
+is direct evidence rather than inference:
+
+> Central Niagara Catholic Family — All Saints · Our Lady of the Lake · St. Brendan on the Lake ·
+> St. John the Baptist … *inside: p5 All Saints, p8 Our Lady of the Lake, p9 St. Brendan on the
+> Lake, p10 St. John the Baptist*
+
+Two signals together are conclusive, and they are cheap:
+
+1. **The combined container is still publishing this week** → the family bulletin is current, not
+   a historical arrangement.
+2. **A member's own former container has gone silent** → that member folded in.
+
+That pair is what settled Central Niagara, including the part domain-grouping got wrong: St. John
+the Baptist and St. Brendan on the Lake both keep live, distinct, parish-looking domains, so every
+website-based heuristic says "two parishes" — but there is one bulletin, so under §1 there is one
+parish. **Where a live domain and the bulletin disagree, the bulletin wins.**
+
+Two practical notes. A *missing* object in the container answers **403, not 404**, so "403 on
+every Sunday" is the dead-container signal — always confirm against a container you know is live
+before concluding from it. And many issues are scanned images with no extractable text; when that
+happens, fall back to an older issue from the same container, which is usually text-native and
+carries the same masthead.
+
+Corollary for the shells: All Saints', St. Brendan's and the family's own `/bulletin` pages all
+render the *identical* LPi widget with no PDF link in the HTML. Matching shells across sites is a
+useful hint that they are fed by one container — but confirm it against the container itself.
+
 ## 4. Environment (this machine vs. the cloud agent)
 
 The original cloud agent ran in a sandbox where **all direct HTTP was 403** and Nominatim was
@@ -138,6 +183,26 @@ north-tonawanda` → folded into `tonawanda-catholic`; `holy-family-albion` → 
 `one-catholic`; `resurrection-batavia` website → the12apostles.org. The batch-1–8 lists below
 record the *original* additions; the audit entries record the corrections.
 
+- **Central Niagara + Catholic Neighbors in Faith** — two families resolved by reading the
+  *bulletin itself* rather than the websites (§4b). Net: parishes unchanged at 143, churches
+  237 → 245.
+  - **`central-niagara-catholic`** (cncfwny.org, ParishesOnline container 14/0428) — a
+    **restructure**: the family publishes ONE bulletin whose masthead carries all four member
+    parishes with a page each, so the two rows we already had for members of it —
+    `st-john-baptist-lockport` and `st-brendan-on-the-lake` — **collapse into this one row**,
+    and the two members we were missing join as worship sites instead of becoming parishes.
+    7 worship sites: All Saints + St. John the Baptist (Lockport), St. Patrick (Barker) +
+    St. Joseph (Lyndonville), St. Bridget (Newfane) + Our Lady of the Rosary (Wilson) +
+    St. Charles Borromeo Oratory (Olcott). Safe to merge: no bulletin or event in the dataset
+    references a Buffalo parish yet, so nothing was orphaned.
+  - **`catholic-neighbors-in-faith`** (cniffamily.org, Jamestown) — one bulletin over four
+    canonical parishes, **5 active worship sites**: St. James + St. John + Ss. Peter and Paul
+    (Jamestown), Sacred Heart (Lakewood), St. Patrick (Randolph).
+  - Two sites removed from the deferred list as **closed, not deferred**: Our Lady of Loreto
+    (Falconer, closed 19 May 2025) and Our Lady of the Snows (Panama) — the family's own
+    parishes page lists the first as closed and does not list the second at all, though the
+    diocesan feed still carries both. Our Lady of Victory Oratory (Frewsburg, closed 13 Jan 2025)
+    was already absent from the feed.
 - **Bulk batch 1** (commit `e556743`) — **44 parishes / 51 churches** in one pass via §4a, plus
   three churches folded into existing parishes on redirect evidence: St. Mary (Batavia) and Our
   Lady of Mercy (LeRoy) under `resurrection-batavia` (both domains 301 to the12apostles.org), and
@@ -231,10 +296,15 @@ cheektowaga / enchanted-mountains case). Addresses already captured below:
 ### 6c. Parishes in active closure/merger flux — DEFERRED until status settles
 - **St. John Kanty** (Buffalo, 101 Swinburne St) — final Mass May 2025, Vatican suspended the
   closure pending a 90-day appeal.
-- **All Saints** (Lockport, 76 Church St) — merged into St. John the Baptist by Vatican decree
-  (Jul 2025), under appeal.
-- **Jamestown / Holy Apostles + St. James** — Vatican overturned the merger decree Dec 2025;
-  worship-site lineup unsettled as of mid-2026.
+- ~~**All Saints** (Lockport) — merged into St. John the Baptist by Vatican decree, under appeal.~~
+  **— RESOLVED.** The canonical appeal turned out to be the wrong thing to wait on: whatever its
+  canonical status, All Saints appears as a member parish with its own page in the *current*
+  Central Niagara Catholic Family bulletin, so §1 places it as a worship site of
+  `central-niagara-catholic`. **Lesson: wait on the bulletin, not on the decree.** A merger under
+  appeal can leave the bulletin arrangement completely settled, and the bulletin is what we model.
+- ~~**Jamestown / Holy Apostles + St. James** — Vatican overturned the merger decree Dec 2025.~~
+  **— RESOLVED** the same way: all four Jamestown-area parishes share the Catholic Neighbors in
+  Faith bulletin regardless of the overturned decree → one `catholic-neighbors-in-faith` row.
 - **St. Mary** (18 Ellicott St, Batavia) — on the diocese's Road-to-Renewal closure list; only
   St. Joseph was added under `resurrection-batavia`.
 - **Blessed Sacrament** (Kenmore) — appears merged into St. John the Baptist's site (would
@@ -292,11 +362,26 @@ Where a dead domain means a parish has fallen back to a shared family bulletin, 
 family parish (as done above) is the right call under 1-parish=1-bulletin, but a human may want to
 confirm the parish hasn't simply moved to a new own-domain instead.
 
-### 6f. Complete deferred inventory (60 worship sites, exhaustive)
+### 6f. Complete deferred inventory (49 worship sites / 38 parishes)
 
-This is now a *closed* list, not an open-ended "rest of the diocese": every one of the diocese's
-167 worship sites is either in the dataset, excluded as not-a-parish (§6d), or listed here. Ordered
-by how much work each group needs.
+This is a *closed* list, not an open-ended "rest of the diocese": every one of the diocese's
+worship sites is either in the dataset, excluded as not-a-parish (§6d), or listed here.
+
+**Regenerate it rather than reading the prose below** — the groupings are a snapshot, and the
+diocese edits the feed:
+
+```
+uv run python scripts/reconcile_diocese_roster.py dio.json --exclude Gianna --list -o missing.json
+```
+
+The narrative groups (a)–(h) below are kept because they record *why* each site is blocked, which
+the tooling cannot regenerate. Counts are as of the Central Niagara / CNIF batch; the group letters
+still describe the shape of the remaining work even where a few members have since been resolved.
+
+**Resolved out of this inventory since it was written:** All Saints (Lockport) and Our Lady of the
+Lake's two sites → `central-niagara-catholic`; St. James, Holy Apostles' two sites, Sacred
+Heart/Lakewood and St. Patrick/Randolph → `catholic-neighbors-in-faith`; Our Lady of Loreto
+(Falconer) and Our Lady of the Snows (Panama) → **closed**, excluded permanently.
 
 **(a) Diocese lists no website — 21 sites.** These need a bulletin home found by hand. Several are
 clearly worship sites of a parish already named, which is the cheapest place to start:
@@ -341,8 +426,14 @@ modelling either way.
 **(f) Lord's Vineyard, still unsplit — 3 sites.** Blessed Mary Angela / St. Hyacinth (Dunkirk),
 St. Elizabeth Ann Seton (Dunkirk), St. Joseph (Fredonia). Each has its own live domain, so the
 per-domain rule *would* split them — but §6b records that St. Anthony + St. Joseph (Fredonia) share
-one bulletin org, so splitting blind would over-split. Confirm the family's bulletin map first.
-This is the one place where the mechanical rule is known to be insufficient.
+one bulletin org, so splitting blind would over-split.
+
+**This is now tractable, and it is the best next job in the list.** It is exactly the shape §4b
+solves: several live domains, one uncertain bulletin map. Probe the Lord's Vineyard container and
+each candidate member's own container — whichever is still publishing this week defines the parish
+rows, and the combined issue's masthead names its members outright. Note the same evidence may
+argue for folding the existing `holy-trinity-dunkirk` row in (its domain already 301s to
+thelordsvineyard3.com), exactly as Central Niagara absorbed two standing rows.
 
 **(g) Would duplicate existing rows — 2 sites.** St. John (Olean, `sjteolean.org`) and St. Mary of
 the Angels (Olean, `smaolean.org`) are already modelled as worship sites of

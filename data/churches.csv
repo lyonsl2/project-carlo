@@ -150,7 +150,6 @@ st-mary-swormville,st-mary-swormville,St. Mary's Church (Swormville),6919 Transi
 st-aloysius-springville,st-aloysius-springville,St. Aloysius Church,190 Franklin Street,,Springville,NY,14141,true,true,42.5099337,-78.6694678
 tonawanda-catholic,st-jude-the-apostle-north-tonawanda,St. Jude the Apostle Church,800 Niagara Falls Boulevard,,North Tonawanda,NY,14120,true,true,43.0590885,-78.8396086
 tonawanda-catholic,our-lady-of-czestochowa-north-tonawanda,Our Lady of Czestochowa Church,64 Center Avenue,,North Tonawanda,NY,14120,true,true,43.0387375,-78.8808090
-st-john-baptist-lockport,st-john-baptist-lockport,St. John the Baptist Church,168 Chestnut Street,,Lockport,NY,14094,true,true,43.1737227,-78.6837304
 our-lady-of-peace-clarence,our-lady-of-peace-clarence,Our Lady of Peace Church,10950 Main Street,,Clarence,NY,14031,true,true,42.9819746,-78.5794286
 catholic-family-cheektowaga,st-josaphat-cheektowaga,St. Josaphat Church,20 Peoria Avenue,,Cheektowaga,NY,14206,true,true,42.8843890,-78.7808843
 catholic-family-cheektowaga,resurrection-cheektowaga,Resurrection Church,130 Como Park Boulevard,,Cheektowaga,NY,14227,true,true,42.8932154,-78.7510864
@@ -185,9 +184,6 @@ niagara-frontier-catholic,st-bernard-youngstown,St. Bernard Church,422 Second St
 niagara-frontier-catholic,immaculate-conception-ransomville,Immaculate Conception Church,4671 Townline Road,,Ransomville,NY,14131,true,true,43.1870018,-78.8840511
 one-catholic,st-mary-medina,St. Mary Church,211 Eagle Street,,Medina,NY,14103,true,true,43.2226333,-78.3900354
 one-catholic,st-mary-holley,St. Mary Church,13 South Main Street,,Holley,NY,14470,true,true,43.225453,-78.0270565
-st-brendan-on-the-lake,st-bridget,St. Bridget Church,3455 Ewings Road,,Newfane,NY,14108,true,true,43.2473125,-78.7113125
-st-brendan-on-the-lake,our-lady-of-the-rosary,Our Lady of the Rosary Church,345 Lake Street,,Wilson,NY,14172,true,true,43.3083125,-78.8264375
-st-brendan-on-the-lake,st-charles-borromeo-olcott,St. Charles Borromeo Oratory,5972 Main Street,,Olcott,NY,14126,true,true,43.3378125,-78.7139375
 st-john-neuman,st-mary-queen-of-the-rosary,St. Mary Queen of the Rosary Church,3854 Main Street,,Strykersville,NY,14145,true,true,42.6998125,-78.4481875
 st-john-neuman,st-cecilia-sheldon,St. Cecilia Church,991 Centerline Road,,Sheldon,NY,14145,true,true,42.7374375,-78.4178125
 resurrection-batavia,st-mary-batavia,St. Mary Church,18 Ellicott Street,,Batavia,NY,14020,true,true,42.9969375,-78.1863125
@@ -236,3 +232,15 @@ most-precious-blood-angola,most-precious-blood-angola,Most Precious Blood Church
 st-john-the-baptist-boston,st-john-the-baptist-boston,St. John the Baptist Church,6895 Boston Cross Road,,Boston,NY,14025,true,true,42.6301875,-78.7361875
 st-teresa-of-avila-akron,st-teresa-of-avila-akron,St. Teresa of Avila Church,5771 Buell Street,,Akron,NY,14001,true,true,43.0033125,-78.5013125
 st-philomena-franklinville,st-philomena-franklinville,St. Philomena Church,26 North Plymouth Avenue,,Franklinville,NY,14737,true,true,42.3441875,-78.4516875
+central-niagara-catholic,st-john-baptist-lockport,St. John the Baptist Church,168 Chestnut Street,,Lockport,NY,14094,true,true,43.1737227,-78.6837304
+central-niagara-catholic,all-saints-lockport,All Saints Church,76 Church Street,,Lockport,NY,14094,true,true,43.1719375,-78.6949375
+central-niagara-catholic,st-bridget,St. Bridget Church,3455 Ewings Road,,Newfane,NY,14108,true,true,43.2473125,-78.7113125
+central-niagara-catholic,our-lady-of-the-rosary,Our Lady of the Rosary Church,345 Lake Street,,Wilson,NY,14172,true,true,43.3083125,-78.8264375
+central-niagara-catholic,st-charles-borromeo-olcott,St. Charles Borromeo Oratory,5972 Main Street,,Olcott,NY,14126,true,true,43.3378125,-78.7139375
+central-niagara-catholic,st-patrick-barker,St. Patrick Church,1726 Quaker Road,,Barker,NY,14012,true,true,43.3260625,-78.5548125
+central-niagara-catholic,st-joseph-lyndonville,St. Joseph Church,36 Lake Avenue,,Lyndonville,NY,14098,true,true,43.3183125,-78.3866875
+catholic-neighbors-in-faith,st-james-jamestown,St. James Church,27 Allen Street,,Jamestown,NY,14701,true,true,42.0918125,-79.2353125
+catholic-neighbors-in-faith,st-john-jamestown,St. John Church,282 Newton Avenue,,Jamestown,NY,14701,true,true,42.1083125,-79.2258125
+catholic-neighbors-in-faith,ss-peter-and-paul-jamestown,Ss. Peter and Paul Church,508 Cherry Street,,Jamestown,NY,14701,true,true,42.0985625,-79.2430625
+catholic-neighbors-in-faith,sacred-heart-lakewood,Sacred Heart Church,380 East Fairmount Avenue,,Lakewood,NY,14750,true,true,42.0983125,-79.2979375
+catholic-neighbors-in-faith,st-patrick-randolph,St. Patrick Church,189 Main Street,,Randolph,NY,14772,true,true,42.1606938,-78.9806791
