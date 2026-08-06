@@ -53,15 +53,19 @@ because Rochester already has `st-louis` (Pittsford). One commit per batch.
 
 ## 3. Current state
 
-**Dataset: 143 parishes / 249 churches; 117 tests green.** (Rochester baseline was 62/132.)
+**Dataset: 142 parishes / 251 churches; 117 tests green.** (Rochester baseline was 62/132.)
 
-**Buffalo contribution: 81 parishes / 117 churches, all geocoded**, spanning **all 8 counties**.
+**Buffalo contribution: 80 parishes / 119 churches, all geocoded**, spanning **all 8 counties**.
 
 Measured against the diocese's own parish finder — 167 locations, which reduce to **158 real
 worship sites** (7 are St. Gianna Molla centers, §6d, and the feed repeats 2) — the dataset now
-covers **113 of 158, or 72%**. The uncovered remainder is exactly 45 sites across 36 canonical
-parishes, every one deferred for a concrete, individually-documented reason (§6f): overwhelmingly
-"the parish's website is dead or the diocese lists none", not "not looked at yet".
+covers **115 of 158, or 73%**. The uncovered remainder is 43 sites across 36 canonical parishes,
+every one deferred for a concrete, individually-documented reason (§6f): overwhelmingly "the
+parish's website is dead or the diocese lists none", not "not looked at yet".
+
+Note the parish count *fell* while coverage rose. That is the expected direction: several batches
+found that rows we already had were members of one bulletin and collapsed them (§4b). Parish count
+is not a progress metric here — church coverage is.
 
 **Recompute these numbers, don't trust this paragraph** — the diocesan feed changes underneath you:
 
@@ -156,6 +160,45 @@ Corollary for the shells: All Saints', St. Brendan's and the family's own `/bull
 render the *identical* LPi widget with no PDF link in the HTML. Matching shells across sites is a
 useful hint that they are fed by one container — but confirm it against the container itself.
 
+## 4c. The diocese publishes its own structure — use it as the backbone
+
+`scripts/fetch_diocese_family_list.py`. The diocese periodically re-issues a **Family of Parishes
+assignment masterlist** as a dated PDF, currently *April 2026*. It is a two-level bullet list of
+every family, its member parishes, and each parish's worship sites:
+
+```
+Family #14 (Fields of Grace)
+ • St. John Neumann, Strykersville        <- a canonical PARISH
+   ◦ St. Vincent, Attica                  <- a WORSHIP SITE of that parish
+   ◦ St. Joseph, Varysburg
+   ◦ St. Cecilia, Sheldon
+ • St. Michael, Warsaw
+   ◦ St. Mary, Pavilion
+```
+
+**This is the authority on structure, and it beats the parish-finder feed at it.** The feed is
+better for addresses and coordinates, but it lags badly on which buildings still exist: it was
+still listing St. Joseph/Fredonia, St. Rose of Lima/Forestville, St. Hedwig/Dunkirk and St. Mary
+Queen of the Rosary/Strykersville long after each stopped being a worship site. The masterlist had
+already dropped all four. **Where the two disagree about structure, the masterlist is right.**
+
+Two rules for using it:
+
+- **A `◦` line is decisive.** "Worship site of X" means that building shares X's bulletin, so if X
+  is already in `parishes.csv` the site can be added as a church row with no further research.
+  This is the cheapest work in the whole backlog.
+- **A Family is NOT automatically one bulletin**, and the bulletin is what we model (§1). Plenty of
+  families here are 4–5 parishes that each publish separately — Family #7 and Family #16, for
+  instance. Learn the structure here, then confirm the bulletin per §4b before collapsing a family
+  into one row.
+
+Used together the three sources are mutually checking, and agreement is worth a lot: Fields of
+Grace, The Lord's Vineyard and Catholic Neighbors in Faith were each confirmed independently by the
+masterlist and by the bulletin masthead, with the feed supplying the addresses.
+
+Note the masterlist has no Family #13, and its trailing pages repeat family numbers next to schools
+and chaplaincies; the parser stops at the first repeated number, so those are excluded.
+
 ## 4. Environment (this machine vs. the cloud agent)
 
 The original cloud agent ran in a sandbox where **all direct HTTP was 403** and Nominatim was
@@ -183,6 +226,21 @@ north-tonawanda` → folded into `tonawanda-catholic`; `holy-family-albion` → 
 `one-catholic`; `resurrection-batavia` website → the12apostles.org. The batch-1–8 lists below
 record the *original* additions; the audit entries record the corrections.
 
+- **Fields of Grace** (Wyoming/Genesee) — `fields-of-grace` (fieldsofgrace.family, container
+  14/0954). Not a judgement call: the bulletin masthead and the diocese's April 2026 masterlist
+  (§4c) list *the same* two parishes and five worship sites. So `eastern-rural-rcc` and
+  `st-john-neuman` collapse into one row — which also retires ERRCC's ParishesOnline-org-page
+  fallback website, since the family has a real homepage again. Sites: St. Michael (Warsaw),
+  St. Cecilia (Sheldon), St. Vincent de Paul (Attica), St. Joseph (Varysburg), St. Mary (Pavilion).
+  Parishes 143 → 142, churches 249 → 251.
+  - This closes most of §6b's ERRCC entry. The old org name `st-michael-st-isidore` is stale
+    branding: **St. Isidore is not in this family**, and its two sites (St. Mary/Silver Spring,
+    St. Joseph/Perry) remain deferred with no bulletin home found.
+  - **St. Mary Queen of the Rosary (Strykersville) removed as closed.** The parish is still *named*
+    for Strykersville — which is what the parish-finder feed is reflecting — but the building is
+    not one of its worship sites: the masterlist omits it, the current bulletin gives Mass times
+    for the other five sites and none for it, local reporting has the site slated to be closed and
+    sold, and OSM has no church node at 3854 Main Street.
 - **The Lord's Vineyard** (N. Chautauqua) — the case §6f(f) called "the one place where the
   mechanical rule is known to be insufficient", closed by §4b. Container 14/1221 is still
   publishing and its masthead lists every member church under one banner → **one parish row**
@@ -292,12 +350,11 @@ cheektowaga / enchanted-mountains case). Addresses already captured below:
   `the-lords-vineyard` row with 5 worship sites; `holy-trinity-dunkirk` folded in. The question
   this entry posed — "does Holy Trinity still print its own bulletin?" — was answered by reading
   the container, not by inspecting domains. See §6f(f).
-- **Eastern Rural RCC (ERRCC)** (errcc.org, Wyoming/Genesee) — now modeled as `eastern-rural-rcc`
-  with **only St. Michael/Warsaw** attached. ERRCC's combined bulletin (org `st-michael-st-isidore`,
-  ParishesOnline 14/0954) also covers Mary Immaculate, St. Isidore (Perry/Silver Springs), St. Joseph,
-  St. Mary, and overlaps the old "Fields of Grace" reorg into **St. John Neumann Parish**. Add the
-  remaining ERRCC worship sites once their addresses + post-reorg status are confirmed (the roster is
-  currently fuzzy — St. Isidore appears in two towns; St. Joseph/St. Mary cities unconfirmed).
+- ~~**Eastern Rural RCC (ERRCC)** (errcc.org, Wyoming/Genesee)~~ **— RESOLVED as `fields-of-grace`.**
+  The "fuzzy roster" this entry complained about was the org name misleading us: `st-michael-st-isidore`
+  is stale branding, and the family is actually St. John Neumann + St. Michael. **St. Isidore is not
+  in it.** Its two sites (St. Mary/Silver Spring, St. Joseph/Perry) are still deferred — the
+  masterlist (§4c) does not place them under any family, so they need their own bulletin home found.
 - **Resurrection / The 12 Apostles** (the12apostles.org, Batavia) — `resurrection-batavia` currently
   has only St. Joseph (303 E Main St). Resurrection has since absorbed Padre Pio (Oakfield), Holy Name
   of Mary (East Pembroke), and Ascension (Batavia, slated to close then kept open). Add these worship

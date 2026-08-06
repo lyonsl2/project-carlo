@@ -164,7 +164,6 @@ enchanted-mountains-catholic,st-john-evangelist-olean,St. John the Evangelist Ch
 enchanted-mountains-catholic,st-bonaventure-allegany,St. Bonaventure Church,95 East Main Street,,Allegany,NY,14706,true,true,42.0868648,-78.4891727
 enchanted-mountains-catholic,sacred-heart-portville,Sacred Heart Church,43 Maple Street,,Portville,NY,14770,true,true,42.0412467,-78.3366479
 one-catholic,holy-family-albion,Holy Family Church,106 South Main Street,,Albion,NY,14411,true,true,43.2449573,-78.1941462
-eastern-rural-rcc,st-michael-warsaw,St. Michael Church,171 North Main Street,,Warsaw,NY,14569,true,true,42.7451605,-78.1330412
 catholic-communities-se-allegany,immaculate-conception-wellsville,Immaculate Conception Church,36 Maple Avenue,,Wellsville,NY,14895,true,false,42.1213889,-77.9425000
 catholic-communities-se-allegany,holy-family-belmont,"Holy Family of Jesus, Mary and Joseph Church",5 Milton Street,,Belmont,NY,14813,true,true,42.2280484,-78.0319071
 blessed-trinity-buffalo,blessed-trinity-buffalo,Blessed Trinity Church,317 Leroy Avenue,,Buffalo,NY,14214,true,true,42.9327367,-78.8344019
@@ -183,8 +182,6 @@ niagara-frontier-catholic,st-bernard-youngstown,St. Bernard Church,422 Second St
 niagara-frontier-catholic,immaculate-conception-ransomville,Immaculate Conception Church,4671 Townline Road,,Ransomville,NY,14131,true,true,43.1870018,-78.8840511
 one-catholic,st-mary-medina,St. Mary Church,211 Eagle Street,,Medina,NY,14103,true,true,43.2226333,-78.3900354
 one-catholic,st-mary-holley,St. Mary Church,13 South Main Street,,Holley,NY,14470,true,true,43.225453,-78.0270565
-st-john-neuman,st-mary-queen-of-the-rosary,St. Mary Queen of the Rosary Church,3854 Main Street,,Strykersville,NY,14145,true,true,42.6998125,-78.4481875
-st-john-neuman,st-cecilia-sheldon,St. Cecilia Church,991 Centerline Road,,Sheldon,NY,14145,true,true,42.7374375,-78.4178125
 resurrection-batavia,st-mary-batavia,St. Mary Church,18 Ellicott Street,,Batavia,NY,14020,true,true,42.9969375,-78.1863125
 resurrection-batavia,our-lady-of-mercy-leroy,Our Lady of Mercy Church,44 Lake Street,,LeRoy,NY,14482,true,true,42.9810625,-77.9921875
 st-patrick-belfast-fillmore,st-patrick-fillmore,St. Patrick Church,109 West Main Street,,Fillmore,NY,14735,true,true,42.4664375,-78.1184375
@@ -248,3 +245,8 @@ the-lords-vineyard,st-elizabeth-ann-seton-dunkirk,St. Elizabeth Ann Seton Church
 the-lords-vineyard,st-hyacinth-dunkirk,St. Hyacinth Church,295 Lake Shore Drive East,,Dunkirk,NY,14048,true,true,42.4915625,-79.3199375
 the-lords-vineyard,our-lady-of-mt-carmel-silver-creek,Our Lady of Mount Carmel Church,165 Central Avenue,,Silver Creek,NY,14136,true,true,42.5449375,-79.1709375
 the-lords-vineyard,st-anthony-of-padua-fredonia,St. Anthony of Padua Church,66 Cushing Street,,Fredonia,NY,14063,true,true,42.4396875,-79.3231875
+fields-of-grace,st-michael-warsaw,St. Michael Church,171 North Main Street,,Warsaw,NY,14569,true,true,42.7451605,-78.1330412
+fields-of-grace,st-cecilia-sheldon,St. Cecilia Church,991 Centerline Road,,Sheldon,NY,14145,true,true,42.7374375,-78.4178125
+fields-of-grace,st-vincent-de-paul-attica,St. Vincent de Paul Church,50 East Avenue,,Attica,NY,14011,true,true,42.8659375,-78.2758125
+fields-of-grace,st-joseph-varysburg,St. Joseph Church,2311 Route 98,,Varysburg,NY,14167,true,false,42.7646875,-78.3111875
+fields-of-grace,st-mary-pavilion,St. Mary Church,11095 St. Mary's Street,,Pavilion,NY,14525,true,true,42.8764375,-78.0254375
