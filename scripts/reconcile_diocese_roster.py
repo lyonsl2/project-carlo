@@ -36,6 +36,7 @@ import csv
 import json
 import math
 import re
+from collections import Counter
 from pathlib import Path
 
 DATA = Path(__file__).resolve().parent.parent / "data"
@@ -113,19 +114,23 @@ def main() -> None:
     if args.exclude:
         dio = [r for r in dio if args.exclude.lower() not in r["parish"].lower()]
 
-    # Sites we have decided will never be modelled -- closed buildings the feed
-    # still lists, and entries that are not parishes at all. Without this the
-    # "MISSING" count silently overstates the work left, because a diocese keeps
-    # listing a church for months or years after its last Mass.
-    excluded: set[tuple[str, str]] = set()
+    # Sites we have decided will never be modelled. Without this the "MISSING"
+    # count silently overstates the work left, because a diocese keeps listing a
+    # church for months or years after its last Mass. The reasons are reported
+    # rather than hardcoded, so a new class of exclusion shows up here instead of
+    # hiding inside a total.
+    excluded: dict[tuple[str, str], str] = {}
     if args.exclude_file and args.exclude_file.exists():
         with args.exclude_file.open(encoding="utf-8") as fh:
             for row in csv.DictReader(fh):
-                excluded.add((norm_name(row["site"], ""), row["city"].strip().lower()))
-    dropped = [r for r in dio
-               if (norm_name(r["site"], ""), r["city"].strip().lower()) in excluded]
-    dio = [r for r in dio
-           if (norm_name(r["site"], ""), r["city"].strip().lower()) not in excluded]
+                key = (norm_name(row["site"], ""), row["city"].strip().lower())
+                excluded[key] = (row.get("reason") or "unspecified").strip()
+
+    def _excl(r: dict) -> str | None:
+        return excluded.get((norm_name(r["site"], ""), r["city"].strip().lower()))
+
+    dropped = [r for r in dio if _excl(r)]
+    dio = [r for r in dio if not _excl(r)]
 
     exact_addr: dict[str, str] = {}
     exact_name: dict[str, str] = {}
@@ -168,8 +173,9 @@ def main() -> None:
 
     unique = len(dio) - len(dupes)
     if dropped:
-        print(f"excluded    {len(dropped)}  (closed / not-a-parish, "
-              f"per {args.exclude_file.name})")
+        by_reason = Counter(_excl(r) for r in dropped)
+        breakdown = ", ".join(f"{n} {reason}" for reason, n in sorted(by_reason.items()))
+        print(f"excluded    {len(dropped)}  ({breakdown}, per {args.exclude_file.name})")
     print(f"feed rows {len(dio)}  (unique sites {unique})")
     print(f"  modelled     {len(matched) + len(loose)}"
           f"   ({len(loose)} matched only after ignoring the city spelling)")
