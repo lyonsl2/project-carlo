@@ -1,9 +1,7 @@
 import { lazy, Suspense, useCallback, useState, type ReactNode } from "react";
 import type { Session } from "@supabase/supabase-js";
-import { isAccountsEnabled } from "@/lib/supabaseEnv";
+import { ACCOUNTS_ENABLED } from "@/lib/supabaseEnv";
 import { AuthContext, SIGNED_OUT, type AuthState } from "./AuthContext";
-
-const SupabaseSessionSync = lazy(() => import("./SupabaseSessionSync"));
 
 function toAuthState(session: Session | null): AuthState {
   if (!session) return SIGNED_OUT;
@@ -13,15 +11,23 @@ function toAuthState(session: Session | null): AuthState {
 /** Publishes the current Supabase session to the tree.
  *
  *  Always mounted, even with accounts switched off, so nothing downstream has
- *  to branch on whether the provider exists — it simply reports signed out. The
- *  part that talks to Supabase is a lazily loaded child, which keeps the client
- *  library out of builds that will never use it.
+ *  to branch on whether the provider exists — it simply reports signed out.
+ *  When accounts are off, ACCOUNTS_ENABLED is a build-time `false` and Rollup
+ *  deletes the enabled branch (and with it the Supabase client) entirely.
  */
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const accountsEnabled = isAccountsEnabled();
-  const [state, setState] = useState<AuthState>(() =>
-    accountsEnabled ? { status: "loading", session: null, user: null } : SIGNED_OUT,
-  );
+  if (!ACCOUNTS_ENABLED) {
+    return <AuthContext value={SIGNED_OUT}>{children}</AuthContext>;
+  }
+  return <AuthProviderEnabled>{children}</AuthProviderEnabled>;
+}
+
+function AuthProviderEnabled({ children }: { children: ReactNode }) {
+  const [state, setState] = useState<AuthState>({
+    status: "loading",
+    session: null,
+    user: null,
+  });
 
   const onSessionChange = useCallback((session: Session | null) => {
     setState(toAuthState(session));
@@ -29,12 +35,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext value={state}>
-      {accountsEnabled ? (
-        <Suspense fallback={null}>
-          <SupabaseSessionSync onSessionChange={onSessionChange} />
-        </Suspense>
-      ) : null}
+      <Suspense fallback={null}>
+        <SupabaseSessionSync onSessionChange={onSessionChange} />
+      </Suspense>
       {children}
     </AuthContext>
   );
 }
+
+const SupabaseSessionSync = lazy(() => import("./SupabaseSessionSync"));

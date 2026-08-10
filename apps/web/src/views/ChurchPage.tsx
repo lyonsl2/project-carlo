@@ -14,16 +14,18 @@ import {
   buildChurchTitle,
   canonicalForPath,
 } from "@/lib/seo";
-import { isAccountsEnabled } from "@/lib/supabaseEnv";
+import { ACCOUNTS_ENABLED } from "@/lib/supabaseEnv";
 import { NotFoundPage } from "./NotFoundPage";
 
 // Lazy so the Supabase client is fetched only by people who have an account to
 // use it with, and never at all on builds where accounts are switched off.
-const SaveChurchButton = lazy(() =>
-  import("@/components/SaveChurchButton").then((m) => ({
-    default: m.SaveChurchButton,
-  })),
-);
+const SaveChurchButton = ACCOUNTS_ENABLED
+  ? lazy(() =>
+      import("@/components/SaveChurchButton").then((m) => ({
+        default: m.SaveChurchButton,
+      })),
+    )
+  : null;
 
 export function ChurchPage() {
   const { churchSlug } = useParams();
@@ -94,7 +96,7 @@ export function ChurchPage() {
         church={church}
         events={events}
         actions={
-          isAccountsEnabled() ? (
+          ACCOUNTS_ENABLED && SaveChurchButton ? (
             <Suspense fallback={null}>
               <SaveChurchButton slug={church.slug} />
             </Suspense>

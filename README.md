@@ -151,8 +151,8 @@ process_result = process_bulletins(parish_name="Southeast Rochester Catholic Com
 The web app can run as a subscription product: sign-in by magic link, a 7-day
 free trial that does not ask for a card, and Stripe for payment. It is off by
 default — with `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` unset the site
-builds and behaves exactly as it does today, and the Supabase client is not
-included in the bundle.
+builds and behaves exactly as it does today, and the Supabase client is never
+loaded at runtime.
 
 Setup is entirely manual (Supabase project, Stripe product, webhook, secrets)
 and written up in [`docs/auth-and-payments-setup.md`](docs/auth-and-payments-setup.md),

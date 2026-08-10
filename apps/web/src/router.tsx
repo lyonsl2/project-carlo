@@ -6,9 +6,8 @@ import {
 } from "react-router-dom";
 import { LandingPage } from "./views/LandingPage";
 import { NotFoundPage } from "./views/NotFoundPage";
-import { RequireAuth } from "./auth/RequireAuth";
 import { isAboutPageEnabled } from "./lib/featureFlags";
-import { isAccountsEnabled, isPaywallEnabled } from "./lib/supabaseEnv";
+import { ACCOUNTS_ENABLED, PAYWALL_ENABLED } from "./lib/supabaseEnv";
 
 const HomePage = lazy(() =>
   import("./views/HomePage").then((m) => ({ default: m.HomePage })),
@@ -22,22 +21,6 @@ const AboutPage = lazy(() =>
   import("./views/AboutPage").then((m) => ({ default: m.AboutPage })),
 );
 
-const SignInPage = lazy(() =>
-  import("./views/SignInPage").then((m) => ({ default: m.SignInPage })),
-);
-
-const AuthCallbackPage = lazy(() =>
-  import("./views/AuthCallbackPage").then((m) => ({ default: m.AuthCallbackPage })),
-);
-
-const AccountPage = lazy(() =>
-  import("./views/AccountPage").then((m) => ({ default: m.AccountPage })),
-);
-
-// Lazy so the entitlement check — and the Supabase client behind it — is not
-// part of the entry bundle.
-const RequireAccess = lazy(() => import("./auth/RequireAccess"));
-
 const lazyPageFallback = (
   <main className="flex min-h-svh items-center justify-center bg-paper px-4">
     <p className="font-serif text-sm text-ink-soft">Loading…</p>
@@ -45,11 +28,13 @@ const lazyPageFallback = (
 );
 
 /** Wraps a page in the paywall when one is configured, and leaves it alone
- *  when it is not. */
+ *  when it is not. Account-only imports stay inside this branch so accounts-off
+ *  builds never pull in RequireAccess / the Supabase client. */
 function gated(page: ReactNode): ReactNode {
-  if (!isPaywallEnabled()) {
+  if (!PAYWALL_ENABLED) {
     return <Suspense fallback={lazyPageFallback}>{page}</Suspense>;
   }
+  const RequireAccess = lazy(() => import("./auth/RequireAccess"));
   return (
     <Suspense fallback={lazyPageFallback}>
       <RequireAccess>{page}</RequireAccess>
@@ -91,7 +76,23 @@ if (isAboutPageEnabled()) {
 
 // Without a Supabase project these routes do not exist, so an unconfigured
 // build cannot land anyone on a sign-in page that could never work.
-if (isAccountsEnabled()) {
+// ACCOUNTS_ENABLED is a build-time const so Rollup can delete this block.
+if (ACCOUNTS_ENABLED) {
+  const SignInPage = lazy(() =>
+    import("./views/SignInPage").then((m) => ({ default: m.SignInPage })),
+  );
+  const AuthCallbackPage = lazy(() =>
+    import("./views/AuthCallbackPage").then((m) => ({
+      default: m.AuthCallbackPage,
+    })),
+  );
+  const AccountPage = lazy(() =>
+    import("./views/AccountPage").then((m) => ({ default: m.AccountPage })),
+  );
+  const RequireAuth = lazy(() =>
+    import("./auth/RequireAuth").then((m) => ({ default: m.RequireAuth })),
+  );
+
   routes.push(
     {
       path: "/signin",
@@ -114,11 +115,11 @@ if (isAccountsEnabled()) {
       // someone whose trial has ended goes to subscribe.
       path: "/account",
       element: (
-        <RequireAuth>
-          <Suspense fallback={lazyPageFallback}>
+        <Suspense fallback={lazyPageFallback}>
+          <RequireAuth>
             <AccountPage />
-          </Suspense>
-        </RequireAuth>
+          </RequireAuth>
+        </Suspense>
       ),
     },
   );

@@ -12,8 +12,8 @@ need a Stripe secret.
 
 **Nothing here is switched on yet.** With `VITE_SUPABASE_URL` and
 `VITE_SUPABASE_ANON_KEY` unset, the site builds and deploys exactly as it did
-before: public map, no sign-in, no account routes, and no Supabase client in the
-bundle. Following this walkthrough is what turns it on.
+before: public map, no sign-in, no account routes, and no Supabase client loaded
+at runtime. Following this walkthrough is what turns it on.
 
 ---
 
