@@ -33,20 +33,29 @@ worth a paid hour with a professional. The rest you can do yourself.
 
 ## 1. The decision that changes everything else
 
-Before any paperwork: decide, deliberately, whether you are charging the
-faithful for Mass times.
+**Decided: direct-to-consumer subscription.** The reasoning, recorded so it
+doesn't get relitigated: the addressable market is four orders of magnitude
+larger than the diocesan one, so matching consumer revenue through chanceries
+would require implausible per-diocese pricing; consumer conversion needs no
+procurement cycle; and a diocese that approaches you after seeing traction
+converts far better than one you cold-call. Partnership stays available later,
+on better terms, from a position of demonstrated use.
 
-I'm not raising this to relitigate the paywall — you built it, and it's built
-well. I'm raising it because the answer changes about half of this document.
-Charging consumers turns on New York sales tax, auto-renewal law, refund policy,
-consumer-protection exposure, and a reputational conversation with parishes
-whose free bulletins are your input. Not charging consumers removes all of it.
+The pricing question is settled on the merits too. The underlying schedules stay
+free at their source — the paywall charges for aggregation, freshness, and the
+twenty minutes of bulletin-digging it removes, and the revenue is what makes the
+project exist at all. An unsustainable free product serves nobody.
 
-Four postures, and what each one costs you in compliance:
+What follows from the decision, and why the rest of this document is shaped the
+way it is: charging consumers turns on New York sales tax, the auto-renewal law,
+a refund policy, and consumer-protection exposure. None of it is optional, and
+none of it is hard.
+
+The four postures, kept for reference:
 
 | Posture | Compliance load | Notes |
 |---|---|---|
-| **B2C subscription** (what's built) | Highest: sales tax registration, ARL, refunds, consumer law | $3/mo has bad unit economics — Stripe takes ~13% of it |
+| **B2C subscription** (chosen) | Highest: sales tax registration, ARL, refunds, consumer law | Watch the price point: Stripe's fixed 30¢ is 10% of a $3 charge before the percentage fee |
 | **B2B**: parishes/dioceses pay, faithful use free | Moderate: sales tax still applies, but ARL/consumer law mostly falls away | Fewer, larger invoices. Aligns incentives with the data owners |
 | **Free + voluntary support** | Low, but **don't call it a donation** (see below) | Sponsorships and "support the project" are not charitable gifts |
 | **501(c)(3) nonprofit** | High up front, low forever after | Form 1023, board, NY Charities Bureau registration. Real option given the mission, but a year of paperwork |
@@ -57,12 +66,26 @@ registration with the Attorney General's Charities Bureau. "Support the
 project," "sponsor a parish," or plain "subscription" keep you out of that
 regime entirely.
 
-My read: the built product is worth shipping as-is, but the durable business
-here is B2B. A parish or diocese paying $200/year for a maintained, accurate
-schedule feed — with the public map free — sidesteps the awkwardness of a
-paywall on Mass times, solves your data-rights problem by converting scraping
-into permission, and needs roughly a tenth as many customers. The rest of this
-plan works for either; where it differs, I say so.
+Three consequences of going B2C that are easy to miss:
+
+- **Every consumer-protection item in Phase 5 is now live**, including the annual
+  pre-renewal reminder (§5.4) that the repository doesn't yet send, and NYC's
+  click-to-cancel rule from October 1, 2026. These are not "later" items.
+- **Phase 7 becomes distribution, not sales.** Parishes stop being customers and
+  become your acquisition channel: free access for parish staff, a bulletin
+  announcement, a pastor's recommendation. It is the cheapest high-trust channel
+  available to a consumer product in this market, and it costs nothing but
+  outreach. Do not skip Phase 7 because you aren't selling to them.
+- **The positioning resolves §1.4.** If what people pay for is convenience rather
+  than the bytes, the public snapshot and the public dataset are tolerable — take
+  option 1 there, and write it down.
+
+The one premise worth watching: market size is not the binding constraint,
+acquisition cost is. You are launching a paid product against free incumbents
+with national coverage — masstimes.org, which the USCCB links to, and the
+Catholic Mass Times app. Coverage is not the thing to compete on; bulletin-derived
+freshness in a region is. That is also exactly the argument that justifies the
+price, so make it the landing page's first line.
 
 ---
 
@@ -251,9 +274,34 @@ assignment from them in writing before they commit code.
 
 ## Phase 2 — Form the LLC
 
-New York, not Delaware. Delaware buys you nothing as a single-member LLC with no
-outside investors, and it costs more: you'd pay Delaware fees *and* register as a
-foreign LLC in New York anyway.
+### Why New York, and not Delaware or Wyoming
+
+You form where you do business. Forming elsewhere doesn't replace the New York
+filing, it adds a second one — and in New York's case the arithmetic is
+unusually lopsided, because **foreign LLCs face the same publication requirement
+domestic ones do.** Run the comparison:
+
+| | Form in NY | Form in WY/DE, qualify in NY |
+|---|---|---|
+| Formation filing | $200 (Articles of Organization) | Other state's fee, plus **$250** NY Application for Authority |
+| Publication, 6 weeks, 2 papers | $200–700 | **The same $200–700** — foreign LLCs must publish too |
+| Certificate of Publication | $50 | **$50** |
+| Registered agent | Optional | **Required** in the formation state, plus NY |
+| Annual filings | One ($9 biennial) | **Two sets**, in both states |
+
+So the out-of-state route costs strictly more, adds a second annual compliance
+calendar, and buys nothing back. It doesn't avoid publication, it doesn't avoid
+New York taxes — those follow your residence and your physical presence, not your
+entity's state of formation — and Delaware's advantages (case law, investor
+familiarity) are for companies with outside investors and a board. If you ever
+raise money, the standard move is converting to a Delaware C-corp then, with a
+lawyer, on the investors' schedule. Nothing you do now forecloses that.
+
+The Wyoming and Nevada "privacy" pitch deserves a specific answer, since it's the
+usual reason people look out of state: it does not work here. The New York
+Application for Authority and the newspaper notices both require an address in New
+York. You cannot use a foreign entity to keep your address off the New York
+record. Use a registered agent instead — see step 2.
 
 Should you bother at all? For a $3/month product with no employees, a sole
 proprietorship plus a solid ToS is legally not far off. The LLC is worth the
@@ -267,12 +315,32 @@ diocesan communications office. Do it.
 1. **Pick the name.** If the legal name isn't "Project Carlo LLC," you'll also
    want a Certificate of Assumed Name ($25) to operate publicly under
    "Project Carlo."
-2. **Decide the address on the public record.** The Articles list a county and an
-   address for service of process, and it becomes public. If you don't want your
-   home address indexed forever, hire a commercial registered agent
-   ($50–200/year) and use their address. Note that New York's Secretary of State
-   is *always* an agent for service of process on a New York LLC; a commercial
-   agent is about privacy, not legal necessity.
+2. **Decide the address on the public record — this is the one step with an
+   asymmetry.** The Articles name a county and an address to which the Secretary
+   of State forwards service of process, and that address lands on the free,
+   fully searchable DOS entity database. It is then scraped by data brokers and
+   solicitation-mail lists, and it is republished in two newspapers by the
+   publication requirement.
+
+   Using a home address is extremely common — it's the default for solo founders,
+   and it is legally fine. New York's Secretary of State is *always* an agent for
+   service of process on a New York LLC, so a commercial agent is a privacy
+   choice, not a legal necessity. No PO boxes: service of process needs a street
+   address, which also rules out most virtual mailboxes.
+
+   **You can change it afterward, but you cannot unpublish it.** Changing is
+   cheap — a **Certificate of Change** under LLC Law § 211-A, **$30**, updates
+   the service-of-process address, the county, or a registered agent designation.
+   What doesn't reverse is exposure: DOS retains historical filings, the
+   newspaper notices are permanent, and anything already scraped is gone. That
+   makes this unlike most decisions in this document, where the fix is as good as
+   getting it right the first time.
+
+   Given that, and given this product will occasionally annoy someone — about a
+   paywall on Mass times, or about automated bulletin collection — spend the
+   $50–200/year on a commercial registered agent from the start. The same address
+   then serves the DOS filing, the physical-address requirement for any marketing
+   email under CAN-SPAM, and the business address Stripe asks for.
 3. **File the Articles of Organization** with the NY Department of State, online
    through Business Express. **$200.** Usually processed within a few business
    days.
@@ -690,7 +758,8 @@ of winding down. Don't take annual prepayments you couldn't refund.
 | NY Articles of Organization | $200 | Formation |
 | Newspaper publication (2 papers, 6 weeks, Monroe County) | $200–700 | Within 120 days |
 | Certificate of Publication | $50 | With affidavits |
-| Registered agent (optional, for address privacy) | $50–200/yr | Formation |
+| Registered agent (recommended, for address privacy) | $50–200/yr | Formation |
+| Certificate of Change, if you move the address later | $30 | As needed |
 | Certificate of Assumed Name (if name differs) | $25 | Formation |
 | Operating agreement (template) | $0 | Formation |
 | EIN | $0 | After Articles |
