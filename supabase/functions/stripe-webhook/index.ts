@@ -28,6 +28,7 @@ import {
   findUserIdForCustomer,
   linkCustomerToUser,
   stripeCustomerMetadataUserId,
+  tagCustomerWithUserId,
 } from "../_shared/customers.ts";
 
 const UNIQUE_VIOLATION = "23505";
@@ -64,7 +65,11 @@ async function releaseEvent(admin: SupabaseClient, eventId: string): Promise<voi
 }
 
 /** Works out which Supabase user an event belongs to, trying the cheapest and
- *  most reliable sources first, and backfills the mapping when it finds one. */
+ *  most reliable sources first, and backfills the mapping when it finds one.
+ *
+ *  This is also where a Stripe customer first becomes known to us: nothing
+ *  creates one before a checkout completes, so the hints on the completed
+ *  session and on the subscription are what tie it to an account. */
 async function resolveUserId(
   admin: SupabaseClient,
   stripe: Stripe,
@@ -77,6 +82,9 @@ async function resolveUserId(
   for (const hint of hints) {
     if (hint) {
       await linkCustomerToUser(admin, hint, customerId);
+      // Checkout created this customer, so it does not carry the user id yet.
+      // Writing it now is what keeps the metadata fallback below meaningful.
+      await tagCustomerWithUserId(stripe, customerId, hint);
       return hint;
     }
   }

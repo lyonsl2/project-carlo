@@ -1,7 +1,9 @@
 # Accounts and payments: setup walkthrough
 
 Project Carlo becomes a subscription product: you sign in, you get a 7-day free
-trial without giving a card, and after that you pay to carry on. This document
+trial, and after that you pay to carry on. The trial asks for a card by default
+and charges nothing until it ends; declining the card is a secondary button that
+buys the same seven days and leaves no record in Stripe at all. This document
 covers what was built, everything you have to do by hand to switch it on, and
 the decisions worth revisiting.
 
@@ -63,44 +65,65 @@ itself.
 service role key never reach the browser. The three functions are the only code
 that holds them.
 
-**Stripe is the source of truth, including for the trial.** Postgres holds a
-projection of the subscription, written only by the webhook. Nothing in the app
-writes billing state, and if the two disagree, Stripe wins.
+**Stripe is the source of truth for anything with a card behind it.** Postgres
+holds a projection of the subscription, written only by the webhook. Nothing in
+the app writes billing state, and if the two disagree, Stripe wins. The single
+exception is the card-free trial, which has no Stripe object to disagree with:
+it is a row in `public.trials` that only `public.start_trial()` can write.
 
 ---
 
 ## The trial, in detail
 
-A new account is offered a 7-day trial with no card. That is a Stripe
-subscription, not a local timer:
+Everyone gets seven days. There are two ways to start them, and the difference
+is whether Stripe is involved at all.
 
-1. The visitor signs in and lands on `/account`, which offers the trial.
-2. `stripe-checkout` creates a Checkout session with
-   `payment_method_collection: "if_required"` and
-   `subscription_data.trial_period_days: 7`. Nothing is due today, so Stripe
-   does not ask for a card.
-3. The subscription is created in `trialing`, the webhook mirrors it, and
-   `has_access()` starts returning true.
-4. If the trial reaches its end with no payment method,
-   `trial_settings.end_behavior.missing_payment_method: "pause"` moves the
-   subscription to `paused`. That status does not grant access, so the site
-   locks. The account and its saved parishes stay exactly as they were.
-5. To come back, the visitor adds a card. `stripe-checkout` notices the paused
-   subscription and returns a **setup-mode** session instead of a new
-   subscription. The webhook makes the card the customer's default and calls
-   `subscriptions.resume`, so the same subscription picks up where it left off.
+**The default: a card up front.** The primary button on `/account` opens
+Checkout with `payment_method_collection: "always"` and
+`subscription_data.trial_period_days: 7`. Nothing is due today, but a card is
+taken, so when the seven days are up Stripe charges it and the subscription
+carries on without anyone having to do anything. This is a Stripe subscription
+in `trialing` from the first minute.
 
-The states, and what each one means here:
+**The secondary: _Maybe later_.** The same seven days with no card and no Stripe
+object of any kind. `public.start_trial()` writes one row in `public.trials` and
+that is the whole of it; `has_access()` honours the row until `ends_at` passes,
+and then the site locks and `/account` asks for a card. An account that never
+enters payment details never appears in Stripe.
 
-| Stripe status | Access? | What the account page says |
+Adding a card partway through a card-free trial does not restart the clock:
+`stripe-checkout` hands Stripe the `ends_at` that trial already has as
+`subscription_data.trial_end`, so seven days stay seven days. Stripe refuses a
+`trial_end` less than 48 hours out, so the last stretch of a card-free trial
+converts to a subscription that bills straight away — Checkout states the amount
+and the date before anyone confirms.
+
+**Nothing creates a Stripe customer before a session completes.** For an account
+Stripe has not seen, `stripe-checkout` passes `customer_email` rather than a
+customer id, and Checkout mints the customer only on completion; the webhook
+then writes `stripe_customers`. An abandoned card form leaves nothing behind in
+either system.
+
+If a subscriber removes their card through the Billing Portal mid-trial,
+`trial_settings.end_behavior.missing_payment_method: "pause"` parks the
+subscription rather than cancelling it. `stripe-checkout` notices the paused
+subscription and returns a **setup-mode** session instead of a new subscription;
+the webhook makes the new card the customer's default and calls
+`subscriptions.resume`, so the same subscription picks up where it left off.
+
+Where an account can be, and what each one means here:
+
+| Where the account is | Access? | What the account page says |
 |---|---|---|
-| _(no subscription)_ | no | Start your free 7-day trial |
-| `trialing` | **yes** | *n* days left in your free trial |
-| `paused` | no | Your free trial has ended — add a payment method |
-| `active` | **yes** | You're subscribed |
-| `past_due`, having paid before | **yes** | We couldn't take your last payment |
-| `past_due`, never paid | no | That card was declined |
-| `canceled`, `unpaid`, `incomplete` | no | Your subscription has ended |
+| nothing started | no | Start your free 7-day trial |
+| `public.trials`, still running | **yes** | *n* days left in your free trial |
+| `public.trials`, expired | no | Your free trial has ended |
+| Stripe `trialing` | **yes** | *n* days left in your free trial |
+| Stripe `paused` | no | Your free trial has ended — add a payment method |
+| Stripe `active` | **yes** | You're subscribed |
+| Stripe `past_due`, having paid before | **yes** | We couldn't take your last payment |
+| Stripe `past_due`, never paid | no | That card was declined |
+| Stripe `canceled`, `unpaid`, `incomplete` | no | Your subscription has ended |
 
 That split of `past_due` matters and is easy to miss. Resuming a paused
 subscription makes Stripe raise an invoice and attempt it immediately; if the
@@ -116,7 +139,7 @@ in `subscriptions.first_paid_at` by a trigger.
 
 | Path | What it is |
 |---|---|
-| `supabase/migrations/*.sql` | Tables, RLS policies, `has_access()` |
+| `supabase/migrations/*.sql` | Tables, RLS policies, `has_access()`, `start_trial()` |
 | `supabase/functions/stripe-checkout/` | Starts the trial, sells a subscription, or collects a card for a paused one |
 | `supabase/functions/stripe-portal/` | Creates a Billing Portal session |
 | `supabase/functions/stripe-webhook/` | Mirrors Stripe state; resumes paused subscriptions |
@@ -136,6 +159,7 @@ in `subscriptions.first_paid_at` by a trigger.
 | `saved_churches` | its owner, and only while entitled | its owner |
 | `stripe_customers` | edge functions (service role) | its owner |
 | `subscriptions` | webhook (service role) | its owner |
+| `trials` | `public.start_trial()`, and nothing else | its owner |
 | `stripe_events` | webhook (service role) | nobody |
 
 ### Which routes are public
@@ -376,18 +400,33 @@ With the site deployed and the variables set:
 3. **Check the profile row.** `public.profiles` should have gained a row with
    your email. If not, the `auth.users` trigger did not fire — re-run
    `supabase db push`.
-4. **Start the trial.** Stripe should *not* ask for a card. You come back to
-   `/account`, see *Confirming with Stripe…* briefly, then *7 days left in your
-   free trial*.
+4. **Start the trial.** Stripe *should* ask for a card — use
+   `4242 4242 4242 4242`, and check it says nothing is due today. You come back
+   to `/account`, see *Confirming with Stripe…* briefly, then *7 days left in
+   your free trial*.
 5. **Use the site.** The map loads; open a parish and save it.
 6. **End the trial early.** In the Stripe dashboard, open the subscription and
-   use **Actions → End trial**, having removed any payment method. Stripe moves
+   use **Actions → End trial**, having removed the payment method. Stripe moves
    it to `paused`. Reload the site: you should be bounced to `/account` with
    *Your free trial has ended*, and your saved parishes should still be listed.
 7. **Add a card.** Click *Add a payment method*, use `4242 4242 4242 4242`. The
    subscription resumes and the site unlocks.
 8. **Open the billing portal**, cancel, come back. The account page should say
    *Your subscription is ending* with the end date.
+
+Then the card-free path, which is the one that must not touch Stripe at all.
+Sign in with a second address:
+
+9. **Click _Maybe later_.** You should land straight on the map. `public.trials`
+   gains a row; `public.stripe_customers` and `public.subscriptions` stay empty,
+   and the Stripe dashboard shows no new customer.
+10. **Abandon a checkout.** Back on `/account`, press the primary button and
+    close the Stripe tab without entering anything. Still no customer in Stripe.
+11. **Expire it.** `update public.trials set ends_at = now() - interval '1 day'
+    where user_id = '…';` Reload: bounced to `/account`, *Your free trial has
+    ended*, saved parishes still listed.
+12. **Subscribe from there.** The plan buttons should charge immediately rather
+    than opening another trial.
 
 Useful test cards: `4000 0000 0000 9995` declines for insufficient funds — worth
 trying at step 7, because the subscription should stay locked rather than
@@ -516,26 +555,34 @@ roles, the `auth` schema, `auth.uid()`, and Supabase's default grants on
 These are the choices worth revisiting. Each says what was picked, why, and what
 would make you choose otherwise.
 
-### Stripe owns the trial, rather than a `trial_ends_at` column
+### Two trials: one in Stripe, one in Postgres
 
-The first cut tracked the trial in Postgres, which is less machinery: no Stripe
-object until someone pays, nothing to reconcile, and "no credit card required"
-is true by construction. Stripe owning it wins on the things that bite later —
-one system decides who may use the product, the trial cannot be extended by
-editing a row, and trial-to-paid conversion shows up in Stripe's own reporting
-rather than having to be derived.
+The trial that collects a card is a Stripe subscription. The one that does not
+is a row in `public.trials`. Running both is more machinery than either alone,
+and the reason is that neither alone does the job.
 
-The costs are real and worth knowing:
+Stripe owning every trial is tidier: one system decides who may use the product,
+the trial cannot be extended by editing a row, and trial-to-paid conversion
+shows up in Stripe's own reporting rather than having to be derived. But it
+means a customer and a subscription in Stripe for everyone who signs up and
+wanders off, including the majority who never gave a card — noise in the
+dashboard, and something to reconcile forever.
 
-- Every trial creates a Stripe customer and subscription, including the ones
-  that never convert. That is noise in the dashboard and in any per-object
-  pricing.
-- The trial does not start at sign-in; it starts after a round trip through
-  Checkout. A brand new user therefore sees `/account` before they see the map.
-  Going back to a local `trial_ends_at` is the fix if that first-run friction
-  turns out to cost more than the tidiness is worth.
+Postgres owning every trial avoids all of that, and then the default path has to
+hand the trial over to Stripe at the seven-day mark, which is the moment someone
+is least inclined to type a card number.
 
-### `pause`, rather than `cancel`, when the trial ends without a card
+Splitting it puts the Stripe object where it earns its keep: an account with a
+card on file converts by itself, and an account without one costs nothing until
+it decides to pay. The price is that `has_access()` has two sources to consult
+and they must not drift — which is what the pgTAP suite is for, and the thing to
+extend first if this ever grows a third source.
+
+If you would rather have one system, dropping *Maybe later* is the smaller
+change: `decideCheckoutAction` already treats a missing trial row as a fresh
+trial, and `has_access()` loses its second `exists`.
+
+### `pause`, rather than `cancel`, when a trial ends without a usable card
 
 `trial_settings.end_behavior.missing_payment_method` also accepts `cancel`,
 which is markedly simpler: the subscription ends, and coming back is an ordinary
@@ -543,9 +590,12 @@ Checkout with a card. No setup-mode session, no resume, no `first_paid_at`
 subtlety.
 
 `pause` was chosen because the same subscription survives, so a returning
-customer keeps one continuous billing history. If the recovery path ever gives
-trouble, switching to `cancel` is a one-word change in
-`stripe-checkout/index.ts` plus deleting the `collectCard` branch.
+customer keeps one continuous billing history. It matters less now that Checkout
+always collects a card — reaching `paused` means removing that card through the
+Billing Portal mid-trial — but it is what keeps that person one subscription
+rather than two. If the recovery path ever gives trouble, switching to `cancel`
+is a one-word change in `stripe-checkout/index.ts` plus deleting the
+`collectCard` branch.
 
 ### `past_due` grants access only after a first successful payment
 
@@ -705,9 +755,11 @@ Each of these is a real gap, listed so it is a decision rather than an oversight
   before you have EU users in any number, and more pressing now that everyone
   who uses the site has an account.
 - **Trial abuse.** Nothing stops someone signing up again with a second email
-  address for a second trial. A card requirement is the usual answer and defeats
-  the point; most products in this shape simply accept it. Watch the numbers
-  before spending anything on it.
+  address for a second trial. A card up front is the usual answer and it is now
+  the default, but *Maybe later* is still free to repeat, and neither the trial
+  row nor the Stripe customer is deduplicated by email or by card fingerprint.
+  Most products in this shape simply accept it; watch the numbers before
+  spending anything on it.
 - **Email change.** Supabase supports it and `config.toml` already requires
   confirmation from both addresses. There is no UI for it.
 - **Refund and dispute handling.** `charge.dispute.created` is not handled. At

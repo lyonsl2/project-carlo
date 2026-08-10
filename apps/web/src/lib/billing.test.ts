@@ -4,8 +4,11 @@ import {
   describeTrialRemaining,
   formatBillingDate,
   isEntitledStatus,
+  offersCardFreeTrial,
   pickPrimarySubscription,
+  showsBillingPortal,
   toBillingState,
+  type BillingState,
   type SubscriptionSummary,
 } from "./billing";
 
@@ -28,7 +31,7 @@ function subscription(
 }
 
 describe("isEntitledStatus", () => {
-  it("covers the card-free trial and a live subscription", () => {
+  it("covers a Stripe trial and a live subscription", () => {
     expect(isEntitledStatus("trialing")).toBe(true);
     expect(isEntitledStatus("active")).toBe(true);
   });
@@ -107,6 +110,41 @@ describe("pickPrimarySubscription", () => {
 describe("toBillingState", () => {
   it("reports an account that has never started anything", () => {
     expect(toBillingState(null)).toEqual({ kind: "none" });
+    expect(toBillingState(null, null, NOW)).toEqual({ kind: "none" });
+  });
+
+  it("reports a card-free trial that is still running", () => {
+    expect(toBillingState(null, "2026-08-17T00:00:00.000Z", NOW)).toEqual({
+      kind: "cardFreeTrial",
+      endsAt: "2026-08-17T00:00:00.000Z",
+    });
+  });
+
+  it("reports a card-free trial that has run out", () => {
+    expect(toBillingState(null, "2026-08-03T00:00:00.000Z", NOW)).toEqual({
+      kind: "cardFreeTrialEnded",
+      endedAt: "2026-08-03T00:00:00.000Z",
+    });
+  });
+
+  it("falls back to the offer when the trial date is unreadable", () => {
+    expect(toBillingState(null, "not a date", NOW)).toEqual({ kind: "none" });
+  });
+
+  it("lets a Stripe subscription speak for an account that also took a card-free trial", () => {
+    // Adding a card partway through the card-free trial leaves both records.
+    // The subscription is the one that will charge them, so it wins.
+    expect(
+      toBillingState(
+        subscription({
+          status: "trialing",
+          firstPaidAt: null,
+          trialEnd: "2026-08-17T00:00:00.000Z",
+        }),
+        "2026-08-17T00:00:00.000Z",
+        NOW,
+      ),
+    ).toEqual({ kind: "trialing", endsAt: "2026-08-17T00:00:00.000Z" });
   });
 
   it("reports a running trial with its end date", () => {
@@ -224,5 +262,46 @@ describe("formatBillingDate", () => {
 
   it("formats an ISO timestamp", () => {
     expect(formatBillingDate("2026-09-01T00:00:00.000Z")).toContain("2026");
+  });
+});
+
+describe("showsBillingPortal", () => {
+  it("offers the portal only where there is a live subscription to manage", () => {
+    const live: BillingState[] = [
+      { kind: "trialing", endsAt: null },
+      { kind: "active", renewsAt: null },
+      { kind: "canceling", endsAt: null },
+      { kind: "pastDue", retriesUntil: null, hasPaidBefore: true },
+    ];
+    for (const state of live) expect(showsBillingPortal(state)).toBe(true);
+  });
+
+  it("offers Checkout instead wherever the portal would be a dead end", () => {
+    // `ended` is the one that matters: a lapsed subscriber sent to the portal
+    // can read their old invoices and nothing else, with no way back in.
+    const dead: BillingState[] = [
+      { kind: "none" },
+      { kind: "cardFreeTrial", endsAt: "2026-08-17T00:00:00.000Z" },
+      { kind: "cardFreeTrialEnded", endedAt: "2026-08-03T00:00:00.000Z" },
+      { kind: "paused" },
+      { kind: "ended", status: "canceled", endedAt: null },
+    ];
+    for (const state of dead) expect(showsBillingPortal(state)).toBe(false);
+  });
+});
+
+describe("offersCardFreeTrial", () => {
+  it("is the one state with no trial behind it yet", () => {
+    expect(offersCardFreeTrial({ kind: "none" })).toBe(true);
+  });
+
+  it("is never offered a second time", () => {
+    const used: BillingState[] = [
+      { kind: "cardFreeTrial", endsAt: "2026-08-17T00:00:00.000Z" },
+      { kind: "cardFreeTrialEnded", endedAt: "2026-08-03T00:00:00.000Z" },
+      { kind: "paused" },
+      { kind: "ended", status: "canceled", endedAt: null },
+    ];
+    for (const state of used) expect(offersCardFreeTrial(state)).toBe(false);
   });
 });

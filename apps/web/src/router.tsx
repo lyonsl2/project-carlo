@@ -75,8 +75,8 @@ if (isAboutPageEnabled()) {
 }
 
 // Without a Supabase project these routes do not exist, so an unconfigured
-// build cannot land anyone on a sign-in page that could never work.
-// ACCOUNTS_ENABLED is a build-time const so Rollup can delete this block.
+// build cannot land anyone on a sign-in page that could never work — and with
+// no route to reach them, the lazy imports below are never fetched.
 if (ACCOUNTS_ENABLED) {
   const SignInPage = lazy(() =>
     import("./views/SignInPage").then((m) => ({ default: m.SignInPage })),

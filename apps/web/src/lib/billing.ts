@@ -1,9 +1,9 @@
-/** Turns the Stripe-derived subscription rows into the handful of states the
- *  account page actually renders.
+/** Turns the subscription rows and the card-free trial into the handful of
+ *  states the account page actually renders.
  *
- *  Pure, so the edge cases — a trial that ran out without a card, a
- *  cancellation that has not taken effect yet, an account with several old
- *  subscriptions — can be tested without a browser or a Stripe account.
+ *  Pure, so the edge cases — a trial nobody gave a card for, a cancellation
+ *  that has not taken effect yet, an account with several old subscriptions —
+ *  can be tested without a browser or a Stripe account.
  */
 
 export interface SubscriptionSummary {
@@ -23,13 +23,21 @@ export interface SubscriptionSummary {
 export interface Entitlements {
   hasAccess: boolean;
   savedCount: number;
+  /** public.trials.ends_at: the card-free trial, or null if they never took
+   *  one. Not on its own a claim to access — the trial may have run out. */
+  trialEndsAt: string | null;
 }
 
 export type BillingState =
   /** Signed in, but has never started a trial or a subscription. */
   | { kind: "none" }
+  /** A trial with no Stripe record behind it, taken by declining the card. */
+  | { kind: "cardFreeTrial"; endsAt: string }
+  | { kind: "cardFreeTrialEnded"; endedAt: string }
+  /** A trial with a card already attached, waiting to convert. */
   | { kind: "trialing"; endsAt: string | null }
-  /** Stripe parked the subscription because the trial ended with no card. */
+  /** Stripe parked the subscription because the trial ended with no usable
+   *  card — the card was removed, or a charge could never be attempted. */
   | { kind: "paused" }
   | { kind: "active"; renewsAt: string | null }
   | { kind: "canceling"; endsAt: string | null }
@@ -68,8 +76,21 @@ export function pickPrimarySubscription(
 
 export function toBillingState(
   subscription: SubscriptionSummary | null,
+  /** public.trials.ends_at, from account_entitlements(). */
+  trialEndsAt: string | null = null,
+  now: Date = new Date(),
 ): BillingState {
-  if (!subscription) return { kind: "none" };
+  // A Stripe subscription always tells the more useful story: once one exists
+  // it is what will charge them, and the card-free trial it grew out of is
+  // history.
+  if (!subscription) {
+    if (!trialEndsAt) return { kind: "none" };
+    const endsAt = new Date(trialEndsAt).getTime();
+    if (Number.isNaN(endsAt)) return { kind: "none" };
+    return endsAt > now.getTime()
+      ? { kind: "cardFreeTrial", endsAt: trialEndsAt }
+      : { kind: "cardFreeTrialEnded", endedAt: trialEndsAt };
+  }
 
   const {
     status,
@@ -102,6 +123,26 @@ export function toBillingState(
     default:
       return { kind: "ended", status, endedAt: endedAt ?? currentPeriodEnd };
   }
+}
+
+/** Whether the Stripe Billing Portal has anything to offer in this state.
+ *
+ *  An allow-list rather than a list of exclusions: every other state needs a
+ *  way to *start* a subscription, and sending someone to a portal that can only
+ *  show them a finished one is a dead end they cannot buy their way out of.
+ */
+export function showsBillingPortal(state: BillingState): boolean {
+  return (
+    state.kind === "trialing" ||
+    state.kind === "active" ||
+    state.kind === "canceling" ||
+    state.kind === "pastDue"
+  );
+}
+
+/** The card-free trial is offered once, to an account with nothing at all. */
+export function offersCardFreeTrial(state: BillingState): boolean {
+  return state.kind === "none";
 }
 
 /** Whole days left, rounded up, so the last few hours still read as "1 day

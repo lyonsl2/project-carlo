@@ -8,6 +8,7 @@ import {
   fetchEntitlements,
   fetchSavedChurchSlugs,
   fetchSubscriptions,
+  startTrial,
   unsaveChurch,
 } from "@/api/account";
 import { fetchChurchesBySlugs } from "@/api";
@@ -22,11 +23,14 @@ import { useHomeHref } from "@/hooks/useHomeHref";
 import {
   describeTrialRemaining,
   formatBillingDate,
+  offersCardFreeTrial,
   pickPrimarySubscription,
+  showsBillingPortal,
   toBillingState,
   type BillingState,
 } from "@/lib/billing";
 import { PLANS, TRIAL_PERIOD_DAYS, type PlanKey } from "@/lib/plans";
+import { cn } from "@/lib/utils";
 
 /** Stripe redirects the browser back the moment checkout succeeds, but the
  *  subscription only exists here once the webhook has been delivered. Poll for
@@ -35,12 +39,18 @@ import { PLANS, TRIAL_PERIOD_DAYS, type PlanKey } from "@/lib/plans";
 const WEBHOOK_POLL_INTERVAL_MS = 2_000;
 const WEBHOOK_POLL_TIMEOUT_MS = 30_000;
 
+/** The plan a first-time visitor lands on. Monthly is the smaller ask, and the
+ *  annual saving is stated on the option itself for anyone who wants it. */
+const DEFAULT_PLAN: PlanKey = "monthly";
+
 function billingHeadline(state: BillingState): string {
   switch (state.kind) {
     case "none":
       return `Start your free ${TRIAL_PERIOD_DAYS}-day trial`;
+    case "cardFreeTrial":
     case "trialing":
       return describeTrialRemaining(state.endsAt);
+    case "cardFreeTrialEnded":
     case "paused":
       return "Your free trial has ended";
     case "active":
@@ -59,13 +69,16 @@ function billingHeadline(state: BillingState): string {
 function billingDetail(state: BillingState): string | null {
   switch (state.kind) {
     case "none":
-      return "No credit card required. We'll only ask for one when the trial ends.";
+      return `Your card isn't charged for ${TRIAL_PERIOD_DAYS} days, and cancelling before then costs nothing.`;
+    case "cardFreeTrial":
     case "trialing": {
       const date = formatBillingDate(state.endsAt);
       return date
         ? `Add a card before ${date} to carry on without interruption.`
         : "Add a card before it ends to carry on without interruption.";
     }
+    case "cardFreeTrialEnded":
+      return "Subscribe to pick up where you left off. Everything you saved is still here.";
     case "paused":
       return "Your subscription is paused. Add a payment method and it picks up where it left off.";
     case "active": {
@@ -94,11 +107,13 @@ function billingDetail(state: BillingState): string | null {
   }
 }
 
-/** The label on the buttons that start a Checkout session. */
+/** The label on the button that starts a Checkout session. Every one of them
+ *  now leads to a card form, so the label says so. */
 function checkoutCallToAction(state: BillingState): string {
   switch (state.kind) {
     case "none":
       return `Start ${TRIAL_PERIOD_DAYS}-day free trial`;
+    case "cardFreeTrial":
     case "paused":
       return "Add a payment method";
     default:
@@ -119,6 +134,7 @@ export function AccountPage() {
   const [justUpgraded, setJustUpgraded] = useState(false);
   const [webhookIsLate, setWebhookIsLate] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [plan, setPlan] = useState<PlanKey>(DEFAULT_PLAN);
 
   const entitlementsQuery = useQuery({
     queryKey: accountKeys.entitlements(),
@@ -170,8 +186,9 @@ export function AccountPage() {
   }, [checkoutOutcome, hasAccess, searchParams, setSearchParams]);
 
   const checkoutMutation = useMutation({
-    mutationFn: (plan: PlanKey) =>
-      createCheckoutUrl(plan, { successPath: "/account", cancelPath: "/account" }),
+    mutationFn: (chosen: PlanKey) =>
+      createCheckoutUrl(chosen, { successPath: "/account", cancelPath: "/account" }),
+    onMutate: () => setActionError(null),
     onSuccess: (url) => {
       window.location.href = url;
     },
@@ -181,8 +198,24 @@ export function AccountPage() {
       ),
   });
 
+  const trialMutation = useMutation({
+    mutationFn: startTrial,
+    onMutate: () => setActionError(null),
+    onSuccess: async () => {
+      // Wait for the refetch before leaving: the route gate reads this same
+      // cache entry, and a stale "no access" would bounce them straight back.
+      await queryClient.invalidateQueries({ queryKey: accountKeys.all });
+      void navigate(homeHref);
+    },
+    onError: (error) =>
+      setActionError(
+        error instanceof Error ? error.message : "We couldn't start your trial.",
+      ),
+  });
+
   const portalMutation = useMutation({
     mutationFn: () => createBillingPortalUrl("/account"),
+    onMutate: () => setActionError(null),
     onSuccess: (url) => {
       window.location.href = url;
     },
@@ -203,12 +236,10 @@ export function AccountPage() {
   });
 
   const subscription = pickPrimarySubscription(subscriptionsQuery.data ?? []);
-  const billingState = toBillingState(subscription);
+  const billingState = toBillingState(subscription, entitlements?.trialEndsAt ?? null);
   const savedChurches = savedChurchesQuery.data ?? [];
-  const busy = checkoutMutation.isPending || portalMutation.isPending;
-  // A paused or missing subscription has nothing for the Stripe portal to
-  // manage, so those states get Checkout buttons instead.
-  const showPortal = billingState.kind !== "none" && billingState.kind !== "paused";
+  const busy =
+    checkoutMutation.isPending || portalMutation.isPending || trialMutation.isPending;
   const ready = !subscriptionsQuery.isLoading && !entitlementsQuery.isLoading;
 
   async function onSignOut() {
@@ -303,7 +334,7 @@ export function AccountPage() {
                 </p>
               ) : null}
 
-              {showPortal ? (
+              {showsBillingPortal(billingState) ? (
                 <Button
                   type="button"
                   variant="outline"
@@ -313,19 +344,41 @@ export function AccountPage() {
                   {portalMutation.isPending ? "Opening…" : "Manage billing"}
                 </Button>
               ) : (
-                <div className="flex flex-wrap gap-3">
-                  {PLANS.map((plan) => (
+                <div className="space-y-4">
+                  <PlanChooser value={plan} onChange={setPlan} disabled={busy} />
+
+                  <div className="flex flex-wrap items-center gap-3">
                     <Button
-                      key={plan.key}
                       type="button"
                       disabled={busy}
-                      onClick={() => checkoutMutation.mutate(plan.key)}
+                      onClick={() => checkoutMutation.mutate(plan)}
                     >
-                      {checkoutCallToAction(billingState)} · {plan.amount}{" "}
-                      {plan.cadence}
-                      {plan.note ? ` · ${plan.note}` : ""}
+                      {checkoutMutation.isPending
+                        ? "Opening Stripe…"
+                        : checkoutCallToAction(billingState)}
                     </Button>
-                  ))}
+
+                    {/* Secondary on purpose. The trial is the same seven days
+                     *  either way; taking it without a card just means we have
+                     *  to ask again when it runs out. */}
+                    {offersCardFreeTrial(billingState) ? (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        disabled={busy}
+                        onClick={() => trialMutation.mutate()}
+                      >
+                        {trialMutation.isPending ? "Starting…" : "Maybe later"}
+                      </Button>
+                    ) : null}
+                  </div>
+
+                  {offersCardFreeTrial(billingState) ? (
+                    <p className="font-serif text-[0.8rem] italic text-ink-faint">
+                      <em>Maybe later</em> starts the same {TRIAL_PERIOD_DAYS} days
+                      without a card. We&apos;ll ask for one when it runs out.
+                    </p>
+                  ) : null}
                 </div>
               )}
 
@@ -387,8 +440,80 @@ export function AccountPage() {
               </li>
             ))}
           </ul>
+
+          {unsaveMutation.error ? (
+            <p className="font-serif text-sm text-rubric" role="alert">
+              That parish couldn&apos;t be removed. Please try again.
+            </p>
+          ) : null}
         </section>
       </div>
     </main>
+  );
+}
+
+interface PlanChooserProps {
+  value: PlanKey;
+  onChange: (plan: PlanKey) => void;
+  disabled: boolean;
+}
+
+/** Radio buttons rather than one Checkout button per plan: with a card now
+ *  collected up front there is a single primary action, and the price belongs
+ *  next to the choice rather than in the label of the thing you press. */
+function PlanChooser({ value, onChange, disabled }: PlanChooserProps) {
+  return (
+    <fieldset className="flex flex-wrap gap-3" disabled={disabled}>
+      <legend className="sr-only">Choose a plan</legend>
+      {PLANS.map((plan) => {
+        const selected = plan.key === value;
+        return (
+          <label
+            key={plan.key}
+            className={cn(
+              "flex cursor-pointer items-baseline gap-2.5 border px-4 py-3 transition-colors",
+              // The radio itself is visually hidden, so the ring has to be drawn
+              // around the label it is standing in for.
+              "has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-[3px] has-[:focus-visible]:outline-rubric/75",
+              selected
+                ? "border-rubric bg-rubric/[0.06]"
+                : "border-rule-strong hover:border-ink-faint",
+              disabled && "cursor-not-allowed opacity-50",
+            )}
+          >
+            <input
+              type="radio"
+              name="plan"
+              value={plan.key}
+              checked={selected}
+              onChange={() => onChange(plan.key)}
+              className="sr-only"
+            />
+            <span
+              aria-hidden
+              className={cn(
+                "inline-block size-2 shrink-0 translate-y-[-1px] rounded-full transition-colors",
+                selected ? "bg-rubric" : "bg-transparent ring-1 ring-rule-strong",
+              )}
+            />
+            <span className="flex flex-col gap-0.5">
+              <span
+                className={cn(
+                  "font-display text-[1.05rem] leading-none",
+                  selected ? "text-rubric" : "text-ink",
+                )}
+              >
+                {plan.amount} {plan.cadence}
+              </span>
+              {plan.note ? (
+                <span className="font-serif text-[0.8rem] italic text-ink-faint">
+                  {plan.note}
+                </span>
+              ) : null}
+            </span>
+          </label>
+        );
+      })}
+    </fieldset>
   );
 }

@@ -8,7 +8,7 @@
 -- switching, because the API roles are NOINHERIT and cannot SET ROLE themselves.
 
 begin;
-select plan(48);
+select plan(62);
 
 -- ------------------------------------------------------------------ fixtures
 
@@ -23,6 +23,7 @@ select has_table('public', 'saved_churches', 'saved_churches table exists');
 select has_table('public', 'stripe_customers', 'stripe_customers table exists');
 select has_table('public', 'subscriptions', 'subscriptions table exists');
 select has_table('public', 'stripe_events', 'stripe_events table exists');
+select has_table('public', 'trials', 'trials table exists');
 
 select is(
   (
@@ -31,11 +32,11 @@ select is(
     join pg_namespace n on n.oid = c.relnamespace
     where n.nspname = 'public'
       and c.relname in ('profiles', 'saved_churches', 'stripe_customers',
-                        'subscriptions', 'stripe_events')
+                        'subscriptions', 'stripe_events', 'trials')
       and c.relrowsecurity
   ),
-  5,
-  'row level security is enabled on all five tables'
+  6,
+  'row level security is enabled on all six tables'
 );
 
 select is_empty(
@@ -43,7 +44,7 @@ select is_empty(
      from information_schema.role_table_grants
      where grantee = 'anon' and table_schema = 'public'
        and table_name in ('profiles', 'saved_churches', 'stripe_customers',
-                          'subscriptions', 'stripe_events') $$,
+                          'subscriptions', 'stripe_events', 'trials') $$,
   'the anon role holds no privileges on any application table'
 );
 
@@ -53,11 +54,12 @@ select is_empty(
 select is(
   (select string_agg(t || ':' || p, ' ' order by t, p)
    from unnest(array['profiles', 'saved_churches', 'stripe_customers',
-                     'subscriptions', 'stripe_events']) t
+                     'subscriptions', 'stripe_events', 'trials']) t
    cross join unnest(array['SELECT', 'INSERT', 'UPDATE', 'DELETE']) p
    where has_table_privilege('authenticated', 'public.' || t, p)),
   'profiles:SELECT saved_churches:DELETE saved_churches:INSERT '
-  || 'saved_churches:SELECT stripe_customers:SELECT subscriptions:SELECT',
+  || 'saved_churches:SELECT stripe_customers:SELECT subscriptions:SELECT '
+  || 'trials:SELECT',
   'the authenticated role holds only the table privileges the app needs'
 );
 
@@ -151,7 +153,7 @@ select is(
 select is(
   public.has_access(),
   false,
-  'signing in alone does not grant access — the trial lives in Stripe'
+  'signing in alone does not grant access — a trial has to be started'
 );
 
 select throws_ok(
@@ -180,12 +182,19 @@ select throws_ok(
 );
 
 select throws_ok(
+  $$ insert into public.trials (user_id, ends_at)
+     values ('11111111-1111-1111-1111-111111111111', now() + interval '10 years') $$,
+  '42501'::text, null::text,
+  'nor write themselves a trial that never ends'
+);
+
+select throws_ok(
   $$ select * from public.stripe_events $$,
   '42501'::text, null::text,
   'a user cannot read the webhook ledger'
 );
 
--- ---------------------------------------------- the card-free trial in Stripe
+-- ------------------------------------------------ the trial Stripe holds
 
 reset role;
 insert into public.stripe_customers (user_id, stripe_customer_id)
@@ -336,12 +345,87 @@ select is(
   'a delete aimed at another user''s rows removes nothing'
 ) from removed;
 
+-- ---------------------------------- the card-free trial, which Stripe never sees
+
+select ok(
+  public.start_trial() between now() + interval '6 days' and now() + interval '8 days',
+  'start_trial hands out a week, dated by the database rather than the caller'
+);
+
+select is(public.has_access(), true, 'and that trial grants access on its own');
+
+select is_empty(
+  $$ select 1 from public.stripe_customers
+     where user_id = '22222222-2222-2222-2222-222222222222' $$,
+  'without creating anything in Stripe'
+);
+
+select lives_ok(
+  $$ insert into public.saved_churches (user_id, church_slug)
+     values ('22222222-2222-2222-2222-222222222222', 'all-saints') $$,
+  'a card-free trial can save parishes like any other'
+);
+
+select is(
+  public.start_trial(),
+  (select t.ends_at from public.trials t),
+  'calling it again returns the same end date rather than extending the trial'
+);
+
+select is(
+  (select count(*)::int from public.trials),
+  1,
+  'and leaves exactly one trial row'
+);
+
+-- The trial runs out.
+
+reset role;
+update public.trials set ends_at = now() - interval '1 minute'
+  where user_id = '22222222-2222-2222-2222-222222222222';
+set local role authenticated;
+
+select is(public.has_access(), false, 'an expired card-free trial grants nothing');
+
+select throws_ok(
+  $$ insert into public.saved_churches (user_id, church_slug)
+     values ('22222222-2222-2222-2222-222222222222', 'holy-cross-freeville') $$,
+  '42501'::text, null::text,
+  'and saving is refused again'
+);
+
+select results_eq(
+  $$ select has_access, saved_count from public.account_entitlements() $$,
+  $$ values (false, 1) $$,
+  'account_entitlements reports the lapse while still listing what was saved'
+);
+
+-- Having been to Stripe is what spends the trial, whatever became of it there.
+
+reset role;
+delete from public.trials where user_id = '22222222-2222-2222-2222-222222222222';
+insert into public.subscriptions (id, user_id, stripe_customer_id, status)
+  values ('sub_bob', '22222222-2222-2222-2222-222222222222', 'cus_bob', 'canceled');
+set local role authenticated;
+
+select throws_ok(
+  $$ select public.start_trial() $$,
+  '42501'::text, null::text,
+  'an account that has been to Stripe cannot fall back on a card-free trial'
+);
+
 -- --------------------------------------------------- ownership of own rows
 
 reset role;
 set local request.jwt.claims =
   '{"sub":"11111111-1111-1111-1111-111111111111","role":"authenticated"}';
 set local role authenticated;
+
+select is(
+  (select count(*)::int from public.trials),
+  0,
+  'a user sees nothing of another user''s trial'
+);
 
 with removed as (
   delete from public.saved_churches
@@ -378,6 +462,17 @@ select is(
    where user_id = '11111111-1111-1111-1111-111111111111'),
   0,
   'and to their subscription rows'
+);
+
+reset role;
+insert into public.trials (user_id, ends_at)
+  values ('22222222-2222-2222-2222-222222222222', now() + interval '7 days');
+delete from auth.users where id = '22222222-2222-2222-2222-222222222222';
+
+select is(
+  (select count(*)::int from public.trials),
+  0,
+  'and a card-free trial goes with the account it belonged to'
 );
 
 select * from finish();

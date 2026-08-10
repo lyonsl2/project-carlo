@@ -100,7 +100,7 @@ export function SignInPage() {
               </h1>
               <p className="font-serif text-base text-ink-soft">
                 {paywalled
-                  ? `We'll email you a link — no password to remember. New here? Signing in starts your free ${TRIAL_PERIOD_DAYS}-day trial, and we won't ask for a card until it ends.`
+                  ? `We'll email you a link — no password to remember. New here? Signing in is the first step of your free ${TRIAL_PERIOD_DAYS}-day trial.`
                   : "An account lets you keep a list of parishes and carry it between your phone and your desk."}
               </p>
             </div>

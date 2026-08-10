@@ -12,8 +12,8 @@ function toAuthState(session: Session | null): AuthState {
  *
  *  Always mounted, even with accounts switched off, so nothing downstream has
  *  to branch on whether the provider exists — it simply reports signed out.
- *  When accounts are off, ACCOUNTS_ENABLED is a build-time `false` and Rollup
- *  deletes the enabled branch (and with it the Supabase client) entirely.
+ *  With accounts off the enabled branch never renders, so SupabaseSessionSync
+ *  is never imported and the Supabase client never reaches the browser.
  */
 export function AuthProvider({ children }: { children: ReactNode }) {
   if (!ACCOUNTS_ENABLED) {

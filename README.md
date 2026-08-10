@@ -149,8 +149,9 @@ process_result = process_bulletins(parish_name="Southeast Rochester Catholic Com
 ## Accounts and payments
 
 The web app can run as a subscription product: sign-in by magic link, a 7-day
-free trial that does not ask for a card, and Stripe for payment. It is off by
-default — with `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` unset the site
+free trial, and Stripe for payment. The trial takes a card up front and charges
+nothing until it ends; declining the card is a secondary button that buys the
+same seven days and creates nothing in Stripe. It is off by default — with `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` unset the site
 builds and behaves exactly as it does today, and the Supabase client is never
 loaded at runtime.
 

@@ -1,6 +1,8 @@
 import { assertEquals } from "jsr:@std/assert@^1";
 import { decideCheckoutAction, type ExistingSubscription } from "./checkoutAction.ts";
 
+const NOW = new Date("2026-08-10T12:00:00.000Z");
+
 function sub(overrides: Partial<ExistingSubscription> = {}): ExistingSubscription {
   return {
     id: "sub_1",
@@ -11,8 +13,8 @@ function sub(overrides: Partial<ExistingSubscription> = {}): ExistingSubscriptio
   };
 }
 
-Deno.test("offers the free trial to a brand new account", () => {
-  assertEquals(decideCheckoutAction([]), { kind: "startTrial" });
+Deno.test("offers the full trial to a brand new account", () => {
+  assertEquals(decideCheckoutAction([]), { kind: "startTrial", trialEndsAt: null });
 });
 
 Deno.test("refuses to sell a second subscription to a live one", () => {
@@ -93,4 +95,57 @@ Deno.test("prefers a live subscription over a stale paused one", () => {
   ]);
 
   assertEquals(action, { kind: "alreadySubscribed" });
+});
+
+// ---------------------------------------------------- the card-free trial
+
+Deno.test("carries a running card-free trial across rather than adding to it", () => {
+  // Five days left: adding a card must buy zero extra days, so Stripe is given
+  // the date the trial already has.
+  assertEquals(
+    decideCheckoutAction([], "2026-08-15T12:00:00.000Z", NOW),
+    { kind: "startTrial", trialEndsAt: "2026-08-15T12:00:00.000Z" },
+  );
+});
+
+Deno.test("sells a subscription outright once the card-free trial has run out", () => {
+  assertEquals(
+    decideCheckoutAction([], "2026-08-09T12:00:00.000Z", NOW),
+    { kind: "subscribeWithoutTrial" },
+  );
+});
+
+Deno.test("bills immediately when too little of the trial is left for Stripe", () => {
+  // Stripe rejects a trial_end under 48 hours out, so the last day and a half
+  // of a card-free trial cannot be carried across.
+  assertEquals(
+    decideCheckoutAction([], "2026-08-11T12:00:00.000Z", NOW),
+    { kind: "subscribeWithoutTrial" },
+  );
+
+  // Exactly 48 hours is the first value Stripe will take.
+  assertEquals(
+    decideCheckoutAction([], "2026-08-12T12:00:00.000Z", NOW),
+    { kind: "startTrial", trialEndsAt: "2026-08-12T12:00:00.000Z" },
+  );
+});
+
+Deno.test("ignores an unreadable trial date rather than granting a fresh trial", () => {
+  assertEquals(
+    decideCheckoutAction([], "not a date", NOW),
+    { kind: "subscribeWithoutTrial" },
+  );
+});
+
+Deno.test("a subscription outranks the card-free trial that preceded it", () => {
+  // They took the card-free trial, subscribed, then cancelled. The trial row is
+  // still there, but it has been spent.
+  assertEquals(
+    decideCheckoutAction(
+      [sub({ status: "canceled" })],
+      "2026-08-15T12:00:00.000Z",
+      NOW,
+    ),
+    { kind: "subscribeWithoutTrial" },
+  );
 });

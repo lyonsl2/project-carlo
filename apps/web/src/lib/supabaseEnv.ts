@@ -31,11 +31,16 @@ function fromNode(name: string): string | undefined {
 }
 
 /**
- * Build-time flag. Must stay a module-level const (not a function) so that when
- * Vite replaces the unset env vars with `undefined`, Rollup sees `false` and
- * can delete the account-only branches — and with them the Supabase client —
- * from accounts-off builds. A `function isAccountsEnabled() { return false }`
- * is not inlined aggressively enough and still keeps those chunks reachable.
+ * Build-time flag, and a module-level const rather than a function so the value
+ * is settled before any of the account branches are evaluated.
+ *
+ * What this buys, measured rather than assumed: with the variables unset, every
+ * account branch is dead, so nothing ever calls the lazy imports behind it and
+ * index.html preloads none of them — the Supabase client is never fetched. The
+ * chunks are still *emitted* into dist/assets; Rollup does not fold the
+ * `import.meta.env` reads far enough to drop them. If that dead weight on the
+ * CDN ever matters, a `define` entry in vite.config.ts substituting a literal
+ * is what would remove it.
  */
 export const ACCOUNTS_ENABLED: boolean = Boolean(
   import.meta.env.VITE_SUPABASE_URL?.trim() &&
@@ -43,8 +48,8 @@ export const ACCOUNTS_ENABLED: boolean = Boolean(
 );
 
 /** Build-time paywall flag. On by default once accounts are configured.
- *  Uses only `import.meta.env` so the accounts-off build can fold this to
- *  `false` without leaving a `process.env` read behind. */
+ *  Reads only `import.meta.env`, never `process.env`, so the value is fixed at
+ *  build time rather than looked up in a browser that has no `process`. */
 export const PAYWALL_ENABLED: boolean = (() => {
   if (!ACCOUNTS_ENABLED) return false;
   const flag = import.meta.env.VITE_REQUIRE_ACCOUNT?.trim().toLowerCase();

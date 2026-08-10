@@ -23,7 +23,25 @@ export async function fetchEntitlements(): Promise<Entitlements> {
   const row = data?.[0];
   if (!row) throw new Error("account_entitlements returned no row");
 
-  return { hasAccess: row.has_access, savedCount: row.saved_count };
+  return {
+    hasAccess: row.has_access,
+    savedCount: row.saved_count,
+    trialEndsAt: row.trial_ends_at,
+  };
+}
+
+/** Starts the card-free trial and returns when it ends.
+ *
+ *  Deliberately not an edge function: the whole point of this path is that
+ *  declining the card form creates nothing in Stripe, so there is no secret
+ *  key involved and nothing to talk to. The database refuses a second trial
+ *  and owns the end date — see public.start_trial().
+ */
+export async function startTrial(): Promise<string> {
+  const { data, error } = await getSupabaseClient().rpc("start_trial");
+  if (error) throw new Error(error.message);
+  if (!data) throw new Error("start_trial returned no end date");
+  return data;
 }
 
 export async function fetchSubscriptions(): Promise<SubscriptionSummary[]> {

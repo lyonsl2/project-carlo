@@ -8,12 +8,16 @@
 
 import { requireEnv } from "./env.ts";
 
-/** Length of the card-free trial, in days.
+/** Length of the trial Checkout takes a card for, in days.
  *
- *  Stripe owns the clock: this is passed as trial_period_days when the first
- *  subscription is created, and after that the trial's end date lives on the
+ *  Stripe owns this clock: the number is passed as trial_period_days when the
+ *  subscription is created, and after that the end date lives on the
  *  subscription. Changing it here only affects trials started from now on.
- *  The same number appears in the marketing copy in apps/web/src/lib/plans.ts.
+ *
+ *  Someone who took the card-free trial instead is not measured from here at
+ *  all — their end date comes from public.trials and is handed to Stripe as
+ *  trial_end. Keep this, the interval in public.start_trial(), and the
+ *  marketing copy in apps/web/src/lib/plans.ts saying the same number.
  */
 export const TRIAL_PERIOD_DAYS = 7;
 

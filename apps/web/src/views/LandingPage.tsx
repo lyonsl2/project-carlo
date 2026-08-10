@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import type { ChurchSearchResult } from "../api";
 import { useAuth } from "@/auth/AuthContext";
 import { safeNextPath } from "@/lib/nextPath";
+import { findPlan, TRIAL_PERIOD_DAYS } from "@/lib/plans";
 import { isPaywallEnabled } from "@/lib/supabaseEnv";
 import { Fleuron } from "../components/Fleuron";
 import { SearchTypeahead } from "../components/SearchTypeahead";
@@ -291,6 +292,7 @@ export function LandingPage() {
 /** What a stranger sees when the site is behind the paywall. */
 function TrialPitch({ nextPath }: { nextPath: string }) {
   const signInHref = `/signin?next=${encodeURIComponent(nextPath)}`;
+  const monthly = findPlan("monthly");
   return (
     <div className="flex w-full flex-col items-center gap-5">
       <p className="m-0 max-w-[34rem] text-center font-serif text-[16px] leading-relaxed text-ink-soft">
@@ -302,12 +304,13 @@ function TrialPitch({ nextPath }: { nextPath: string }) {
         to={signInHref}
         className="missal-focus smallcaps inline-flex w-full items-center justify-center gap-[10px] bg-rubric px-6 py-[14px] text-[14px] tracking-[0.14em] text-paper transition-colors hover:bg-rubric-deep active:translate-y-px md:w-auto"
       >
-        <span>Start your free 7-day trial</span>
+        <span>Start your free {TRIAL_PERIOD_DAYS}-day trial</span>
         <ArrowRightIcon className="size-[14px]" />
       </Link>
 
       <p className="m-0 text-center font-serif italic text-[13px] text-ink-faint">
-        No credit card required.
+        Free for {TRIAL_PERIOD_DAYS} days, then {monthly.amount} {monthly.cadence}.
+        Cancel any time.
       </p>
 
       <p className="m-0 text-center font-serif text-[14px] text-ink-soft">

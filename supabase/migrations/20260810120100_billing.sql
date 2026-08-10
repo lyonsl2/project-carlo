@@ -1,10 +1,11 @@
 -- Stripe billing state, mirrored into Postgres by the stripe-webhook function.
 --
--- Stripe stays the source of truth, including for the free trial: a new account
--- gets a Stripe subscription in `trialing` with no payment method attached, and
--- Stripe moves it to `paused` if the trial runs out before a card arrives. That
--- keeps one system deciding whether someone may use the product, and means the
--- trial cannot be extended by editing a row here.
+-- Stripe is the source of truth for everything with a card behind it, including
+-- the default trial: a new account that gives a card gets a Stripe subscription
+-- in `trialing`, and Stripe decides when it converts. Nothing here can extend
+-- it. The one thing Stripe does not own is the card-free trial someone gets by
+-- declining the card form, which has no Stripe object at all and lives in
+-- public.trials — see 20260810120300_trials.sql.
 --
 -- Nothing below is written by the browser: every table grants the API roles
 -- read access at most, and the webhook writes with the service role, which
@@ -17,7 +18,8 @@ create table if not exists public.stripe_customers (
 );
 
 comment on table public.stripe_customers is
-  'Maps a Supabase user to the Stripe Customer created for them at first checkout.';
+  'Maps a Supabase user to their Stripe Customer. Written by the webhook once a
+   checkout completes, so an abandoned one leaves nothing behind here or in Stripe.';
 
 create table if not exists public.subscriptions (
   -- Stripe subscription id (sub_...), so redelivered webhooks upsert in place.
@@ -121,8 +123,12 @@ grant select on table public.subscriptions to authenticated;
 
 /** The single entitlement question the rest of the schema asks.
  *
- *  `trialing` covers the card-free trial. `paused` — which is where Stripe puts
- *  a trial that ended without a payment method — deliberately does not.
+ *  Replaced in 20260810120300_trials.sql, which adds the card-free trial as a
+ *  second source of entitlement. The Stripe half below is unchanged.
+ *
+ *  `trialing` covers a trial with a card already attached. `paused` — where
+ *  Stripe puts a subscription whose trial ended without a usable payment
+ *  method — deliberately does not.
  *
  *  `past_due` counts only once a payment has actually succeeded. Stripe retries
  *  a failed renewal for days, and cutting a long-standing subscriber off the

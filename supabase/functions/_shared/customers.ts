@@ -1,14 +1,19 @@
-/** Lookups that tie a Supabase user to a Stripe customer. */
+/** Lookups that tie a Supabase user to a Stripe customer.
+ *
+ *  Nothing here creates a customer. Stripe mints one when a Checkout session
+ *  completes, and the webhook records the mapping — so an account that starts
+ *  checkout and walks away leaves nothing behind in either system.
+ */
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type Stripe from "stripe";
 
-/** Set on every Stripe customer we create, so the mapping survives even if the
- *  stripe_customers row is lost or the customer is reached from Stripe's side
- *  first (a webhook for a subscription started in the dashboard, say). */
+/** Stamped on the subscription and the setup intent we ask Stripe to create,
+ *  and backfilled onto the customer itself by tagCustomerWithUserId, so the
+ *  mapping survives even if the stripe_customers row is lost or the customer is
+ *  reached from Stripe's side first (a webhook for a subscription started in the
+ *  dashboard, say). */
 export const SUPABASE_USER_ID_METADATA_KEY = "supabase_user_id";
-
-const UNIQUE_VIOLATION = "23505";
 
 export async function findStripeCustomerId(
   admin: SupabaseClient,
@@ -59,42 +64,22 @@ export async function linkCustomerToUser(
   if (error) throw new Error(`Linking Stripe customer: ${error.message}`);
 }
 
-/** Returns the user's Stripe customer, creating it on first use.
+/** Writes the Supabase user id onto a Stripe customer Checkout created for us.
  *
- *  Two checkouts started at once would otherwise create two customers for the
- *  same person, so the insert is allowed to lose the race and re-read. */
-export async function ensureStripeCustomer(
-  admin: SupabaseClient,
+ *  Best effort by design: this only exists to make findUserIdForCustomer's last
+ *  resort work, and a webhook must not fail — and be retried forever — over a
+ *  bookkeeping write.
+ */
+export async function tagCustomerWithUserId(
   stripe: Stripe,
-  user: { id: string; email?: string | null },
-): Promise<string> {
-  const existing = await findStripeCustomerId(admin, user.id);
-  if (existing) return existing;
-
-  const customer = await stripe.customers.create({
-    email: user.email ?? undefined,
-    metadata: { [SUPABASE_USER_ID_METADATA_KEY]: user.id },
-  });
-
-  const { error } = await admin
-    .from("stripe_customers")
-    .insert({ user_id: user.id, stripe_customer_id: customer.id });
-
-  if (error) {
-    if (error.code === UNIQUE_VIOLATION) {
-      const winner = await findStripeCustomerId(admin, user.id);
-      if (winner) {
-        // Another request got there first. Leave the duplicate customer behind
-        // rather than deleting it: it has no subscription attached and Stripe
-        // keeps it out of the way, whereas a wrong delete is unrecoverable.
-        console.warn(
-          `Discarding duplicate Stripe customer ${customer.id} for user ${user.id}`,
-        );
-        return winner;
-      }
-    }
-    throw new Error(`Saving Stripe customer: ${error.message}`);
+  stripeCustomerId: string,
+  userId: string,
+): Promise<void> {
+  try {
+    await stripe.customers.update(stripeCustomerId, {
+      metadata: { [SUPABASE_USER_ID_METADATA_KEY]: userId },
+    });
+  } catch (error) {
+    console.error(`Could not tag customer ${stripeCustomerId}: ${error}`);
   }
-
-  return customer.id;
 }

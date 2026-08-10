@@ -15,7 +15,6 @@ export interface Database {
           id: string;
           email: string | null;
           display_name: string | null;
-          trial_ends_at: string;
           created_at: string;
           updated_at: string;
         };
@@ -43,6 +42,17 @@ export interface Database {
           stripe_customer_id: string;
           created_at: string;
         };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
+      trials: {
+        Row: {
+          user_id: string;
+          started_at: string;
+          ends_at: string;
+        };
+        /** public.start_trial() is the only way a row gets here. */
         Insert: never;
         Update: never;
         Relationships: [];
@@ -78,11 +88,17 @@ export interface Database {
         Returns: {
           has_access: boolean;
           saved_count: number;
+          trial_ends_at: string | null;
         }[];
       };
       has_access: {
         Args: Record<PropertyKey, never>;
         Returns: boolean;
+      };
+      start_trial: {
+        Args: Record<PropertyKey, never>;
+        /** When the trial ends, as an ISO timestamp. */
+        Returns: string;
       };
     };
     Enums: Record<never, never>;

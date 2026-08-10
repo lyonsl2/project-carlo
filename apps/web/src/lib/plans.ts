@@ -7,8 +7,10 @@
  *  change pricing in Stripe.
  */
 
-/** Marketing copy only. The clock that matters is Stripe's trial_period_days,
- *  set in supabase/functions/_shared/plans.ts — keep the two the same. */
+/** Marketing copy only. Two other places own a real clock and have to say the
+ *  same number: TRIAL_PERIOD_DAYS in supabase/functions/_shared/plans.ts, which
+ *  Stripe is given for a trial with a card, and the interval in
+ *  public.start_trial(), which times the card-free one. */
 export const TRIAL_PERIOD_DAYS = 7;
 
 export const PLAN_KEYS = ["monthly", "annual"] as const;
