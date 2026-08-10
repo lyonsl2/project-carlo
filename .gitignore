@@ -23,6 +23,8 @@ eggs/
 .env.*
 !apps/web/.env.production
 !apps/web/.env.development
+!apps/web/.env.example
+!supabase/functions/.env.example
 *.log
 
 # IDE
@@ -43,6 +45,10 @@ dist/
 
 # Cloudflare Wrangler
 .wrangler/
+
+# Supabase CLI local state
+supabase/.temp/
+supabase/.branches/
 
 # Playwright
 apps/web/playwright-report/

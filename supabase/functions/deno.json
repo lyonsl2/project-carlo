@@ -1,0 +1,14 @@
+{
+  "imports": {
+    "stripe": "npm:stripe@^22.4.0",
+    "@supabase/supabase-js": "npm:@supabase/supabase-js@^2.112.2"
+  },
+  "lint": {
+    "rules": {
+      "tags": ["recommended"]
+    }
+  },
+  "fmt": {
+    "lineWidth": 90
+  }
+}
