@@ -135,9 +135,14 @@ function writeSitemapAndRobots(
   writeFileSync(resolve(distDir, "sitemap.xml"), sitemap, "utf-8");
 
   const sitemapUrl = absoluteUrl(origin, "/sitemap.xml");
+  // The account routes are per-user and behind a sign-in, so there is nothing
+  // for a crawler to index and every hit would be a redirect.
   const robots =
     "User-agent: *\n" +
     "Allow: /\n" +
+    "Disallow: /account\n" +
+    "Disallow: /signin\n" +
+    "Disallow: /auth/\n" +
     "\n" +
     `Sitemap: ${sitemapUrl}\n`;
 

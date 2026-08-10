@@ -14,6 +14,7 @@ import { FilterPanel } from "../components/FilterPanel";
 import { FilterPills } from "../components/FilterPills";
 import { SearchTypeahead } from "../components/SearchTypeahead";
 import { Masthead } from "../components/Masthead";
+import { AccountMenu } from "../components/AccountMenu";
 import {
   filtersEqual,
   getTimeRange,
@@ -281,14 +282,14 @@ export function HomePage() {
           <div className="pointer-events-auto rise-in shrink-0 border border-rule-strong bg-paper/96 px-6 pt-5 pb-4 shadow-missal-floating backdrop-blur-sm">
             <div className="flex items-start justify-between gap-4">
               <Masthead />
-              {aboutPageEnabled ? (
-                <Link
-                  to="/about"
-                  className="rubric-link smallcaps mt-1 shrink-0 text-[0.75rem]"
-                >
-                  About
-                </Link>
-              ) : null}
+              <div className="mt-1 flex shrink-0 items-baseline gap-4">
+                {aboutPageEnabled ? (
+                  <Link to="/about" className="rubric-link smallcaps text-[0.75rem]">
+                    About
+                  </Link>
+                ) : null}
+                <AccountMenu />
+              </div>
             </div>
             <div className="mt-5">
               <SearchTypeahead

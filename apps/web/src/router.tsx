@@ -6,7 +6,9 @@ import {
 } from "react-router-dom";
 import { LandingPage } from "./views/LandingPage";
 import { NotFoundPage } from "./views/NotFoundPage";
+import { RequireAuth } from "./auth/RequireAuth";
 import { isAboutPageEnabled } from "./lib/featureFlags";
+import { isAccountsEnabled } from "./lib/supabaseEnv";
 
 const HomePage = lazy(() =>
   import("./views/HomePage").then((m) => ({ default: m.HomePage })),
@@ -18,6 +20,18 @@ const ChurchPage = lazy(() =>
 
 const AboutPage = lazy(() =>
   import("./views/AboutPage").then((m) => ({ default: m.AboutPage })),
+);
+
+const SignInPage = lazy(() =>
+  import("./views/SignInPage").then((m) => ({ default: m.SignInPage })),
+);
+
+const AuthCallbackPage = lazy(() =>
+  import("./views/AuthCallbackPage").then((m) => ({ default: m.AuthCallbackPage })),
+);
+
+const AccountPage = lazy(() =>
+  import("./views/AccountPage").then((m) => ({ default: m.AccountPage })),
 );
 
 const lazyPageFallback = (
@@ -62,6 +76,39 @@ if (isAboutPageEnabled()) {
       </Suspense>
     ),
   });
+}
+
+// Without a Supabase project these routes do not exist, so an unconfigured
+// build cannot land anyone on a sign-in page that could never work.
+if (isAccountsEnabled()) {
+  routes.push(
+    {
+      path: "/signin",
+      element: (
+        <Suspense fallback={lazyPageFallback}>
+          <SignInPage />
+        </Suspense>
+      ),
+    },
+    {
+      path: "/auth/callback",
+      element: (
+        <Suspense fallback={lazyPageFallback}>
+          <AuthCallbackPage />
+        </Suspense>
+      ),
+    },
+    {
+      path: "/account",
+      element: (
+        <RequireAuth>
+          <Suspense fallback={lazyPageFallback}>
+            <AccountPage />
+          </Suspense>
+        </RequireAuth>
+      ),
+    },
+  );
 }
 
 routes.push({
