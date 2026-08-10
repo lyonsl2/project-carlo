@@ -19,6 +19,12 @@ Confession, and Adoration times parsed from weekly bulletins
 - `sitemap.xml` (with `<lastmod>`) + `robots.txt` generated at build.
 - Trailing-slash canonicalization via `public/_redirects`.
 - Clean SVG favicon.
+- **Closed churches are removed from the dataset and their URLs 404** (owner decision,
+  2026-08-06): no redirect to a sibling church, no tombstone page. A church that closes
+  drops out of `churches.csv`, the prerender and the sitemap together. First case:
+  `/churches/st-mary-batavia/` (Batavia, last Mass 14 Aug 2024). If closures ever become
+  frequent enough to matter for organic traffic, revisit — the alternative on the table was
+  a 301 to another church of the same parish.
 
 **Gaps this plan addresses:**
 
