@@ -112,12 +112,14 @@ problems that founders do first because they feel like progress.
 Do this before you file anything, because the entity name and the trademark are
 easier to change now than later.
 
-- Search USPTO's trademark database (`tmsearch.uspto.gov`) for "Project Carlo"
-  and "Carlo" in **class 9** (software), **class 42** (SaaS), and **class 45**
-  (religious services). Also plain-web search for anyone using the name for a
-  Catholic app.
+- Search USPTO's trademark database (`tmsearch.uspto.gov`) for "Carlo" in any
+  class — **not** only class 9 (software), 42 (SaaS), and 45 (religious
+  services). See the conflict analysis in §1.2: the class on an application does
+  not bound the confusion question. Also plain-web search for anyone using the
+  name for a Catholic project of any kind.
 - Check New York DOS's corporate name availability search for your intended LLC
-  name.
+  name. Note that state entity-name availability is **not** trademark clearance —
+  New York will happily register a name that infringes someone's mark.
 - On the saint: Carlo Acutis was canonized in September 2025 and is associated
   with the internet and with young Catholics, so the name is apt. Nobody owns
   it. But there has been public friction about commercial exploitation of his
@@ -126,14 +128,88 @@ easier to change now than later.
   that says plainly this is a project named in his honor, not one endorsed by
   anyone connected to him.
 
-### 1.2 Lock down the domain
+### 1.2 The "Carlo Project" conflict — probably a rename
+
+A pending application for something like **"The Carlo Project"** — a Catholic
+fundraising venture, in a class unrelated to software — turned up during name
+clearance. Two instincts about that are wrong.
+
+**The class doesn't protect you.** International Classes are an administrative
+device for fees and searching, and are explicitly not determinative of likelihood
+of confusion (TMEP 1207.01(d)(v)). What controls is the **goods/services wording**
+in the application and whether consumers would think the two come from the same
+source. Different classes are found related routinely; the same class is often
+found unrelated. A registration also doesn't limit the owner to what they sell
+today — the "natural zone of expansion" doctrine reaches services they would
+plausibly grow into, and a Catholic fundraising outfit adding a parish-facing app
+is not a stretch.
+
+**The marks are effectively identical.** "Project Carlo" and "The Carlo Project"
+differ by a transposition and an article. The TTAB regularly finds transposed
+marks confusingly similar where the transposition doesn't change meaning or
+commercial impression, and "The" carries no source-identifying weight. Sound,
+appearance, meaning, and commercial impression all collapse together — and both
+get shorthanded to "the Carlo project" in speech. That is the most heavily
+weighted factor in the analysis.
+
+Where it actually turns is relatedness. If their venture is a fundraising
+*campaign or program* — money for a shrine, a school, a scholarship — nobody
+expects it to share a source with a Mass-times app. If it's a fundraising
+*platform sold to parishes and dioceses*, the channels of trade land directly on
+the B2B path in §1 of this document: same buyers, same institutions, both digital
+subscription services. Either way the audiences overlap, since both reach
+Catholic laity through parish bulletins, diocesan newsletters, Catholic media,
+and Google.
+
+One point in your favor: **"Carlo" is a crowded field.** Post-canonization there
+is a Netherlands catechesis "Project Carlo," a Carlo Acutis Catholic High School,
+Foundation of Carlo Inc., Green Bay's Blessed Carlo Acutis Project, and schools in
+Malawi, Australia, Wales, and Chile. A crowded field narrows everyone's scope of
+protection. It cuts both ways: your mark would be inherently weak, and collisions
+are guaranteed no matter who registers what.
+
+One point against: priority comes from **use in commerce**, not registration, and
+your use is thin. The repository dates to March 2026, the product isn't launched,
+and pre-launch development generally isn't use in commerce. If they filed before
+you began publicly rendering services, they likely take priority nationwide once
+it registers.
+
+**Pull the record before deciding.** From the USPTO search, get the serial number,
+then read the TSDR file for: exact mark, owner, the *full* goods/services wording,
+filing basis (§1(a) use-based with a claimed first-use date, or §1(b)
+intent-to-use), filing date, status, and whether it has been published for
+opposition. Opposition runs 30 days from publication in the Official Gazette,
+extendable.
+
+**Recommendation: rename, and do it before the LLC filing.** Not because you'd
+necessarily lose a fight, but because switching cost is at its lifetime minimum —
+no customers, no brand equity, no SEO, no printed material. A rename today costs a
+domain, an OG image, some meta tags, and a repository rename; a rename after
+launch costs all of that plus every link and every parish that has heard of you.
+There's an independent reason too: *Project Carlo* tells a stranger nothing about
+Mass times, which is a discovery and conversion problem for a product whose
+audience searches "confession times near me." Keep Project Carlo as the internal
+name and the story — it's a good story — and launch under something a searcher
+understands.
+
+If you keep it: don't file an application (it likely draws a §2(d) refusal and
+announces you to them), date and preserve evidence of first public use,
+differentiate hard visually, and accept that you cannot stop anyone else. A
+**consent or coexistence agreement** is the cheap, friendly option — the USPTO
+gives them real weight, and a Catholic nonprofit may sign one happily.
+
+Either way, buy one trademark attorney hour ($300–500) once you have the record.
+Marks this close are exactly the situation where a professional read is worth more
+than the fee.
+
+### 1.3 Lock down the domain
 
 `projectcarlo.com` is hardcoded in `index.html` and `seo.ts`. Confirm you own
 it, then: enable auto-renew, turn on registrar lock, turn on WHOIS privacy, and
 enable 2FA on the registrar account. Consider defensively registering `.org`.
 A lapsed domain is the one operational failure you cannot undo.
 
-### 1.3 Fix the repository
+### 1.4 Fix the repository
 
 This is the item I'd most want you to look at, because it quietly undermines the
 paywall you just built.
@@ -162,7 +238,7 @@ remove them from git history — you'd need `git filter-repo` or a fresh
 repository to truly withdraw the data that's already published. And whatever
 stays public should get an explicit LICENSE file so your intent is legible.
 
-### 1.4 Assign the IP to the LLC
+### 1.5 Assign the IP to the LLC
 
 After you form the entity (Phase 2), sign a one-page assignment transferring the
 domain, code, trademark rights, and data compilation from you personally to the
@@ -645,10 +721,13 @@ Ordered by dependency, not by importance — you can't open a bank account befor
 you have an EIN, and you can't have an EIN before the Articles.
 
 **Week 1 — decisions and clearances**
-Settle the pricing posture from §1. Run the USPTO and NY name searches. Confirm
-and lock the domain. Decide the repo question and, if splitting, start moving
-`data/` out. Apply for the **NY Certificate of Authority** — it has the longest
-lead time on this list, so it goes first, not last.
+Settle the pricing posture from §1. Pull the "Carlo Project" application from
+TSDR and **settle the name** — this gates the entity name, the domain, and the
+repo, so it can't wait. Run the remaining USPTO and NY name searches. Confirm and
+lock the domain for whatever name wins. Decide the repo question and, if
+splitting, start moving `data/` out. Apply for the **NY Certificate of
+Authority** — it has the longest lead time on this list, so it goes first, not
+last.
 
 **Week 2 — form the entity**
 File the Articles ($200). Get the EIN the day they're approved. Sign the
