@@ -62,7 +62,10 @@ otp_length = 6
 otp_expiry = 3600
 
 # Sign-in is magic-link only by default; there are no passwords to leak, reset,
-# or store. Turn this on (and fill in the credentials) to add Google as well.
+# or store. With the whole site behind sign-in, delivery matters — configure
+# real SMTP on the hosted project before launch.
+#
+# Turn this on (and fill in the credentials) to add Google as well.
 [auth.external.google]
 enabled = false
 client_id = ""

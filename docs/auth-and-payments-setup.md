@@ -1,14 +1,18 @@
 # Accounts and payments: setup walkthrough
 
-Project Carlo is a static site. There is no server to put a session on and no
-place to keep a Stripe secret key, so accounts and payments are built out of two
-things the browser can talk to directly: Supabase for identity and data, and
-Supabase Edge Functions for the three moments that need a secret.
+Project Carlo becomes a subscription product: you sign in, you get a 7-day free
+trial without giving a card, and after that you pay to carry on. This document
+covers what was built, everything you have to do by hand to switch it on, and
+the decisions worth revisiting.
 
-Nothing in this document is wired up yet. The code is in the repository and the
-site builds and deploys without any of it — with `VITE_SUPABASE_URL` and
-`VITE_SUPABASE_ANON_KEY` unset, the account routes are never registered, no
-sign-in link appears, and the Supabase client is not even included in the
+The site is static, with no server to hold a session or a secret key, so the
+whole thing is built out of two things a browser can talk to directly: Supabase
+for identity and data, and Supabase Edge Functions for the three moments that
+need a Stripe secret.
+
+**Nothing here is switched on yet.** With `VITE_SUPABASE_URL` and
+`VITE_SUPABASE_ANON_KEY` unset, the site builds and deploys exactly as it did
+before: public map, no sign-in, no account routes, and no Supabase client in the
 bundle. Following this walkthrough is what turns it on.
 
 ---
@@ -16,17 +20,19 @@ bundle. Following this walkthrough is what turns it on.
 ## Contents
 
 1. [How the pieces fit](#how-the-pieces-fit)
-2. [What is in the repository](#what-is-in-the-repository)
-3. [Part 1 — Supabase project](#part-1--supabase-project)
-4. [Part 2 — Stripe](#part-2--stripe)
-5. [Part 3 — Deploy the edge functions](#part-3--deploy-the-edge-functions)
-6. [Part 4 — Turn it on in the web app](#part-4--turn-it-on-in-the-web-app)
-7. [Part 5 — Verify end to end](#part-5--verify-end-to-end)
-8. [Part 6 — Going live](#part-6--going-live)
-9. [Local development](#local-development)
-10. [Running the tests](#running-the-tests)
-11. [Decision points and alternatives](#decision-points-and-alternatives)
-12. [Deliberately not built](#deliberately-not-built)
+2. [The trial, in detail](#the-trial-in-detail)
+3. [What is in the repository](#what-is-in-the-repository)
+4. [Part 1 — Supabase project](#part-1--supabase-project)
+5. [Part 2 — Stripe](#part-2--stripe)
+6. [Part 3 — Deploy the edge functions](#part-3--deploy-the-edge-functions)
+7. [Part 4 — Turn it on in the web app](#part-4--turn-it-on-in-the-web-app)
+8. [Part 5 — Verify end to end](#part-5--verify-end-to-end)
+9. [Part 6 — Going live](#part-6--going-live)
+10. [Read this before launch: the snapshot is still public](#read-this-before-launch-the-snapshot-is-still-public)
+11. [Local development](#local-development)
+12. [Running the tests](#running-the-tests)
+13. [Decision points and alternatives](#decision-points-and-alternatives)
+14. [Deliberately not built](#deliberately-not-built)
 
 ---
 
@@ -44,22 +50,65 @@ bundle. Following this walkthrough is what turns it on.
                                  └──── webhook ──── Stripe
 ```
 
-Three rules follow from the site being static, and everything else in the design
-is downstream of them:
+Three rules follow from the site being static, and the rest of the design is
+downstream of them.
 
 **Row Level Security is the security boundary, not the UI.** The browser holds a
-publishable key and talks to Postgres through PostgREST. Any check that only
+publishable key and talks to Postgres through PostgREST. A check that only
 exists in React can be skipped by anyone willing to open a terminal, so every
-per-user table has RLS on, and the free-tier cap on saved parishes is enforced
-by an insert policy rather than by the save button.
+per-user table has RLS on and writes are gated on entitlement in the policy
+itself.
 
 **Secrets live only in edge functions.** The Stripe secret key and the Supabase
 service role key never reach the browser. The three functions are the only code
 that holds them.
 
-**Stripe is the source of truth for money.** Postgres holds a projection of the
-subscription, written only by the webhook. Nothing in the app writes billing
-state, and if the two ever disagree, Stripe wins.
+**Stripe is the source of truth, including for the trial.** Postgres holds a
+projection of the subscription, written only by the webhook. Nothing in the app
+writes billing state, and if the two disagree, Stripe wins.
+
+---
+
+## The trial, in detail
+
+A new account is offered a 7-day trial with no card. That is a Stripe
+subscription, not a local timer:
+
+1. The visitor signs in and lands on `/account`, which offers the trial.
+2. `stripe-checkout` creates a Checkout session with
+   `payment_method_collection: "if_required"` and
+   `subscription_data.trial_period_days: 7`. Nothing is due today, so Stripe
+   does not ask for a card.
+3. The subscription is created in `trialing`, the webhook mirrors it, and
+   `has_access()` starts returning true.
+4. If the trial reaches its end with no payment method,
+   `trial_settings.end_behavior.missing_payment_method: "pause"` moves the
+   subscription to `paused`. That status does not grant access, so the site
+   locks. The account and its saved parishes stay exactly as they were.
+5. To come back, the visitor adds a card. `stripe-checkout` notices the paused
+   subscription and returns a **setup-mode** session instead of a new
+   subscription. The webhook makes the card the customer's default and calls
+   `subscriptions.resume`, so the same subscription picks up where it left off.
+
+The states, and what each one means here:
+
+| Stripe status | Access? | What the account page says |
+|---|---|---|
+| _(no subscription)_ | no | Start your free 7-day trial |
+| `trialing` | **yes** | *n* days left in your free trial |
+| `paused` | no | Your free trial has ended — add a payment method |
+| `active` | **yes** | You're subscribed |
+| `past_due`, having paid before | **yes** | We couldn't take your last payment |
+| `past_due`, never paid | no | That card was declined |
+| `canceled`, `unpaid`, `incomplete` | no | Your subscription has ended |
+
+That split of `past_due` matters and is easy to miss. Resuming a paused
+subscription makes Stripe raise an invoice and attempt it immediately; if the
+card declines, the subscription lands in `past_due`. Treating `past_due` as
+entitled — which is the right thing to do for a long-standing subscriber whose
+card expired — would otherwise mean a declined card buys full access. So the
+grace period is limited to subscriptions that have paid at least once, recorded
+in `subscriptions.first_paid_at` by a trigger.
 
 ---
 
@@ -67,14 +116,14 @@ state, and if the two ever disagree, Stripe wins.
 
 | Path | What it is |
 |---|---|
-| `supabase/migrations/*.sql` | Tables, RLS policies, and the entitlement functions |
-| `supabase/functions/stripe-checkout/` | Creates a Checkout session for the signed-in user |
+| `supabase/migrations/*.sql` | Tables, RLS policies, `has_access()` |
+| `supabase/functions/stripe-checkout/` | Starts the trial, sells a subscription, or collects a card for a paused one |
 | `supabase/functions/stripe-portal/` | Creates a Billing Portal session |
-| `supabase/functions/stripe-webhook/` | Mirrors Stripe subscription state into Postgres |
-| `supabase/functions/_shared/` | CORS, env, redirect safety, plan mapping, Stripe mapping |
+| `supabase/functions/stripe-webhook/` | Mirrors Stripe state; resumes paused subscriptions |
+| `supabase/functions/_shared/` | CORS, env, redirect safety, plan mapping, checkout decision, Stripe mapping |
 | `supabase/tests/rls_test.sql` | pgTAP suite for the policies |
 | `supabase/config.toml` | Local stack config, and `verify_jwt = false` for the webhook |
-| `apps/web/src/auth/` | Session provider, route guard, sign-in actions |
+| `apps/web/src/auth/` | Session provider, sign-in actions, `RequireAccess` gate |
 | `apps/web/src/api/account.ts` | Every per-user read and write |
 | `apps/web/src/views/{SignIn,AuthCallback,Account}Page.tsx` | The account UI |
 | `scripts/db-test-local.sh` | Runs the pgTAP suite without Docker |
@@ -84,16 +133,20 @@ state, and if the two ever disagree, Stripe wins.
 | Table | Written by | Readable by |
 |---|---|---|
 | `profiles` | trigger on `auth.users` | its owner (only `display_name` is writable) |
-| `saved_churches` | its owner, within their plan | its owner |
+| `saved_churches` | its owner, and only while entitled | its owner |
 | `stripe_customers` | edge functions (service role) | its owner |
 | `subscriptions` | webhook (service role) | its owner |
 | `stripe_events` | webhook (service role) | nobody |
 
-### What the paid tier buys
+### Which routes are public
 
-A free account can save **3 parishes**. A patron can save any number. The number
-lives in `public.free_saved_church_limit()` and is read by both the insert policy
-and the account page, so changing it is a one-line migration.
+| Route | Public? |
+|---|---|
+| `/landing` | yes — the marketing page and the only way in |
+| `/signin`, `/auth/callback` | yes |
+| `/account` | signed in, but **not** gated on payment; it is where you go to pay |
+| `/about` | yes (already behind its own feature flag) |
+| `/`, `/churches/:slug` | require a live trial or subscription |
 
 ---
 
@@ -122,43 +175,40 @@ project. If you have lost it, reset it under **Project Settings → Database**.
 supabase db push
 ```
 
-This runs the three files in `supabase/migrations` in order. Confirm afterwards
-that the Supabase dashboard shows no RLS warnings: **Database → Tables** flags
-any table that is exposed without row level security, and there should be none.
+This runs the three files in `supabase/migrations` in order. Afterwards, check
+that the dashboard shows no RLS warnings: **Database → Tables** flags any table
+exposed without row level security, and there should be none.
 
 ### 1.4 Configure the auth URLs
 
 **Authentication → URL Configuration**:
 
 - **Site URL**: `https://projectcarlo.com`
-- **Redirect URLs** — add every origin that will complete a sign-in:
+- **Redirect URLs** — every origin that will complete a sign-in:
   - `https://projectcarlo.com/auth/callback`
-  - `https://*.project-carlo.workers.dev/auth/callback` (Cloudflare preview
-    deployments, if you want sign-in to work on them)
   - `http://127.0.0.1:5173/auth/callback` and `http://localhost:5173/auth/callback`
+  - any Cloudflare preview domain you want sign-in to work on
 
 A redirect that is not on this list is silently rewritten to the Site URL, which
-looks like "the magic link takes me to the home page and I am not signed in".
+presents as "the magic link takes me to the home page and I am not signed in".
 That is the first thing to check if sign-in misbehaves.
 
 ### 1.5 Set up email delivery — do not skip this
 
 Supabase's built-in email sender is for development. It is rate limited to a
-handful of messages per hour and its deliverability is not guaranteed. Magic
-links **are** the sign-in mechanism here, so an undelivered email is a locked-out
-user.
+handful of messages an hour and its deliverability is not guaranteed. Magic
+links **are** the way in, and with the whole site behind them an undelivered
+email is a customer who cannot reach the product they are paying for.
 
 Configure your own SMTP under **Project Settings → Authentication → SMTP
 Settings** before letting real people sign in. Resend, Postmark, and Amazon SES
-all work; Postmark has the best reputation for transactional mail, Resend is the
-quickest to set up.
+all work; Postmark has the strongest reputation for transactional mail, Resend
+is the quickest to set up.
 
 While you are there, edit the **Magic Link** template under **Authentication →
 Email Templates**. The default is generic and reads like phishing.
 
 ### 1.6 Optional: Google sign-in
-
-Only worth doing if you expect signup friction from magic links.
 
 1. In Google Cloud, create an OAuth 2.0 client (Web application).
 2. Authorised redirect URI:
@@ -167,31 +217,27 @@ Only worth doing if you expect signup friction from magic links.
    client ID and secret.
 4. Set `VITE_AUTH_GOOGLE_ENABLED=true` in the web build.
 
-The button stays hidden until that variable is set, so step 4 is what makes it
-appear.
+The button stays hidden until step 4, so that is what makes it appear.
 
 ---
 
 ## Part 2 — Stripe
 
-Do all of this in **test mode** first. The toggle is in the top right of the
-Stripe dashboard.
+Do all of this in **test mode** first. The toggle is top right in the dashboard.
 
 ### 2.1 Create the product and prices
 
 **Product catalogue → Add product**:
 
-- Name: `Project Carlo Patron` (this is what appears on the card statement
-  descriptor and the receipt, so make it recognisable)
-- Add two **recurring** prices:
-  - `$3.00` / month
-  - `$30.00` / year
+- Name: `Project Carlo` — this appears on the receipt and the card statement, so
+  make it recognisable.
+- Add two **recurring** prices: `$3.00` / month and `$30.00` / year.
 
-Copy both price IDs (`price_...`). They are needed in 2.4.
+Copy both price IDs (`price_...`); they are needed in 2.4.
 
 If you change these amounts, update the display copy in
-`apps/web/src/lib/plans.ts` to match. The client only ever sends a plan key, so
-a mismatch shows the wrong number in the UI but cannot charge the wrong amount.
+`apps/web/src/lib/plans.ts` to match. The client only sends a plan key, so a
+mismatch shows the wrong number in the UI but cannot charge the wrong amount.
 
 ### 2.2 Configure the Billing Portal
 
@@ -201,8 +247,8 @@ been configured and saved at least once, and the error is unhelpful.
 Enable at minimum:
 
 - Update payment method
-- Cancel subscription (choose *at end of billing period* — cancelling
-  immediately means refund questions you have not built answers for)
+- Cancel subscription — choose *at end of billing period*; cancelling
+  immediately raises refund questions you have not built answers for
 - Invoice history
 
 ### 2.3 Create the webhook endpoint
@@ -218,10 +264,9 @@ Enable at minimum:
 
 Copy the signing secret (`whsec_...`).
 
-Invoice events are deliberately not handled. Everything they would tell you — a
-renewal, a failed charge, a recovery — also arrives as
-`customer.subscription.updated`, and subscribing to both means two code paths
-writing the same row.
+`customer.subscription.paused` and `.resumed` are not needed: Stripe emits an
+`.updated` carrying the same object, and subscribing to both would mean two
+paths writing the same row. Invoice events are left out for the same reason.
 
 ### 2.4 Set the function secrets
 
@@ -247,28 +292,22 @@ back, so add any preview domain you want to be able to check out from.
 
 ```bash
 supabase functions deploy
-```
-
-The webhook is deployed without JWT verification (`verify_jwt = false` in
-`supabase/config.toml`) because Stripe cannot present a Supabase token. Its
-signature check is what authenticates the request. Verify after deploying:
-
-```bash
 supabase functions list
 ```
 
-`stripe-webhook` should show JWT verification off, the other two on.
+`stripe-webhook` should show JWT verification **off** (Stripe cannot present a
+Supabase token; its signature is what authenticates the request), and the other
+two **on**.
 
-Then send a test event from **Developers → Webhooks → your endpoint → Send test
-webhook**, and check the logs:
+Send a test event from **Developers → Webhooks → your endpoint → Send test
+webhook**, then:
 
 ```bash
 supabase functions logs stripe-webhook
 ```
 
-A `checkout.session.completed` test event will log
-`No Supabase user for Stripe customer ...` and return 200. That is correct — the
-synthetic customer in a test event does not belong to anyone.
+A test event logs `No Supabase user for Stripe customer ...` and returns 200.
+That is correct — the synthetic customer in a test event belongs to nobody.
 
 ---
 
@@ -284,6 +323,10 @@ VITE_SUPABASE_ANON_KEY=<publishable / anon key>
 
 Both are public by design; RLS is what protects the data behind them.
 
+Setting those two also turns the paywall on. To run accounts alongside a public
+map instead — sign-in and saved parishes, but no gate — add
+`VITE_REQUIRE_ACCOUNT=false`.
+
 **Locally**: put them in `apps/web/.env.development.local`, which is gitignored.
 See `apps/web/.env.example`.
 
@@ -298,10 +341,27 @@ repository secrets and pass them into the build step:
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 ```
 
-Committing them to `apps/web/.env.production` alongside the existing Geoapify
-key would also work and is consistent with what the repository already does.
-That is a judgement call about how much you mind the project ref being in git
-history — it is discoverable from the deployed bundle either way.
+### What this does to SEO
+
+Turning the paywall on changes what the build produces, deliberately:
+
+- **Parish pages are no longer prerendered.** Those 132 static HTML files are
+  the full schedules — the paid content — readable by anyone with the URL. With
+  a paywall they would be the largest hole in it, so `scripts/prerender.ts`
+  stops writing them.
+- **The sitemap lists only `/landing`,** and `robots.txt` disallows everything
+  else. Advertising URLs that all redirect to a sign-in earns nothing and reads
+  to a crawler as a soft 404.
+
+This is a real cost. The prerendered pages, the JSON-LD, and the sitemap were
+the site's organic acquisition, and a paywalled site gives that up almost
+entirely. If search traffic matters more than the subscription, the middle
+ground is to keep parish pages public and gate only the map and saved parishes
+(`VITE_REQUIRE_ACCOUNT=false` plus a gate on the routes you choose). Serving
+full content to crawlers and a paywall to everyone else is **cloaking** and will
+earn a manual penalty; Google's supported route for that is
+[structured data for paywalled content](https://developers.google.com/search/docs/appearance/structured-data/paywalled-content),
+which needs the page to be marked up honestly.
 
 ---
 
@@ -309,25 +369,31 @@ history — it is discoverable from the deployed bundle either way.
 
 With the site deployed and the variables set:
 
-1. **Sign in.** Click *Sign in*, enter your address, open the link. You should
-   land on `/account`.
-2. **Check the profile row.** In the Supabase dashboard, `public.profiles`
-   should have gained a row with your email. If not, the `auth.users` trigger
-   did not fire — re-run `supabase db push`.
-3. **Save four parishes.** The fourth should be refused with an upgrade prompt.
-   The refusal comes from the database, so it also happens if you call the API
-   directly.
-4. **Subscribe.** Use Stripe's test card `4242 4242 4242 4242`, any future
-   expiry, any CVC. You should come back to `/account`, see *confirming with
-   Stripe…* briefly, then *You're a patron*.
-5. **Save a fifth parish.** It should now work.
-6. **Open the billing portal**, cancel, and come back. The account page should
-   say *Your patronage is ending* with the end date.
+1. **Visit the site signed out.** You should land on `/landing` with a
+   "Start your free 7-day trial" button and no search box.
+2. **Sign in.** Enter your address, open the emailed link. You land on
+   `/account`, which offers the trial.
+3. **Check the profile row.** `public.profiles` should have gained a row with
+   your email. If not, the `auth.users` trigger did not fire — re-run
+   `supabase db push`.
+4. **Start the trial.** Stripe should *not* ask for a card. You come back to
+   `/account`, see *Confirming with Stripe…* briefly, then *7 days left in your
+   free trial*.
+5. **Use the site.** The map loads; open a parish and save it.
+6. **End the trial early.** In the Stripe dashboard, open the subscription and
+   use **Actions → End trial**, having removed any payment method. Stripe moves
+   it to `paused`. Reload the site: you should be bounced to `/account` with
+   *Your free trial has ended*, and your saved parishes should still be listed.
+7. **Add a card.** Click *Add a payment method*, use `4242 4242 4242 4242`. The
+   subscription resumes and the site unlocks.
+8. **Open the billing portal**, cancel, come back. The account page should say
+   *Your subscription is ending* with the end date.
 
-Useful test cards: `4000 0000 0000 9995` declines for insufficient funds;
-`4000 0025 0000 3155` requires 3D Secure authentication.
+Useful test cards: `4000 0000 0000 9995` declines for insufficient funds — worth
+trying at step 7, because the subscription should stay locked rather than
+falling into an entitled `past_due`. `4000 0025 0000 3155` requires 3D Secure.
 
-If step 4 stalls on *confirming with Stripe*, the webhook is the problem. Check
+If step 4 stalls on *Confirming with Stripe*, the webhook is the problem. Check
 **Developers → Webhooks → your endpoint** for delivery failures, then
 `supabase functions logs stripe-webhook`.
 
@@ -341,15 +407,59 @@ If step 4 stalls on *confirming with Stripe*, the webhook is the problem. Check
 - [ ] `supabase secrets set` the live `sk_live_...` and the live `whsec_...`.
 - [ ] Confirm your own SMTP is configured (1.5). This is the one that bites.
 - [ ] Complete Stripe's business profile so payouts are not held.
-- [ ] Decide about tax. Stripe Tax is not enabled in the checkout call; if you
-      need it, add `automatic_tax: { enabled: true }` in
+- [ ] Decide about tax. Stripe Tax is not enabled; if you need it, add
+      `automatic_tax: { enabled: true }` in
       `supabase/functions/stripe-checkout/index.ts` and register your tax
-      obligations in Stripe first. For a small donation-style subscription in a
-      single country you may not need it — take advice.
-- [ ] Write a refund policy and put it somewhere linkable. Stripe's dispute
-      process asks for one.
-- [ ] Set up alerting on failed webhook deliveries. Stripe emails you after
-      repeated failures, but the default is easy to miss.
+      obligations in Stripe first.
+- [ ] Publish terms and a refund policy, and link them. Stripe's dispute process
+      asks for them, and you are now taking recurring money from strangers.
+- [ ] Set up alerting on failed webhook deliveries. Stripe emails after repeated
+      failures, but the default is easy to miss.
+- [ ] Re-read the next section.
+
+---
+
+## Read this before launch: the snapshot is still public
+
+The gate described above is a routing gate in a single-page app. It decides what
+React renders. It does not protect the data, because the data is not behind it.
+
+`apps/web/public/frontend.snapshot` is a gzipped SQLite database of every parish
+and every service time, served as a static file from the CDN. Anyone can fetch
+it directly, with no account, and read the entire product:
+
+```
+curl -s https://projectcarlo.com/frontend.snapshot | gunzip > carlo.db
+```
+
+Turning the paywall on closed the prerendered HTML hole. It did not close this
+one, and no amount of client-side work can: the file has to be readable by the
+browser, and a browser with a paywalled page in it is still just a browser.
+
+Whether that matters is a business question, not a technical one. If what people
+pay for is the map, the search, and the saved parishes, this is tolerable — plenty
+of subscription products have a scrapeable back end. If the compiled schedule
+data is itself the asset, close it before launch. In rough order of effort:
+
+1. **Serve the snapshot from private Supabase Storage.** Upload it from the
+   weekly pipeline into a private bucket with a policy requiring
+   `has_access()`, and have `src/db.ts` download it through the Supabase client
+   instead of `fetch("/frontend.snapshot")`. Simple and genuinely closed. Costs
+   Supabase egress on every cold load and gives up the Cloudflare CDN, which is
+   currently what makes the map feel instant.
+2. **Hand out a short-lived signed URL** from a fourth edge function that checks
+   entitlement. Keeps the file on object storage, adds one round trip, and
+   the URL is shareable for as long as it lives.
+3. **Verify a token at the edge.** The site already deploys as a Cloudflare
+   Worker; give it a request handler that checks a Supabase JWT on
+   `/frontend.snapshot` before serving it. Keeps the CDN, but entitlement is not
+   in the JWT by default, so you would add it with a
+   [custom access token hook](https://supabase.com/docs/guides/auth/auth-hooks/custom-access-token-hook)
+   and accept that the claim is up to an hour stale.
+
+My recommendation: ship with option 1 if the data is the product, and otherwise
+write down explicitly that the snapshot is public so nobody later assumes it is
+not.
 
 ---
 
@@ -406,147 +516,142 @@ roles, the `auth` schema, `auth.uid()`, and Supabase's default grants on
 These are the choices worth revisiting. Each says what was picked, why, and what
 would make you choose otherwise.
 
+### Stripe owns the trial, rather than a `trial_ends_at` column
+
+The first cut tracked the trial in Postgres, which is less machinery: no Stripe
+object until someone pays, nothing to reconcile, and "no credit card required"
+is true by construction. Stripe owning it wins on the things that bite later —
+one system decides who may use the product, the trial cannot be extended by
+editing a row, and trial-to-paid conversion shows up in Stripe's own reporting
+rather than having to be derived.
+
+The costs are real and worth knowing:
+
+- Every trial creates a Stripe customer and subscription, including the ones
+  that never convert. That is noise in the dashboard and in any per-object
+  pricing.
+- The trial does not start at sign-in; it starts after a round trip through
+  Checkout. A brand new user therefore sees `/account` before they see the map.
+  Going back to a local `trial_ends_at` is the fix if that first-run friction
+  turns out to cost more than the tidiness is worth.
+
+### `pause`, rather than `cancel`, when the trial ends without a card
+
+`trial_settings.end_behavior.missing_payment_method` also accepts `cancel`,
+which is markedly simpler: the subscription ends, and coming back is an ordinary
+Checkout with a card. No setup-mode session, no resume, no `first_paid_at`
+subtlety.
+
+`pause` was chosen because the same subscription survives, so a returning
+customer keeps one continuous billing history. If the recovery path ever gives
+trouble, switching to `cancel` is a one-word change in
+`stripe-checkout/index.ts` plus deleting the `collectCard` branch.
+
+### `past_due` grants access only after a first successful payment
+
+Explained in [The trial, in detail](#the-trial-in-detail). The alternative is to
+refuse `past_due` outright, which is safe but cuts off long-standing subscribers
+on the first failed retry, and they are usually just an expired card. The
+`first_paid_at` stamp is what lets both be true at once. It is set by a trigger
+rather than by the webhook so the invariant holds no matter what writes the row.
+
 ### Supabase, rather than Cloudflare D1 or a small server
 
 The site already deploys to Cloudflare, so D1 plus Workers was the obvious
-alternative and would have kept everything on one platform. Supabase wins here
-because **auth is the expensive part to build**, not the database: magic links,
-token refresh, email change confirmation, and OAuth are weeks of work and a
-permanent security liability if you get them wrong. RLS also lets the browser
-talk to the database directly without an API layer in between, which suits a
-static site.
+alternative and would keep everything on one platform. Supabase wins because
+**auth is the expensive part to build**, not the database: magic links, token
+refresh, email change confirmation, and OAuth are weeks of work and a permanent
+security liability if you get them wrong. RLS also lets the browser talk to the
+database directly without an API layer in between.
 
 Reconsider if you end up wanting significant server-side logic. At that point
-you are running two platforms for one product, and consolidating on Workers plus
-D1 with a hand-rolled session — or moving the whole app to a framework with a
-server — starts to look better than the split.
+you are running two platforms for one product.
 
 ### Edge Functions, rather than Cloudflare Workers, for the Stripe hooks
 
-The functions are next to the database they write to and the auth that issues
+The functions sit next to the database they write to and the auth that issues
 the tokens they verify, and they deploy on their own cadence rather than with
-every site change. The trade-off is a second deploy target and a second runtime
-(Deno).
+every site change. The cost is a second deploy target and a second runtime.
 
-If you would rather keep one platform, these three functions port to Cloudflare
-Workers with little change — same Web APIs, same Stripe SDK, same async
-signature verification — but you would then hold the service role key in
-Cloudflare and lose `verify_jwt` as a free front door.
+They port to Cloudflare Workers with little change — same Web APIs, same Stripe
+SDK, same async signature verification — but you would then hold the service
+role key in Cloudflare and lose `verify_jwt` as a free front door. Note that if
+you close the snapshot hole with option 3 above, you are running a Worker
+anyway, at which point consolidating starts to look better.
 
 ### Magic links, rather than passwords
 
 No password to store, leak, reset, or check against a breach list, and no
-support burden. The cost is real: sign-in depends on email delivery, it is
+support burden. The cost is that sign-in depends on email delivery, it is
 slower, and it is awkward when someone opens the link on a different device from
-the one they requested it on.
+the one that asked for it. With the whole site gated, that cost lands on paying
+customers, so **configure your own SMTP** (1.5) and consider adding passwords if
+support requests pile up. Supabase supports them out of the box; the sign-in
+page is the only thing that would change.
 
-Add passwords if signups stall — Supabase supports them out of the box and the
-sign-in page is the only thing that would change. **Configure your own SMTP
-either way** (1.5); with magic links it is not optional.
+### Writes are gated on entitlement in the policy, not the client
 
-### The free-tier cap is enforced in the database
+`saved_churches`' insert policy calls `has_access()`. Doing it in React would be
+simpler and would give a nicer error, but it would be bypassable with `curl`.
+Reads are deliberately left open to the owner, so someone whose trial lapsed can
+still see what they saved.
 
-`saved_churches`' insert policy calls `can_save_another_church()`. Putting the
-check in React would have been simpler and would have given a nicer error, but
-it would also be bypassable with `curl`, and entitlement checks that only exist
-in the client are how people end up with paid features for free.
-
-Two things to know about it:
-
-- **It can be raced.** Two concurrent inserts can both see the same count and
-  both pass, so someone determined can exceed the cap by a row or two. Closing
-  that needs row locking or a serializable transaction, which is a poor trade
-  for a soft limit on a bookmark list. Revisit if the limit ever gates something
-  expensive.
-- **The error is coarse.** PostgREST reports a policy refusal as `42501` with no
-  detail, so the client infers "you hit the cap" from the fact that this is the
-  only policy that can refuse an authenticated user's own insert. If you add
-  another restriction to that policy, `SavedChurchLimitError` becomes a lie and
-  you should switch to a `BEFORE INSERT` trigger that raises a distinguishable
-  `SQLSTATE` instead.
-
-### A recurring subscription, rather than one-off donations
-
-A subscription gives predictable income and a reason for accounts to exist. It
-also means dunning, cancellations, and a billing portal to maintain.
-
-For a project like this, one-off donations are a genuinely reasonable
-alternative and much less machinery: `mode: "payment"` in the checkout call, a
-`payments` table instead of `subscriptions`, and no portal, no `past_due`, no
-renewal logic. What you lose is the recurring relationship. A middle option is
-to offer both, with a one-off "buy me a coffee" price alongside the subscription
-— the checkout function already takes a plan key, so it is mostly a matter of
-adding a key that maps to a one-time price and branching on `mode`.
+One wrinkle: PostgREST reports a policy refusal as `42501` with no detail, so the
+client infers "your access has lapsed" from the fact that this is the only policy
+that can refuse an authenticated user's own insert. If you add another
+restriction to that policy, `AccessRequiredError` becomes a lie — switch to a
+`BEFORE INSERT` trigger raising a distinguishable `SQLSTATE` at that point.
 
 ### `status` is `text`, not an enum
 
-An enum or a `CHECK` constraint would be better data hygiene. Both would also
-mean that the day Stripe introduces a status, the webhook starts failing — and a
-failing webhook means Stripe retries forever while the customer sits there
-having paid and not been given access. Correctness of the money flow beats
-tidiness of the column.
-
-The set of statuses that grant access lives in one place,
-`has_active_subscription()`, which is the thing you would actually want to
-change.
-
-### `past_due` keeps access
-
-Stripe retries a failed renewal over several days. Revoking access on the first
-failed charge punishes people whose card simply expired, and they are the
-majority of failures. If you would rather cut access immediately, remove
-`'past_due'` from `has_active_subscription()` — that one line is the whole
-policy.
+An enum or a `CHECK` would be better data hygiene. Both would also mean that the
+day Stripe introduces a status, the webhook starts failing — and a failing
+webhook means Stripe retries forever while a customer who has paid sits locked
+out. Correctness of the money flow beats tidiness of the column. The statuses
+that grant access live in one place, `has_access()`.
 
 ### Cancelled subscriptions are kept, not deleted
 
 `customer.subscription.deleted` upserts the row with `status = 'canceled'`
-rather than removing it, so the account page can say what happened and when, and
-so a returning subscriber's history survives. The cost is that
-`subscriptions` grows one row per subscription ever held, which is why
+rather than removing it, so the account page can say what happened and when. The
+cost is one row per subscription ever held, which is why
 `pickPrimarySubscription()` exists on the client.
 
 ### The webhook claims event ids before doing work
 
 Stripe delivers at least once. `stripe_events` is an idempotency ledger: the
 handler inserts the event id, and a unique violation means "already processed,
-skip". On failure it deletes the claim again so the retry is not mistaken for a
+skip". On failure it deletes the claim so the retry is not mistaken for a
 duplicate.
 
 An upsert-only design without the ledger would also be idempotent for
-subscription rows specifically, and is simpler. The ledger earns its place as
-soon as a handler does anything that is not an upsert — sending a receipt email,
-say — and it gives you a log of what was processed.
+subscription rows specifically, and is simpler. The ledger earns its place now
+that the handler does things that are not upserts — attaching a payment method
+and resuming a subscription — and it gives you a log of what was processed.
 
 ### The account page polls after checkout
 
-Stripe redirects the browser back the instant payment succeeds, which is usually
-before the webhook has been delivered. Showing "you're on the free plan" to
-someone who has just paid is the worst possible moment to be wrong, so the page
-polls entitlements for up to 30 seconds and then explains itself.
+Stripe redirects the browser back the instant Checkout completes, which is
+usually before the webhook has been delivered. Telling someone who has just
+started a trial that they need to start a trial is the worst possible moment to
+be wrong, so the page polls entitlements for up to 30 seconds and then explains
+itself.
 
 Two alternatives, both better in some way:
 
 - **Verify the session server-side.** Pass `session_id={CHECKOUT_SESSION_ID}`
-  through the success URL and add a fourth function that retrieves the session
-  from Stripe and confirms it directly. Authoritative and instant, at the cost
-  of another endpoint.
+  through the success URL and add a function that retrieves the session from
+  Stripe. Authoritative and instant, at the cost of another endpoint.
 - **Supabase Realtime.** Subscribe to inserts on `subscriptions` and let the
-  webhook's write push to the browser. Elegant, and it means enabling the
-  realtime service and holding a websocket open on a page most people visit
-  once.
+  webhook's write push to the browser. Elegant; means enabling the realtime
+  service and holding a websocket open on a page most people visit rarely.
 
 ### The client sends a plan key, never a price id
 
 `stripe-checkout` maps `"monthly"` / `"annual"` onto `STRIPE_PRICE_MONTHLY` /
 `STRIPE_PRICE_ANNUAL`. Accepting a price id from the browser — even validated
 against an allow-list — would mean the set of purchasable things is defined in
-two places. The cost is that adding a plan is a code change plus a secret, not
-just a dashboard change.
-
-If you expect to run frequent pricing experiments, invert it: add a function
-that lists active prices from a Stripe product and have the client pass back one
-of those ids, validated server-side against the same list.
+two places. The cost is that adding a plan is a code change plus a secret.
 
 ### Database types are hand-written
 
@@ -560,28 +665,16 @@ supabase gen types typescript --linked > apps/web/src/lib/database.types.ts
 
 ### `saved_churches` stores a slug with no foreign key
 
-Parish records live in the SQLite snapshot the browser downloads, not in
-Postgres, so there is nothing for a foreign key to point at. A format `CHECK` is
-the only integrity available, and the account page tolerates a slug that no
-longer resolves.
+Parish records live in the SQLite snapshot, not in Postgres, so there is nothing
+for a foreign key to point at. A format `CHECK` is the only integrity available,
+and the account page tolerates a slug that no longer resolves.
 
-The alternative is to have the weekly pipeline mirror `church` into Postgres,
-which buys a real foreign key, lets you join saved parishes to parish data in
-one query, and opens the door to server-side features like change notifications.
-It also means two copies of the pipeline's output that can drift. Worth doing
-when you build something that needs to know about parishes server-side, and not
-before.
-
-### Prerendered parish pages ship no JavaScript
-
-`scripts/prerender.ts` renders each parish to static HTML with no script tag, so
-a save button baked into it would look live and do nothing. The button is passed
-into `ChurchPageContent` as a slot that only the interactive route fills.
-
-The consequence is that someone arriving on a parish page from a search engine
-sees no save button until they navigate within the app. Fixing that properly
-means hydrating the prerendered pages, which is a change to how the site is
-built and should be weighed on its own merits.
+The alternative is to have the weekly pipeline mirror `church` into Postgres:
+a real foreign key, joins between saved parishes and parish data, and the door
+open to server-side features like change notifications. It also means two copies
+of the pipeline's output that can drift. Worth doing when you build something
+that needs to know about parishes server-side — and note that it would also give
+you a way to serve parish data through RLS instead of as a public file.
 
 ### CORS echoes an allow-list, rather than `*`
 
@@ -596,9 +689,9 @@ The code reads `VITE_SUPABASE_ANON_KEY` and `SUPABASE_SERVICE_ROLE_KEY`, which
 is what Supabase injects into edge functions today. Supabase is migrating to
 publishable (`sb_publishable_...`) and secret (`sb_secret_...`) keys. The new
 publishable key drops straight into `VITE_SUPABASE_ANON_KEY` with no code
-change. If you move the functions to secret keys, update
-`createServiceClient()` in `supabase/functions/_shared/supabase.ts` — it is the
-only place the service key is read.
+change. If you move the functions to secret keys, update `createServiceClient()`
+in `supabase/functions/_shared/supabase.ts` — the only place the service key is
+read.
 
 ---
 
@@ -608,18 +701,20 @@ Each of these is a real gap, listed so it is a decision rather than an oversight
 
 - **Account deletion.** Users cannot delete their own account. `auth.users`
   cascades to every table here, so the work is an edge function that calls
-  `auth.admin.deleteUser` and cancels any Stripe subscription first. Needed
-  before you have EU users in any number.
-- **Data export.** Same reasoning, less urgent — a saved-parish list is not much
-  personal data.
-- **Email change.** Supabase supports it; `config.toml` already requires
+  `auth.admin.deleteUser` after cancelling any Stripe subscription. Needed
+  before you have EU users in any number, and more pressing now that everyone
+  who uses the site has an account.
+- **Trial abuse.** Nothing stops someone signing up again with a second email
+  address for a second trial. A card requirement is the usual answer and defeats
+  the point; most products in this shape simply accept it. Watch the numbers
+  before spending anything on it.
+- **Email change.** Supabase supports it and `config.toml` already requires
   confirmation from both addresses. There is no UI for it.
-- **Anything the subscription unlocks beyond unlimited saves.** The obvious next
-  feature is notifying patrons when a saved parish's schedule changes, which is
-  the point at which mirroring parish data into Postgres starts to pay for
-  itself.
 - **Refund and dispute handling.** `charge.dispute.created` is not handled. At
   this volume, dealing with them by hand in the Stripe dashboard is fine.
-- **Rate limiting on sign-in.** Supabase applies its own defaults per project;
-  they are adjustable under **Authentication → Rate Limits** and worth a look
-  before launch.
+- **Dunning email of our own.** Stripe's automatic emails are the only thing
+  telling a customer their card failed. Check they are enabled under
+  **Settings → Billing → Subscriptions and emails**.
+- **Rate limiting on sign-in.** Supabase applies per-project defaults; they are
+  adjustable under **Authentication → Rate Limits** and worth a look before
+  launch.

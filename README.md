@@ -146,6 +146,28 @@ fetch_result = fetch_bulletins(parish_name="Southeast Rochester Catholic Communi
 process_result = process_bulletins(parish_name="Southeast Rochester Catholic Community")
 ```
 
+## Accounts and payments
+
+The web app can run as a subscription product: sign-in by magic link, a 7-day
+free trial that does not ask for a card, and Stripe for payment. It is off by
+default — with `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` unset the site
+builds and behaves exactly as it does today, and the Supabase client is not
+included in the bundle.
+
+Setup is entirely manual (Supabase project, Stripe product, webhook, secrets)
+and written up in [`docs/auth-and-payments-setup.md`](docs/auth-and-payments-setup.md),
+along with the decisions worth revisiting and the gaps left open on purpose.
+
+Server-side pieces live in `supabase/`:
+
+```bash
+supabase db push                          # apply migrations
+supabase functions deploy                 # stripe-checkout, stripe-portal, stripe-webhook
+supabase test db                          # pgTAP suite for the RLS policies
+./scripts/db-test-local.sh                # the same suite, without Docker
+cd supabase/functions && deno test --allow-env
+```
+
 ## Environment Variables
 
 - `GEMINI_API_KEY`: automatically picked up by the Gemini client.
@@ -154,6 +176,9 @@ process_result = process_bulletins(parish_name="Southeast Rochester Catholic Com
 
 - `VITE_GEOAPIFY_API_KEY`: place search on the map (see `apps/web/.env.production`).
 - `VITE_TALLY_FORM_ID`: Tally form ID for user feedback (e.g. `Me65rA` from `https://tally.so/r/Me65rA`). Set in `apps/web/.env.development` (dev) and `apps/web/.env.production` (build). When unset, feedback links are hidden.
+- `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`: switch accounts and billing on. See `apps/web/.env.example`.
+- `VITE_REQUIRE_ACCOUNT`: set to `false` to keep the map public while still offering accounts. Defaults to on once Supabase is configured.
+- `VITE_AUTH_GOOGLE_ENABLED`: adds a "Continue with Google" button.
 
 ## User feedback
 

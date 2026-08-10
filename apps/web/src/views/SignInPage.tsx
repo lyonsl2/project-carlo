@@ -10,7 +10,8 @@ import { Label } from "@/components/ui/label";
 import { useDocumentMeta } from "@/hooks/useDocumentMeta";
 import { useHomeHref } from "@/hooks/useHomeHref";
 import { safeNextPath } from "@/lib/nextPath";
-import { isGoogleSignInEnabled } from "@/lib/supabaseEnv";
+import { TRIAL_PERIOD_DAYS } from "@/lib/plans";
+import { isGoogleSignInEnabled, isPaywallEnabled } from "@/lib/supabaseEnv";
 
 type Phase = { kind: "form" } | { kind: "sending" } | { kind: "sent"; email: string };
 
@@ -21,6 +22,7 @@ export function SignInPage() {
   const homeHref = useHomeHref();
   const [searchParams] = useSearchParams();
   const nextPath = safeNextPath(searchParams.get("next"));
+  const paywalled = isPaywallEnabled();
 
   const [email, setEmail] = useState("");
   const [phase, setPhase] = useState<Phase>({ kind: "form" });
@@ -97,9 +99,9 @@ export function SignInPage() {
                 Sign in
               </h1>
               <p className="font-serif text-base text-ink-soft">
-                An account lets you keep a list of parishes and carry it between
-                your phone and your desk. The map itself stays free and needs no
-                account.
+                {paywalled
+                  ? `We'll email you a link — no password to remember. New here? Signing in starts your free ${TRIAL_PERIOD_DAYS}-day trial, and we won't ask for a card until it ends.`
+                  : "An account lets you keep a list of parishes and carry it between your phone and your desk."}
               </p>
             </div>
 
