@@ -13,7 +13,9 @@
  *  Invoice events are deliberately not handled. Every state they would tell us
  *  about — a renewal, a failed charge moving the subscription to past_due, a
  *  recovery — also arrives as customer.subscription.updated, and handling both
- *  would mean two paths writing the same row.
+ *  would mean two paths writing the same row. The same goes for
+ *  customer.subscription.paused and .resumed, which Stripe emits alongside an
+ *  .updated carrying the same object.
  */
 
 import type Stripe from "stripe";
@@ -125,6 +127,57 @@ async function upsertSubscription(
   console.log(`Subscription ${subscription.id} for user ${userId} is ${row.status}`);
 }
 
+/** A setup-mode session means a card was collected for a subscription Stripe
+ *  paused when its trial ended without one. Make it the customer's default and
+ *  put the subscription back to work. */
+async function handleCardCollected(
+  admin: SupabaseClient,
+  stripe: Stripe,
+  session: Stripe.Checkout.Session,
+): Promise<void> {
+  const setupIntentId = stripeIdOf(session.setup_intent);
+  if (!setupIntentId) {
+    console.error(`Setup session ${session.id} completed without a setup intent`);
+    return;
+  }
+
+  const setupIntent = await stripe.setupIntents.retrieve(setupIntentId);
+  const paymentMethodId = stripeIdOf(setupIntent.payment_method);
+  const subscriptionId = setupIntent.metadata?.subscription_id;
+  const customerId = stripeIdOf(session.customer) ?? stripeIdOf(setupIntent.customer);
+
+  if (!paymentMethodId || !subscriptionId || !customerId) {
+    console.error(
+      `Setup session ${session.id} is missing the payment method, subscription, or customer`,
+    );
+    return;
+  }
+
+  // Resuming bills immediately, so the card has to be the default first.
+  await stripe.customers.update(customerId, {
+    invoice_settings: { default_payment_method: paymentMethodId },
+  });
+
+  const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+  if (subscription.status !== "paused") {
+    // Already resumed by an earlier delivery, or cancelled in the meantime.
+    console.log(
+      `Subscription ${subscriptionId} is ${subscription.status}, not resuming`,
+    );
+    await upsertSubscription(admin, stripe, subscription);
+    return;
+  }
+
+  // Stripe raises an invoice and attempts it straight away. A decline leaves
+  // the subscription past_due with no first_paid_at, which has_access() does
+  // not honour, so a bad card cannot buy its way in.
+  const resumed = await stripe.subscriptions.resume(subscriptionId, {
+    billing_cycle_anchor: "now",
+  });
+
+  await upsertSubscription(admin, stripe, resumed);
+}
+
 async function handleCheckoutCompleted(
   admin: SupabaseClient,
   stripe: Stripe,
@@ -133,6 +186,11 @@ async function handleCheckoutCompleted(
   const customerId = stripeIdOf(session.customer);
   if (customerId) {
     await resolveUserId(admin, stripe, customerId, [session.client_reference_id]);
+  }
+
+  if (session.mode === "setup") {
+    await handleCardCollected(admin, stripe, session);
+    return;
   }
 
   if (session.mode !== "subscription") return;

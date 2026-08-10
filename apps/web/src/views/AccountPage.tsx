@@ -20,13 +20,13 @@ import { Button } from "@/components/ui/button";
 import { useDocumentMeta } from "@/hooks/useDocumentMeta";
 import { useHomeHref } from "@/hooks/useHomeHref";
 import {
+  describeTrialRemaining,
   formatBillingDate,
   pickPrimarySubscription,
-  remainingSaves,
   toBillingState,
   type BillingState,
 } from "@/lib/billing";
-import { PLANS, type PlanKey } from "@/lib/plans";
+import { PLANS, TRIAL_PERIOD_DAYS, type PlanKey } from "@/lib/plans";
 
 /** Stripe redirects the browser back the moment checkout succeeds, but the
  *  subscription only exists here once the webhook has been delivered. Poll for
@@ -38,48 +38,71 @@ const WEBHOOK_POLL_TIMEOUT_MS = 30_000;
 function billingHeadline(state: BillingState): string {
   switch (state.kind) {
     case "none":
-      return "You're on the free plan";
-    case "active":
-      return "You're a patron";
+      return `Start your free ${TRIAL_PERIOD_DAYS}-day trial`;
     case "trialing":
-      return "Your trial is running";
+      return describeTrialRemaining(state.endsAt);
+    case "paused":
+      return "Your free trial has ended";
+    case "active":
+      return "You're subscribed";
     case "canceling":
-      return "Your patronage is ending";
+      return "Your subscription is ending";
     case "pastDue":
-      return "We couldn't take your last payment";
+      return state.hasPaidBefore
+        ? "We couldn't take your last payment"
+        : "That card was declined";
     case "ended":
-      return "Your patronage has ended";
+      return "Your subscription has ended";
   }
 }
 
 function billingDetail(state: BillingState): string | null {
   switch (state.kind) {
     case "none":
-      return null;
+      return "No credit card required. We'll only ask for one when the trial ends.";
+    case "trialing": {
+      const date = formatBillingDate(state.endsAt);
+      return date
+        ? `Add a card before ${date} to carry on without interruption.`
+        : "Add a card before it ends to carry on without interruption.";
+    }
+    case "paused":
+      return "Your subscription is paused. Add a payment method and it picks up where it left off.";
     case "active": {
       const date = formatBillingDate(state.renewsAt);
       return date ? `Renews on ${date}. Thank you.` : "Thank you.";
     }
-    case "trialing": {
-      const date = formatBillingDate(state.trialEndsAt ?? state.renewsAt);
-      return date ? `Your first payment is due on ${date}.` : null;
-    }
     case "canceling": {
       const date = formatBillingDate(state.endsAt);
       return date
-        ? `You keep everything until ${date}, and won't be charged again.`
+        ? `You keep access until ${date}, and won't be charged again.`
         : "You won't be charged again.";
     }
     case "pastDue": {
       const date = formatBillingDate(state.retriesUntil);
+      if (!state.hasPaidBefore) {
+        return "We'll try again shortly. You can also add a different card.";
+      }
       return date
-        ? `We'll keep trying until ${date}. Update your card to stay a patron.`
-        : "Update your card to stay a patron.";
+        ? `We'll keep trying until ${date}. Update your card to keep your access.`
+        : "Update your card to keep your access.";
     }
     case "ended": {
       const date = formatBillingDate(state.endedAt);
       return date ? `It finished on ${date}.` : null;
     }
+  }
+}
+
+/** The label on the buttons that start a Checkout session. */
+function checkoutCallToAction(state: BillingState): string {
+  switch (state.kind) {
+    case "none":
+      return `Start ${TRIAL_PERIOD_DAYS}-day free trial`;
+    case "paused":
+      return "Add a payment method";
+    default:
+      return "Subscribe";
   }
 }
 
@@ -118,8 +141,11 @@ export function AccountPage() {
   });
 
   const entitlements = entitlementsQuery.data;
-  const isPatron = entitlements?.isPatron ?? false;
-  const awaitingWebhook = checkoutOutcome === "success" && !isPatron && !webhookIsLate;
+  const hasAccess = entitlements?.hasAccess ?? false;
+  // Covers starting the trial and subscribing alike: both only take effect here
+  // once Stripe's webhook has been delivered.
+  const awaitingWebhook =
+    checkoutOutcome === "success" && !hasAccess && !webhookIsLate;
 
   useEffect(() => {
     if (!awaitingWebhook) return;
@@ -135,13 +161,13 @@ export function AccountPage() {
   }, [awaitingWebhook, queryClient]);
 
   useEffect(() => {
-    if (checkoutOutcome !== "success" || !isPatron) return;
+    if (checkoutOutcome !== "success" || !hasAccess) return;
     setJustUpgraded(true);
     // Drop the marker so a reload or a bookmark doesn't replay the thank-you.
     const next = new URLSearchParams(searchParams);
     next.delete("checkout");
     setSearchParams(next, { replace: true });
-  }, [checkoutOutcome, isPatron, searchParams, setSearchParams]);
+  }, [checkoutOutcome, hasAccess, searchParams, setSearchParams]);
 
   const checkoutMutation = useMutation({
     mutationFn: (plan: PlanKey) =>
@@ -178,9 +204,12 @@ export function AccountPage() {
 
   const subscription = pickPrimarySubscription(subscriptionsQuery.data ?? []);
   const billingState = toBillingState(subscription);
-  const remaining = entitlements ? remainingSaves(entitlements) : null;
   const savedChurches = savedChurchesQuery.data ?? [];
   const busy = checkoutMutation.isPending || portalMutation.isPending;
+  // A paused or missing subscription has nothing for the Stripe portal to
+  // manage, so those states get Checkout buttons instead.
+  const showPortal = billingState.kind !== "none" && billingState.kind !== "paused";
+  const ready = !subscriptionsQuery.isLoading && !entitlementsQuery.isLoading;
 
   async function onSignOut() {
     await signOut();
@@ -191,10 +220,14 @@ export function AccountPage() {
     <main className="min-h-svh bg-paper px-4 py-8 sm:py-12">
       <div className="mx-auto flex w-full max-w-[40rem] flex-col gap-8">
         <header className="space-y-4">
-          <Link to={homeHref} className="rubric-link smallcaps text-[0.875rem]">
-            <ArrowLeftIcon className="size-3" />
-            Back to map
-          </Link>
+          {/* Only offer the way back when there is something to go back to;
+           *  without access the map would bounce straight here again. */}
+          {hasAccess ? (
+            <Link to={homeHref} className="rubric-link smallcaps text-[0.875rem]">
+              <ArrowLeftIcon className="size-3" />
+              Back to map
+            </Link>
+          ) : null}
           <Masthead compact />
         </header>
 
@@ -222,13 +255,13 @@ export function AccountPage() {
 
         {awaitingWebhook ? (
           <p className="border-l-2 border-brass pl-4 font-serif text-base text-ink-soft">
-            Payment received — confirming with Stripe…
+            Confirming with Stripe…
           </p>
         ) : null}
 
-        {checkoutOutcome === "success" && webhookIsLate && !isPatron ? (
+        {checkoutOutcome === "success" && webhookIsLate && !hasAccess ? (
           <p className="border-l-2 border-rubric pl-4 font-serif text-base text-ink-soft">
-            Stripe took your payment but hasn&apos;t confirmed it here yet. This
+            Stripe has your details but hasn&apos;t confirmed them here yet. This
             usually settles within a minute or two — reload the page, and get in
             touch if it doesn&apos;t.
           </p>
@@ -259,7 +292,7 @@ export function AccountPage() {
             <p className="font-serif text-sm text-ink-soft">Loading…</p>
           ) : null}
 
-          {entitlements ? (
+          {ready ? (
             <>
               <p className="font-serif text-base text-ink">
                 {billingHeadline(billingState)}
@@ -270,7 +303,7 @@ export function AccountPage() {
                 </p>
               ) : null}
 
-              {isPatron ? (
+              {showPortal ? (
                 <Button
                   type="button"
                   variant="outline"
@@ -280,26 +313,27 @@ export function AccountPage() {
                   {portalMutation.isPending ? "Opening…" : "Manage billing"}
                 </Button>
               ) : (
-                <>
-                  <p className="font-serif text-base text-ink-soft">
-                    Patrons can save any number of parishes. The map, the parish
-                    pages, and the weekly bulletin parsing stay free for everyone.
-                  </p>
-                  <div className="flex flex-wrap gap-3">
-                    {PLANS.map((plan) => (
-                      <Button
-                        key={plan.key}
-                        type="button"
-                        disabled={busy}
-                        onClick={() => checkoutMutation.mutate(plan.key)}
-                      >
-                        {plan.amount} {plan.cadence}
-                        {plan.note ? ` · ${plan.note}` : ""}
-                      </Button>
-                    ))}
-                  </div>
-                </>
+                <div className="flex flex-wrap gap-3">
+                  {PLANS.map((plan) => (
+                    <Button
+                      key={plan.key}
+                      type="button"
+                      disabled={busy}
+                      onClick={() => checkoutMutation.mutate(plan.key)}
+                    >
+                      {checkoutCallToAction(billingState)} · {plan.amount}{" "}
+                      {plan.cadence}
+                      {plan.note ? ` · ${plan.note}` : ""}
+                    </Button>
+                  ))}
+                </div>
               )}
+
+              {hasAccess ? (
+                <Link to={homeHref} className="rubric-link smallcaps text-[0.875rem]">
+                  Open the map
+                </Link>
+              ) : null}
             </>
           ) : null}
 
@@ -320,14 +354,6 @@ export function AccountPage() {
               message="We couldn't load your saved parishes."
               onRetry={() => void savedSlugsQuery.refetch()}
             />
-          ) : null}
-
-          {entitlements && remaining !== null ? (
-            <p className="font-serif text-sm text-ink-faint">
-              {remaining === 0
-                ? "Your free plan is full."
-                : `${remaining} of ${entitlements.savedLimit} free slots left.`}
-            </p>
           ) : null}
 
           {savedChurches.length === 0 && !savedSlugsQuery.isLoading ? (

@@ -92,6 +92,43 @@ function isAboutPageEnabledAtBuild(): boolean {
   return v === "true" || v === "1";
 }
 
+/** Mirrors isPaywallEnabled() in src/lib/supabaseEnv.ts, which cannot be
+ *  imported here because it reads import.meta.env. */
+function isPaywallEnabledAtBuild(): boolean {
+  const configured =
+    Boolean(process.env.VITE_SUPABASE_URL?.trim()) &&
+    Boolean(process.env.VITE_SUPABASE_ANON_KEY?.trim());
+  if (!configured) return false;
+  const v = process.env.VITE_REQUIRE_ACCOUNT?.trim().toLowerCase();
+  return v !== "false" && v !== "0";
+}
+
+/** With the site behind a paywall the only page a crawler can reach is the
+ *  landing page, so that is the only thing worth advertising. Listing parish
+ *  URLs that all redirect to a sign-in earns nothing and reads as a soft 404. */
+function writePaywalledSitemapAndRobots(distDir: string, origin: string): number {
+  const buildDate = new Date().toISOString().slice(0, 10);
+  const sitemap =
+    `<?xml version="1.0" encoding="UTF-8"?>\n` +
+    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
+    `  <url>\n` +
+    `    <loc>${escapeXml(absoluteUrl(origin, "/landing"))}</loc>\n` +
+    `    <lastmod>${buildDate}</lastmod>\n` +
+    `  </url>\n` +
+    `</urlset>\n`;
+  writeFileSync(resolve(distDir, "sitemap.xml"), sitemap, "utf-8");
+
+  const robots =
+    "User-agent: *\n" +
+    "Allow: /landing\n" +
+    "Disallow: /\n" +
+    "\n" +
+    `Sitemap: ${absoluteUrl(origin, "/sitemap.xml")}\n`;
+  writeFileSync(resolve(distDir, "robots.txt"), robots, "utf-8");
+
+  return 1;
+}
+
 function writeSitemapAndRobots(
   distDir: string,
   origin: string,
@@ -151,6 +188,19 @@ function writeSitemapAndRobots(
 }
 
 async function main() {
+  const origin = getSiteOrigin();
+
+  // Prerendered parish pages are the full schedules as static HTML. Behind a
+  // paywall they would be the largest hole in it — every one of them readable
+  // without an account — so they are simply not written.
+  if (isPaywallEnabledAtBuild()) {
+    writePaywalledSitemapAndRobots(DIST_DIR, origin);
+    console.log(
+      "Paywall enabled: skipped parish prerendering, wrote a landing-only sitemap.",
+    );
+    return;
+  }
+
   const SQL = await initSqlJs();
   const dbBuffer = gunzipSync(readFileSync(DB_PATH));
   const db = new SQL.Database(dbBuffer);
@@ -158,7 +208,6 @@ async function main() {
   const { cssPath, fontPaths } = discoverAssets();
   const slugs = getAllChurchSlugs(db);
   const lastmodBySlug = getChurchLastModifiedDates(db);
-  const origin = getSiteOrigin();
 
   console.log(`Pre-rendering ${slugs.length} church pages...`);
 

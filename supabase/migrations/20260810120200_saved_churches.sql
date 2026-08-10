@@ -1,5 +1,4 @@
--- Saved parishes: the first piece of per-user data, and the thing the paid tier
--- unlocks more of.
+-- Saved parishes: the first piece of per-user data.
 --
 -- Parish records live in the SQLite snapshot the browser downloads, not in
 -- Postgres, so there is no foreign key to point at. The slug is the join key
@@ -20,57 +19,6 @@ comment on table public.saved_churches is
 
 create index if not exists saved_churches_user_id_idx on public.saved_churches (user_id);
 
-create or replace function public.free_saved_church_limit()
-returns integer
-language sql
-immutable
-set search_path = ''
-as $$ select 3 $$;
-
-comment on function public.free_saved_church_limit() is
-  'How many parishes an account without a subscription may save. Single source of
-   truth: the insert policy enforces it and account_entitlements() reports it.';
-
-grant execute on function public.free_saved_church_limit() to authenticated;
-
--- Entitlement check used by the insert policy. Enforcing the free-tier cap in
--- the database rather than the client means a hand-written API call cannot slip
--- past it.
---
--- Known trade-off: two concurrent inserts can both observe the same count and
--- both pass, so a determined user can exceed the cap by a row or two. Closing
--- that needs row locking or a serializable transaction, which is a poor deal
--- for a soft limit on a bookmark list.
-create or replace function public.can_save_another_church()
-returns boolean
-language plpgsql
-stable
-security definer
-set search_path = ''
-as $$
-declare
-  uid uuid := (select auth.uid());
-  saved_count integer;
-begin
-  if uid is null then
-    return false;
-  end if;
-
-  if public.has_active_subscription() then
-    return true;
-  end if;
-
-  select count(*) into saved_count
-  from public.saved_churches
-  where user_id = uid;
-
-  return saved_count < public.free_saved_church_limit();
-end;
-$$;
-
-revoke all on function public.can_save_another_church() from public;
-grant execute on function public.can_save_another_church() to authenticated;
-
 alter table public.saved_churches enable row level security;
 
 create policy "Saved parishes are readable by their owner"
@@ -78,12 +26,16 @@ create policy "Saved parishes are readable by their owner"
   to authenticated
   using ((select auth.uid()) = user_id);
 
-create policy "Saved parishes are insertable by their owner within their plan"
+-- Reading stays open to the owner even once their access lapses, so the account
+-- page can still show what they had. Writing needs a live trial or paid
+-- subscription: the check belongs here rather than in the client, where anyone
+-- with a token and a terminal could skip it.
+create policy "Saved parishes are insertable by owners with access"
   on public.saved_churches for insert
   to authenticated
   with check (
     (select auth.uid()) = user_id
-    and public.can_save_another_church()
+    and public.has_access()
   );
 
 create policy "Saved parishes are deletable by their owner"
@@ -91,21 +43,18 @@ create policy "Saved parishes are deletable by their owner"
   to authenticated
   using ((select auth.uid()) = user_id);
 
--- No update policy: a saved parish is only ever added or removed, and letting
--- a row be re-pointed at a different slug would sidestep the insert-time cap.
+-- No update policy: a saved parish is only ever added or removed.
 
 revoke all on table public.saved_churches from anon, authenticated;
 grant select, insert, delete on table public.saved_churches to authenticated;
 
--- One round trip for everything the account UI needs to render, so the client
--- never has to hardcode the free-tier number or re-derive "is this user a
--- patron" from raw subscription rows.
+-- One cheap round trip for the question every gated route has to ask before it
+-- renders. The account page reads the subscription rows themselves for the
+-- detail; this is deliberately just the verdict.
 create or replace function public.account_entitlements()
 returns table (
-  is_patron boolean,
-  saved_count integer,
-  -- null means unlimited
-  saved_limit integer
+  has_access boolean,
+  saved_count integer
 )
 language sql
 stable
@@ -113,16 +62,12 @@ security definer
 set search_path = ''
 as $$
   select
-    public.has_active_subscription() as is_patron,
+    public.has_access() as has_access,
     (
       select count(*)::integer
       from public.saved_churches sc
       where sc.user_id = (select auth.uid())
-    ) as saved_count,
-    case
-      when public.has_active_subscription() then null
-      else public.free_saved_church_limit()
-    end as saved_limit;
+    ) as saved_count;
 $$;
 
 revoke all on function public.account_entitlements() from public;

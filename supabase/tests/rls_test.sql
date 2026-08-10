@@ -1,15 +1,14 @@
 -- Row Level Security suite for the account and billing tables.
 --
 --   supabase test db                 (against the local Supabase stack)
---   pnpm test:db                     (against a plain PostgreSQL server; see
---                                     scripts/db-test-local.sh)
+--   ./scripts/db-test-local.sh       (against a plain PostgreSQL server)
 --
 -- Everything runs inside one transaction that is rolled back at the end, so the
 -- fixtures never persist. Each block resets to the owning superuser role before
 -- switching, because the API roles are NOINHERIT and cannot SET ROLE themselves.
 
 begin;
-select plan(41);
+select plan(48);
 
 -- ------------------------------------------------------------------ fixtures
 
@@ -101,6 +100,11 @@ select is(
   'the profile trigger follows an email change'
 );
 
+select is_empty(
+  $$ select 1 from public.stripe_customers $$,
+  'signing up on its own creates nothing in Stripe'
+);
+
 -- ------------------------------------------------------------- as anonymous
 
 reset role;
@@ -125,7 +129,7 @@ select throws_ok(
   'anon cannot read subscriptions'
 );
 
--- ---------------------------------------------------------------- as Alice
+-- ------------------------------------------- as Alice, before starting a trial
 
 reset role;
 set local request.jwt.claims =
@@ -142,6 +146,19 @@ select is(
   (select id from public.profiles),
   '11111111-1111-1111-1111-111111111111'::uuid,
   'and it is their own'
+);
+
+select is(
+  public.has_access(),
+  false,
+  'signing in alone does not grant access — the trial lives in Stripe'
+);
+
+select throws_ok(
+  $$ insert into public.saved_churches (user_id, church_slug)
+     values ('11111111-1111-1111-1111-111111111111', 'st-marys-corning') $$,
+  '42501'::text, null::text,
+  'and nothing can be saved yet'
 );
 
 select lives_ok(
@@ -168,12 +185,24 @@ select throws_ok(
   'a user cannot read the webhook ledger'
 );
 
--- ------------------------------------------------- saved parishes, free tier
+-- ---------------------------------------------- the card-free trial in Stripe
+
+reset role;
+insert into public.stripe_customers (user_id, stripe_customer_id)
+  values ('11111111-1111-1111-1111-111111111111', 'cus_alice');
+insert into public.subscriptions
+  (id, user_id, stripe_customer_id, status, trial_end)
+  values ('sub_alice', '11111111-1111-1111-1111-111111111111', 'cus_alice',
+          'trialing', now() + interval '7 days');
+set local role authenticated;
+
+select is(public.has_access(), true, 'a Stripe trial grants access');
 
 select lives_ok(
   $$ insert into public.saved_churches (user_id, church_slug)
-     values ('11111111-1111-1111-1111-111111111111', 'st-marys-corning') $$,
-  'a user can save a parish'
+     values ('11111111-1111-1111-1111-111111111111', 'st-marys-corning'),
+            ('11111111-1111-1111-1111-111111111111', 'all-saints') $$,
+  'and a trialling user can save parishes'
 );
 
 select throws_ok(
@@ -190,53 +219,78 @@ select throws_ok(
   'the slug format check rejects anything that is not a parish slug'
 );
 
-select lives_ok(
-  $$ insert into public.saved_churches (user_id, church_slug)
-     values ('11111111-1111-1111-1111-111111111111', 'all-saints'),
-            ('11111111-1111-1111-1111-111111111111', 'holy-cross-freeville') $$,
-  'the free tier allows up to three saved parishes'
+select results_eq(
+  $$ select has_access, saved_count from public.account_entitlements() $$,
+  $$ values (true, 2) $$,
+  'account_entitlements reports access during the trial'
 );
+
+-- ------------------------- the trial ends with no card: Stripe pauses it
+
+reset role;
+update public.subscriptions set status = 'paused', trial_end = now() - interval '1 day'
+  where id = 'sub_alice';
+set local role authenticated;
+
+select is(public.has_access(), false, 'a paused subscription does not grant access');
 
 select throws_ok(
   $$ insert into public.saved_churches (user_id, church_slug)
-     values ('11111111-1111-1111-1111-111111111111', 'st-anthonys') $$,
+     values ('11111111-1111-1111-1111-111111111111', 'holy-cross-freeville') $$,
   '42501'::text, null::text,
-  'the fourth save is refused by the database, not just by the UI'
+  'saving is refused by the database once the trial has run out'
 );
 
-select results_eq(
-  $$ select is_patron, saved_count, saved_limit from public.account_entitlements() $$,
-  $$ values (false, 3, 3) $$,
-  'account_entitlements reports a full free tier'
+select is(
+  (select count(*)::int from public.saved_churches),
+  2,
+  'but what was already saved is still readable'
 );
 
--- ------------------------------------------------- the same user, subscribed
+-- ----------------- a card is added and the resume attempt fails: still locked
 
 reset role;
-insert into public.stripe_customers (user_id, stripe_customer_id)
-  values ('11111111-1111-1111-1111-111111111111', 'cus_alice');
-insert into public.subscriptions (id, user_id, stripe_customer_id, status)
-  values ('sub_alice', '11111111-1111-1111-1111-111111111111', 'cus_alice', 'active');
-
+update public.subscriptions set status = 'past_due' where id = 'sub_alice';
 set local role authenticated;
 
 select is(
-  public.has_active_subscription(),
-  true,
-  'an active subscription entitles the user'
+  public.has_access(),
+  false,
+  'past_due on a subscription that never paid does not buy access'
 );
+
+-- --------------------------------- the payment succeeds and the account is live
+
+reset role;
+update public.subscriptions set status = 'active', first_paid_at = now()
+  where id = 'sub_alice';
+set local role authenticated;
+
+select is(public.has_access(), true, 'a paid subscription grants access');
 
 select lives_ok(
   $$ insert into public.saved_churches (user_id, church_slug)
-     values ('11111111-1111-1111-1111-111111111111', 'st-anthonys') $$,
-  'and lifts the saved-parish cap'
+     values ('11111111-1111-1111-1111-111111111111', 'holy-cross-freeville') $$,
+  'and saving works again'
 );
 
-select results_eq(
-  $$ select is_patron, saved_count, saved_limit from public.account_entitlements() $$,
-  $$ values (true, 4, null::int) $$,
-  'account_entitlements reports an unlimited tier'
+-- ------------------- a later renewal fails: the dunning grace period applies
+
+reset role;
+update public.subscriptions set status = 'past_due' where id = 'sub_alice';
+set local role authenticated;
+
+select is(
+  public.has_access(),
+  true,
+  'past_due keeps access once the subscription has paid at least once'
 );
+
+reset role;
+update public.subscriptions set status = 'canceled' where id = 'sub_alice';
+set local role authenticated;
+
+select is(public.has_access(), false, 'a cancelled subscription does not');
 
 select is(
   (select count(*)::int from public.subscriptions),
@@ -269,11 +323,7 @@ select is(
   'nor their subscription'
 );
 
-select is(
-  public.has_active_subscription(),
-  false,
-  'and is not entitled by it'
-);
+select is(public.has_access(), false, 'and is not entitled by it');
 
 with removed as (
   delete from public.saved_churches
@@ -295,13 +345,13 @@ set local role authenticated;
 
 with removed as (
   delete from public.saved_churches
-  where church_slug = 'st-anthonys'
+  where church_slug = 'holy-cross-freeville'
   returning 1
 )
 select is(
   count(*)::int,
   1,
-  'a user can unsave their own parish'
+  'a user can unsave their own parish even after their subscription ends'
 ) from removed;
 
 -- ------------------------------------------------------------ account teardown

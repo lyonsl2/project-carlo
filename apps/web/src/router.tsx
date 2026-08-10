@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, type ReactNode } from "react";
 import {
   createBrowserRouter,
   Navigate,
@@ -8,7 +8,7 @@ import { LandingPage } from "./views/LandingPage";
 import { NotFoundPage } from "./views/NotFoundPage";
 import { RequireAuth } from "./auth/RequireAuth";
 import { isAboutPageEnabled } from "./lib/featureFlags";
-import { isAccountsEnabled } from "./lib/supabaseEnv";
+import { isAccountsEnabled, isPaywallEnabled } from "./lib/supabaseEnv";
 
 const HomePage = lazy(() =>
   import("./views/HomePage").then((m) => ({ default: m.HomePage })),
@@ -34,22 +34,37 @@ const AccountPage = lazy(() =>
   import("./views/AccountPage").then((m) => ({ default: m.AccountPage })),
 );
 
+// Lazy so the entitlement check — and the Supabase client behind it — is not
+// part of the entry bundle.
+const RequireAccess = lazy(() => import("./auth/RequireAccess"));
+
 const lazyPageFallback = (
   <main className="flex min-h-svh items-center justify-center bg-paper px-4">
     <p className="font-serif text-sm text-ink-soft">Loading…</p>
   </main>
 );
 
+/** Wraps a page in the paywall when one is configured, and leaves it alone
+ *  when it is not. */
+function gated(page: ReactNode): ReactNode {
+  if (!isPaywallEnabled()) {
+    return <Suspense fallback={lazyPageFallback}>{page}</Suspense>;
+  }
+  return (
+    <Suspense fallback={lazyPageFallback}>
+      <RequireAccess>{page}</RequireAccess>
+    </Suspense>
+  );
+}
+
 const routes: RouteObject[] = [
   {
     path: "/",
-    element: (
-      <Suspense fallback={lazyPageFallback}>
-        <HomePage />
-      </Suspense>
-    ),
+    element: gated(<HomePage />),
   },
   {
+    // The public face of the site: the only content page that stays reachable
+    // without an account, and where the trial is offered.
     path: "/landing",
     element: <LandingPage />,
   },
@@ -59,11 +74,7 @@ const routes: RouteObject[] = [
   },
   {
     path: "/churches/:churchSlug",
-    element: (
-      <Suspense fallback={lazyPageFallback}>
-        <ChurchPage />
-      </Suspense>
-    ),
+    element: gated(<ChurchPage />),
   },
 ];
 
@@ -99,6 +110,8 @@ if (isAccountsEnabled()) {
       ),
     },
     {
+      // Deliberately behind sign-in but not behind the paywall: this is where
+      // someone whose trial has ended goes to subscribe.
       path: "/account",
       element: (
         <RequireAuth>

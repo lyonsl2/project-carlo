@@ -9,7 +9,7 @@ import {
 } from "@/api/account";
 import { useAuth } from "@/auth/AuthContext";
 import { BookmarkIcon } from "@/components/icons";
-import { SavedChurchLimitError } from "@/lib/accountErrors";
+import { AccessRequiredError } from "@/lib/accountErrors";
 import { isAccountsEnabled } from "@/lib/supabaseEnv";
 
 const TRIGGER_CLASS =
@@ -61,7 +61,7 @@ export function SaveChurchButton({ slug }: { slug: string }) {
     );
   }
 
-  const atLimit = mutation.error instanceof SavedChurchLimitError;
+  const needsAccess = mutation.error instanceof AccessRequiredError;
 
   return (
     <span className="inline-flex flex-col items-start gap-1">
@@ -75,16 +75,16 @@ export function SaveChurchButton({ slug }: { slug: string }) {
         <BookmarkIcon className="size-3" filled={isSaved} />
         {isSaved ? "Saved" : "Save this parish"}
       </button>
-      {atLimit ? (
+      {needsAccess ? (
         <span className="font-serif text-[0.8rem] italic text-ink-faint">
-          Your free plan is full.{" "}
+          Your trial has ended.{" "}
           <Link to="/account" className="rubric-link">
-            Become a patron
+            Subscribe
           </Link>{" "}
-          to save more.
+          to keep saving parishes.
         </span>
       ) : null}
-      {mutation.error && !atLimit ? (
+      {mutation.error && !needsAccess ? (
         <span className="font-serif text-[0.8rem] italic text-rubric">
           That didn&apos;t save. Please try again.
         </span>

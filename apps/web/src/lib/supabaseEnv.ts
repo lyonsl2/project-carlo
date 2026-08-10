@@ -47,6 +47,22 @@ export function isAccountsEnabled(): boolean {
   return Boolean(getSupabaseUrl() && getSupabaseAnonKey());
 }
 
+/** Whether the site itself is behind the paywall.
+ *
+ *  On by default once accounts are configured, because that is the product:
+ *  a free 7-day trial and then a subscription. Set VITE_REQUIRE_ACCOUNT=false to
+ *  run accounts alongside a public map instead — the sign-in, saved parishes,
+ *  and billing all still work, they just stop being a condition of entry.
+ */
+export function isPaywallEnabled(): boolean {
+  if (!isAccountsEnabled()) return false;
+  const flag = firstNonEmpty(
+    viteEnv()?.VITE_REQUIRE_ACCOUNT,
+    nodeEnv()?.VITE_REQUIRE_ACCOUNT,
+  )?.toLowerCase();
+  return flag !== "false" && flag !== "0";
+}
+
 export function isGoogleSignInEnabled(): boolean {
   const flag = firstNonEmpty(
     viteEnv()?.VITE_AUTH_GOOGLE_ENABLED,

@@ -1,15 +1,16 @@
 /** Error shapes shared by the account API layer and the UI that renders them. */
 
-/** PostgREST reports a policy refusal as insufficient_privilege. */
+/** PostgREST reports a policy refusal as insufficient_privilege, with no detail
+ *  about which policy refused. */
 const INSUFFICIENT_PRIVILEGE = "42501";
 
-/** Raised when the database refuses a save because the free tier is full. The
- *  cap lives in the insert policy, so this is the only place the client finds
- *  out it has been reached. */
-export class SavedChurchLimitError extends Error {
+/** Raised when the database refuses a write because the trial has run out and
+ *  there is no subscription. The check lives in the insert policy, so this is
+ *  how the client finds out. */
+export class AccessRequiredError extends Error {
   constructor() {
-    super("You have saved as many parishes as the free plan allows.");
-    this.name = "SavedChurchLimitError";
+    super("Your trial has ended. Subscribe to keep using Project Carlo.");
+    this.name = "AccessRequiredError";
   }
 }
 

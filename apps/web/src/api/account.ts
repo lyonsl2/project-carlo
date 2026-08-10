@@ -7,10 +7,10 @@
 import type { Entitlements, SubscriptionSummary } from "@/lib/billing";
 import type { PlanKey } from "@/lib/plans";
 import {
+  AccessRequiredError,
   FunctionCallError,
   isPolicyViolation,
   parseFunctionErrorPayload,
-  SavedChurchLimitError,
 } from "@/lib/accountErrors";
 import { getSupabaseClient } from "@/lib/supabase";
 
@@ -23,18 +23,14 @@ export async function fetchEntitlements(): Promise<Entitlements> {
   const row = data?.[0];
   if (!row) throw new Error("account_entitlements returned no row");
 
-  return {
-    isPatron: row.is_patron,
-    savedCount: row.saved_count,
-    savedLimit: row.saved_limit,
-  };
+  return { hasAccess: row.has_access, savedCount: row.saved_count };
 }
 
 export async function fetchSubscriptions(): Promise<SubscriptionSummary[]> {
   const { data, error } = await getSupabaseClient()
     .from("subscriptions")
     .select(
-      "id, status, cancel_at_period_end, current_period_end, trial_end, ended_at, created_at",
+      "id, status, cancel_at_period_end, current_period_end, trial_end, ended_at, first_paid_at, created_at",
     );
   if (error) throw new Error(error.message);
 
@@ -45,6 +41,7 @@ export async function fetchSubscriptions(): Promise<SubscriptionSummary[]> {
     currentPeriodEnd: row.current_period_end,
     trialEnd: row.trial_end,
     endedAt: row.ended_at,
+    firstPaidAt: row.first_paid_at,
     createdAt: row.created_at,
   }));
 }
@@ -66,8 +63,9 @@ export async function saveChurch(userId: string, slug: string): Promise<void> {
 
   if (!error) return;
   // The only policy that can refuse this insert for a correctly authenticated
-  // user is the free-tier cap, so translate it into something the UI can act on.
-  if (isPolicyViolation(error)) throw new SavedChurchLimitError();
+  // user saving into their own account is the has_access() check, so translate
+  // it into something the UI can act on.
+  if (isPolicyViolation(error)) throw new AccessRequiredError();
   throw new Error(error.message);
 }
 

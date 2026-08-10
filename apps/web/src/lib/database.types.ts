@@ -15,6 +15,7 @@ export interface Database {
           id: string;
           email: string | null;
           display_name: string | null;
+          trial_ends_at: string;
           created_at: string;
           updated_at: string;
         };
@@ -61,6 +62,7 @@ export interface Database {
           trial_end: string | null;
           canceled_at: string | null;
           ended_at: string | null;
+          first_paid_at: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -74,18 +76,13 @@ export interface Database {
       account_entitlements: {
         Args: Record<PropertyKey, never>;
         Returns: {
-          is_patron: boolean;
+          has_access: boolean;
           saved_count: number;
-          saved_limit: number | null;
         }[];
       };
-      has_active_subscription: {
+      has_access: {
         Args: Record<PropertyKey, never>;
         Returns: boolean;
-      };
-      free_saved_church_limit: {
-        Args: Record<PropertyKey, never>;
-        Returns: number;
       };
     };
     Enums: Record<never, never>;

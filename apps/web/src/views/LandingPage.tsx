@@ -1,6 +1,9 @@
 import { useCallback, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import type { ChurchSearchResult } from "../api";
+import { useAuth } from "@/auth/AuthContext";
+import { safeNextPath } from "@/lib/nextPath";
+import { isPaywallEnabled } from "@/lib/supabaseEnv";
 import { Fleuron } from "../components/Fleuron";
 import { SearchTypeahead } from "../components/SearchTypeahead";
 import { TimeRangeSlider } from "../components/TimeRangeSlider";
@@ -49,6 +52,12 @@ export function LandingPage() {
 
   const navigate = useNavigate();
   const isDesktop = useMinWidth(768);
+  const { status } = useAuth();
+  const [searchParams] = useSearchParams();
+  // With the paywall on, this is the one page a stranger can reach, so it
+  // offers the trial instead of a search over parishes they cannot open yet.
+  const pitchTrial = isPaywallEnabled() && status !== "signedIn";
+  const nextPath = safeNextPath(searchParams.get("next"), "/");
   const [open, setOpen] = useState(false);
   const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTER_STATE);
   const [locationStatus, setLocationStatus] = useState<
@@ -185,6 +194,10 @@ export function LandingPage() {
           </p>
         </div>
 
+        {/* The search block is left out rather than hidden when pitching the
+         *  trial: mounting the typeahead downloads the parish snapshot, which
+         *  is the very thing behind the paywall. */}
+        {pitchTrial ? <TrialPitch nextPath={nextPath} /> : (
         <div
           className={cn(
             "flex w-full flex-col",
@@ -251,8 +264,9 @@ export function LandingPage() {
             </p>
           ) : null}
         </div>
+        )}
 
-        {open ? (
+        {open && !pitchTrial ? (
           <RefineSection
             filters={filters}
             onChange={setFilters}
@@ -271,6 +285,38 @@ export function LandingPage() {
         )}
       </div>
     </main>
+  );
+}
+
+/** What a stranger sees when the site is behind the paywall. */
+function TrialPitch({ nextPath }: { nextPath: string }) {
+  const signInHref = `/signin?next=${encodeURIComponent(nextPath)}`;
+  return (
+    <div className="flex w-full flex-col items-center gap-5">
+      <p className="m-0 max-w-[34rem] text-center font-serif text-[16px] leading-relaxed text-ink-soft">
+        Every Mass, Confession, and Adoration time from the parishes we follow,
+        read out of their weekly bulletins and kept on one map.
+      </p>
+
+      <Link
+        to={signInHref}
+        className="missal-focus smallcaps inline-flex w-full items-center justify-center gap-[10px] bg-rubric px-6 py-[14px] text-[14px] tracking-[0.14em] text-paper transition-colors hover:bg-rubric-deep active:translate-y-px md:w-auto"
+      >
+        <span>Start your free 7-day trial</span>
+        <ArrowRightIcon className="size-[14px]" />
+      </Link>
+
+      <p className="m-0 text-center font-serif italic text-[13px] text-ink-faint">
+        No credit card required.
+      </p>
+
+      <p className="m-0 text-center font-serif text-[14px] text-ink-soft">
+        Already have an account?{" "}
+        <Link to={signInHref} className="rubric-link">
+          Sign in
+        </Link>
+      </p>
+    </div>
   );
 }
 

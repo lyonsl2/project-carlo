@@ -1,13 +1,15 @@
 import { describe, expect, it } from "vitest";
 import {
-  canSaveMore,
+  daysRemaining,
+  describeTrialRemaining,
   formatBillingDate,
   isEntitledStatus,
   pickPrimarySubscription,
-  remainingSaves,
   toBillingState,
   type SubscriptionSummary,
 } from "./billing";
+
+const NOW = new Date("2026-08-10T12:00:00.000Z");
 
 function subscription(
   overrides: Partial<SubscriptionSummary> = {},
@@ -19,24 +21,37 @@ function subscription(
     currentPeriodEnd: "2026-09-01T00:00:00.000Z",
     trialEnd: null,
     endedAt: null,
+    firstPaidAt: "2026-08-01T00:00:00.000Z",
     createdAt: "2026-08-01T00:00:00.000Z",
     ...overrides,
   };
 }
 
 describe("isEntitledStatus", () => {
-  it("keeps access through a failed renewal", () => {
-    expect(isEntitledStatus("past_due")).toBe(true);
-  });
-
-  it("covers active and trialing", () => {
-    expect(isEntitledStatus("active")).toBe(true);
+  it("covers the card-free trial and a live subscription", () => {
     expect(isEntitledStatus("trialing")).toBe(true);
+    expect(isEntitledStatus("active")).toBe(true);
   });
 
-  it("excludes everything else Stripe can report", () => {
-    for (const status of ["canceled", "unpaid", "incomplete", "incomplete_expired", "paused"]) {
-      expect(isEntitledStatus(status)).toBe(false);
+  it("keeps access through a failed renewal on a subscription that has paid", () => {
+    expect(isEntitledStatus("past_due", "2026-08-01T00:00:00.000Z")).toBe(true);
+  });
+
+  it("refuses past_due when nothing has ever been paid", () => {
+    // A trial that ended with a card Stripe could not charge lands here, and it
+    // must not buy access.
+    expect(isEntitledStatus("past_due", null)).toBe(false);
+  });
+
+  it("refuses a paused trial and everything else Stripe can report", () => {
+    for (const status of [
+      "paused",
+      "canceled",
+      "unpaid",
+      "incomplete",
+      "incomplete_expired",
+    ]) {
+      expect(isEntitledStatus(status, "2026-08-01T00:00:00.000Z")).toBe(false);
     }
   });
 });
@@ -57,7 +72,23 @@ describe("pickPrimarySubscription", () => {
     expect(pickPrimarySubscription([dead, live])?.id).toBe("sub_live");
   });
 
-  it("falls back to the most recent when none is entitled", () => {
+  it("surfaces a paused trial ahead of an older cancelled subscription", () => {
+    const paused = subscription({
+      id: "sub_paused",
+      status: "paused",
+      firstPaidAt: null,
+      createdAt: "2026-01-01T00:00:00.000Z",
+    });
+    const cancelled = subscription({
+      id: "sub_cancelled",
+      status: "canceled",
+      createdAt: "2026-06-01T00:00:00.000Z",
+    });
+
+    expect(pickPrimarySubscription([cancelled, paused])?.id).toBe("sub_paused");
+  });
+
+  it("falls back to the most recent when none is entitled or paused", () => {
     const older = subscription({
       id: "sub_older",
       status: "canceled",
@@ -74,8 +105,26 @@ describe("pickPrimarySubscription", () => {
 });
 
 describe("toBillingState", () => {
-  it("reports no subscription", () => {
+  it("reports an account that has never started anything", () => {
     expect(toBillingState(null)).toEqual({ kind: "none" });
+  });
+
+  it("reports a running trial with its end date", () => {
+    expect(
+      toBillingState(
+        subscription({
+          status: "trialing",
+          firstPaidAt: null,
+          trialEnd: "2026-08-17T00:00:00.000Z",
+        }),
+      ),
+    ).toEqual({ kind: "trialing", endsAt: "2026-08-17T00:00:00.000Z" });
+  });
+
+  it("reports a trial Stripe paused for want of a card", () => {
+    expect(
+      toBillingState(subscription({ status: "paused", firstPaidAt: null })),
+    ).toEqual({ kind: "paused" });
   });
 
   it("reports an active subscription with its renewal date", () => {
@@ -92,29 +141,31 @@ describe("toBillingState", () => {
     });
   });
 
-  it("reports a trial that is already set to cancel as canceling", () => {
-    const state = toBillingState(
-      subscription({ status: "trialing", cancelAtPeriodEnd: true }),
-    );
-    expect(state.kind).toBe("canceling");
-  });
-
-  it("reports a trial", () => {
+  it("reports a trial cancelled before it converts as canceling, from the trial date", () => {
     expect(
       toBillingState(
-        subscription({ status: "trialing", trialEnd: "2026-08-15T00:00:00.000Z" }),
+        subscription({
+          status: "trialing",
+          cancelAtPeriodEnd: true,
+          trialEnd: "2026-08-17T00:00:00.000Z",
+        }),
       ),
-    ).toEqual({
-      kind: "trialing",
-      renewsAt: "2026-09-01T00:00:00.000Z",
-      trialEndsAt: "2026-08-15T00:00:00.000Z",
-    });
+    ).toEqual({ kind: "canceling", endsAt: "2026-08-17T00:00:00.000Z" });
   });
 
-  it("reports a failed payment", () => {
+  it("distinguishes a failed renewal from a failed first payment", () => {
     expect(toBillingState(subscription({ status: "past_due" }))).toEqual({
       kind: "pastDue",
       retriesUntil: "2026-09-01T00:00:00.000Z",
+      hasPaidBefore: true,
+    });
+
+    expect(
+      toBillingState(subscription({ status: "past_due", firstPaidAt: null })),
+    ).toEqual({
+      kind: "pastDue",
+      retriesUntil: "2026-09-01T00:00:00.000Z",
+      hasPaidBefore: false,
     });
   });
 
@@ -129,36 +180,39 @@ describe("toBillingState", () => {
       endedAt: "2026-08-20T00:00:00.000Z",
     });
   });
+});
 
-  it("falls back to the period end when a dead subscription has no end date", () => {
-    expect(toBillingState(subscription({ status: "unpaid" }))).toEqual({
-      kind: "ended",
-      status: "unpaid",
-      endedAt: "2026-09-01T00:00:00.000Z",
-    });
+describe("daysRemaining", () => {
+  it("rounds part days up", () => {
+    expect(daysRemaining("2026-08-17T12:00:00.000Z", NOW)).toBe(7);
+    expect(daysRemaining("2026-08-10T18:00:00.000Z", NOW)).toBe(1);
+  });
+
+  it("floors at zero once the date has passed", () => {
+    expect(daysRemaining("2026-08-09T12:00:00.000Z", NOW)).toBe(0);
+  });
+
+  it("returns null when there is no date to count to", () => {
+    expect(daysRemaining(null, NOW)).toBeNull();
+    expect(daysRemaining("not a date", NOW)).toBeNull();
   });
 });
 
-describe("saved parish allowance", () => {
-  it("counts down the free tier", () => {
-    expect(remainingSaves({ isPatron: false, savedCount: 1, savedLimit: 3 })).toBe(2);
-    expect(canSaveMore({ isPatron: false, savedCount: 1, savedLimit: 3 })).toBe(true);
+describe("describeTrialRemaining", () => {
+  it("counts the days down in words", () => {
+    expect(describeTrialRemaining("2026-08-17T12:00:00.000Z", NOW)).toBe(
+      "7 days left in your free trial",
+    );
+    expect(describeTrialRemaining("2026-08-11T00:00:00.000Z", NOW)).toBe(
+      "1 day left in your free trial",
+    );
+    expect(describeTrialRemaining("2026-08-09T12:00:00.000Z", NOW)).toBe(
+      "Your free trial ends today",
+    );
   });
 
-  it("stops at zero once the free tier is full", () => {
-    const full = { isPatron: false, savedCount: 3, savedLimit: 3 };
-    expect(remainingSaves(full)).toBe(0);
-    expect(canSaveMore(full)).toBe(false);
-  });
-
-  it("never goes negative if the cap is lowered under an existing account", () => {
-    expect(remainingSaves({ isPatron: false, savedCount: 9, savedLimit: 3 })).toBe(0);
-  });
-
-  it("treats a null limit as unlimited", () => {
-    const patron = { isPatron: true, savedCount: 40, savedLimit: null };
-    expect(remainingSaves(patron)).toBeNull();
-    expect(canSaveMore(patron)).toBe(true);
+  it("stays sensible with no end date", () => {
+    expect(describeTrialRemaining(null, NOW)).toBe("Your free trial is running");
   });
 });
 
