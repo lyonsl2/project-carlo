@@ -1,0 +1,159 @@
+listing_id,location,listing_name,church_slug,times,notes
+2,Rochester,Blessed Sacrament,blessed-sacrament,Sun 9:30 AM,
+7,Rochester,Holy Apostles,holy-apostles,Sat 4:00 PM|Sun 9:30 AM|Sun 11:30 AM,9:30 English / 11:30 Spanish
+8,Charlotte,Holy Cross,holy-cross-rochester,Sat 5:00 PM|Sun 8:00 AM|Sun 10:00 AM,
+14,Rochester,Immaculate Conception,immaculate-conception-st-bridgets,Sun 9:00 AM,
+17,Brighton,Our Lady of Lourdes,our-lady-of-lourdes,Mon 8:30 AM|Tue 8:30 AM|Thu 8:30 AM|Fri 8:30 AM|Sat 5:30 PM|Sun 9:30 AM,
+21,Brighton,Our Lady Queen of Peace,our-lady-queen-of-peace,Sat 4:30 PM|Sun 9:00 AM,
+22,Rochester,Our Lady of Victory/St. Joseph,our-lady-of-victory-st-joseph,Sat 4:30 PM|Sun 10:00 AM,
+23,Greece,Our Mother of Sorrows,our-mother-of-sorrows,Sat 4:00 PM|Sun 8:30 AM|Sun 11:00 AM,
+26,Rochester,St. Anne,st-anne,Mon 8:00 AM|Tue 8:00 AM|Wed 8:00 AM|Fri 8:00 AM|Sat 4:00 PM|Sun 11:00 AM,Sunday 11am listed as 'starting Nov. 6'
+29,Rochester,St. Boniface,st-boniface,Sat 4:30 PM|Sun 8:00 AM,Sat 4:30pm January-July only
+32,Rochester,St. Charles Borromeo,st-charles-borromeo,Sat 4:30 PM|Sun 8:30 AM|Sun 10:30 AM,
+35,Rochester,St. George R. C. Lithuanian,,Sun 9:30 AM|Sun 11:00 AM,9:30 English / 11am Lithuanian
+39,Greece,St. John the Evangelist,st-john-evangelist-greece,Sat 4:00 PM|Sun 8:00 AM|Sun 10:00 AM,
+41,Greece,St. Lawrence,st-lawrence,Sat 4:00 PM|Sun 8:00 AM|Sun 10:00 AM,
+44,Greece,St. Mark,st-marks,Sat 5:00 PM|Sun 8:30 AM|Sun 11:00 AM,
+45,Rochester,St. Mary,st-marys-rochester,Sat 4:30 PM|Sun 11:15 AM,Sat 4:30pm July-December only
+47,Rochester,St. Monica,st-monica,Sat 4:00 PM|Sun 10:15 AM,
+51,Chili,St. Pius the Tenth,st-pius-x,Sat 4:00 PM|Sun 7:30 AM|Sun 9:30 AM,
+53,Rochester,St. Stanislaus,st-stanislaus-kostka,Sat 4:00 PM|Sun 8:45 AM|Sun 11:15 AM,Sat/8:45 English; 11:15 Polish
+54,Gates,St. Theodore,st-theodores,Sat 4:30 PM|Sun 9:00 AM|Sun 11:00 AM,
+57,Rochester,St. Thomas More,st-thomas-more,Sat 4:30 PM|Sun 11:00 AM,
+58,Rochester,Emmanuel Church of the Deaf,st-monica,Sun 11:30 AM,Voice interpreted; hosted at St. Monica
+204,Auburn,Holy Family,holy-family-auburn,Sat 4:00 PM|Sun 9:00 AM,
+205,Auburn,Sacred Heart,sacred-heart,Sat 5:30 PM|Sun 7:30 AM|Sun 11:00 AM,
+207,Auburn,St. Alphonsus,st-alphonsus,Sat 4:30 PM|Sun 10:15 AM|Sun 5:00 PM,
+210,Auburn,St. Mary,st-marys-auburn,Sat 5:30 PM|Sun 7:00 AM|Sun 9:45 AM|Sun 12:00 PM,
+212,Avon,St. Agnes,st-agnes,Sat 4:00 PM|Sun 11:30 AM,
+215,Brockport,Nativity of the Blessed Virgin Mary,nativity-of-blessed-virgin-mary,Sat 5:00 PM|Sun 11:00 AM|Sun 1:30 PM,Sun 1:30pm Spanish; Sun 9am belongs to St. Elizabeth Ann Seton
+233,Freeville,Holy Cross,holy-cross-freeville,Sun 8:30 AM,
+237,East Rochester,St. Jerome,st-jerome,Sat 4:30 PM|Sun 8:00 AM|Sun 10:00 AM,
+248,Fairport,Church of the Assumption,assumption,Sat 4:00 PM|Sun 8:00 AM|Sun 11:30 AM,
+249,Fairport,St. John of Rochester,st-john-of-rochester,Sat 5:00 PM|Sun 7:30 AM|Sun 9:00 AM|Sun 11:00 AM,
+255,Groton,St. Anthony,st-anthonys,Sat 4:30 PM|Sun 2:00 PM,
+259,Hilton,St. Leo,st-leo-the-great,Mon 5:30 PM|Tue 8:30 AM|Wed 8:30 AM|Thu 8:30 AM|Fri 8:30 AM|Sat 5:00 PM|Sun 8:00 AM|Sun 10:30 AM|Sun 6:00 PM,Fri 8:30am is a Communion Service
+260,Honeoye,St. Mary,st-marys-honeoye,Tue 9:00 AM|Thu 9:00 AM,
+261,Honeoye Falls,St. Paul of the Cross,st-paul-of-the-cross,Sun 10:00 AM,
+264,Horseheads,St. Mary our Mother,st-mary-our-mother,Sat 5:00 PM|Sun 8:30 AM|Sun 10:30 AM,
+266,Ithaca,Immaculate Conception,immaculate-conception,Sat 4:30 PM|Sun 8:30 AM|Sun 10:30 AM,
+267,Ithaca,St. Catherine of Siena,st-catherine-of-siena-ithaca,Sat 5:00 PM|Sun 9:00 AM|Sun 11:30 AM,
+270,Lima,St. Rose,st-rose,Sun 8:00 AM,Listed address/county are Brooklyn (Kings) - listing error
+273,Lansing,All Saints Church,all-saints,Sun 10:30 AM,
+277,Mendon,St. Catherine of Siena,st-catherine-of-siena-mendon,Sat 5:30 PM|Sun 10:45 AM|Tue 9:00 AM|Thu 9:00 AM,
+283,Newark,St. Michael,st-michael-newark,Sun 8:15 AM|Sun 10:30 AM,
+287,Odessa,St. Benedict,st-benedicts,Sat 5:00 PM,
+290,Owasco,St. Ann,st-ann,Sun 9:00 AM,
+291,Fair Haven,St. Jude Chapel,st-jude,Sun 8:00 AM,mid-June to mid-September
+294,Penfield,Holy Spirit,holy-spirit,Sat 4:00 PM|Sun 8:30 AM|Sun 10:30 AM,
+295,Penfield,St. Joseph,st-josephs,Sat 9:00 AM|Sat 4:30 PM|Sun 8:00 AM|Sun 9:30 AM|Sun 11:00 AM|Mon 9:00 AM|Tue 9:00 AM|Wed 9:00 AM|Thu 9:00 AM|Fri 9:00 AM,Sun 5pm resumes September
+300,Pittsford,St. Louis,st-louis,Sat 4:30 PM|Sun 8:00 AM|Sun 10:30 AM|Sun 5:00 PM|Mon 11:00 AM|Tue 11:00 AM|Wed 11:00 AM|Thu 11:00 AM|Fri 11:00 AM,
+316,Spencerport,St. John the Evangelist,st-john-evangelist-spencerport,Sat 5:00 PM|Sun 7:45 AM|Sun 9:30 AM|Sun 11:15 AM,
+321,Victor,St. Patrick,st-patricks-victor,Sat 4:30 PM|Sun 8:30 AM|Sun 10:30 AM,
+323,Watkins Glen,St. Mary of the Lake,st-marys-of-lake-watkins-glen,Sun 8:00 AM|Sun 10:00 AM,
+326,Webster,Holy Trinity,holy-trinity,Mon 8:30 AM|Tue 8:30 AM|Wed 8:30 AM|Thu 8:30 AM|Fri 8:30 AM|Sat 4:30 PM|Sun 8:30 AM|Sun 10:30 AM,
+327,West Webster,St. Rita,st-rita,Thu 6:00 PM|Sat 5:00 PM|Sun 8:00 AM|Sun 10:30 AM,
+331,Webster,St. Paul,st-pauls,Sat 4:00 PM|Sun 9:00 AM|Sun 11:00 AM,
+333,North Chili,St. Christopher,st-christophers,Sat 4:30 PM|Sun 10:00 AM,
+334,Fairport,Church of the Resurrection,resurrection,Sat 8:00 AM|Sun 9:45 AM,Sat 8am listed as first Saturday of month only
+335,Hamlin,St. Elizabeth Ann Seton,st-elizabeth-ann-seton,Sun 9:00 AM,
+336,Pittsford,Church of the Transfiguration,transfiguration,Sat 4:00 PM|Sun 8:45 AM|Mon 6:45 AM|Wed 6:45 AM,
+337,King Ferry,Our Lady of the Lake,our-lady-of-the-lake,Sun 10:30 AM,
+337,Union Springs,St. Michael,st-michaels,Sat 4:00 PM,
+337,Aurora,St. Patrick (Aurora),st-patricks-aurora,Sun 12:00 PM,
+337,Moravia,St. Patrick (Moravia),st-patricks-moravia,Sun 8:30 AM,
+338,Corning,All Saints Parish,st-marys-corning,Mon 12:15 PM|Wed 12:15 PM|Fri 12:15 PM|Tue 8:20 AM|Sat 9:00 AM|Sat 5:00 PM|Sun 8:00 AM|Sun 10:30 AM,Sat 9am first Saturday of month only
+339,Livonia,St. Matthew,st-matthew,Mon 9:00 AM|Wed 9:00 AM,
+340,Waverly,St. James,st-james-waverly,Sat 5:00 PM,
+340,Newark Valley,St. John the Evangelist,st-john-evangelist-newark-valley,,Listed as No Mass
+340,Apalachin,St. Margaret Mary,st-margaret-mary-apalachin,,Listed as No Mass
+340,Owego,St. Patrick,st-patrick-owego,Sat 5:00 PM|Sun 9:00 AM,
+341,Hornell,St. Ann,st-anns,Sat 4:30 PM|Sun 7:00 AM|Sun 10:30 AM|Sun 5:30 PM,
+341,Rexville,St. Mary,st-marys-rexville,Sun 8:30 AM,
+342,Perkinsville,Sacred Heart of Jesus,sacred-heart-of-jesus,Sun 9:15 AM,
+342,Wayland,St. Joseph,st-joseph-wayland,Mon 9:00 AM|Wed 9:00 AM|Sun 7:30 AM,
+342,Dansville,St. Mary,st-mary-dansville,Tue 8:15 AM|Thu 8:15 AM|Fri 8:15 AM|Sat 4:00 PM,
+342,Cohocton,St. Pius V,st-pius-v,Sun 11:00 AM,
+343,Port Byron,St. John,,Sat 5:00 PM,
+343,Weedsport,St. Joseph,st-joseph-weedsport,Sun 10:30 AM,
+343,Cato,St. Patrick,st-patrick-cato,Sun 8:30 AM,
+344,Nunda,Holy Angels,holy-angels,Sat 5:45 PM,
+344,Retsof,St. Lucy,st-lucy,Sat 4:00 PM,churches.csv places St. Lucy in Piffard
+344,Geneseo,St. Thomas Aquinas,,,Listed as No Mass
+344,Geneseo,St. Mary,st-mary-geneseo,Sun 10:00 AM,
+344,Mt. Morris,St. Patrick,st-patrick-mount-morris,Sun 8:30 AM,
+345,Wolcott,St. Mary Magdalene,st-mary-magdalene,Sat 4:30 PM,
+345,Red Creek,St. Thomas,st-thomas,Sun 8:00 AM,mid-September to mid-June only
+345,Fair Haven,St. Jude,st-jude,Sun 8:00 AM,mid-June to mid-September only
+346,Geneva,St. Francis deSales,st-francis-desales,Sat 4:30 PM|Sun 9:00 AM|Sun 12:00 PM,Sun noon Spanish
+346,Geneva,St. Stephen,st-stephen,Sun 7:30 AM|Sun 10:30 AM,
+346,Geneva,St. John Chapel (HWS),st-johns-chapel,Sun 4:30 PM,
+348,Rochester,St. Ambrose,st-ambrose,Sun 9:45 AM|Sun 5:00 PM,
+348,Irondequoit,St. James,st-james-rochester,Sat 4:30 PM|Sun 8:00 AM,
+348,Rochester,St. John the Evangelist,st-john-evangelist-humboldt,Sun 9:00 AM|Sun 11:00 AM,
+353,Ontario,St. Mary of the Lake,st-marys-of-lake-ontario,Sat 4:30 PM|Sun 8:30 AM,
+353,Sodus,Church of the Epiphany,epiphany,Sun 10:30 AM,
+354,Rochester,Sacred Heart Cathedral,sacred-heart-cathedral,Sat 4:00 PM|Sun 7:00 AM|Sun 9:15 AM|Sun 11:15 AM,
+355,Addison,St. Catherine of Siena,st-catherine-of-siena-addison,Sat 6:00 PM|Sun 9:00 AM|Tue 9:00 AM,
+355,Campbell,St. Joseph the Carpenter,st-joseph-carpenter,Sat 4:00 PM|Mon 5:30 PM,
+355,Bradford,St. Stanislaus Bishop & Martyr,st-stanislaus-bishop-martyr,Sun 11:00 AM|Fri 5:30 PM,
+356,Macedon,St. Patrick's,st-patricks-macedon,Sat 4:30 PM|Sun 10:00 AM,
+356,Palmyra,St. Anne's,st-annes,Sun 8:30 AM,
+357,Irondequoit,Christ the King,christ-king,Mon 12:00 PM|Tue 12:00 PM|Wed 12:00 PM|Thu 12:00 PM|Fri 12:00 PM|Sat 4:00 PM|Sun 11:00 AM,
+357,Irondequoit,Latin Mass Community (St. Thomas the Apostle),st-thomas-apostle,Sun 9:00 AM|Sun 11:15 AM,9am English; 11:15am Latin
+357,Irondequoit,St. Cecilia,st-cecilia,Sun 8:00 AM,
+357,Irondequoit,St. Margaret Mary,st-margaret-mary-rochester,Sun 9:30 AM,
+358,Rochester,Annunciation Church,annunciation,Sat 4:15 PM|Sun 10:15 AM,
+358,Rochester,Corpus Christi (Our Lady of the Americas),corpus-christi,Sun 8:45 AM|Sun 10:45 AM,10:45 Spanish
+358,Rochester,St. Michael,st-michael,Sun 11:45 AM|Sun 4:00 PM,11:45 Spanish
+359,Naples,St. Januarius,st-januarius,Tue 8:00 AM|Thu 8:00 AM|Fri 8:00 AM|Sun 8:30 AM,
+359,Penn Yan,St. Michael's,st-michaels-penn-yan,Mon 8:00 AM|Fri 8:00 AM|Wed 12:00 PM|Sat 5:30 PM|Sun 10:30 AM,
+359,Prattsburg,St. Patrick's,st-patricks,Sat 3:30 PM,
+360,Shortsville,St. Dominic,st-dominic,Sat 4:00 PM|Sun 12:00 PM,
+360,Clifton Springs,St. Felix,st-felix,Sun 8:00 AM,
+360,Phelps,St. Francis,st-francis,Sun 10:00 AM,
+361,Hammondsport,St. Gabriel Church,st-gabriels,Sun 8:00 AM|Sat 4:00 PM,Sat 4pm Memorial Day-Labor Day only
+361,Bath,St. Mary Church,st-marys-bath,Sun 10:00 AM|Sat 4:00 PM|Sun 9:00 AM,Sun 10am now; Sat 4pm + Sun 9am after Labor Day
+362,Henrietta,Guardian Angels,guardian-angels,Sat 4:30 PM|Sun 8:00 AM|Sun 10:30 AM|Mon 12:10 PM|Wed 12:10 PM|Tue 8:00 AM|Thu 8:00 AM,
+362,Rush,St. Joseph,,Sun 8:00 AM|Tue 8:00 AM|Thu 8:00 AM,
+363,Auburn,St. Francis of Assisi,st-francis-of-assisi,Sun 10:00 AM,May-Oct season; Nov-Apr is Sat 4pm + Sun 8am
+363,Auburn,St. Hyacinth,st-hyacinth,Sat 4:00 PM|Sun 8:00 AM,May-Oct season; Nov-Apr is Sun 10am
+364,Clyde,St. John the Evangelist,st-john-evangelist-clyde,Sun 10:30 AM,
+364,Lyons,St. Michael,st-michael-lyons,Sat 4:00 PM,
+364,Savannah,St. Patrick,st-patrick-savannah,,Sacraments only
+365,Marion,Mission of Our Lady of Guadalupe (St. Gregory),,Sun 2:00 PM,Spanish
+365,East Bloomfield,St. Bridget,st-bridgets,Sun 9:30 AM,
+365,Canandaigua,St. Mary,st-marys-canandaigua,Sat 5:00 PM|Sun 7:30 AM|Sun 9:00 AM|Sun 11:30 AM,
+366,Waterloo,St. Mary's,st-marys-waterloo,Sat 5:00 PM|Sun 9:30 AM,
+366,Seneca Falls,St. Patricks,st-patricks-seneca-falls,Sun 8:00 AM|Sun 11:00 AM,
+367,Gates,St. Jude,holy-family,Sat 8:00 AM|Sat 4:00 PM|Sun 9:00 AM|Sun 11:30 AM|Sun 5:00 PM,Sat 4pm / Sun 9am / Sun 5pm Vietnamese
+368,Ovid,Holy Cross,holy-cross-ovid,Sun 10:30 AM,
+368,Interlaken,St. James the Apostle,st-james-apostle,Sun 9:00 AM,Duplicate listing - also listed under Trumansburg
+368,Interlaken,St. Francis Solanus,st-francis-solanus,Sat 4:00 PM,
+368,Trumansburg,St. James the Apostle,st-james-apostle,Sun 9:00 AM,
+369,Caledonia,St. Columba/St. Patrick,st-columba,Sat 4:00 PM|Wed 6:00 PM|Fri 12:00 PM,
+369,Scottsville,St. Mary of the Assumption,st-mary-of-assumption,Sun 9:00 AM|Tue 9:00 AM,
+369,Churchville,St. Vincent de Paul,st-vincent-de-paul,Sun 11:00 AM|Mon 8:30 AM,
+370,Elmira,St. Charles Borromeo,,,Listed as no Mass
+370,Elmira,Our Lady of Lourdes,,Sun 9:00 AM,
+370,Elmira,Ss. Peter and Paul,,Sat 5:30 PM,
+370,Elmira,St. Casimir,,Sun 7:30 AM,
+370,Elmira,St. Mary,st-marys-elmira,Sat 4:00 PM|Sun 11:30 AM,
+370,Elmira,St. Patrick,st-patricks-elmira,Sun 10:30 AM|Sun 5:00 PM,
+ind,Piffard,Abbey of the Genesee,,Sun 9:45 AM,Individual listing
+ind,Pittsford,Carmelite Monastery,,Sat 8:00 AM|Sun 8:00 AM|Mon 7:30 AM|Tue 7:30 AM|Wed 7:30 AM|Thu 7:30 AM|Fri 7:30 AM,Individual listing
+ind,Pine City,Mount Saviour Monastery,,Sun 9:00 AM,Individual listing
+ind,Brockport,Newman Center,,Sun 11:30 AM,Individual listing
+ind,Ithaca,Cornell Newman Parish,,,Individual listing - see website
+ind,Rochester,U of R Newman Parish,,Sun 10:30 AM|Sun 7:00 PM|Wed 9:00 PM,Individual listing
+ind,Rochester,RIT Newman Parish,,,Individual listing - no times given
+ind,Geneseo,Geneseo Newman Parish,,,Individual listing - no times given
+ind,Auburn,Ss. Peter and Paul,,Sat 4:00 PM|Sun 8:00 AM|Sun 9:30 AM,Individual listing
+ind,Irondequoit,St. Alban's Catholic Church,,Sun 11:00 AM,Individual listing - meets at St. Cecilia
+ind,Irondequoit,St. Ann Community,,Sat 3:45 PM|Sun 10:00 AM,Individual listing
+ind,Scipio Center,St. Bernard,,,Individual listing - see Good Shepherd
+ind,Irondequoit,St. Josaphats (Ukrainian),,Sat 5:00 PM|Sun 8:30 AM|Sun 10:00 AM|Sun 11:30 AM,Individual listing
+ind,Elmira Heights,St. Nicholas,,Sat 5:00 PM|Sun 8:30 AM|Sun 10:00 AM,Individual listing
+ind,Gates,St. Nicholas the Wonderworker,,Sun 10:00 AM,Individual listing
+ind,Leicester,St. Thomas Aquinas,,Sat 4:00 PM,Individual listing - celebrated at St. Lucy Retsof
+ind,Rochester,Ukrainian Catholic Church of Epiphany,,Sun 10:00 AM|Sun 11:30 AM,Individual listing

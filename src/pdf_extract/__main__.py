@@ -142,6 +142,13 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     _add_common_args(verify_frontend_snapshot_parser)
 
+    # -- audit-diocese --
+    audit_diocese_parser = subparsers.add_parser(
+        "audit-diocese",
+        help="Diff the diocese Mass-time listing against bulletin-extracted events",
+    )
+    _add_common_args(audit_diocese_parser)
+
     return parser
 
 
@@ -244,6 +251,10 @@ def main(argv: list[str] | None = None) -> int:
             else:
                 parser.parse_args([args.command, "--help"])
                 return 1
+        elif args.command == "audit-diocese":
+            from pdf_extract.audit_diocese import run as run_audit_diocese
+            result = run_audit_diocese()
+
         elif args.command == "verify-frontend-snapshot":
             from pdf_extract.verify_frontend_snapshot import verify_frontend_snapshot
             result = verify_frontend_snapshot()
