@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { ChurchNotFoundError, fetchChurch, fetchChurchEvents } from "../api";
@@ -13,7 +14,18 @@ import {
   buildChurchTitle,
   canonicalForPath,
 } from "@/lib/seo";
+import { ACCOUNTS_ENABLED } from "@/lib/supabaseEnv";
 import { NotFoundPage } from "./NotFoundPage";
+
+// Lazy so the Supabase client is fetched only by people who have an account to
+// use it with, and never at all on builds where accounts are switched off.
+const SaveChurchButton = ACCOUNTS_ENABLED
+  ? lazy(() =>
+      import("@/components/SaveChurchButton").then((m) => ({
+        default: m.SaveChurchButton,
+      })),
+    )
+  : null;
 
 export function ChurchPage() {
   const { churchSlug } = useParams();
@@ -79,7 +91,19 @@ export function ChurchPage() {
   }
 
   if (church && events) {
-    return <ChurchPageContent church={church} events={events} />;
+    return (
+      <ChurchPageContent
+        church={church}
+        events={events}
+        actions={
+          ACCOUNTS_ENABLED && SaveChurchButton ? (
+            <Suspense fallback={null}>
+              <SaveChurchButton slug={church.slug} />
+            </Suspense>
+          ) : null
+        }
+      />
+    );
   }
 
   return (

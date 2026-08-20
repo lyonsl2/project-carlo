@@ -1,0 +1,87 @@
+# Supabase CLI configuration.
+#
+# This file drives the *local* stack (`supabase start`) and the deploy-time
+# settings the CLI knows about. Anything under [auth] applies to the local stack
+# only unless you push it deliberately with `supabase config push`; the hosted
+# project's auth settings live in the dashboard. See
+# docs/auth-and-payments-setup.md for the walkthrough.
+
+project_id = "project-carlo"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 17
+
+[db.pooler]
+enabled = false
+
+[studio]
+enabled = true
+port = 54323
+
+# Local mail catcher. Magic links sent by the local stack land here instead of
+# a real inbox.
+[inbucket]
+enabled = true
+port = 54324
+
+[auth]
+enabled = true
+# Where Supabase sends people after a magic link or OAuth round trip. The hosted
+# project needs the same value set under Authentication -> URL Configuration.
+site_url = "http://127.0.0.1:5173"
+additional_redirect_urls = [
+  "http://127.0.0.1:5173/auth/callback",
+  "http://localhost:5173/auth/callback",
+  "http://127.0.0.1:8787/auth/callback",
+]
+jwt_expiry = 3600
+enable_refresh_token_rotation = true
+refresh_token_reuse_interval = 10
+enable_signup = true
+# Nothing in this app is useful to an unidentified user, and anonymous users
+# would still consume rows and Stripe customers.
+enable_anonymous_sign_ins = false
+
+[auth.email]
+enable_signup = true
+enable_confirmations = true
+# Changing the email on an account changes who Stripe bills, so require
+# confirmation from both the old and the new address.
+double_confirm_changes = true
+secure_password_change = true
+otp_length = 6
+otp_expiry = 3600
+
+# Sign-in is magic-link only by default; there are no passwords to leak, reset,
+# or store. With the whole site behind sign-in, delivery matters — configure
+# real SMTP on the hosted project before launch.
+#
+# Turn this on (and fill in the credentials) to add Google as well.
+[auth.external.google]
+enabled = false
+client_id = ""
+secret = ""
+redirect_uri = ""
+
+# Stripe signs its requests and cannot present a Supabase JWT, so this endpoint
+# has to be reachable without one. The signature check inside the function is
+# what authenticates the caller.
+[functions.stripe-webhook]
+verify_jwt = false
+
+# The two browser-facing functions keep the default verify_jwt = true, so an
+# unauthenticated request never reaches the handler.
+[functions.stripe-checkout]
+verify_jwt = true
+
+[functions.stripe-portal]
+verify_jwt = true

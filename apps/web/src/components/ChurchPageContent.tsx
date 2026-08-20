@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { Link } from "react-router-dom";
 import { DAY_ORDER } from "../constants/days";
 import { EVENT_TYPE_LABELS, EVENT_TYPE_ORDER } from "../constants/eventTypes";
@@ -182,9 +183,20 @@ function PageRef({
 interface ChurchPageContentProps {
   church: ChurchDetail;
   events: EventSummary[];
+  /** Interactive controls for the link row, e.g. the save-parish toggle.
+   *
+   *  A slot rather than a direct import because this component is also rendered
+   *  by the build-time prerender, whose output ships no JavaScript — a button
+   *  baked into that HTML would look live and do nothing. The prerender leaves
+   *  this empty; the client route fills it in. */
+  actions?: ReactNode;
 }
 
-export function ChurchPageContent({ church, events }: ChurchPageContentProps) {
+export function ChurchPageContent({
+  church,
+  events,
+  actions,
+}: ChurchPageContentProps) {
   const byType = partitionEventsByType(events);
   const homeHref = useHomeHref();
 
@@ -245,6 +257,7 @@ export function ChurchPageContent({ church, events }: ChurchPageContentProps) {
               variant="pill"
               icon={<PencilIcon className="size-3" />}
             />
+            {actions}
           </div>
         </section>
 

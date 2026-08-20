@@ -317,6 +317,33 @@ export async function fetchChurch(slug: string): Promise<ChurchDetail> {
   }
 }
 
+/** Resolves saved-parish slugs to their names in one pass.
+ *
+ *  Slugs are all the account database stores — parish records live in the
+ *  snapshot — so the saved list has to come back here to render anything a
+ *  person would recognise. Unknown slugs are dropped rather than throwing: a
+ *  parish can disappear from the snapshot between weekly refreshes. */
+export async function fetchChurchesBySlugs(
+  slugs: readonly string[],
+): Promise<ChurchDetail[]> {
+  if (slugs.length === 0) return [];
+
+  const bySlug = new Map<string, ChurchDetail>();
+  for (const slug of new Set(slugs)) {
+    try {
+      const church = await fetchChurch(slug);
+      bySlug.set(slug, church);
+    } catch (error) {
+      if (!(error instanceof ChurchNotFoundError)) throw error;
+    }
+  }
+
+  return slugs.flatMap((slug) => {
+    const church = bySlug.get(slug);
+    return church ? [church] : [];
+  });
+}
+
 export async function fetchChurchEvents(
   slug: string,
   types: EventType[],

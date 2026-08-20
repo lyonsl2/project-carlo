@@ -133,6 +133,24 @@ export function XIcon(props: IconProps) {
   );
 }
 
+export function UserIcon(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 21a8 8 0 0 1 16 0" />
+    </Icon>
+  );
+}
+
+/** Bookmark ribbon for the saved-parish toggle; fills in once saved. */
+export function BookmarkIcon({ filled = false, ...props }: IconProps & { filled?: boolean }) {
+  return (
+    <Icon fill={filled ? "currentColor" : "none"} {...props}>
+      <path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+    </Icon>
+  );
+}
+
 export function ChurchIcon(props: IconProps) {
   return (
     <Icon {...props}>
